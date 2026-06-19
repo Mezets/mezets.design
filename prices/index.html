@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Цены — Mezets</title>
+  <title>Правила — Mezets</title>
   <link rel="icon" type="image/png" href="/favicon.png">
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
@@ -46,16 +46,14 @@
       100% { transform: translate(70vw, 70vh); }
     }
 
-    /* ── LAYOUT ── */
     .page {
       position: relative;
       z-index: 2;
-      max-width: 860px;
+      max-width: 1100px;
       margin: 0 auto;
-      padding: 80px 24px 80px;
+      padding: 28px 32px 20px;
     }
 
-    /* ── BACK BTN ── */
     .home-arrow {
       position: fixed; top: 18px; left: 18px; z-index: 9999;
       width: 42px; height: 42px;
@@ -70,162 +68,118 @@
     .home-arrow svg { width: 18px; height: 18px; display: block; }
     .home-arrow:hover { transform: scale(1.1) translateX(-2px); border-color: rgba(255,0,0,0.5); box-shadow: 0 0 26px rgba(255,0,0,0.3); }
 
-    /* ── HEADER ── */
     .page-header {
       text-align: center;
-      margin-bottom: 56px;
+      margin-bottom: 18px;
     }
     .page-title {
-      font-size: 18px;
+      font-size: 14px;
       color: #ff2a2a;
       letter-spacing: 2px;
-      line-height: 1.6;
-      margin-bottom: 14px;
+      line-height: 1.4;
+      margin-bottom: 6px;
     }
     .page-sub {
-      font-size: 8px;
-      color: rgba(255,200,200,0.4);
+      font-size: 7px;
+      color: rgba(255,200,200,0.35);
       letter-spacing: 1px;
-      line-height: 2;
+      line-height: 1.8;
     }
 
-    /* ── SECTION ── */
-    .section { margin-bottom: 40px; }
-    .section-label {
-      font-size: 8px;
-      color: rgba(255,150,150,0.45);
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      margin-bottom: 14px;
-      padding-left: 2px;
-    }
-
-    /* ── GRID ── */
-    .items-grid {
+    /* ── RULE GRID ── */
+    .rules-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
     }
 
-    /* ── ITEM CARD ── */
-    .item {
+    /* ── RULE CARD ── */
+    .rule {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
       gap: 12px;
-      padding: 16px 18px;
-      border-radius: 14px;
+      padding: 14px 16px;
+      border-radius: 12px;
       background: rgba(255,0,0,0.04);
-      border: 1px solid rgba(255,0,0,0.14);
-      transition: border-color .2s, box-shadow .2s, transform .15s;
+      border: 1px solid rgba(255,0,0,0.13);
+      transition: border-color .2s, box-shadow .2s;
       opacity: 0;
-      animation: fadeUp .45s ease forwards;
+      animation: fadeUp .4s ease forwards;
     }
-    .item:hover {
-      border-color: rgba(255,0,0,0.32);
-      box-shadow: 0 0 22px rgba(255,0,0,0.09);
-      transform: translateY(-2px);
+    .rule:hover {
+      border-color: rgba(255,0,0,0.28);
+      box-shadow: 0 0 20px rgba(255,0,0,0.07);
     }
 
-    .item-name {
+    .rule-num {
       font-size: 8px;
-      color: rgba(255,220,220,0.85);
-      line-height: 1.7;
-      flex: 1;
-    }
-    .item-dot {
-      width: 4px; height: 4px; border-radius: 50%;
-      background: #ff2a2a;
-      box-shadow: 0 0 5px rgba(255,0,0,0.7);
+      color: rgba(255,0,0,0.3);
       flex-shrink: 0;
+      width: 20px;
+      padding-top: 2px;
+      text-align: right;
     }
-    .item-price {
-      font-size: 11px;
+
+    .rule-body { flex: 1; }
+
+    .rule-title {
+      font-size: 8px;
       color: #ff3b3b;
-      white-space: nowrap;
-      flex-shrink: 0;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+      line-height: 1.4;
     }
 
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(12px); }
-      to   { opacity: 1; transform: translateY(0); }
+    .rule-text {
+      font-size: 6.5px;
+      color: rgba(255,210,210,0.65);
+      line-height: 1.9;
+      letter-spacing: .3px;
     }
 
-    /* ── DIVIDER ── */
+    .rule-text .hi {
+      color: rgba(255,180,180,0.9);
+    }
+
+    .rule.important {
+      border-color: rgba(255,0,0,0.22);
+      background: rgba(255,0,0,0.07);
+    }
+
     .divider {
       height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(255,0,0,0.18), transparent);
-      margin: 40px 0;
+      background: linear-gradient(90deg, transparent, rgba(255,0,0,0.15), transparent);
+      margin: 12px 0;
     }
 
-    /* ── PAYMENT ── */
-    .payment-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-    }
-    .pay-block {
-      padding: 18px 18px;
-      border-radius: 14px;
-      background: rgba(255,0,0,0.04);
-      border: 1px solid rgba(255,0,0,0.14);
-      opacity: 0;
-      animation: fadeUp .45s ease forwards;
-    }
-    .pay-region {
-      font-size: 8px;
-      color: #ff2a2a;
-      letter-spacing: 1px;
-      margin-bottom: 12px;
-    }
-    .pay-method {
-      display: flex; align-items: flex-start; gap: 8px;
-      font-size: 7px;
-      color: rgba(255,200,200,0.65);
-      line-height: 2;
-    }
-    .pay-method + .pay-method { margin-top: 4px; }
-    .pay-dot {
-      width: 3px; height: 3px; border-radius: 50%;
-      background: rgba(255,0,0,0.5);
-      margin-top: 7px; flex-shrink: 0;
-    }
-
-    /* ── COMMISSION WARNING ── */
-    .commission {
-      display: flex; align-items: center; gap: 10px;
-      padding: 14px 18px;
-      border-radius: 12px;
-      background: rgba(255,40,0,0.07);
-      border: 1px solid rgba(255,0,0,0.22);
+    .footer-note {
       margin-top: 14px;
-    }
-    .commission-icon { font-size: 14px; flex-shrink: 0; }
-    .commission-text {
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: 1px dashed rgba(255,0,0,0.2);
       font-size: 7px;
-      color: rgba(255,180,150,0.7);
-      line-height: 2;
+      color: rgba(255,180,180,0.45);
+      line-height: 1.8;
+      text-align: center;
       letter-spacing: .5px;
     }
 
-    /* ── ORDER BTN ── */
     .order-cta {
-      margin-top: 48px;
+      margin-top: 14px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 14px;
+      gap: 8px;
     }
     .cta-label {
-      font-size: 8px;
-      color: rgba(255,200,200,0.35);
+      font-size: 7px;
+      color: rgba(255,200,200,0.3);
       letter-spacing: 1px;
     }
     .cta-btn {
-      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
-      padding: 18px 32px;
-      font-family: 'Press Start 2P', monospace; font-size: 11px; line-height: 1.6;
-      color: #ff3b3b; border-radius: 14px;
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 11px 22px;
+      font-family: 'Press Start 2P', monospace; font-size: 9px; line-height: 1.6;
+      color: #ff3b3b; border-radius: 12px;
       background: rgba(255,0,0,0.05); border: 1px solid rgba(255,0,0,0.25);
       text-decoration: none;
       transition: .2s; position: relative; overflow: hidden;
@@ -236,13 +190,18 @@
       transition: .5s;
     }
     .cta-btn:hover::before { left: 120%; }
-    .cta-btn:hover { border-color: rgba(255,0,0,0.5); box-shadow: 0 0 30px rgba(255,0,0,0.15); transform: scale(1.03); }
+    .cta-btn:hover { border-color: rgba(255,0,0,0.5); box-shadow: 0 0 28px rgba(255,0,0,0.13); transform: scale(1.03); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
 
     @media (max-width: 600px) {
       .page { padding: 70px 16px 60px; }
-      .page-title { font-size: 13px; }
-      .payment-grid { grid-template-columns: 1fr; }
-      .items-grid { grid-template-columns: 1fr; }
+      .page-title { font-size: 12px; }
+      .rule { gap: 12px; padding: 18px 16px; }
+      .rule-num { width: 18px; }
     }
   </style>
 </head>
@@ -264,113 +223,125 @@
 <div class="page">
 
   <div class="page-header">
-    <div class="page-title">Цены</div>
-    <div class="page-sub">Всё оформление делается вручную · Качество гарантировано</div>
+    <div class="page-title">Правила заказа</div>
+    <div class="page-sub">Прочитай перед оформлением · Это важно для нас обоих</div>
   </div>
 
-  <!-- БАЗОВЫЕ -->
-  <div class="section">
-    <div class="section-label">Базовое</div>
-    <div class="items-grid">
-      <div class="item" style="animation-delay:.05s">
-        <span class="item-dot"></span>
-        <span class="item-name">Аватарка</span>
-        <span class="item-price">100 ₽</span>
-      </div>
-      <div class="item" style="animation-delay:.10s">
-        <span class="item-dot"></span>
-        <span class="item-name">Анимированная аватарка</span>
-        <span class="item-price">150 ₽</span>
-      </div>
-      <div class="item" style="animation-delay:.15s">
-        <span class="item-dot"></span>
-        <span class="item-name">Обложка / Баннер / Шапка</span>
-        <span class="item-price">200 ₽</span>
+  <div class="rules-grid">
+
+  <div class="rule important" style="animation-delay:.04s">
+    <div class="rule-num">01</div>
+    <div class="rule-body">
+      <div class="rule-title">Начало работы</div>
+      <div class="rule-text">
+        Работа начинается после внесения <span class="hi">предоплаты — 50% от стоимости заказа</span>.<br>
+        Обычно предоплата не возвращается.
       </div>
     </div>
   </div>
 
-  <!-- DISCORD -->
-  <div class="section">
-    <div class="section-label">Discord</div>
-    <div class="items-grid">
-      <div class="item" style="animation-delay:.20s">
-        <span class="item-dot"></span>
-        <span class="item-name">Фон приглашения на сервер</span>
-        <span class="item-price">250 ₽</span>
-      </div>
-      <div class="item" style="animation-delay:.25s">
-        <span class="item-dot"></span>
-        <span class="item-name">Фоновый баннер сервера</span>
-        <span class="item-price">250 ₽</span>
-      </div>
-      <div class="item" style="animation-delay:.30s">
-        <span class="item-dot"></span>
-        <span class="item-name">Анимированный баннер сервера</span>
-        <span class="item-price">300 ₽</span>
+  <div class="rule" style="animation-delay:.09s">
+    <div class="rule-num">02</div>
+    <div class="rule-body">
+      <div class="rule-title">Правки</div>
+      <div class="rule-text">
+        Доступно <span class="hi">3 бесплатные правки</span>. Каждая следующая — <span class="hi">+20%</span> от стоимости заказа.<br>
+        Кардинальное изменение ТЗ в процессе работы оплачивается дополнительно: <span class="hi">+75%</span> от стоимости.
       </div>
     </div>
   </div>
 
-  <!-- TWITCH -->
-  <div class="section">
-    <div class="section-label">Twitch</div>
-    <div class="items-grid">
-      <div class="item" style="animation-delay:.35s">
-        <span class="item-dot"></span>
-        <span class="item-name">Кнопка в описании</span>
-        <span class="item-price">50 ₽</span>
+  <div class="rule" style="animation-delay:.14s">
+    <div class="rule-num">03</div>
+    <div class="rule-body">
+      <div class="rule-title">Сроки</div>
+      <div class="rule-text">
+        Сроки оговариваются заранее и зависят от сложности и загруженности.<br>
+        Обычно: <span class="hi">от 1 до 3 дней</span>.<br>
+        За срочность — <span class="hi">доплата +50%</span>.
       </div>
     </div>
   </div>
 
-  <!-- YOUTUBE -->
-  <div class="section">
-    <div class="section-label">YouTube</div>
-    <div class="items-grid">
-      <div class="item" style="animation-delay:.40s">
-        <span class="item-dot"></span>
-        <span class="item-name">Превью</span>
-        <span class="item-price">200 ₽</span>
+  <div class="rule" style="animation-delay:.19s">
+    <div class="rule-num">04</div>
+    <div class="rule-body">
+      <div class="rule-title">Скидки</div>
+      <div class="rule-text">
+        Скидки возможны и обсуждаемы при:<br>
+        — большом объёме работ<br>
+        — заказе нескольких оформлений<br>
+        — повторных заказах
       </div>
     </div>
   </div>
 
-  <div class="divider"></div>
-
-  <!-- ОПЛАТА -->
-  <div class="section">
-    <div class="section-label">Способы оплаты</div>
-    <div class="payment-grid">
-      <div class="pay-block" style="animation-delay:.45s">
-        <div class="pay-region">🇷🇺 Для РФ</div>
-        <div class="pay-method"><span class="pay-dot"></span>Перевод по номеру телефона (СБП)</div>
-        <div class="pay-method"><span class="pay-dot"></span>Перевод по номеру карты</div>
+  <div class="rule" style="animation-delay:.24s">
+    <div class="rule-num">05</div>
+    <div class="rule-body">
+      <div class="rule-title">Передача работы</div>
+      <div class="rule-text">
+        Готовое оформление передаётся <span class="hi">после полной оплаты</span> в согласованном формате.
       </div>
-      <div class="pay-block" style="animation-delay:.50s">
-        <div class="pay-region">🌍 Другие страны</div>
-        <div class="pay-method"><span class="pay-dot"></span>Подарком Steam (DLC или игра)</div>
-        <div class="pay-method"><span class="pay-dot"></span>Пополнение баланса Steam</div>
-      </div>
-    </div>
-    <div class="commission">
-      <span class="commission-icon">⚠️</span>
-      <span class="commission-text">Комиссия при переводе — на покупателе во всех случаях</span>
     </div>
   </div>
 
-  <!-- CTA -->
+  <div class="rule" style="animation-delay:.29s">
+    <div class="rule-num">06</div>
+    <div class="rule-body">
+      <div class="rule-title">Предоплата</div>
+      <div class="rule-text">
+        Возврат предоплаты возможен <span class="hi">по договорённости</span> в отдельных случаях.
+      </div>
+    </div>
+  </div>
+
+  <div class="rule" style="animation-delay:.34s">
+    <div class="rule-num">07</div>
+    <div class="rule-body">
+      <div class="rule-title">Завершение с возвратом</div>
+      <div class="rule-text">
+        В отдельных случаях работа может быть завершена с возвратом предоплаты, если результат не подходит или мы не пришли к общему видению.
+      </div>
+    </div>
+  </div>
+
+  <div class="rule important" style="animation-delay:.39s">
+    <div class="rule-num">08</div>
+    <div class="rule-body">
+      <div class="rule-title">Претензии после получения</div>
+      <div class="rule-text">
+        После передачи оформления у тебя есть <span class="hi">3 дня</span> для замечаний и недочётов.<br>
+        По истечении срока претензии могут не приниматься.
+      </div>
+    </div>
+  </div>
+
+  <div class="rule" style="animation-delay:.44s">
+    <div class="rule-num">09</div>
+    <div class="rule-body">
+      <div class="rule-title">Дополнительно</div>
+      <div class="rule-text">
+        Для крупных заказов — возможность работы в <span class="hi">Discord с демонстрацией экрана</span>: обсуждаем детали, правки и видение вживую.<br><br>
+        Дизайнер вправе дополнять и изменять правила отдельно к каждому клиенту.
+      </div>
+    </div>
+  </div>
+
+  </div><!-- /rules-grid -->
+
+  <div class="footer-note">
+    Оформляя заказ, ты соглашаешься с этими правилами
+  </div>
+
   <div class="order-cta">
-    <div class="cta-label">Готов заказать?</div>
-    <a class="cta-btn" href="https://mezets.github.io/mezets.design/">
-      Оформить заказ
-    </a>
+    <div class="cta-label">Всё понятно?</div>
+    <a class="cta-btn" href="https://mezets.github.io/mezets.design/">Оформить заказ</a>
   </div>
 
 </div>
 
 <script>
-  /* ЧАСТИЦЫ */
   const canvas = document.getElementById('bg');
   const ctx    = canvas.getContext('2d');
   function resize() { canvas.width = innerWidth; canvas.height = innerHeight; }
