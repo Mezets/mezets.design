@@ -21,6 +21,7 @@
 
     body {
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
@@ -66,8 +67,8 @@
     }
 
     .card {
-      width: 360px;
-      padding: 30px 26px;
+      width: 300px;
+      padding: 26px 22px;
       border-radius: 22px;
       background: rgba(255,0,0,0.05);
       border: 1px solid rgba(255,0,0,0.2);
@@ -347,7 +348,7 @@
     @media (prefers-reduced-motion: reduce) { .live-dot, .fluff-1, .fluff-2 { animation: none; } }
     @media (max-width: 760px) {
       .main { gap: 24px; padding: 40px 16px; }
-      .card { width: 100%; max-width: 360px; }
+      .card { width: 100%; max-width: 300px; }
       .koleso-btn { width: 64px; height: 64px; bottom: 18px; right: 18px; }
       .maint-toast { bottom: 100px; right: 16px; left: 16px; width: auto; }
     }
@@ -359,7 +360,7 @@
       display: flex;
       justify-content: center;
       gap: 16px;
-      padding: 0 20px 48px;
+      padding: 8px 20px 48px;
       flex-wrap: wrap;
     }
     .bottom-nav-btn {
@@ -501,8 +502,8 @@
 
     /* ========================= ОТЗЫВЫ ========================= */
     .reviews-card {
-      width: 360px;
-      padding: 26px 22px;
+      width: 300px;
+      padding: 22px 18px;
       border-radius: 22px;
       background: rgba(255,0,0,0.05);
       border: 1px solid rgba(255,0,0,0.2);
@@ -512,7 +513,7 @@
       display: flex;
       flex-direction: column;
       gap: 0;
-      max-height: 620px;
+      max-height: 460px;
       overflow: hidden;
       transform-style: preserve-3d;
       will-change: transform;
@@ -619,7 +620,7 @@
     }
 
     @media (max-width: 760px) {
-      .reviews-card { width: 100%; max-width: 360px; max-height: 480px; }
+      .reviews-card { width: 100%; max-width: 300px; max-height: 400px; }
     }
 
     .home-arrow {
