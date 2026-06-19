@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mezets Design</title>
+  <link rel="icon" href="favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <style>
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      font-family: 'Press Start 2P', monospace;
+      background: #050000;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    canvas { position: fixed; inset: 0; z-index: 0; }
+
+    .fluff-wrap { position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+    .fluff { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.25; }
+    .fluff-1 {
+      width: 700px; height: 700px;
+      background: radial-gradient(circle, rgba(255,0,0,0.9), rgba(180,0,0,0.3), transparent 70%);
+      animation: moveFluff1 18s ease-in-out infinite;
+    }
+    .fluff-2 {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(255,60,0,0.8), rgba(200,0,0,0.2), transparent 70%);
+      animation: moveFluff2 12s ease-in-out infinite;
+      opacity: 0.18;
+    }
+    @keyframes moveFluff1 {
+      0%   { transform: translate(5vw,  10vh); }
+      25%  { transform: translate(55vw, 20vh); }
+      50%  { transform: translate(60vw, 60vh); }
+      75%  { transform: translate(15vw, 65vh); }
+      100% { transform: translate(5vw,  10vh); }
+    }
+    @keyframes moveFluff2 {
+      0%   { transform: translate(70vw, 70vh); }
+      33%  { transform: translate(10vw, 50vh); }
+      66%  { transform: translate(50vw, 5vh);  }
+      100% { transform: translate(70vw, 70vh); }
+    }
+
+    .main {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 40px;
+      z-index: 2;
+      padding: 60px 20px;
+      perspective: 1200px;
+    }
+
+    .card {
+      width: 360px;
+      padding: 30px 26px;
+      border-radius: 22px;
+      background: rgba(255,0,0,0.05);
+      border: 1px solid rgba(255,0,0,0.2);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 0 40px rgba(255,0,0,0.12);
+      transition: border-color .25s, box-shadow .25s, transform .1s ease-out;
+      transform-style: preserve-3d;
+      will-change: transform;
+      cursor: default;
+    }
+    .card:hover { border-color: rgba(255,0,0,0.4); box-shadow: 0 0 56px rgba(255,0,0,0.2); }
+
+    .avatar-wrap { position: relative; width: 115px; margin: 0 auto 12px; }
+    .avatar { width: 115px; height: 115px; border-radius: 50%; object-fit: cover; display: block; border: 2px solid rgba(255,0,0,0.35); }
+
+    .name { text-align: center; font-size: 15px; line-height: 1.6; color: #ff2a2a; margin-bottom: 22px; letter-spacing: 1px; }
+
+    /* Плейсхолдер: статус самозанятого. Вписать формулировку/ИНН когда будет готово. */
+    .self-employed-badge {
+      text-align: center;
+      font-size: 7px;
+      line-height: 1.8;
+      color: rgba(255,200,200,0.55);
+      margin-bottom: 18px;
+      letter-spacing: 1px;
+    }
+
+    .btn {
+      display: flex; align-items: center; justify-content: center;
+      padding: 16px 12px; margin: 10px 0; text-align: center; text-decoration: none;
+      font-family: 'Press Start 2P', monospace; font-size: 11px; line-height: 1.6;
+      color: #ff3b3b; border-radius: 12px;
+      background: rgba(255,0,0,0.05); border: 1px solid rgba(255,0,0,0.25);
+      transition: .2s; position: relative; overflow: hidden;
+    }
+    .btn::before {
+      content: ""; position: absolute; top: 0; left: -120%; width: 120%; height: 100%;
+      background: linear-gradient(120deg, transparent, rgba(255,0,0,0.35), transparent);
+      transition: .5s;
+    }
+    .btn:hover::before { left: 120%; }
+    .btn:hover { transform: scale(1.04); border-color: rgba(255,0,0,0.5); }
+
+    .stats { text-align: center; }
+    .stat-block { margin: 18px 0; }
+    .big { font-size: 17px; line-height: 1.6; color: white; font-variant-numeric: tabular-nums; }
+    .big.online-value { display: flex; align-items: center; justify-content: center; gap: 10px; color: #ff3b3b; }
+    .live-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: #ff2a2a; box-shadow: 0 0 8px rgba(255,0,0,0.9);
+      animation: pulse 1.8s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.45;transform:scale(.85)} }
+    .label { font-size: 8px; line-height: 1.6; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,200,200,0.75); margin: 10px 0; display: flex; align-items: center; justify-content: center; }
+    .stars { display: flex; justify-content: center; gap: 6px; margin: 10px 0; }
+    .star { font-size: 22px; color: rgba(255,255,255,0.2); transition: color .3s, text-shadow .3s; }
+    .star.full { color: #ff2a2a; text-shadow: 0 0 10px rgba(255,0,0,0.6); }
+
+    .koleso-btn {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      z-index: 100;
+      width: 80px;
+      height: 80px;
+      cursor: pointer;
+      border-radius: 50%;
+      border: 2px solid rgba(255,0,0,0.4);
+      box-shadow: 0 0 20px rgba(255,0,0,0.3);
+      overflow: hidden;
+      transition: transform .2s, box-shadow .2s;
+      background: rgba(10,0,0,0.6);
+    }
+    .koleso-btn img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .koleso-btn:hover {
+      transform: scale(1.12) rotate(10deg);
+      box-shadow: 0 0 34px rgba(255,0,0,0.6);
+    }
+    .koleso-btn:active { transform: scale(0.96); }
+
+    .roulette-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(6px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .3s;
+    }
+    .roulette-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .roulette-box {
+      width: 420px;
+      max-width: 95vw;
+      padding: 32px 28px;
+      border-radius: 22px;
+      background: rgba(10,0,0,0.92);
+      border: 1px solid rgba(255,0,0,0.3);
+      box-shadow: 0 0 60px rgba(255,0,0,0.2);
+      text-align: center;
+      position: relative;
+    }
+
+    .roulette-close {
+      position: absolute;
+      top: 14px; right: 18px;
+      font-size: 18px;
+      color: rgba(255,100,100,0.7);
+      cursor: pointer;
+      font-family: monospace;
+      line-height: 1;
+      transition: color .2s;
+    }
+    .roulette-close:hover { color: #ff2a2a; }
+
+    .roulette-title {
+      font-size: 12px;
+      color: #ff2a2a;
+      letter-spacing: 1px;
+      margin-bottom: 22px;
+      line-height: 1.6;
+    }
+
+    /* Плейсхолдер: вкладки бесплатной / платной (25р) крутки */
+    .spin-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    .spin-tab {
+      flex: 1;
+      padding: 10px 6px;
+      font-size: 8px;
+      line-height: 1.6;
+      border-radius: 10px;
+      border: 1px solid rgba(255,0,0,0.25);
+      background: rgba(255,0,0,0.05);
+      color: rgba(255,200,200,0.7);
+      cursor: pointer;
+      transition: .2s;
+    }
+    .spin-tab.active {
+      border-color: rgba(255,0,0,0.6);
+      color: #ff3b3b;
+      background: rgba(255,0,0,0.12);
+    }
+
+    .strip-wrap {
+      width: 100%;
+      height: 70px;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      border: 1px solid rgba(255,0,0,0.3);
+      margin-bottom: 8px;
+    }
+    .strip-arrow {
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 0; height: 0;
+      border-left: 8px solid transparent; border-right: 8px solid transparent;
+      border-top: 13px solid #ff2a2a;
+      z-index: 10; filter: drop-shadow(0 0 4px rgba(255,0,0,0.8));
+    }
+    .strip-line {
+      position: absolute; top: 0; bottom: 0; left: 50%;
+      width: 2px; background: rgba(255,0,0,0.5);
+      transform: translateX(-50%); z-index: 9;
+    }
+    .strip { display: flex; height: 100%; will-change: transform; }
+    .strip-item {
+      flex-shrink: 0;
+      width: 90px; height: 100%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      font-family: 'Press Start 2P', monospace;
+      border-right: 1px solid rgba(255,0,0,0.12);
+    }
+    .strip-item .si-pct   { font-size: 17px; line-height: 1.2; }
+    .strip-item .si-label { font-size: 7px; color: rgba(255,200,200,0.6); margin-top: 4px; }
+
+    .si-100 { background: rgba(255,20,20,0.22); }  .si-100 .si-pct { color: #ff4444; }
+    .si-75  { background: rgba(255,80,0,0.18); }   .si-75  .si-pct { color: #ff7733; }
+    .si-50  { background: rgba(200,100,0,0.15); }  .si-50  .si-pct { color: #ffaa44; }
+    .si-25  { background: rgba(150,120,0,0.13); }  .si-25  .si-pct { color: #ffcc44; }
+    .si-10  { background: rgba(50,50,50,0.22); }   .si-10  .si-pct { color: rgba(255,200,200,0.45); }
+
+    .chances {
+      display: flex; justify-content: center; gap: 10px;
+      flex-wrap: wrap; margin: 8px 0 16px;
+    }
+    .chance-item { font-size: 7px; color: rgba(255,200,200,0.45); line-height: 1.8; }
+
+    .roulette-result { min-height: 68px; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 10px 0; }
+    .result-pct  { font-size: 20px; color: #ff2a2a; line-height: 1.6; opacity: 0; transition: opacity .4s; }
+    .result-code {
+      font-size: 10px; color: rgba(255,200,200,0.8); margin-top: 7px;
+      letter-spacing: 2px; opacity: 0; transition: opacity .4s .15s;
+      cursor: pointer; border: 1px dashed rgba(255,0,0,0.35);
+      padding: 6px 14px; border-radius: 8px;
+    }
+    .result-code:hover { border-color: rgba(255,0,0,0.7); background: rgba(255,0,0,0.06); }
+    .result-pct.show, .result-code.show { opacity: 1; }
+    .copied-msg { font-size: 8px; color: #ff4444; margin-top: 4px; opacity: 0; transition: opacity .3s; }
+    .copied-msg.show { opacity: 1; }
+
+    .discord-login-btn {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; padding: 16px 12px; margin-top: 4px;
+      font-family: 'Press Start 2P', monospace; font-size: 10px; line-height: 1.6;
+      color: #fff; border-radius: 12px; cursor: pointer; text-decoration: none;
+      background: #5865F2; border: 1px solid #5865F2;
+      transition: .2s;
+    }
+    .discord-login-btn:hover { transform: scale(1.03); box-shadow: 0 0 24px rgba(88,101,242,0.5); }
+
+    .login-hint {
+      font-size: 8px; color: rgba(255,200,200,0.5);
+      margin-top: 14px; line-height: 1.6;
+    }
+
+    .logged-as {
+      font-size: 8px; color: rgba(150,255,150,0.7);
+      margin-bottom: 14px; line-height: 1.6;
+    }
+
+    /* Плейсхолдер: кнопка оплаты 25р за вторую крутку (требует интеграции с платёжным провайдером) */
+    .pay-spin-hint {
+      font-size: 7px;
+      color: rgba(255,200,200,0.45);
+      margin-top: 10px;
+      line-height: 1.8;
+    }
+
+    /* ========================= MAINTENANCE TOAST ========================= */
+    .maint-toast {
+      position: fixed;
+      bottom: 120px;
+      right: 28px;
+      z-index: 999;
+      width: 280px;
+      background: rgba(8,0,0,0.97);
+      border: 1px solid rgba(255,0,0,0.4);
+      border-radius: 18px;
+      padding: 18px 18px 16px;
+      font-family: 'Press Start 2P', monospace;
+      box-shadow: 0 0 50px rgba(255,0,0,0.2);
+      transform: translateY(20px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .4s cubic-bezier(.22,1,.36,1), transform .4s cubic-bezier(.22,1,.36,1);
+    }
+    .maint-toast.show {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: none;
+    }
+    .maint-toast-head {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+    }
+    .maint-toast-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #ff2a2a; flex-shrink: 0;
+      animation: maint-tdot 1.8s ease-in-out infinite;
+    }
+    @keyframes maint-tdot {
+      0%,100%{opacity:1;box-shadow:0 0 6px rgba(255,0,0,.8)}
+      50%{opacity:.4;box-shadow:none}
+    }
+    .maint-toast-title { font-size: 9px; color: #ff2a2a; letter-spacing: 1px; line-height: 1.6; }
+    .maint-toast-msg {
+      font-size: 7px; color: rgba(255,200,200,.65);
+      line-height: 2; letter-spacing: .5px;
+    }
+
+    @media (prefers-reduced-motion: reduce) { .live-dot, .fluff-1, .fluff-2 { animation: none; } }
+    @media (max-width: 760px) {
+      .main { gap: 24px; padding: 40px 16px; }
+      .card { width: 100%; max-width: 360px; }
+      .koleso-btn { width: 64px; height: 64px; bottom: 18px; right: 18px; }
+      .maint-toast { bottom: 100px; right: 16px; left: 16px; width: auto; }
+    }
+
+  </style>
+</head>
+<body>
+
+<audio id="spinSound" src="roulette-spin.mp3" preload="auto"></audio>
+<audio id="stopSound" src="win.mp3" preload="auto"></audio>
+
+<canvas id="bg"></canvas>
+<div class="fluff-wrap">
+  <div class="fluff fluff-1"></div>
+  <div class="fluff fluff-2"></div>
+</div>
+
+<div class="main">
+
+  <!-- КАРТОЧКА DISCORD-СЕРВЕРА -->
+  <div class="card stats" id="card2">
+    <div class="avatar-wrap">
+      <img src="avatar_server.png" class="avatar" alt="Discord Server">
+    </div>
+    <div class="name">Discord Server</div>
+
+    <!-- TODO: вписать формулировку статуса самозанятого (например "Самозанятый, ИНН ХХХХХХХХХХХХ") -->
+    <div class="self-employed-badge" id="selfEmployedBadge">Самозанятый — реквизиты уточняются</div>
+
+    <div class="stat-block">
+      <div class="big" id="orders">0</div>
+      <div class="label">Заказы</div>
+    </div>
+    <div class="stat-block">
+      <div class="stars" id="stars">
+        <div class="star">★</div><div class="star">★</div><div class="star">★</div>
+        <div class="star">★</div><div class="star">★</div>
+      </div>
+      <div class="label">Рейтинг</div>
+    </div>
+    <div class="stat-block">
+      <div class="big" id="period" style="font-size:12px">—</div>
+      <div class="label">Период</div>
+    </div>
+    <div class="stat-block">
+      <div class="big online-value">
+        <span class="live-dot"></span>
+        <span id="online">0</span>
+      </div>
+      <div class="label">Онлайн сейчас</div>
+    </div>
+
+    <a class="btn" href="https://discord.gg/npZ3QDQjVR" target="_blank" style="margin-top:16px">
+      Вступить в Discord
+    </a>
+  </div>
+
+</div>
+
+<!-- КНОПКА ОТКРЫТЬ РУЛЕТКУ -->
+<div class="koleso-btn" onclick="openRoulette()" title="Рулетка скидок">
+  <img src="koleso.png" alt="Рулетка">
+</div>
+
+<!-- ОВЕРЛЕЙ РУЛЕТКИ -->
+<div class="roulette-overlay" id="rouletteOverlay" onclick="closeOnBg(event)">
+  <div class="roulette-box" id="rouletteBox">
+
+    <div class="roulette-close" onclick="closeRoulette()">✕</div>
+    <div class="roulette-title">Рулетка скидок</div>
+
+    <!-- Плейсхолдер: переключение между бесплатной и платной (25р) прокруткой.
+         Логика оплаты пока не подключена — нужен платёжный провайдер (ЮMoney/Тинькофф/CloudPayments и т.п.),
+         который умеет принимать самозанятым чек по 422-ФЗ. -->
+    <div class="spin-tabs" id="spinTabs">
+      <div class="spin-tab active" id="tabFree" onclick="selectSpinMode('free')">1-я крутка<br>бесплатно</div>
+      <div class="spin-tab" id="tabPaid" onclick="selectSpinMode('paid')">2-я крутка<br>25₽</div>
+    </div>
+
+    <div class="strip-wrap">
+      <div class="strip-arrow"></div>
+      <div class="strip-line"></div>
+      <div class="strip" id="strip"></div>
+    </div>
+
+    <div class="chances">
+      <span class="chance-item">Испытай свою удачу &gt;:3</span>
+    </div>
+
+    <div class="roulette-result">
+      <div class="result-pct" id="resultPct"></div>
+      <div class="result-code" id="resultCode" onclick="copyCode()"></div>
+      <div class="copied-msg" id="copiedMsg">скопировано!</div>
+    </div>
+
+    <div id="loginBlock">
+      <a class="discord-login-btn" id="discordLoginBtn" href="#">
+        Войти через Discord
+      </a>
+      <div class="login-hint">Нужно войти, чтобы крутить рулетку (1 раз бесплатно на аккаунт)</div>
+    </div>
+
+    <div id="spinBlock" style="display:none">
+      <div class="logged-as" id="loggedAs"></div>
+      <button class="btn" id="spinBtn" onclick="spin()" style="width:100%;cursor:pointer;border:none">
+        Крутить
+      </button>
+      <!-- TODO: когда подключим оплату — этот блок будет показывать кнопку "Оплатить 25₽ и крутить" в режиме paid -->
+      <div class="pay-spin-hint" id="paySpinHint" style="display:none">
+        Оплата за вторую крутку (25₽) пока не подключена. Скоро добавим.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ТОСТ ТЕХ. НЕПОЛАДОК -->
+<div class="maint-toast" id="maintToast">
+  <div class="maint-toast-head">
+    <div class="maint-toast-dot"></div>
+    <div class="maint-toast-title">Тех. неполадки</div>
+  </div>
+  <div class="maint-toast-msg" id="maintToastMsg">
+    Ведутся технические работы.<br>После 21:00 по МСК всё заработает!
+  </div>
+</div>
+
+
+<script>
+
+  /* =========================
+     КОНФИГ
+  ========================= */
+  const API = 'https://49411852e5f511.lhr.life';
+
+  const VISUAL = {
+    10:  { pct: '10%',  cls: 'si-10'  },
+    25:  { pct: '25%',  cls: 'si-25'  },
+    50:  { pct: '50%',  cls: 'si-50'  },
+    75:  { pct: '75%',  cls: 'si-75'  },
+    100: { pct: '100%', cls: 'si-100' },
+  };
+  const VISUAL_LIST = [10, 25, 50, 75, 100];
+
+  const RESULT_PHRASE = {
+    10:  'больше только в фильмах',
+    25:  'ну нармальна',
+    50:  'жэст',
+    75:  'ну пачти',
+    100: 'везунчик епта :3',
+  };
+
+  const ITEM_W  = 90;
+  const TOTAL   = 44;
+  const WIN_IDX = 34;
+
+  const stripEl = document.getElementById('strip');
+
+  /* =========================
+     РЕЖИМ КРУТКИ (free / paid)
+     TODO: paid-режим сейчас просто блокирует кнопку и показывает подсказку.
+     Когда будет готова оплата — здесь нужно дёргать эндпоинт создания платежа
+     и открывать платёжную форму перед вызовом /spin.
+  ========================= */
+  let spinMode = 'free';
+  function selectSpinMode(mode) {
+    spinMode = mode;
+    document.getElementById('tabFree').classList.toggle('active', mode === 'free');
+    document.getElementById('tabPaid').classList.toggle('active', mode === 'paid');
+    const hint = document.getElementById('paySpinHint');
+    const btn  = document.getElementById('spinBtn');
+    if (mode === 'paid') {
+      hint.style.display = 'block';
+      btn.textContent    = 'Оплатить 25₽ и крутить';
+      btn.style.opacity  = '0.5';
+      btn.style.cursor   = 'not-allowed';
+      btn.onclick        = null; // временно отключено до интеграции оплаты
+    } else {
+      hint.style.display = 'none';
+      checkCanSpin();
+    }
+  }
+
+  /* =========================
+     MAINTENANCE
+  ========================= */
+  function showMaint(msg) {
+    if (msg) document.getElementById('maintToastMsg').innerHTML = msg;
+    document.getElementById('maintToast').classList.add('show');
+  }
+  function hideMaint() {
+    document.getElementById('maintToast').classList.remove('show');
+  }
+  async function checkMaintenance() {
+    try {
+      const res  = await fetch(`${API}/maintenance-status`, { mode: 'cors' });
+      const data = await res.json();
+      if (data.on) showMaint(data.msg);
+      else hideMaint();
+    } catch(e) {}
+  }
+  checkMaintenance();
+  setInterval(checkMaintenance, 5000);
+
+  /* =========================
+     ТЕСТОВЫЙ РЕЖИМ
+  ========================= */
+  function getTestKeyFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('test_key');
+  }
+  const TEST_KEY = getTestKeyFromUrl();
+
+  /* =========================
+     СЕССИЯ DISCORD
+  ========================= */
+  function getSessionFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('session');
+  }
+  function getStoredSession() {
+    return localStorage.getItem('mezets_session') || null;
+  }
+  function storeSession(token) {
+    localStorage.setItem('mezets_session', token);
+  }
+  (function initSession() {
+    const urlSession = getSessionFromUrl();
+    if (urlSession) {
+      storeSession(urlSession);
+      const cleanUrl = window.location.origin + window.location.pathname;
+      window.history.replaceState({}, document.title, cleanUrl);
+    }
+  })();
+  function currentSession() {
+    return getStoredSession();
+  }
+
+  /* =========================
+     ЛОГИН ЧЕРЕЗ DISCORD
+  ========================= */
+  async function setupLoginButton() {
+    try {
+      const res  = await fetch(`${API}/discord-login-url`, { mode: 'cors' });
+      const data = await res.json();
+      document.getElementById('discordLoginBtn').href = data.url;
+    } catch(e) {
+      console.error('Не удалось получить ссылку логина', e);
+    }
+  }
+
+  /* =========================
+     ПРОВЕРКА СТАТУСА
+  ========================= */
+  async function checkCanSpin() {
+    if (spinMode === 'paid') return; // платный режим пока не трогаем
+
+    const loginBlock = document.getElementById('loginBlock');
+    const spinBlock  = document.getElementById('spinBlock');
+    const btn        = document.getElementById('spinBtn');
+
+    if (TEST_KEY) {
+      loginBlock.style.display = 'none';
+      spinBlock.style.display  = 'block';
+      document.getElementById('loggedAs').textContent = 'Тестовый режим';
+      btn.textContent   = 'Крутить';
+      btn.style.opacity = '1';
+      btn.style.cursor  = 'pointer';
+      btn.onclick       = spin;
+      return;
+    }
+
+    const session = currentSession();
+    if (!session) {
+      loginBlock.style.display = 'block';
+      spinBlock.style.display  = 'none';
+      setupLoginButton();
+      return;
+    }
+
+    try {
+      const res  = await fetch(`${API}/can-spin?session=${encodeURIComponent(session)}`, { mode: 'cors' });
+      const data = await res.json();
+
+      if (!data.logged_in) {
+        localStorage.removeItem('mezets_session');
+        loginBlock.style.display = 'block';
+        spinBlock.style.display  = 'none';
+        setupLoginButton();
+        return;
+      }
+
+      loginBlock.style.display = 'none';
+      spinBlock.style.display  = 'block';
+      document.getElementById('loggedAs').textContent = 'Вы вошли через Discord';
+
+      if (!data.can_spin) {
+        btn.textContent   = 'Уже крутил';
+        btn.style.opacity = '0.4';
+        btn.style.cursor  = 'not-allowed';
+        btn.onclick       = null;
+      } else {
+        btn.textContent   = 'Крутить';
+        btn.style.opacity = '1';
+        btn.style.cursor  = 'pointer';
+        btn.onclick       = spin;
+      }
+    } catch(e) {
+      console.error('Ошибка проверки статуса', e);
+    }
+  }
+
+  /* =========================
+     АНИМАЦИЯ ПОЛОСЫ
+  ========================= */
+  function buildStrip(winnerDiscount) {
+    stripEl.innerHTML = '';
+    for (let i = 0; i < TOTAL; i++) {
+      const disc = (i === WIN_IDX)
+        ? winnerDiscount
+        : VISUAL_LIST[Math.floor(Math.random() * VISUAL_LIST.length)];
+      const v  = VISUAL[disc];
+      const el = document.createElement('div');
+      el.className = `strip-item ${v.cls}`;
+      el.innerHTML = `<span class="si-pct">${v.pct}</span><span class="si-label">скидка</span>`;
+      stripEl.appendChild(el);
+    }
+  }
+
+  function runAnimation(winnerDiscount, code) {
+    buildStrip(winnerDiscount);
+    const wrapW   = stripEl.parentElement.offsetWidth;
+    const targetX = WIN_IDX * ITEM_W + ITEM_W / 2 - wrapW / 2;
+    stripEl.style.transition = 'none';
+    stripEl.style.transform  = 'translateX(0)';
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      stripEl.style.transition = 'transform 3.4s cubic-bezier(0.17,0.67,0.10,1.0)';
+      stripEl.style.transform  = `translateX(-${targetX}px)`;
+      setTimeout(() => {
+        document.getElementById('spinSound').pause();
+        document.getElementById('stopSound').currentTime = 0;
+        document.getElementById('stopSound').play();
+        lastCode = code;
+        document.getElementById('resultPct').innerHTML =
+          `Скидка ${VISUAL[winnerDiscount].pct}!<br><span style="font-size:10px;color:rgba(255,200,200,0.7)">${RESULT_PHRASE[winnerDiscount]}</span>`;
+        document.getElementById('resultPct').classList.add('show');
+        document.getElementById('resultCode').textContent = code;
+        document.getElementById('resultCode').classList.add('show');
+        spinning = false;
+        const btn = document.getElementById('spinBtn');
+        if (TEST_KEY) {
+          btn.textContent   = 'Крутить ещё';
+          btn.style.opacity = '1';
+          btn.style.cursor  = 'pointer';
+          btn.onclick       = spin;
+        } else {
+          btn.textContent   = 'Уже крутил';
+          btn.style.opacity = '0.4';
+          btn.style.cursor  = 'not-allowed';
+          btn.onclick       = null;
+        }
+      }, 3500);
+    }));
+  }
+
+  let spinning = false;
+  let lastCode = null;
+
+  async function spin() {
+    if (spinning) return;
+    spinning = true;
+    const snd = document.getElementById('spinSound');
+    snd.pause(); snd.currentTime = 0; snd.play();
+
+    let url;
+    if (TEST_KEY) {
+      url = `${API}/spin?test_key=${encodeURIComponent(TEST_KEY)}`;
+    } else {
+      const session = currentSession();
+      if (!session) { checkCanSpin(); return; }
+      url = `${API}/spin?session=${encodeURIComponent(session)}`;
+    }
+
+    const btn = document.getElementById('spinBtn');
+    btn.textContent   = '...';
+    btn.style.opacity = '0.5';
+    document.getElementById('resultPct').classList.remove('show');
+    document.getElementById('resultCode').classList.remove('show');
+    document.getElementById('copiedMsg').classList.remove('show');
+
+    try {
+      const res  = await fetch(url, { mode: 'cors' });
+      const data = await res.json();
+      if (data.error === 'already_spun') {
+        spinning = false;
+        btn.textContent   = 'Уже крутил';
+        btn.style.opacity = '0.4';
+        btn.style.cursor  = 'not-allowed';
+        document.getElementById('resultPct').textContent = 'Вы уже крутили!';
+        document.getElementById('resultPct').classList.add('show');
+        return;
+      }
+      if (data.error === 'not_logged_in') {
+        spinning = false;
+        localStorage.removeItem('mezets_session');
+        checkCanSpin();
+        return;
+      }
+      runAnimation(data.discount, data.code);
+    } catch(e) {
+      spinning = false;
+      btn.textContent   = 'Ошибка, попробуй ещё';
+      btn.style.opacity = '1';
+    }
+  }
+
+  function copyCode() {
+    if (!lastCode) return;
+    navigator.clipboard.writeText(lastCode).then(() => {
+      const msg = document.getElementById('copiedMsg');
+      msg.classList.add('show');
+      setTimeout(() => msg.classList.remove('show'), 1500);
+    });
+  }
+
+  function openRoulette() {
+    document.getElementById('rouletteOverlay').classList.add('open');
+    selectSpinMode('free');
+  }
+  function closeRoulette() {
+    document.getElementById('rouletteOverlay').classList.remove('open');
+  }
+  function closeOnBg(e) {
+    if (e.target === document.getElementById('rouletteOverlay')) closeRoulette();
+  }
+
+  /* =========================
+     СТАТИСТИКА
+  ========================= */
+  function animateCount(el, target, duration) {
+    const start = performance.now();
+    function step(now) {
+      const p    = Math.min((now - start) / duration, 1);
+      const ease = p === 1 ? 1 : 1 - Math.pow(2, -10 * p);
+      el.textContent = Math.round(target * ease);
+      if (p < 1) requestAnimationFrame(step);
+      else el.textContent = target;
+    }
+    requestAnimationFrame(step);
+  }
+
+  function animateStars(count) {
+    document.querySelectorAll('#stars .star').forEach((s, i) => {
+      s.classList.remove('full');
+      if (i < count) setTimeout(() => s.classList.add('full'), i * 200);
+    });
+  }
+
+  function extractNumber(v) { const m = String(v||'').match(/(\d+)/); return m ? parseInt(m[1]) : 0; }
+  function extractRating(v) { const m = String(v||'').match(/([\d.]+)/); return m ? parseFloat(m[1]) : 0; }
+  function safe(v) { return v ?? '—'; }
+
+  let prevOrders = null, prevOnline = null, prevRating = null, firstLoad = true;
+
+  async function loadStats() {
+    try {
+      const res = await fetch(`${API}/stats`, { mode: 'cors' });
+      if (!res.ok) throw new Error();
+      const d      = await res.json();
+      const orders = extractNumber(d.total_orders);
+      const online = typeof d.online === 'number' ? d.online : extractNumber(d.online);
+      const rating = Math.round(extractRating(d.average_rating));
+      if (firstLoad || prevOrders !== orders) { animateCount(document.getElementById('orders'), orders, firstLoad ? 1400 : 600); prevOrders = orders; }
+      if (firstLoad || prevOnline !== online) { animateCount(document.getElementById('online'), online, firstLoad ? 1000 : 500); prevOnline = online; }
+      if (firstLoad || prevRating !== rating) { animateStars(rating); prevRating = rating; }
+      document.getElementById('period').textContent = safe(d.period);
+      firstLoad = false;
+    } catch(e) {
+      document.getElementById('orders').textContent = '—';
+      document.getElementById('period').textContent = '—';
+      document.getElementById('online').textContent = '—';
+    }
+  }
+  loadStats();
+  setInterval(loadStats, 5000);
+
+  /* =========================
+     3D НАКЛОН
+  ========================= */
+  function tilt(card) {
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width  - 0.5;
+      const y = (e.clientY - r.top)  / r.height - 0.5;
+      card.style.transform = `rotateY(${x*16}deg) rotateX(${-y*16}deg) scale(1.02)`;
+    });
+    card.addEventListener('mouseleave', () => { card.style.transform = 'rotateY(0) rotateX(0) scale(1)'; });
+  }
+  tilt(document.getElementById('card2'));
+
+  /* =========================
+     ЧАСТИЦЫ
+  ========================= */
+  const canvas = document.getElementById('bg');
+  const ctx    = canvas.getContext('2d');
+  function resize() { canvas.width = innerWidth; canvas.height = innerHeight; }
+  resize(); addEventListener('resize', resize);
+  let dots = [];
+  function initDots() {
+    dots = [];
+    const n = Math.round((innerWidth * innerHeight) / 9000);
+    for (let i = 0; i < n; i++) dots.push({
+      x: Math.random()*canvas.width, y: Math.random()*canvas.height,
+      r: Math.random()*1.3+0.3, dx:(Math.random()-.5)*.15, dy:(Math.random()-.5)*.15
+    });
+  }
+  initDots(); addEventListener('resize', initDots);
+  const noMotion = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  function animate() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    for (let d of dots) {
+      ctx.beginPath(); ctx.arc(d.x,d.y,d.r,0,Math.PI*2);
+      ctx.fillStyle='rgba(255,0,0,0.6)'; ctx.fill();
+      d.x+=d.dx; d.y+=d.dy;
+      if(d.x<0)d.x=canvas.width; if(d.x>canvas.width)d.x=0;
+      if(d.y<0)d.y=canvas.height; if(d.y>canvas.height)d.y=0;
+    }
+    requestAnimationFrame(animate);
+  }
+  if (!noMotion) animate();
+  else for (let d of dots) { ctx.beginPath(); ctx.arc(d.x,d.y,d.r,0,Math.PI*2); ctx.fillStyle='rgba(255,0,0,0.6)'; ctx.fill(); }
+
+</script>
+</body>
+</html>
