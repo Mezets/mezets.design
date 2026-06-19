@@ -351,46 +351,56 @@
       .koleso-btn { width: 64px; height: 64px; bottom: 18px; right: 18px; }
       .maint-toast { bottom: 100px; right: 16px; left: 16px; width: auto; }
     }
-    
-      .home-arrow {
-        position: fixed;
-        top: 18px;
-        left: 18px;
-        z-index: 9999;
-      
-        width: 42px;
-        height: 42px;
-      
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      
-        border-radius: 12px;
-      
-        background: rgba(255, 0, 0, 0.08);
-        border: 1px solid rgba(255, 0, 0, 0.25);
-      
-        color: #ff2a2a;
-        font-size: 18px;
-        text-decoration: none;
-      
-        backdrop-filter: blur(10px);
-        box-shadow: 0 0 18px rgba(255, 0, 0, 0.15);
-      
-        transition: 0.2s ease;
-      }
 
-.home-arrow:hover {
-  transform: scale(1.1) translateX(-2px);
-  border-color: rgba(255, 0, 0, 0.5);
-  box-shadow: 0 0 26px rgba(255, 0, 0, 0.3);
-}
-    
+    .home-arrow {
+      position: fixed;
+      top: 18px;
+      left: 18px;
+      z-index: 9999;
+
+      width: 42px;
+      height: 42px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border-radius: 12px;
+
+      background: rgba(255, 0, 0, 0.08);
+      border: 1px solid rgba(255, 0, 0, 0.25);
+
+      color: #ff2a2a;
+      text-decoration: none;
+
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 18px rgba(255, 0, 0, 0.15);
+
+      transition: 0.2s ease;
+    }
+
+    .home-arrow svg {
+      width: 18px;
+      height: 18px;
+      display: block;
+    }
+
+    .home-arrow:hover {
+      transform: scale(1.1) translateX(-2px);
+      border-color: rgba(255, 0, 0, 0.5);
+      box-shadow: 0 0 26px rgba(255, 0, 0, 0.3);
+    }
+
   </style>
 </head>
 <body>
-<a class="home-arrow" href="https://mezets.github.io/">←</a>
-  
+<a class="home-arrow" href="https://mezets.github.io/" title="На главную">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="19" y1="12" x2="5" y2="12"></line>
+    <polyline points="12 19 5 12 12 5"></polyline>
+  </svg>
+</a>
+
 <audio id="spinSound" src="roulette-spin.mp3" preload="auto"></audio>
 <audio id="stopSound" src="win.mp3" preload="auto"></audio>
 
@@ -471,7 +481,7 @@
       <a class="discord-login-btn" id="discordLoginBtn" href="#">
         Войти через Discord
       </a>
-      <div class="login-hint">Нужно войти, чтобы крутить рулетку</div>
+      <div class="login-hint">Нужно войти, чтобы крутить рулетку (1 раз бесплатно на аккаунт)</div>
     </div>
 
     <div id="spinBlock" style="display:none">
@@ -500,6 +510,7 @@
 
   /* =========================
      КОНФИГ
+     ВАЖНО: меняй этот адрес на актуальный адрес туннеля/бэкенда!
   ========================= */
   const API = 'https://57be9df90aae7e.lhr.life';
 
@@ -606,17 +617,17 @@
     if (TEST_KEY) {
       loginBlock.style.display = 'none';
       spinBlock.style.display  = 'block';
-    
+
       const btn = document.getElementById('spinBtn');
-    
+
       document.getElementById('loggedAs').textContent = 'Тестовый режим (без ограничений)';
-    
+
       btn.textContent = 'Крутить';
       btn.style.opacity = '1';
       btn.style.cursor = 'pointer';
-    
+
       btn.onclick = spin;
-    
+
       return;
     }
 
