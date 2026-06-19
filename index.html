@@ -387,19 +387,26 @@
       flex: 1;
     }
 
-    .reviews-list::-webkit-scrollbar { width: 4px; }
+    .reviews-list::-webkit-scrollbar { width: 2px; }
     .reviews-list::-webkit-scrollbar-track { background: transparent; }
-    .reviews-list::-webkit-scrollbar-thumb { background: rgba(255,0,0,0.3); border-radius: 4px; }
+    .reviews-list::-webkit-scrollbar-thumb { background: rgba(255,0,0,0.2); border-radius: 2px; }
+
+    @keyframes reviewFadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
 
     .review-item {
       padding: 14px 14px 12px;
       border-radius: 14px;
       background: rgba(255,0,0,0.04);
       border: 1px solid rgba(255,0,0,0.14);
-      transition: border-color .2s;
+      transition: border-color .2s, box-shadow .2s;
       flex-shrink: 0;
+      opacity: 0;
+      animation: reviewFadeIn .4s ease forwards;
     }
-    .review-item:hover { border-color: rgba(255,0,0,0.3); }
+    .review-item:hover { border-color: rgba(255,0,0,0.3); box-shadow: 0 0 18px rgba(255,0,0,0.08); }
 
     .review-header {
       display: flex;
@@ -561,7 +568,7 @@
 
   <!-- ОТЗЫВЫ ИЗ DISCORD -->
   <div class="reviews-card">
-    <div class="reviews-title">📝 Отзывы</div>
+    <div class="reviews-title">Отзывы</div>
     <div class="reviews-list" id="reviewsList">
       <div class="reviews-loading">Загружаем отзывы...</div>
     </div>
@@ -944,6 +951,7 @@
           : '';
         const el = document.createElement('div');
         el.className = 'review-item';
+        el.style.animationDelay = `${reviews.indexOf(r) * 60}ms`;
         el.innerHTML = `
           <div class="review-header">
             ${avatar}
@@ -1026,6 +1034,10 @@
     card.addEventListener('mouseleave', () => { card.style.transform = 'rotateY(0) rotateX(0) scale(1)'; });
   }
   tilt(document.getElementById('card2'));
+
+  // 3D наклон для карточки отзывов
+  const reviewsCard = document.querySelector('.reviews-card');
+  if (reviewsCard) tilt(reviewsCard);
 
   /* =========================
      ЧАСТИЦЫ
