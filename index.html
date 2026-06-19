@@ -712,6 +712,34 @@
       box-shadow: 0 0 26px rgba(255, 0, 0, 0.3);
     }
 
+    /* ========================= ЛЕТАЮЩАЯ КОРОВА ========================= */
+    .flying-cow {
+      position: fixed;
+      top: -120px;
+      left: -120px;
+      width: 90px;
+      z-index: 1;
+      cursor: pointer;
+      pointer-events: none;
+      opacity: 0;
+      filter: drop-shadow(0 6px 16px rgba(0,0,0,0.5));
+      will-change: transform, opacity;
+    }
+    .flying-cow.fly {
+      pointer-events: all;
+      animation: cowFly 6s linear forwards;
+    }
+    .flying-cow:hover { transform: scale(1.15) rotate(-15deg); }
+    @keyframes cowFly {
+      0%   { opacity: 0; top: -5vh; left: 68vw; transform: rotate(35deg); }
+      8%   { opacity: 1; }
+      92%  { opacity: 1; }
+      100% { opacity: 0; top: 56vh; left: 93vw; transform: rotate(35deg); }
+    }
+    @media (max-width: 760px) {
+      .flying-cow { width: 60px; }
+    }
+
   </style>
 </head>
 <body>
@@ -847,7 +875,42 @@
 </div>
 
 
+<!-- ЛЕТАЮЩАЯ КОРОВА -->
+<img src="cow.png" alt="cow" class="flying-cow" id="flyingCow" title="Жми на корову!">
+<audio id="cowSound" src="cow.mp3" preload="auto"></audio>
+
+
 <script>
+
+  /* =========================
+     ЛЕТАЮЩАЯ КОРОВА
+  ========================= */
+  (function() {
+    const cow = document.getElementById('flyingCow');
+    const cowSound = document.getElementById('cowSound');
+
+    function launchCow() {
+      cow.classList.remove('fly');
+      // форсируем перезапуск анимации
+      void cow.offsetWidth;
+      cow.classList.add('fly');
+    }
+
+    cow.addEventListener('animationend', () => {
+      cow.classList.remove('fly');
+    });
+
+    cow.addEventListener('click', () => {
+      cowSound.currentTime = 0;
+      cowSound.play().catch(() => {});
+    });
+
+    // первый пролёт через 42 секунды, затем повтор каждые 42 секунды
+    setTimeout(() => {
+      launchCow();
+      setInterval(launchCow, 42000);
+    }, 42000);
+  })();
 
   /* =========================
      КОНФИГ
