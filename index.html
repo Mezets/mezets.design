@@ -429,14 +429,6 @@
     <div class="roulette-close" onclick="closeRoulette()">✕</div>
     <div class="roulette-title">Рулетка скидок</div>
 
-    <!-- Плейсхолдер: переключение между бесплатной и платной (25р) прокруткой.
-         Логика оплаты пока не подключена — нужен платёжный провайдер (ЮMoney/Тинькофф/CloudPayments и т.п.),
-         который умеет принимать самозанятым чек по 422-ФЗ. -->
-    <div class="spin-tabs" id="spinTabs">
-      <div class="spin-tab active" id="tabFree" onclick="selectSpinMode('free')">1-я крутка<br>бесплатно</div>
-      <div class="spin-tab" id="tabPaid" onclick="selectSpinMode('paid')">2-я крутка<br>25₽</div>
-    </div>
-
     <div class="strip-wrap">
       <div class="strip-arrow"></div>
       <div class="strip-line"></div>
@@ -465,10 +457,6 @@
       <button class="btn" id="spinBtn" onclick="spin()" style="width:100%;cursor:pointer;border:none">
         Крутить
       </button>
-      <!-- TODO: когда подключим оплату — этот блок будет показывать кнопку "Оплатить 25₽ и крутить" в режиме paid -->
-      <div class="pay-spin-hint" id="paySpinHint" style="display:none">
-        Оплата за вторую крутку (25₽) пока не подключена. Скоро добавим.
-      </div>
     </div>
 
   </div>
@@ -515,31 +503,6 @@
   const WIN_IDX = 34;
 
   const stripEl = document.getElementById('strip');
-
-  /* =========================
-     РЕЖИМ КРУТКИ (free / paid)
-     TODO: paid-режим сейчас просто блокирует кнопку и показывает подсказку.
-     Когда будет готова оплата — здесь нужно дёргать эндпоинт создания платежа
-     и открывать платёжную форму перед вызовом /spin.
-  ========================= */
-  let spinMode = 'free';
-  function selectSpinMode(mode) {
-    spinMode = mode;
-    document.getElementById('tabFree').classList.toggle('active', mode === 'free');
-    document.getElementById('tabPaid').classList.toggle('active', mode === 'paid');
-    const hint = document.getElementById('paySpinHint');
-    const btn  = document.getElementById('spinBtn');
-    if (mode === 'paid') {
-      hint.style.display = 'block';
-      btn.textContent    = 'Оплатить 25₽ и крутить';
-      btn.style.opacity  = '0.5';
-      btn.style.cursor   = 'not-allowed';
-      btn.onclick        = null; // временно отключено до интеграции оплаты
-    } else {
-      hint.style.display = 'none';
-      checkCanSpin();
-    }
-  }
 
   /* =========================
      MAINTENANCE
@@ -612,8 +575,7 @@
   /* =========================
      ПРОВЕРКА СТАТУСА
   ========================= */
-  async function checkCanSpin() {
-    if (spinMode === 'paid') return; // платный режим пока не трогаем
+  async function checkCanSpin() {м
 
     const loginBlock = document.getElementById('loginBlock');
     const spinBlock  = document.getElementById('spinBlock');
@@ -785,7 +747,7 @@
 
   function openRoulette() {
     document.getElementById('rouletteOverlay').classList.add('open');
-    selectSpinMode('free');
+    checkCanSpin();
   }
   function closeRoulette() {
     document.getElementById('rouletteOverlay').classList.remove('open');
