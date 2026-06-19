@@ -733,7 +733,8 @@
     @keyframes cowFly {
       0%   { opacity: 0; top: -5vh; left: 68vw; transform: rotate(35deg); }
       8%   { opacity: 1; }
-      100% { opacity: 1; top: 56vh; left: 93vw; transform: rotate(35deg); }
+      90%  { opacity: 1; }
+      100% { opacity: 0; top: 68vh; left: 102vw; transform: rotate(35deg); }
     }
     @media (max-width: 760px) {
       .flying-cow { width: 38px; }
@@ -893,6 +894,10 @@
       // форсируем перезапуск анимации
       void cow.offsetWidth;
       cow.classList.add('fly');
+      // на всякий случай гарантированно скрываем после завершения анимации
+      setTimeout(() => {
+        cow.classList.remove('fly');
+      }, 6200);
     }
 
     cow.addEventListener('click', () => {
