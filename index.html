@@ -88,7 +88,7 @@
     .avatar-wrap { position: relative; width: 115px; margin: 0 auto 12px; }
     .avatar { width: 115px; height: 115px; border-radius: 50%; object-fit: cover; display: block; border: 2px solid rgba(255,0,0,0.35); }
 
-    .name { text-align: center; font-size: 15px; line-height: 1.6; color: #ff2a2a; margin-bottom: 22px; letter-spacing: 1px; }
+    .name { text-align: center; font-size: 15px; line-height: 1.6; color: #ff2a2a; margin-bottom: 22px; letter-spacing: 1px; text-shadow: 0 0 12px rgba(255,40,40,0.7), 0 0 28px rgba(255,0,0,0.35); }
 
     .btn {
       display: flex; align-items: center; justify-content: center;
@@ -120,18 +120,34 @@
     .stats { text-align: center; display: flex; flex-direction: column; flex: 1; }
     .stats-body { flex: 1; }
     .stat-block { margin: 18px 0; }
-    .big { font-size: 17px; line-height: 1.6; color: white; font-variant-numeric: tabular-nums; }
-    .big.online-value { display: flex; align-items: center; justify-content: center; gap: 10px; color: #ff3b3b; }
+    .big {
+      font-size: 17px; line-height: 1.6; color: white; font-variant-numeric: tabular-nums;
+      text-shadow: 0 0 10px rgba(255,255,255,0.45), 0 0 22px rgba(255,0,0,0.25);
+      animation: beacon 4.5s ease-in-out infinite;
+    }
+    .big.online-value {
+      display: flex; align-items: center; justify-content: center; gap: 10px; color: #ff3b3b;
+      text-shadow: 0 0 10px rgba(255,40,40,0.7), 0 0 24px rgba(255,0,0,0.4);
+      animation: beacon-red 4.5s ease-in-out infinite;
+    }
+    @keyframes beacon {
+      0%, 100% { text-shadow: 0 0 10px rgba(255,255,255,0.45), 0 0 22px rgba(255,0,0,0.25); }
+      50%      { text-shadow: 0 0 18px rgba(255,255,255,0.85), 0 0 40px rgba(255,0,0,0.6); }
+    }
+    @keyframes beacon-red {
+      0%, 100% { text-shadow: 0 0 10px rgba(255,40,40,0.7), 0 0 24px rgba(255,0,0,0.4); }
+      50%      { text-shadow: 0 0 18px rgba(255,80,80,1), 0 0 44px rgba(255,0,0,0.75); }
+    }
     .live-dot {
       width: 10px; height: 10px; border-radius: 50%;
       background: #ff2a2a; box-shadow: 0 0 8px rgba(255,0,0,0.9);
       animation: pulse 1.8s ease-in-out infinite;
     }
     @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.45;transform:scale(.85)} }
-    .label { font-size: 8px; line-height: 1.6; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,200,200,0.75); margin: 10px 0; display: flex; align-items: center; justify-content: center; }
+    .label { font-size: 8px; line-height: 1.6; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,200,200,0.75); margin: 10px 0; display: flex; align-items: center; justify-content: center; text-shadow: 0 0 8px rgba(255,0,0,0.25); }
     .stars { display: flex; justify-content: center; gap: 6px; margin: 10px 0; }
     .star { font-size: 22px; color: rgba(255,255,255,0.2); transition: color .3s, text-shadow .3s; }
-    .star.full { color: #ff2a2a; text-shadow: 0 0 10px rgba(255,0,0,0.6); }
+    .star.full { color: #ff2a2a; text-shadow: 0 0 10px rgba(255,40,40,0.9), 0 0 24px rgba(255,0,0,0.6); }
 
     .koleso-btn {
       position: fixed;
@@ -552,6 +568,7 @@
       margin-bottom: 18px;
       text-align: center;
       line-height: 1.6;
+      text-shadow: 0 0 12px rgba(255,40,40,0.7), 0 0 28px rgba(255,0,0,0.35);
     }
 
     .reviews-list {
@@ -578,12 +595,19 @@
       border-radius: 14px;
       background: rgba(255,0,0,0.04);
       border: 1px solid rgba(255,0,0,0.14);
-      transition: border-color .2s, box-shadow .2s;
+      transition: border-color .2s, box-shadow .2s, transform .2s ease;
       flex-shrink: 0;
       opacity: 0;
       animation: reviewFadeIn .4s ease forwards;
+      transform-origin: center;
     }
-    .review-item:hover { border-color: rgba(255,0,0,0.3); box-shadow: 0 0 18px rgba(255,0,0,0.08); }
+    .review-item:hover {
+      border-color: rgba(255,0,0,0.35);
+      box-shadow: 0 0 22px rgba(255,0,0,0.12);
+      transform: scale(1.035);
+      position: relative;
+      z-index: 5;
+    }
 
     .review-header {
       display: flex;
@@ -616,12 +640,13 @@
       color: #ff3b3b;
       line-height: 1.4;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      text-shadow: 0 0 8px rgba(255,40,40,0.6), 0 0 18px rgba(255,0,0,0.3);
     }
     .review-date { font-size: 7px; color: rgba(255,200,200,0.4); margin-top: 3px; }
 
     .review-stars { display: flex; gap: 3px; margin-bottom: 7px; }
     .review-star { font-size: 13px; color: rgba(255,255,255,0.15); }
-    .review-star.on { color: #ff2a2a; text-shadow: 0 0 7px rgba(255,0,0,0.5); }
+    .review-star.on { color: #ff2a2a; text-shadow: 0 0 9px rgba(255,40,40,0.85), 0 0 18px rgba(255,0,0,0.5); }
 
     .review-comment {
       font-size: 8px;
@@ -730,7 +755,7 @@
     </div>
     <div class="stat-block">
       <div class="big" id="period" style="font-size:12px">—</div>
-      <div class="label">Период</div>
+      <div class="label">Период выполнения заказов</div>
     </div>
     <div class="stat-block">
       <div class="big online-value">
