@@ -1,1 +1,1 @@
-# mezets.design.github.io
+42
