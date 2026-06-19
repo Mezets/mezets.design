@@ -367,6 +367,10 @@
       gap: 0;
       max-height: 620px;
       overflow: hidden;
+      transform-style: preserve-3d;
+      will-change: transform;
+      transition: border-color .25s, box-shadow .25s, transform .1s ease-out;
+      cursor: default;
     }
 
     .reviews-title {
@@ -925,49 +929,60 @@
   /* =========================
      ОТЗЫВЫ ИЗ DISCORD
   ========================= */
+  function renderReview(r, idx, list) {
+    const stars = [1,2,3,4,5].map(i =>
+      `<span class="review-star ${i <= r.rating ? 'on' : ''}">★</span>`
+    ).join('');
+    const avatar = r.avatar
+      ? `<img class="review-avatar" src="${r.avatar}" alt="" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'review-avatar-placeholder',textContent:'?'}))">`
+      : `<div class="review-avatar-placeholder">?</div>`;
+    const comment = r.comment ? `<div class="review-comment">${r.comment}</div>` : '';
+    const orderInfo = r.order
+      ? `<div class="review-order">Заказ ${r.order}${r.order_type ? ' · ' + r.order_type : ''}</div>`
+      : '';
+    const el = document.createElement('div');
+    el.className = 'review-item';
+    el.style.animationDelay = `${idx * 60}ms`;
+    el.innerHTML = `
+      <div class="review-header">
+        ${avatar}
+        <div class="review-meta">
+          <div class="review-author">${r.author}</div>
+          <div class="review-date">${r.date}</div>
+        </div>
+      </div>
+      <div class="review-stars">${stars}</div>
+      ${comment}
+      ${orderInfo}
+    `;
+    list.appendChild(el);
+  }
+
   async function loadReviews() {
     const list = document.getElementById('reviewsList');
     try {
       const res = await fetch(`${API}/api/reviews?limit=20`, { mode: 'cors' });
-      if (!res.ok) throw new Error();
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       if (!data.reviews || data.reviews.length === 0) {
         list.innerHTML = '<div class="reviews-loading">Отзывов пока нет</div>';
         return;
       }
       list.innerHTML = '';
-      for (const r of data.reviews) {
-        const stars = [1,2,3,4,5].map(i =>
-          `<span class="review-star ${i <= r.rating ? 'on' : ''}">★</span>`
-        ).join('');
-        const avatar = r.avatar
-          ? `<img class="review-avatar" src="${r.avatar}" alt="" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'review-avatar-placeholder',textContent:'👤'}))">`
-          : `<div class="review-avatar-placeholder">👤</div>`;
-        const comment = r.comment
-          ? `<div class="review-comment">${r.comment}</div>`
-          : '';
-        const orderInfo = r.order
-          ? `<div class="review-order">Заказ ${r.order}${r.order_type ? ' · ' + r.order_type : ''}</div>`
-          : '';
-        const el = document.createElement('div');
-        el.className = 'review-item';
-        el.style.animationDelay = `${reviews.indexOf(r) * 60}ms`;
-        el.innerHTML = `
-          <div class="review-header">
-            ${avatar}
-            <div class="review-meta">
-              <div class="review-author">${r.author}</div>
-              <div class="review-date">${r.date}</div>
-            </div>
-          </div>
-          <div class="review-stars">${stars}</div>
-          ${comment}
-          ${orderInfo}
-        `;
-        list.appendChild(el);
-      }
+      data.reviews.forEach((r, idx) => renderReview(r, idx, list));
     } catch(e) {
-      list.innerHTML = '<div class="reviews-loading">Не удалось загрузить отзывы</div>';
+      console.error('Reviews fetch error:', e);
+      try {
+        const res2 = await fetch(`${API}/api/reviews?limit=20`);
+        if (!res2.ok) throw new Error(`HTTP ${res2.status}`);
+        const data2 = await res2.json();
+        if (data2.reviews && data2.reviews.length > 0) {
+          list.innerHTML = '';
+          data2.reviews.forEach((r, idx) => renderReview(r, idx, list));
+          return;
+        }
+      } catch(e2) { console.error('Fallback error:', e2); }
+      list.innerHTML = `<div class="reviews-loading">Ошибка загрузки.<br>Проверь консоль (F12)</div>`;
     }
   }
   loadReviews();
