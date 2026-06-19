@@ -717,7 +717,7 @@
       position: fixed;
       top: -120px;
       left: -120px;
-      width: 90px;
+      width: 55px;
       z-index: 1;
       cursor: pointer;
       pointer-events: none;
@@ -733,11 +733,10 @@
     @keyframes cowFly {
       0%   { opacity: 0; top: -5vh; left: 68vw; transform: rotate(35deg); }
       8%   { opacity: 1; }
-      92%  { opacity: 1; }
-      100% { opacity: 0; top: 56vh; left: 93vw; transform: rotate(35deg); }
+      100% { opacity: 1; top: 56vh; left: 93vw; transform: rotate(35deg); }
     }
     @media (max-width: 760px) {
-      .flying-cow { width: 60px; }
+      .flying-cow { width: 38px; }
     }
 
   </style>
@@ -895,10 +894,6 @@
       void cow.offsetWidth;
       cow.classList.add('fly');
     }
-
-    cow.addEventListener('animationend', () => {
-      cow.classList.remove('fly');
-    });
 
     cow.addEventListener('click', () => {
       cowSound.currentTime = 0;
