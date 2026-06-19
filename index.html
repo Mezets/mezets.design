@@ -228,11 +228,18 @@
       margin-bottom: 8px;
     }
     .strip-arrow {
-      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-      width: 0; height: 0;
-      border-left: 8px solid transparent; border-right: 8px solid transparent;
+      position: absolute;
+      top: -2px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
       border-top: 13px solid #ff2a2a;
-      z-index: 10; filter: drop-shadow(0 0 4px rgba(255,0,0,0.8));
+      z-index: 20;
+      filter: drop-shadow(0 0 6px rgba(255,0,0,0.9));
+      pointer-events: none;
     }
     .strip-line {
       position: absolute; top: 0; bottom: 0; left: 50%;
@@ -599,11 +606,17 @@
     if (TEST_KEY) {
       loginBlock.style.display = 'none';
       spinBlock.style.display  = 'block';
-      document.getElementById('loggedAs').textContent = 'Тестовый режим';
-      btn.textContent   = 'Крутить';
+    
+      const btn = document.getElementById('spinBtn');
+    
+      document.getElementById('loggedAs').textContent = 'Тестовый режим (без ограничений)';
+    
+      btn.textContent = 'Крутить';
       btn.style.opacity = '1';
-      btn.style.cursor  = 'pointer';
-      btn.onclick       = spin;
+      btn.style.cursor = 'pointer';
+    
+      btn.onclick = spin;
+    
       return;
     }
 
@@ -728,7 +741,7 @@
     try {
       const res  = await fetch(url, { mode: 'cors' });
       const data = await res.json();
-      if (data.error === 'already_spun') {
+      if (data.error === 'already_spun' && !TEST_KEY) {
         spinning = false;
         btn.textContent   = 'Уже крутил';
         btn.style.opacity = '0.4';
