@@ -1124,6 +1124,8 @@
 
 <audio id="spinSound" src="roulette-spin.mp3" preload="auto"></audio>
 <audio id="stopSound" src="win.mp3" preload="auto"></audio>
+<audio id="cowSound42" src="cow.mp3" preload="auto"></audio>
+<audio id="sound67" src="67.mp3" preload="auto"></audio>
 
 <canvas id="bg"></canvas>
 <div class="fluff-wrap">
@@ -1499,7 +1501,6 @@
         btn.style.opacity = '0.4';
         btn.style.cursor  = 'not-allowed';
         btn.onclick       = null;
-        restoreSpinResult();
       } else {
         btn.textContent   = 'Крутить';
         btn.style.opacity = '1';
@@ -1579,11 +1580,18 @@
       stripEl.style.transform  = `translateX(-${targetX}px)`;
       setTimeout(() => {
         document.getElementById('spinSound').pause();
-        document.getElementById('stopSound').currentTime = 0;
-        document.getElementById('stopSound').play();
+        // Специальные звуки для особых скидок
+        if (winnerDiscount === 42) {
+          const s = document.getElementById('cowSound42');
+          s.currentTime = 0; s.play().catch(() => {});
+        } else if (winnerDiscount === 67) {
+          const s = document.getElementById('sound67');
+          s.currentTime = 0; s.play().catch(() => {});
+        } else {
+          document.getElementById('stopSound').currentTime = 0;
+          document.getElementById('stopSound').play();
+        }
         lastCode = code;
-        // Сохраняем результат чтобы показывать после F5
-        localStorage.setItem('mezets_spin_result', JSON.stringify({ discount: winnerDiscount, code }));
         document.getElementById('resultPct').innerHTML =
           `Скидка ${VISUAL[winnerDiscount].pct}!<br><span style="font-size:10px;color:rgba(255,200,200,0.7)">${RESULT_PHRASE[winnerDiscount]}</span>`;
         document.getElementById('resultPct').classList.add('show');
@@ -1664,27 +1672,6 @@
       msg.classList.add('show');
       setTimeout(() => msg.classList.remove('show'), 1500);
     });
-  }
-
-  function restoreSpinResult() {
-    try {
-      const saved = localStorage.getItem('mezets_spin_result');
-      if (!saved) return;
-      const { discount, code } = JSON.parse(saved);
-      if (!VISUAL[discount] || !code) return;
-      lastCode = code;
-      // Показываем финальное положение полосы
-      buildStrip(discount);
-      const wrapW   = stripEl.parentElement.offsetWidth;
-      const targetX = WIN_IDX * ITEM_W + ITEM_W / 2 - wrapW / 2;
-      stripEl.style.transition = 'none';
-      stripEl.style.transform  = `translateX(-${targetX}px)`;
-      document.getElementById('resultPct').innerHTML =
-        `Скидка ${VISUAL[discount].pct}!<br><span style="font-size:10px;color:rgba(255,200,200,0.7)">${RESULT_PHRASE[discount]}</span>`;
-      document.getElementById('resultPct').classList.add('show');
-      document.getElementById('resultCode').textContent = code;
-      document.getElementById('resultCode').classList.add('show');
-    } catch(e) {}
   }
 
   function openRoulette() {
