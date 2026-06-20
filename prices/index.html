@@ -27,6 +27,21 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
+    /* ── КАСТОМНЫЙ СКРОЛЛБАР ── */
+    html { scrollbar-width: thin; scrollbar-color: rgba(255,0,0,0.45) rgba(10,0,0,0.6); }
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-track { background: rgba(10,0,0,0.6); }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255,0,0,0.45);
+      border-radius: 6px;
+      border: 2px solid rgba(10,0,0,0.6);
+      box-shadow: 0 0 6px rgba(255,0,0,0.3);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255,30,30,0.75);
+      box-shadow: 0 0 12px rgba(255,0,0,0.55);
+    }
+
     html, body {
       font-family: 'Press Start 2P', monospace;
       background: #050000;
@@ -136,9 +151,9 @@
     /* ── ITEM CARD ── */
     .item {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
       padding: 13px 16px;
       border-radius: 12px;
       background: rgba(255,0,0,0.04);
@@ -151,6 +166,12 @@
       border-color: rgba(255,0,0,0.32);
       box-shadow: 0 0 22px rgba(255,0,0,0.09);
       transform: translateY(-2px);
+    }
+    .item-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
     }
 
     .item-name {
@@ -166,10 +187,11 @@
       flex-shrink: 0;
     }
     .item-price {
-      font-size: 12px;
+      font-size: 13px;
       color: #ff5555;
       white-space: nowrap;
       flex-shrink: 0;
+      padding-left: 13px;
     }
 
     @keyframes fadeUp {
@@ -303,19 +325,13 @@
     <div class="section-label">Базовое</div>
     <div class="items-grid">
       <div class="item" style="animation-delay:.05s">
-        <span class="item-dot"></span>
-        <span class="item-name">Аватарка</span>
-        <span class="item-price">100 ₽</span>
+        <div class="item-row"><span class="item-dot"></span><span class="item-name">Аватарка</span></div><span class="item-price">100 ₽</span>
       </div>
       <div class="item" style="animation-delay:.10s">
-        <span class="item-dot"></span>
-        <span class="item-name">Анимированная аватарка</span>
-        <span class="item-price">150 ₽</span>
+        <div class="item-row"><span class="item-dot"></span><span class="item-name">Анимированная аватарка</span></div><span class="item-price">150 ₽</span>
       </div>
       <div class="item" style="animation-delay:.15s">
-        <span class="item-dot"></span>
-        <span class="item-name">Обложка / Баннер / Шапка</span>
-        <span class="item-price">200 ₽</span>
+        <div class="item-row"><span class="item-dot"></span><span class="item-name">Обложка / Баннер / Шапка</span></div><span class="item-price">200 ₽</span>
       </div>
     </div>
   </div>
@@ -325,19 +341,13 @@
     <div class="section-label">Discord</div>
     <div class="items-grid">
       <div class="item" style="animation-delay:.20s">
-        <span class="item-dot"></span>
-        <span class="item-name">Фон приглашения на сервер</span>
-        <span class="item-price">250 ₽</span>
+        <div class="item-row"><span class="item-dot"></span><span class="item-name">Фон приглашения на сервер</span></div><span class="item-price">250 ₽</span>
       </div>
       <div class="item" style="animation-delay:.25s">
-        <span class="item-dot"></span>
-        <span class="item-name">Фоновый баннер сервера</span>
-        <span class="item-price">250 ₽</span>
+        <div class="item-row"><span class="item-dot"></span><span class="item-name">Фоновый баннер сервера</span></div><span class="item-price">250 ₽</span>
       </div>
       <div class="item" style="animation-delay:.30s">
-        <span class="item-dot"></span>
-        <span class="item-name">Анимированный баннер сервера</span>
-        <span class="item-price">300 ₽</span>
+        <div class="item-row"><span class="item-dot"></span><span class="item-name">Анимированный баннер сервера</span></div><span class="item-price">300 ₽</span>
       </div>
     </div>
   </div>
@@ -347,60 +357,7 @@
     <div class="section-label">Twitch</div>
     <div class="items-grid">
       <div class="item" style="animation-delay:.35s">
-        <span class="item-dot"></span>
-        <span class="item-name">Кнопка в описании</span>
-        <span class="item-price">50 ₽</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- VK -->
-  <div class="section">
-    <div class="section-label">VK</div>
-    <div class="items-grid">
-      <div class="item" style="animation-delay:.37s">
-        <span class="item-dot"></span>
-        <span class="item-name">Оформление группы ВК</span>
-        <span class="item-price">по договорённости</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- ФОРУМЫ -->
-  <div class="section">
-    <div class="section-label">Форум</div>
-    <div class="items-grid">
-      <div class="item" style="animation-delay:.375s">
-        <span class="item-dot"></span>
-        <span class="item-name">Оформление форумного аккаунта</span>
-        <span class="item-price">по договорённости</span>
-      </div>
-      <div class="item" style="animation-delay:.378s">
-        <span class="item-dot"></span>
-        <span class="item-name">Оформление раздела на форуме</span>
-        <span class="item-price">по договорённости</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- БОТЫ -->
-  <div class="section">
-    <div class="section-label">Боты</div>
-    <div class="items-grid">
-      <div class="item" style="animation-delay:.38s">
-        <span class="item-dot"></span>
-        <span class="item-name">Бот для Discord</span>
-        <span class="item-price">по договорённости</span>
-      </div>
-      <div class="item" style="animation-delay:.39s">
-        <span class="item-dot"></span>
-        <span class="item-name">Бот для Telegram</span>
-        <span class="item-price">по договорённости</span>
-      </div>
-      <div class="item" style="animation-delay:.40s">
-        <span class="item-dot"></span>
-        <span class="item-name">Бот для VK</span>
-        <span class="item-price">по договорённости</span>
+        <div class="item-row"><span class="item-dot"></span><span class="item-name">Кнопка в описании</span></div><span class="item-price">50 ₽</span>
       </div>
     </div>
   </div>
@@ -409,10 +366,47 @@
   <div class="section">
     <div class="section-label">YouTube</div>
     <div class="items-grid">
-      <div class="item" style="animation-delay:.40s">
-        <span class="item-dot"></span>
-        <span class="item-name">Превью</span>
-        <span class="item-price">200 ₽</span>
+      <div class="item" style="animation-delay:.37s">
+        <div class="item-row"><span class="item-dot"></span><span class="item-name">Превью</span></div><span class="item-price">200 ₽</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- VK -->
+  <div class="section">
+    <div class="section-label">VK</div>
+    <div class="items-grid">
+      <div class="item" style="animation-delay:.39s">
+        <div class="item-row"><span class="item-dot"></span><span class="item-name">Оформление группы ВК</span></div><span class="item-price">по договорённости</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ФОРУМЫ -->
+  <div class="section">
+    <div class="section-label">Форум</div>
+    <div class="items-grid">
+      <div class="item" style="animation-delay:.41s">
+        <div class="item-row"><span class="item-dot"></span><span class="item-name">Оформление форумного аккаунта</span></div><span class="item-price">по договорённости</span>
+      </div>
+      <div class="item" style="animation-delay:.43s">
+        <div class="item-row"><span class="item-dot"></span><span class="item-name">Оформление раздела на форуме</span></div><span class="item-price">по договорённости</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- БОТЫ -->
+  <div class="section">
+    <div class="section-label">Боты</div>
+    <div class="items-grid">
+      <div class="item" style="animation-delay:.45s">
+        <div class="item-row"><span class="item-dot"></span><span class="item-name">Бот для Discord</span></div><span class="item-price">по договорённости</span>
+      </div>
+      <div class="item" style="animation-delay:.47s">
+        <div class="item-row"><span class="item-dot"></span><span class="item-name">Бот для Telegram</span></div><span class="item-price">по договорённости</span>
+      </div>
+      <div class="item" style="animation-delay:.49s">
+        <div class="item-row"><span class="item-dot"></span><span class="item-name">Бот для VK</span></div><span class="item-price">по договорённости</span>
       </div>
     </div>
   </div>
