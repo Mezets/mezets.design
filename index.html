@@ -710,17 +710,17 @@
     /* ========================= MAINTENANCE TOAST ========================= */
     .maint-toast {
       position: fixed;
-      bottom: 28px;
+      bottom: 120px;
       left: 28px;
       z-index: 999;
-      width: 220px;
+      width: 280px;
       background: rgba(8,0,0,0.97);
       border: 1px solid rgba(255,0,0,0.4);
       border-radius: 18px;
-      padding: 14px 14px 12px;
+      padding: 18px 18px 16px;
       font-family: 'Press Start 2P', monospace;
-      box-shadow: 0 0 30px rgba(255,0,0,0.2);
-      transform: translateY(10px);
+      box-shadow: 0 0 50px rgba(255,0,0,0.2);
+      transform: translateY(20px);
       opacity: 0;
       pointer-events: none;
       transition: opacity .4s cubic-bezier(.22,1,.36,1), transform .4s cubic-bezier(.22,1,.36,1);
@@ -753,7 +753,7 @@
       .main { gap: 24px; padding: 40px 16px; }
       .card { width: 100%; max-width: 340px; }
       .koleso-btn { width: 56px; height: 56px; bottom: 16px; right: 16px; }
-      .maint-toast { bottom: 16px; left: 12px; width: 180px; }
+      .maint-toast { bottom: 84px; left: 12px; right: 12px; width: auto; }
       .bottom-nav-btn { width: 100%; max-width: 340px; }
       .bottom-nav { padding: 8px 16px 40px; gap: 12px; }
       .home-arrow { width: 38px; height: 38px; top: 12px; left: 12px; }
@@ -1499,6 +1499,7 @@
         btn.style.opacity = '0.4';
         btn.style.cursor  = 'not-allowed';
         btn.onclick       = null;
+        restoreSpinResult();
       } else {
         btn.textContent   = 'Крутить';
         btn.style.opacity = '1';
@@ -1581,6 +1582,8 @@
         document.getElementById('stopSound').currentTime = 0;
         document.getElementById('stopSound').play();
         lastCode = code;
+        // Сохраняем результат чтобы показывать после F5
+        localStorage.setItem('mezets_spin_result', JSON.stringify({ discount: winnerDiscount, code }));
         document.getElementById('resultPct').innerHTML =
           `Скидка ${VISUAL[winnerDiscount].pct}!<br><span style="font-size:10px;color:rgba(255,200,200,0.7)">${RESULT_PHRASE[winnerDiscount]}</span>`;
         document.getElementById('resultPct').classList.add('show');
@@ -1661,6 +1664,27 @@
       msg.classList.add('show');
       setTimeout(() => msg.classList.remove('show'), 1500);
     });
+  }
+
+  function restoreSpinResult() {
+    try {
+      const saved = localStorage.getItem('mezets_spin_result');
+      if (!saved) return;
+      const { discount, code } = JSON.parse(saved);
+      if (!VISUAL[discount] || !code) return;
+      lastCode = code;
+      // Показываем финальное положение полосы
+      buildStrip(discount);
+      const wrapW   = stripEl.parentElement.offsetWidth;
+      const targetX = WIN_IDX * ITEM_W + ITEM_W / 2 - wrapW / 2;
+      stripEl.style.transition = 'none';
+      stripEl.style.transform  = `translateX(-${targetX}px)`;
+      document.getElementById('resultPct').innerHTML =
+        `Скидка ${VISUAL[discount].pct}!<br><span style="font-size:10px;color:rgba(255,200,200,0.7)">${RESULT_PHRASE[discount]}</span>`;
+      document.getElementById('resultPct').classList.add('show');
+      document.getElementById('resultCode').textContent = code;
+      document.getElementById('resultCode').classList.add('show');
+    } catch(e) {}
   }
 
   function openRoulette() {
@@ -1972,6 +1996,7 @@
     { img: "portfolio/png/ff7f32b0d6ba1011.png", type: "Оформление форумных разделов", time: "1 день" },
     { img: "portfolio/png/11beebc137b1f5e9.png", type: "Оформление группы ВК", time: "2 дня" },
     { img: "portfolio/mp4/9c45641283169ca6.mp4", type: "Анимированное оформление форумного аккаунта", time: "2 дня" },
+    { img: "portfolio/gif/2473ba2234504e66.gif", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
     { img: "portfolio/png/4fb69b3f3e108103.png", type: "Оформление форумного аккаунта", time: "1 день" },
    { img: "portfolio/mp4/ae016f282b171634.mp4", type: "Анимированное оформление форумного аккаунта", time: "2 дня" },
 {
@@ -1991,6 +2016,7 @@
     { img: "portfolio/mp4/5abbc31fb75cc879.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
     { img: "portfolio/png/2.png", type: "Оформление форумного аккаунта", time: "1 день" },
     { img: "portfolio/mp4/9aea3cf2d065ca86.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/gif/1.gif", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
     { img: "portfolio/png/a3e33aad31bfabfe.png", type: "Оформление форумного аккаунта", time: "1 день" },
     { img: "portfolio/mp4/b48e6dd5bea5da15.mp4", type: "Анимированное оформление форумного аккаунта", time: "2 дня" },
     { img: "portfolio/mp4/3a39b97d42947ac6.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
