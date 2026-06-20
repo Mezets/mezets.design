@@ -161,6 +161,7 @@
       font-family: 'Press Start 2P', monospace; font-size: 11px; line-height: 1.6;
       color: #ff3b3b; border-radius: 12px;
       background: rgba(255,0,0,0.05); border: 1px solid rgba(255,0,0,0.25);
+      box-shadow: 0 0 18px rgba(255,0,0,0.1);
       transition: .2s; position: relative; overflow: hidden;
     }
     .btn::before {
@@ -169,7 +170,7 @@
       transition: .5s;
     }
     .btn:hover::before { left: 120%; }
-    .btn:hover { transform: scale(1.04); border-color: rgba(255,0,0,0.5); }
+    .btn:hover { transform: scale(1.04); border-color: rgba(255,0,0,0.5); box-shadow: 0 0 36px rgba(255,0,0,0.28); }
 
     .discord-order-btn {
       display: flex; align-items: center; justify-content: center; gap: 10px;
@@ -230,6 +231,7 @@
       text-align: center;
       margin-bottom: 18px;
       text-shadow: 0 0 12px rgba(255,40,40,0.6), 0 0 26px rgba(255,0,0,0.3);
+      animation: beacon-red 4.5s ease-in-out infinite;
     }
     .portfolio-track-wrap {
       overflow: hidden;
@@ -237,6 +239,8 @@
       cursor: grab;
       touch-action: pan-y;
       padding: 10px 0;
+      border-radius: 16px;
+      box-shadow: 0 0 32px rgba(255,0,0,0.1);
       mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
       -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
     }
@@ -253,7 +257,7 @@
       overflow: hidden;
       border: 1px solid rgba(255,0,0,0.22);
       background: rgba(255,0,0,0.04);
-      box-shadow: 0 0 20px rgba(255,0,0,0.08);
+      box-shadow: 0 0 22px rgba(255,0,0,0.1);
       cursor: pointer;
       transition: border-color .2s, box-shadow .2s, transform .1s ease-out;
       user-select: none;
@@ -264,7 +268,7 @@
     }
     .portfolio-card:hover {
       border-color: rgba(255,0,0,0.45);
-      box-shadow: 0 0 28px rgba(255,0,0,0.18);
+      box-shadow: 0 0 40px rgba(255,0,0,0.22);
     }
     .portfolio-card img,
     .portfolio-card video {
@@ -568,10 +572,19 @@
       border-radius: 22px;
       background: rgba(10,0,0,0.92);
       border: 1px solid rgba(255,0,0,0.3);
-      box-shadow: 0 0 60px rgba(255,0,0,0.2);
+      box-shadow: 0 0 40px rgba(255,0,0,0.14);
       text-align: center;
       position: relative;
+      transform-style: preserve-3d;
+      will-change: transform;
+      transition: border-color .25s, box-shadow .25s, transform .1s ease-out;
+      cursor: default;
+      max-height: 90vh;
+      overflow-y: auto;
+      overflow-x: hidden;
     }
+    .roulette-box:hover { border-color: rgba(255,0,0,0.5); box-shadow: 0 0 60px rgba(255,0,0,0.24); }
+    .roulette-overlay { perspective: 1200px; }
 
     .roulette-close {
       position: absolute;
@@ -717,8 +730,8 @@
     /* ========================= MAINTENANCE TOAST ========================= */
     .maint-toast {
       position: fixed;
-      bottom: 120px;
-      right: 28px;
+      bottom: 28px;
+      left: 28px;
       z-index: 999;
       width: 240px;
       background: rgba(8,0,0,0.97);
@@ -726,7 +739,7 @@
       border-radius: 18px;
       padding: 14px 14px 12px;
       font-family: 'Press Start 2P', monospace;
-      box-shadow: 0 0 50px rgba(255,0,0,0.2);
+      box-shadow: 0 0 40px rgba(255,0,0,0.18);
       transform: translateY(20px);
       opacity: 0;
       pointer-events: none;
@@ -773,7 +786,7 @@
       .main { gap: 24px; padding: 40px 16px; }
       .card { width: 100%; max-width: 340px; }
       .koleso-btn { width: 56px; height: 56px; bottom: 16px; right: 16px; }
-      .maint-toast { bottom: 84px; right: 8px; left: auto; width: 200px; }
+      .maint-toast { bottom: 16px; left: 8px; right: auto; width: 200px; }
       .float-winners { display: none; }
       .bottom-nav-btn { width: 100%; max-width: 340px; }
       .bottom-nav { padding: 8px 16px 40px; gap: 12px; }
@@ -1135,6 +1148,7 @@
       transition: border-color .25s, box-shadow .25s, transform .1s ease-out;
       cursor: default;
     }
+    .reviews-card:hover { border-color: rgba(255,0,0,0.4); box-shadow: 0 0 56px rgba(255,0,0,0.22); }
 
     .reviews-title {
       font-size: 11px;
@@ -2065,6 +2079,25 @@
   const reviewsCard = document.querySelector('.reviews-card');
   if (reviewsCard) tilt(reviewsCard);
 
+  // 3D наклон для рулетки
+  const rouletteOverlayEl = document.getElementById('rouletteOverlay');
+  const rouletteBoxEl     = document.getElementById('rouletteBox');
+  if (rouletteOverlayEl && rouletteBoxEl) {
+    rouletteOverlayEl.addEventListener('mousemove', e => {
+      const r = rouletteBoxEl.getBoundingClientRect();
+      if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) {
+        rouletteBoxEl.style.transform = 'rotateY(0) rotateX(0)';
+        return;
+      }
+      const x = (e.clientX - r.left) / r.width  - 0.5;
+      const y = (e.clientY - r.top)  / r.height - 0.5;
+      rouletteBoxEl.style.transform = `rotateY(${x*10}deg) rotateX(${-y*10}deg)`;
+    });
+    rouletteOverlayEl.addEventListener('mouseleave', () => {
+      rouletteBoxEl.style.transform = 'rotateY(0) rotateX(0)';
+    });
+  }
+
   // 3D наклон для карточки заказа
   const orderCard = document.getElementById('orderCard');
   if (orderCard) tilt(orderCard);
@@ -2264,6 +2297,7 @@
     { img: "portfolio/png/ff7f32b0d6ba1011.png", type: "Оформление форумных разделов", time: "1 день" },
     { img: "portfolio/png/11beebc137b1f5e9.png", type: "Оформление группы ВК", time: "2 дня" },
     { img: "portfolio/mp4/9c45641283169ca6.mp4", type: "Анимированное оформление форумного аккаунта", time: "2 дня" },
+    { img: "portfolio/gif/2473ba2234504e66.gif", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
     { img: "portfolio/png/4fb69b3f3e108103.png", type: "Оформление форумного аккаунта", time: "1 день" },
    { img: "portfolio/mp4/ae016f282b171634.mp4", type: "Анимированное оформление форумного аккаунта", time: "2 дня" },
 {
@@ -2283,6 +2317,7 @@
     { img: "portfolio/mp4/5abbc31fb75cc879.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
     { img: "portfolio/png/2.png", type: "Оформление форумного аккаунта", time: "1 день" },
     { img: "portfolio/mp4/9aea3cf2d065ca86.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/gif/1.gif", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
     { img: "portfolio/png/a3e33aad31bfabfe.png", type: "Оформление форумного аккаунта", time: "1 день" },
     { img: "portfolio/mp4/b48e6dd5bea5da15.mp4", type: "Анимированное оформление форумного аккаунта", time: "2 дня" },
     { img: "portfolio/mp4/3a39b97d42947ac6.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
