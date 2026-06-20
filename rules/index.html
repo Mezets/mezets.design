@@ -26,6 +26,21 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
+    /* ── КАСТОМНЫЙ СКРОЛЛБАР ── */
+    html { scrollbar-width: thin; scrollbar-color: rgba(255,0,0,0.45) rgba(10,0,0,0.6); }
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-track { background: rgba(10,0,0,0.6); }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255,0,0,0.45);
+      border-radius: 6px;
+      border: 2px solid rgba(10,0,0,0.6);
+      box-shadow: 0 0 6px rgba(255,0,0,0.3);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255,30,30,0.75);
+      box-shadow: 0 0 12px rgba(255,0,0,0.55);
+    }
+
     html, body {
       font-family: 'Press Start 2P', monospace;
       background: #050000;
