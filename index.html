@@ -234,6 +234,7 @@
       overflow: hidden;
       width: 100%;
       cursor: grab;
+      touch-action: pan-y;
       mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
       -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
     }
@@ -243,19 +244,9 @@
       gap: 14px;
       will-change: transform;
     }
-    .portfolio-track.auto-scroll {
-      animation: portfolioAutoScroll 32s linear infinite;
-    }
-    @keyframes portfolioAutoScroll {
-      from { transform: translateX(0); }
-      to   { transform: translateX(-50%); }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .portfolio-track.auto-scroll { animation: none; }
-    }
     .portfolio-card {
       flex-shrink: 0;
-      width: 180px;
+      width: 240px;
       border-radius: 14px;
       overflow: hidden;
       border: 1px solid rgba(255,0,0,0.22);
@@ -265,18 +256,21 @@
       transition: border-color .2s, box-shadow .2s, transform .2s;
       user-select: none;
       -webkit-user-select: none;
+      position: relative;
     }
     .portfolio-card:hover {
       border-color: rgba(255,0,0,0.45);
       box-shadow: 0 0 28px rgba(255,0,0,0.18);
       transform: translateY(-3px);
     }
-    .portfolio-card img {
+    .portfolio-card img,
+    .portfolio-card video {
       width: 100%;
-      height: 130px;
+      height: 170px;
       object-fit: cover;
       display: block;
       pointer-events: none;
+      background: #000;
     }
     .portfolio-card-info {
       padding: 9px 10px;
@@ -293,10 +287,24 @@
       margin-top: 4px;
       letter-spacing: .3px;
     }
+    .portfolio-card-badge {
+      position: absolute;
+      top: 8px; right: 8px;
+      background: rgba(8,0,0,0.85);
+      border: 1px solid rgba(255,0,0,0.4);
+      color: #ff9b9b;
+      font-size: 7px;
+      letter-spacing: .5px;
+      padding: 4px 7px;
+      border-radius: 8px;
+      pointer-events: none;
+      box-shadow: 0 0 10px rgba(255,0,0,0.25);
+    }
     @media (max-width: 600px) {
       .portfolio-section { padding: 6px 12px 24px; }
-      .portfolio-card { width: 140px; }
-      .portfolio-card img { height: 100px; }
+      .portfolio-card { width: 175px; }
+      .portfolio-card img,
+      .portfolio-card video { height: 125px; }
     }
 
     /* ── ОКНО ПРОСМОТРА РАБОТЫ ── */
@@ -320,8 +328,8 @@
     }
     .portfolio-modal {
       position: relative;
-      max-width: 560px;
-      max-height: 88vh;
+      max-width: 720px;
+      max-height: 90vh;
       width: 100%;
       border-radius: 18px;
       background: rgba(10,0,0,0.95);
@@ -341,16 +349,52 @@
       background: rgba(0,0,0,0.5);
       border-radius: 50%;
       cursor: pointer;
-      z-index: 2;
+      z-index: 3;
       transition: background .2s;
     }
     .portfolio-modal-close:hover { background: rgba(255,0,0,0.6); }
-    .portfolio-modal-img {
+    .portfolio-modal-media-wrap { position: relative; }
+    .portfolio-modal-img,
+    .portfolio-modal-vid {
       width: 100%;
-      max-height: 65vh;
+      max-height: 72vh;
       object-fit: contain;
       display: block;
       background: #000;
+    }
+    .portfolio-modal-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      color: #fff;
+      background: rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,0,0,0.35);
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 3;
+      user-select: none;
+      transition: background .2s;
+    }
+    .portfolio-modal-arrow:hover { background: rgba(255,0,0,0.6); }
+    .portfolio-modal-arrow.left { left: 12px; }
+    .portfolio-modal-arrow.right { right: 12px; }
+    .portfolio-modal-dots {
+      display: flex; justify-content: center; gap: 6px;
+      padding-top: 12px;
+    }
+    .portfolio-modal-dots span {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: rgba(255,0,0,0.25);
+      cursor: pointer;
+      transition: background .2s, transform .2s;
+    }
+    .portfolio-modal-dots span.active {
+      background: #ff3b3b;
+      transform: scale(1.3);
+      box-shadow: 0 0 8px rgba(255,0,0,0.6);
     }
     .portfolio-modal-info {
       padding: 16px 20px;
@@ -667,7 +711,7 @@
     .maint-toast {
       position: fixed;
       bottom: 120px;
-      right: 28px;
+      left: 28px;
       z-index: 999;
       width: 280px;
       background: rgba(8,0,0,0.97);
@@ -709,7 +753,7 @@
       .main { gap: 24px; padding: 40px 16px; }
       .card { width: 100%; max-width: 340px; }
       .koleso-btn { width: 56px; height: 56px; bottom: 16px; right: 16px; }
-      .maint-toast { bottom: 84px; right: 12px; left: 12px; width: auto; }
+      .maint-toast { bottom: 84px; left: 12px; right: 12px; width: auto; }
       .bottom-nav-btn { width: 100%; max-width: 340px; }
       .bottom-nav { padding: 8px 16px 40px; gap: 12px; }
       .home-arrow { width: 38px; height: 38px; top: 12px; left: 12px; }
@@ -1156,7 +1200,13 @@
 <div class="portfolio-modal-overlay" id="portfolioModalOverlay" onclick="closePortfolioOnBg(event)">
   <div class="portfolio-modal">
     <div class="portfolio-modal-close" onclick="closePortfolioModal()">✕</div>
-    <img class="portfolio-modal-img" id="portfolioModalImg" src="" alt="Работа">
+    <div class="portfolio-modal-media-wrap" id="portfolioModalMediaWrap">
+      <img class="portfolio-modal-img" id="portfolioModalImg" src="" alt="Работа" style="display:none">
+      <video class="portfolio-modal-vid" id="portfolioModalVid" muted loop playsinline controls style="display:none"></video>
+      <div class="portfolio-modal-arrow left" id="portfolioModalPrev" onclick="portfolioModalStep(-1, event)" style="display:none">‹</div>
+      <div class="portfolio-modal-arrow right" id="portfolioModalNext" onclick="portfolioModalStep(1, event)" style="display:none">›</div>
+    </div>
+    <div class="portfolio-modal-dots" id="portfolioModalDots"></div>
     <div class="portfolio-modal-info">
       <div class="portfolio-modal-type" id="portfolioModalType"></div>
       <div class="portfolio-modal-time" id="portfolioModalTime"></div>
@@ -1465,6 +1515,7 @@
      АНИМАЦИЯ ПОЛОСЫ
   ========================= */
   function buildStrip(winnerDiscount) {
+    idleStripRunning = false;
     stripEl.classList.remove('idle-scroll');
     stripEl.innerHTML = '';
     for (let i = 0; i < TOTAL; i++) {
@@ -1479,10 +1530,18 @@
     }
   }
 
+  let idleStripRunning = false;
+
   /* Декоративная лента, бегущая фоном до авторизации через Discord.
      Не участвует в реальном спине — просто заполняет полосу и
-     дублирует её x2 для бесшовной CSS-анимации (idleScroll: -50%). */
+     дублирует её x2 для бесшовной CSS-анимации (idleScroll: -50%).
+     ВАЖНО: строится только один раз и дальше не трогается, иначе
+     при каждом открытии рулетки (checkCanSpin) лента дёргано
+     телепортировалась бы на новые случайные цифры. */
   function buildIdleStrip() {
+    if (idleStripRunning) return;
+    idleStripRunning = true;
+
     stripEl.classList.remove('idle-scroll');
     stripEl.style.transition = 'none';
     stripEl.style.transform  = 'translateX(0)';
@@ -1504,6 +1563,7 @@
   }
 
   function stopIdleStrip() {
+    idleStripRunning = false;
     stripEl.classList.remove('idle-scroll');
   }
 
@@ -1851,60 +1911,216 @@
      ПОРТФОЛИО
      Чтобы добавить новую работу — допиши объект в конец массива
      PORTFOLIO_ITEMS ниже. Три поля:
-       img  — имя файла фото, лежит в папке portfolio/
+       img  — имя файла, лежит в папке portfolio/
+              поддерживаются картинки (.png/.jpg/.gif) и видео (.mp4)
        type — что за работа ("Аватарка", "Баннер",
               "Оформление форумного аккаунта" и т.п.)
        time — за сколько выполнена ("1 день", "3 часа" и т.п.)
      Пример:
        { img: "portfolio/work12.png", type: "Баннер сервера", time: "1 день" },
+       { img: "portfolio/work13.mp4", type: "Анимированный баннер", time: "1 день" },
+
+     Чтобы объединить НЕСКОЛЬКО работ в одно окошко (с листанием
+     по стрелкам/точкам/свайпом при открытии) — оберни их в group:
+       {
+         group: [
+           { img: "portfolio/a.png", type: "Работа 1", time: "1 день" },
+           { img: "portfolio/b.png", type: "Работа 2", time: "1 день" },
+         ]
+       }
   ========================================================= */
   const PORTFOLIO_ITEMS = [
-    { img: "portfolio/dvizhpervih (6).png", type: "Оформление для <<Движения первых>>", time: "2 месяца" },
-    { img: "portfolio/vk (3).png", type: "Оформление группы ВК", time: "2 дня" },
-    { img: "portfolio/321.png", type: "Оформление форумного аккаунта", time: "1 день" },
-    { img: "portfolio/dvizhpervih (2).png", type: "Оформление для <<Движения первых>>", time: "2 месяца" },
-    { img: "portfolio/d48ccf921236f3c2126.png", type: "Оформление группы ВК", time: "1 день" },
-    { img: "portfolio/a3290f724f898e3f.png", type: "Оформление форумного аккаунта", time: "1 день" },
-    { img: "portfolio/dvizhpervih (5).png", type: "Оформление для <<Движения первых>>", time: "2 дня" },
-    { img: "portfolio/148604a323a84573.png", type: "Оформление форумного аккаунта", time: "2 дня" },
-    { img: "portfolio/tv (1).png", type: "Оформление Twitch", time: "2 дня" },
-    { img: "portfolio/9ac3993015b2b9cf.png", type: "Оформление форумного аккаунта", time: "1 день" },
-    { img: "portfolio/dvizhpervih (4).png", type: "Оформление для <<Движения первых>>", time: "2 месяца" },
-    { img: "portfolio/ff7f32b0d6ba1011.png", type: "Оформление форумных разделов", time: "1 день" },
-    { img: "portfolio/11beebc137b1f5e9.png", type: "Оформление группы ВК", time: "2 дня" },
-    { img: "portfolio/vk (1).png", type: "Оформление группы ВК", time: "2 дня" },
-    { img: "portfolio/dvizhpervih (7).png", type: "Оформление для <<Движения первых>>", time: "2 месяца" },
-    { img: "portfolio/4fb69b3f3e108103.png", type: "Оформление форумного аккаунта", time: "1 день" },
-    { img: "portfolio/dvizhpervih (8).png", type: "Оформление для <<Движения первых>>", time: "2 месяца" },
-    { img: "portfolio/9ef13f1bfc538763.png", type: "Оформление форумного аккаунта", time: "1 день" },
-    { img: "portfolio/prev.png", type: "Превью для YouTube", time: "2 дня" },
-    { img: "portfolio/2.png", type: "Оформление форумного аккаунта", time: "1 день" },
-    { img: "portfolio/vk (2).png", type: "Оформление группы ВК", time: "2 дня" },
-    { img: "portfolio/dvizhpervih (1).png", type: "Оформление для <<Движения первых>>", time: "2 месяца" },
-    { img: "portfolio/tv (2).png", type: "Оформление Twitch", time: "1 день" },
-    { img: "portfolio/a3e33aad31bfabfe.png", type: "Оформление форумного аккаунта", time: "1 день" },
-    { img: "portfolio/dvizhpervih (3).png", type: "Оформление для <<Движения первых>>", time: "2 месяца" },
-    { img: "portfolio/ec777b88d33127a8.png", type: "Оформление форумного аккаунта", time: "2 дня" },
+    { img: "portfolio/mp4/f2c72d40df4751e3.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/mp4/1.mp4", type: "Анимированное оформление форумного аккаунта", time: "3 дня" },
+    { img: "portfolio/mp4/d61caa09fc0a7268.mp4", type: "Анимированное оформление форумного аккаунта", time: "2 дня" },
+    { img: "portfolio/mp4/c5e015abe5ef5d24.mp4", type: "Анимированное оформление форумного аккаунта", time: "14 дней / С учётом ожиданий" },
+    { img: "portfolio/mp4/6e1c16cb73a4f0c7.mp4", type: "Анимированное оформление форумного аккаунта", time: "3 дня" },
+    { img: "portfolio/mp4/e826c60c70506a4e.mp4", type: "Анимированное оформление форумного аккаунта", time: "2 дня" },
+    { img: "portfolio/mp4/9cce42308c66a6fa.mp4", type: "Анимированное оформление форумного аккаунта", time: "2 дня" },
+    { img: "portfolio/mp4/637c6ea26a1fc236.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/mp4/c110732042b25a2b.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/mp4/2b5b754da85608e5.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/mp4/ca37069f0cb26cf0.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+{
+  group: [
+    { img: "portfolio/png/vk (3).png", type: "Оформление группы ВК", time: "2 дня" },
+    { img: "portfolio/png/vk (1).png", type: "Оформление группы ВК", time: "2 дня" },
+    { img: "portfolio/png/vk (2).png", type: "Оформление группы ВК", time: "2 дня" },
+  ]
+},
+    { img: "portfolio/png/321.png", type: "Оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/mp4/9eae1af972e0c792.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/png/d48ccf921236f3c2126.png", type: "Оформление группы ВК", time: "1 день" },
+    { img: "portfolio/mp4/bc06898fd6fc67ab.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/png/a3290f724f898e3f.png", type: "Оформление форумного аккаунта", time: "1 день" },
+{
+  group: [
+    { img: "portfolio/mp4/21808c23072837b1.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/mp4/66fad8f99e42d879.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+  ]
+},
+    { img: "portfolio/mp4/c.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/png/148604a323a84573.png", type: "Оформление форумного аккаунта", time: "2 дня" },
+    { img: "portfolio/mp4/feedf0a20e18c140.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+{
+  group: [
+    { img: "portfolio/png/tv (2).png", type: "Оформление Twitch", time: "1 день" },
+    { img: "portfolio/png/tv (1).png", type: "Оформление Twitch", time: "1 день" },
+  ]
+},
+    { img: "portfolio/png/9ac3993015b2b9cf.png", type: "Оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/png/ff7f32b0d6ba1011.png", type: "Оформление форумных разделов", time: "1 день" },
+    { img: "portfolio/png/11beebc137b1f5e9.png", type: "Оформление группы ВК", time: "2 дня" },
+    { img: "portfolio/mp4/9c45641283169ca6.mp4", type: "Анимированное оформление форумного аккаунта", time: "2 дня" },
+    { img: "portfolio/gif/2473ba2234504e66.gif", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/png/4fb69b3f3e108103.png", type: "Оформление форумного аккаунта", time: "1 день" },
+   { img: "portfolio/mp4/ae016f282b171634.mp4", type: "Анимированное оформление форумного аккаунта", time: "2 дня" },
+{
+  group: [
+    { img: "portfolio/png/dvizhpervih (6).png", type: "Оформление для <<Движения первых>>", time: "2 месяца / С учётом ожиданий" },
+    { img: "portfolio/png/dvizhpervih (7).png", type: "Оформление для <<Движения первых>>", time: "2 месяца / С учётом ожиданий" },
+    { img: "portfolio/png/dvizhpervih (8).png", type: "Оформление для <<Движения первых>>", time: "2 месяца / С учётом ожиданий" },
+    { img: "portfolio/png/dvizhpervih (1).png", type: "Оформление для <<Движения первых>>", time: "2 месяца / С учётом ожиданий" },
+    { img: "portfolio/png/dvizhpervih (2).png", type: "Оформление для <<Движения первых>>", time: "2 месяца / С учётом ожиданий" },
+    { img: "portfolio/png/dvizhpervih (3).png", type: "Оформление для <<Движения первых>>", time: "2 месяца / С учётом ожиданий" },
+    { img: "portfolio/png/dvizhpervih (5).png", type: "Оформление для <<Движения первых>>", time: "2 месяца / С учётом ожиданий" },
+    { img: "portfolio/png/dvizhpervih (4).png", type: "Оформление для <<Движения первых>>", time: "2 месяца / С учётом ожиданий" },
+  ]
+},
+    { img: "portfolio/png/9ef13f1bfc538763.png", type: "Оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/png/prev.png", type: "Превью для YouTube", time: "2 дня" },
+    { img: "portfolio/mp4/5abbc31fb75cc879.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/png/2.png", type: "Оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/mp4/9aea3cf2d065ca86.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/gif/1.gif", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/png/a3e33aad31bfabfe.png", type: "Оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/mp4/b48e6dd5bea5da15.mp4", type: "Анимированное оформление форумного аккаунта", time: "2 дня" },
+    { img: "portfolio/mp4/3a39b97d42947ac6.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/png/ec777b88d33127a8.png", type: "Оформление форумного аккаунта", time: "2 дня" },
   ];
+
+  function isVideoSrc(src) {
+    return /\.(mp4|webm|mov)$/i.test(src || '');
+  }
 
   const portfolioTrack        = document.getElementById('portfolioTrack');
   const portfolioTrackWrap    = portfolioTrack ? portfolioTrack.parentElement : null;
   const portfolioModalOverlay = document.getElementById('portfolioModalOverlay');
   const portfolioModalImg     = document.getElementById('portfolioModalImg');
+  const portfolioModalVid     = document.getElementById('portfolioModalVid');
   const portfolioModalType    = document.getElementById('portfolioModalType');
   const portfolioModalTime    = document.getElementById('portfolioModalTime');
+  const portfolioModalPrev    = document.getElementById('portfolioModalPrev');
+  const portfolioModalNext    = document.getElementById('portfolioModalNext');
+  const portfolioModalDots    = document.getElementById('portfolioModalDots');
 
-  function openPortfolioModal(item) {
-    portfolioModalImg.src           = item.img;
-    portfolioModalType.textContent  = item.type;
-    portfolioModalTime.textContent  = `Срок выполнения: ${item.time}`;
+  let currentGroup = null;
+  let currentIndex = 0;
+
+  function showModalSlide() {
+    const items = currentGroup;
+    const item  = items[currentIndex];
+
+    if (isVideoSrc(item.img)) {
+      portfolioModalImg.style.display = 'none';
+      portfolioModalImg.removeAttribute('src');
+      portfolioModalVid.src = item.img;
+      portfolioModalVid.style.display = 'block';
+      portfolioModalVid.currentTime = 0;
+      portfolioModalVid.play().catch(() => {});
+    } else {
+      portfolioModalVid.pause();
+      portfolioModalVid.removeAttribute('src');
+      portfolioModalVid.style.display = 'none';
+      portfolioModalImg.src = item.img;
+      portfolioModalImg.style.display = 'block';
+    }
+
+    portfolioModalType.textContent = item.type;
+    portfolioModalTime.textContent = `Срок выполнения: ${item.time}`;
+
+    const multi = items.length > 1;
+    portfolioModalPrev.style.display = multi ? 'flex' : 'none';
+    portfolioModalNext.style.display = multi ? 'flex' : 'none';
+
+    portfolioModalDots.innerHTML = '';
+    if (multi) {
+      items.forEach((_, i) => {
+        const dot = document.createElement('span');
+        if (i === currentIndex) dot.classList.add('active');
+        dot.addEventListener('click', (e) => {
+          e.stopPropagation();
+          currentIndex = i;
+          showModalSlide();
+        });
+        portfolioModalDots.appendChild(dot);
+      });
+    }
+  }
+
+  function portfolioModalStep(dir, e) {
+    if (e) e.stopPropagation();
+    if (!currentGroup) return;
+    currentIndex = (currentIndex + dir + currentGroup.length) % currentGroup.length;
+    showModalSlide();
+  }
+
+  function openPortfolioModal(items) {
+    currentGroup = items;
+    currentIndex = 0;
+    showModalSlide();
     portfolioModalOverlay.classList.add('open');
   }
   function closePortfolioModal() {
     portfolioModalOverlay.classList.remove('open');
+    portfolioModalVid.pause();
   }
   function closePortfolioOnBg(e) {
     if (e.target === portfolioModalOverlay) closePortfolioModal();
+  }
+
+  /* Свайп внутри открытого окна для листания группы работ */
+  let modalSwipeStartX = null;
+  if (portfolioModalOverlay) {
+    portfolioModalOverlay.addEventListener('touchstart', (e) => {
+      modalSwipeStartX = e.touches[0].clientX;
+    }, { passive: true });
+    portfolioModalOverlay.addEventListener('touchend', (e) => {
+      if (modalSwipeStartX === null || !currentGroup || currentGroup.length < 2) return;
+      const diff = e.changedTouches[0].clientX - modalSwipeStartX;
+      modalSwipeStartX = null;
+      if (Math.abs(diff) > 40) portfolioModalStep(diff > 0 ? -1 : 1);
+    });
+  }
+
+  /* Видео в ленте играют только пока карточка видна на экране —
+     экономит ресурсы и даёт эффект "проигрывания при прокрутке" */
+  const portfolioVidObserver = ('IntersectionObserver' in window)
+    ? new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          const vid = entry.target;
+          if (entry.isIntersecting) vid.play().catch(() => {});
+          else vid.pause();
+        });
+      }, { threshold: 0.35 })
+    : null;
+
+  function buildCardMedia(coverItem) {
+    if (isVideoSrc(coverItem.img)) {
+      const vid = document.createElement('video');
+      vid.src = coverItem.img;
+      vid.muted = true;
+      vid.loop = true;
+      vid.playsInline = true;
+      vid.preload = 'metadata';
+      if (portfolioVidObserver) portfolioVidObserver.observe(vid);
+      return vid;
+    }
+    const img = document.createElement('img');
+    img.src = coverItem.img;
+    img.alt = coverItem.type;
+    img.loading = 'lazy';
+    return img;
   }
 
   function renderPortfolio() {
@@ -1912,41 +2128,83 @@
     portfolioTrack.innerHTML = '';
     // Дублируем набор x2 для бесшовной автопрокрутки (-50%)
     for (let rep = 0; rep < 2; rep++) {
-      PORTFOLIO_ITEMS.forEach(item => {
+      PORTFOLIO_ITEMS.forEach(entry => {
+        const items = entry.group ? entry.group : [entry];
+        const cover = items[0];
+
         const card = document.createElement('div');
         card.className = 'portfolio-card';
-        card.innerHTML = `
-          <img src="${item.img}" alt="${item.type}" loading="lazy">
-          <div class="portfolio-card-info">
-            <div class="portfolio-card-type">${item.type}</div>
-            <div class="portfolio-card-time">${item.time}</div>
-          </div>
+        card.appendChild(buildCardMedia(cover));
+
+        if (items.length > 1) {
+          const badge = document.createElement('div');
+          badge.className = 'portfolio-card-badge';
+          badge.textContent = `1/${items.length}`;
+          card.appendChild(badge);
+        }
+
+        const info = document.createElement('div');
+        info.className = 'portfolio-card-info';
+        info.innerHTML = `
+          <div class="portfolio-card-type">${cover.type}</div>
+          <div class="portfolio-card-time">${cover.time}</div>
         `;
+        card.appendChild(info);
+
         card.addEventListener('click', () => {
-          if (!portfolioDragged) openPortfolioModal(item);
+          if (!portfolioDragged) openPortfolioModal(items);
         });
         portfolioTrack.appendChild(card);
       });
     }
-    if (PORTFOLIO_ITEMS.length > 1) {
-      portfolioTrack.classList.add('auto-scroll');
-    }
   }
 
-  /* Перетаскивание мышью/тапом — на время drag глушим автопрокрутку
-     и клик по карточке (чтобы свайп не считался кликом). */
+  /* =========================================================
+     ПРОКРУТКА ЛЕНТЫ — единый JS-источник позиции.
+     Раньше автопрокрутка шла через CSS @keyframes, а драг —
+     через инлайн-transform поверх неё: при отпускании мышки/пальца
+     позиции конфликтовали и ленту резко перебрасывало в случайное
+     место ("баговалась" при свайпе). Теперь и автопрокрутка, и драг
+     управляют ОДНОЙ переменной portfolioX через requestAnimationFrame —
+     никаких рывков и скачков в любую сторону.
+  ========================================================= */
+  let portfolioX        = 0;     // текущая позиция трека (<= 0)
   let portfolioDown     = false;
   let portfolioDragged  = false;
   let portfolioStartX   = 0;
-  let portfolioScrollX  = 0;
   let portfolioBaseX    = 0;
+  let portfolioPaused   = false;
+  let portfolioLastTs   = null;
+  const PORTFOLIO_SPEED = 36; // px/сек
 
-  function getTrackTranslateX() {
-    const tr = window.getComputedStyle(portfolioTrack).transform;
-    if (tr === 'none') return 0;
-    const m = tr.match(/matrix\(([^)]+)\)/);
-    if (!m) return 0;
-    return parseFloat(m[1].split(',')[4]) || 0;
+  const portfolioReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function portfolioHalfWidth() {
+    return portfolioTrack.scrollWidth / 2 || 1;
+  }
+
+  // Корректно сворачивает позицию в диапазон (-half, 0] независимо
+  // от направления — раньше это работало только при драге влево.
+  function portfolioWrap(x) {
+    const half = portfolioHalfWidth();
+    x = x % half;
+    if (x > 0) x -= half;
+    return x;
+  }
+
+  function portfolioApply(x) {
+    portfolioX = x;
+    portfolioTrack.style.transform = `translateX(${x}px)`;
+  }
+
+  function portfolioTick(ts) {
+    if (portfolioLastTs === null) portfolioLastTs = ts;
+    const dt = (ts - portfolioLastTs) / 1000;
+    portfolioLastTs = ts;
+    if (!portfolioPaused && !portfolioDown && PORTFOLIO_ITEMS.length > 1) {
+      portfolioApply(portfolioWrap(portfolioX - PORTFOLIO_SPEED * dt));
+    }
+    requestAnimationFrame(portfolioTick);
   }
 
   function portfolioPointerDown(e) {
@@ -1954,10 +2212,7 @@
     portfolioDown    = true;
     portfolioDragged = false;
     portfolioStartX  = (e.touches ? e.touches[0].clientX : e.clientX);
-    portfolioBaseX   = getTrackTranslateX();
-    portfolioTrack.classList.remove('auto-scroll');
-    portfolioTrack.style.transition = 'none';
-    portfolioTrack.style.transform  = `translateX(${portfolioBaseX}px)`;
+    portfolioBaseX   = portfolioX;
     portfolioTrackWrap.classList.add('dragging');
   }
   function portfolioPointerMove(e) {
@@ -1965,39 +2220,29 @@
     const x    = (e.touches ? e.touches[0].clientX : e.clientX);
     const diff = x - portfolioStartX;
     if (Math.abs(diff) > 4) portfolioDragged = true;
-    portfolioScrollX = portfolioBaseX + diff;
-    portfolioTrack.style.transform = `translateX(${portfolioScrollX}px)`;
+    if (portfolioDragged && e.cancelable) e.preventDefault();
+    portfolioApply(portfolioWrap(portfolioBaseX + diff));
   }
   function portfolioPointerUp() {
     if (!portfolioDown) return;
     portfolioDown = false;
     portfolioTrackWrap.classList.remove('dragging');
-
-    // Нормализуем позицию в пределы одной копии ленты, чтобы не
-    // уехать в пустоту, затем возвращаем автопрокрутку.
-    const halfWidth = portfolioTrack.scrollWidth / 2;
-    let x = portfolioScrollX % halfWidth;
-    if (x > 0) x -= halfWidth;
-    portfolioTrack.style.transform = `translateX(${x}px)`;
-
     setTimeout(() => { portfolioDragged = false; }, 50);
-    setTimeout(() => {
-      portfolioTrack.style.transition = '';
-      portfolioTrack.style.transform  = '';
-      if (PORTFOLIO_ITEMS.length > 1) portfolioTrack.classList.add('auto-scroll');
-    }, 300);
   }
 
   if (portfolioTrackWrap) {
     portfolioTrackWrap.addEventListener('mousedown',  portfolioPointerDown);
     portfolioTrackWrap.addEventListener('touchstart', portfolioPointerDown, { passive: true });
     window.addEventListener('mousemove',  portfolioPointerMove);
-    window.addEventListener('touchmove',  portfolioPointerMove, { passive: true });
+    window.addEventListener('touchmove',  portfolioPointerMove, { passive: false });
     window.addEventListener('mouseup',    portfolioPointerUp);
     window.addEventListener('touchend',   portfolioPointerUp);
+    portfolioTrackWrap.addEventListener('mouseenter', () => { portfolioPaused = true;  });
+    portfolioTrackWrap.addEventListener('mouseleave', () => { portfolioPaused = false; });
   }
 
   renderPortfolio();
+  if (!portfolioReducedMotion) requestAnimationFrame(portfolioTick);
 
 </script>
 </body>
