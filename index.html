@@ -925,6 +925,109 @@
       .order-card { width: 100%; max-width: 360px; }
     }
 
+    /* ========================= ПОСЛЕДНИЕ ПОБЕДИТЕЛИ ========================= */
+    .winners-card {
+      width: 300px;
+      padding: 22px 20px;
+      border-radius: 22px;
+      background: rgba(255,0,0,0.05);
+      border: 1px solid rgba(255,0,0,0.2);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 0 40px rgba(255,0,0,0.12);
+      display: flex;
+      flex-direction: column;
+      max-height: 420px;
+      transform-style: preserve-3d;
+      will-change: transform;
+      transition: border-color .25s, box-shadow .25s, transform .1s ease-out;
+      cursor: default;
+    }
+    .winners-title {
+      font-size: 11px;
+      color: #ff2a2a;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+      text-align: center;
+      line-height: 1.6;
+      text-shadow: 0 0 12px rgba(255,40,40,0.7), 0 0 28px rgba(255,0,0,0.35);
+    }
+    .winners-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow-y: auto;
+      flex: 1;
+      min-height: 0;
+      padding-right: 2px;
+    }
+    .winners-list::-webkit-scrollbar { width: 2px; }
+    .winners-list::-webkit-scrollbar-thumb { background: rgba(255,0,0,0.2); border-radius: 2px; }
+    .winner-item {
+      padding: 12px 12px 10px;
+      border-radius: 14px;
+      background: rgba(255,0,0,0.04);
+      border: 1px solid rgba(255,0,0,0.14);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: border-color .2s, box-shadow .2s;
+      animation: reviewFadeIn .4s ease forwards;
+      opacity: 0;
+    }
+    .winner-item:hover {
+      border-color: rgba(255,0,0,0.35);
+      box-shadow: 0 0 18px rgba(255,0,0,0.1);
+    }
+    .winner-avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid rgba(255,0,0,0.3);
+      flex-shrink: 0;
+    }
+    .winner-avatar-placeholder {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: rgba(255,0,0,0.15);
+      border: 1px solid rgba(255,0,0,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .winner-info { flex: 1; min-width: 0; }
+    .winner-name {
+      font-size: 8px;
+      color: rgba(255,225,225,0.9);
+      line-height: 1.6;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .winner-date {
+      font-size: 7px;
+      color: rgba(255,150,150,0.5);
+      margin-top: 2px;
+      letter-spacing: .3px;
+    }
+    .winner-badge {
+      font-size: 10px;
+      color: #ff2a2a;
+      text-shadow: 0 0 8px rgba(255,0,0,0.6);
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+    .winners-empty {
+      font-size: 8px;
+      color: rgba(255,150,150,0.4);
+      text-align: center;
+      line-height: 2;
+      padding: 20px 0;
+    }
+    @media (max-width: 760px) {
+      .winners-card { width: 100%; max-width: 340px; }
+    }
+
     /* ========================= ОТЗЫВЫ ========================= */
     .reviews-card {
       width: 340px;
@@ -1192,6 +1295,14 @@
     <div class="reviews-title">Отзывы</div>
     <div class="reviews-list" id="reviewsList">
       <div class="reviews-loading">Загружаем отзывы...</div>
+    </div>
+  </div>
+
+  <!-- ПОСЛЕДНИЕ ПОБЕДИТЕЛИ РУЛЕТКИ -->
+  <div class="winners-card" id="winnersCard">
+    <div class="winners-title">Последние победители</div>
+    <div class="winners-list" id="winnersList">
+      <div class="winners-empty">Никто ещё не крутил...</div>
     </div>
   </div>
 
@@ -1866,6 +1977,10 @@
   const reviewsCard = document.querySelector('.reviews-card');
   if (reviewsCard) tilt(reviewsCard);
 
+  // 3D наклон для карточки победителей
+  const winnersCard = document.getElementById('winnersCard');
+  if (winnersCard) tilt(winnersCard);
+
   // 3D наклон для карточки заказа
   const orderCard = document.getElementById('orderCard');
   if (orderCard) tilt(orderCard);
@@ -1920,6 +2035,50 @@
   }
 
 
+
+  /* =========================
+     ПОСЛЕДНИЕ ПОБЕДИТЕЛИ
+  ========================= */
+  const DISCOUNT_EMOJI = {10:'🎟️',25:'🎫',42:'🐄',50:'🎯',67:'🔥',75:'💎',100:'👑'};
+
+  function renderWinners(winners) {
+    const list = document.getElementById('winnersList');
+    if (!list) return;
+    if (!winners || winners.length === 0) {
+      list.innerHTML = '<div class="winners-empty">Никто ещё не крутил...</div>';
+      return;
+    }
+    list.innerHTML = '';
+    winners.forEach((w, i) => {
+      const item = document.createElement('div');
+      item.className = 'winner-item';
+      item.style.animationDelay = `${i * 80}ms`;
+      const avatarHtml = w.avatar
+        ? `<img class="winner-avatar" src="${w.avatar}" alt="${w.username}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="winner-avatar-placeholder" style="display:none">🎰</div>`
+        : `<div class="winner-avatar-placeholder">🎰</div>`;
+      const emoji = DISCOUNT_EMOJI[w.discount] || '🎰';
+      item.innerHTML = `
+        ${avatarHtml}
+        <div class="winner-info">
+          <div class="winner-name">${w.username}</div>
+          <div class="winner-date">${w.date}</div>
+        </div>
+        <div class="winner-badge">${emoji} ${w.discount}%</div>
+      `;
+      list.appendChild(item);
+    });
+  }
+
+  async function loadWinners() {
+    try {
+      const res  = await fetch(`${API}/last-winners`, { mode: 'cors' });
+      const data = await res.json();
+      renderWinners(data.winners);
+    } catch(e) {}
+  }
+
+  loadWinners();
+  setInterval(loadWinners, 15000);
 
   /* =========================
      ЧАСТИЦЫ
