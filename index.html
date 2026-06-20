@@ -3,14 +3,79 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mezets</title>
+
+  <title>Mezets — оформление Discord, VK, YouTube, Twitch для RP-серверов | Province RP, GPA 5 RP, Majestik, Arizona</title>
+  <meta name="description" content="Mezets — оформление Discord-серверов, групп ВК, превью YouTube, Twitch и форумных аккаунтов. Работаю с игроками Province RP, GPA 5 RP, Majestik, Arizona. Также делаю ботов для Discord, Telegram и VK. Быстро, качественно, под ключ.">
+  <meta name="keywords" content="оформление discord, оформление вк, youtube оформление, province rp оформление, gpa 5 rp, majestik оформление, arizona rp, дискорд сервер, бот discord, бот telegram, бот vk, оформление группы вк, twitch оформление, оформление форума, форумный аккаунт">
+  <meta name="author" content="Mezets">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://mezets.github.io/mezets.design/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://mezets.github.io/mezets.design/">
+  <meta property="og:title" content="Mezets — оформление Discord, VK, YouTube, Twitch для RP-серверов">
+  <meta property="og:description" content="Оформление Discord, ВК, YouTube, Twitch и форумных аккаунтов для RP-проектов: Province RP, GPA 5 RP, Majestik, Arizona. Делаю ботов для Discord, Telegram, VK.">
+  <meta property="og:image" content="https://mezets.github.io/mezets.design/avatar_server.png">
+  <meta property="og:locale" content="ru_RU">
+  <meta property="og:site_name" content="Mezets">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Mezets — оформление Discord, VK, YouTube, Twitch для RP-серверов">
+  <meta name="twitter:description" content="Оформление Discord, ВК, YouTube, Twitch и форумных аккаунтов для RP-проектов: Province RP, GPA 5 RP, Majestik, Arizona. Делаю ботов для Discord, Telegram, VK.">
+  <meta name="twitter:image" content="https://mezets.github.io/mezets.design/avatar_server.png">
+
   <link rel="icon" type="image/png" href="/favicon.png">
   <link rel="shortcut icon" href="/favicon.png">
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
+  <!-- Schema.org: структурированные данные для поисковиков -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "serviceType": "Оформление Discord, VK, YouTube, Twitch, форумов и разработка ботов",
+    "provider": {
+      "@type": "Person",
+      "name": "Mezets",
+      "url": "https://mezets.github.io/mezets.design/",
+      "sameAs": [
+        "https://discord.gg/aBJBmzS49e"
+      ]
+    },
+    "areaServed": "RU",
+    "audience": {
+      "@type": "Audience",
+      "audienceType": "RP-сервера: Province RP, GPA 5 RP, Majestik, Arizona RP"
+    },
+    "description": "Оформление Discord-серверов, групп ВК, превью YouTube, оформление Twitch и форумных аккаунтов/разделов, а также создание ботов для Discord, Telegram и VK для RP-проектов.",
+    "offers": {
+      "@type": "Offer",
+      "priceCurrency": "RUB",
+      "url": "https://mezets.github.io/mezets.design/prices/"
+    }
+  }
+  </script>
+
   <style>
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    /* ── КАСТОМНЫЙ СКРОЛЛБАР ── */
+    html { scrollbar-width: thin; scrollbar-color: rgba(255,0,0,0.45) rgba(10,0,0,0.6); }
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-track { background: rgba(10,0,0,0.6); }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255,0,0,0.45);
+      border-radius: 6px;
+      border: 2px solid rgba(10,0,0,0.6);
+      box-shadow: 0 0 6px rgba(255,0,0,0.3);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255,30,30,0.75);
+      box-shadow: 0 0 12px rgba(255,0,0,0.55);
+    }
 
     html, body {
       font-family: 'Press Start 2P', monospace;
@@ -149,6 +214,56 @@
     .star { font-size: 22px; color: rgba(255,255,255,0.2); transition: color .3s, text-shadow .3s; }
     .star.full { color: #ff2a2a; text-shadow: 0 0 10px rgba(255,40,40,0.9), 0 0 24px rgba(255,0,0,0.6); }
 
+    /* ========================= SEO-ТЕКСТ ========================= */
+    .seo-text {
+      position: relative;
+      z-index: 2;
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 0 24px 20px;
+      color: rgba(255,210,210,0.65);
+      font-size: 9px;
+      line-height: 2;
+      letter-spacing: .3px;
+      text-align: left;
+    }
+    .seo-text h1 {
+      font-size: 13px;
+      color: #ff3b3b;
+      line-height: 1.6;
+      margin-bottom: 14px;
+      letter-spacing: 1px;
+      text-align: center;
+    }
+    .seo-text h2 {
+      font-size: 10px;
+      color: rgba(255,150,150,0.8);
+      letter-spacing: 1px;
+      margin: 16px 0 10px;
+      text-transform: uppercase;
+    }
+    .seo-text p { margin-bottom: 12px; }
+    .seo-text strong { color: rgba(255,180,180,0.95); }
+    .seo-text ul { list-style: none; padding: 0; }
+    .seo-text li {
+      padding-left: 16px;
+      position: relative;
+      margin-bottom: 8px;
+    }
+    .seo-text li::before {
+      content: "";
+      position: absolute;
+      left: 0; top: 7px;
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: #ff2a2a;
+      box-shadow: 0 0 5px rgba(255,0,0,0.7);
+    }
+    @media (max-width: 600px) {
+      .seo-text { font-size: 8px; padding: 0 16px 16px; }
+      .seo-text h1 { font-size: 11px; }
+    }
+
     .koleso-btn {
       position: fixed;
       bottom: 28px;
@@ -160,7 +275,6 @@
       border-radius: 50%;
       border: 2px solid rgba(255,0,0,0.4);
       box-shadow: 0 0 20px rgba(255,0,0,0.3);
-      overflow: hidden;
       transition: transform .2s, box-shadow .2s;
       background: rgba(10,0,0,0.6);
     }
@@ -168,6 +282,7 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      border-radius: 50%;
       display: block;
     }
     .koleso-btn:hover {
@@ -175,6 +290,51 @@
       box-shadow: 0 0 34px rgba(255,0,0,0.6);
     }
     .koleso-btn:active { transform: scale(0.96); }
+
+    .koleso-hint {
+      position: absolute;
+      bottom: calc(100% + 10px);
+      right: 0;
+      width: 150px;
+      padding: 8px 26px 8px 12px;
+      border-radius: 10px;
+      background: rgba(10,0,0,0.95);
+      border: 1px solid rgba(255,0,0,0.4);
+      color: #ff8a8a;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 7px;
+      line-height: 1.7;
+      text-align: center;
+      letter-spacing: .3px;
+      box-shadow: 0 0 18px rgba(255,0,0,0.25);
+      pointer-events: auto;
+    }
+    .koleso-hint::after {
+      content: "";
+      position: absolute;
+      top: 100%; right: 18px;
+      border: 6px solid transparent;
+      border-top-color: rgba(255,0,0,0.4);
+    }
+    .koleso-hint-close {
+      position: absolute;
+      top: 6px; right: 7px;
+      width: 14px; height: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px;
+      line-height: 1;
+      color: rgba(255,150,150,0.6);
+      cursor: pointer;
+      border-radius: 4px;
+      transition: color .2s, background .2s;
+    }
+    .koleso-hint-close:hover {
+      color: #ff4444;
+      background: rgba(255,0,0,0.15);
+    }
+    @media (max-width: 760px) {
+      .koleso-hint { width: 120px; font-size: 6px; right: -6px; }
+    }
 
     .roulette-overlay {
       position: fixed;
@@ -279,6 +439,16 @@
       transform: translateX(-50%); z-index: 9;
     }
     .strip { display: flex; height: 100%; will-change: transform; }
+    .strip.idle-scroll {
+      animation: idleScroll 5s linear infinite;
+    }
+    @keyframes idleScroll {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .strip.idle-scroll { animation: none; }
+    }
     .strip-item {
       flex-shrink: 0;
       width: 90px; height: 100%;
@@ -292,7 +462,9 @@
 
     .si-100 { background: rgba(255,20,20,0.22); }  .si-100 .si-pct { color: #ff4444; }
     .si-75  { background: rgba(255,80,0,0.18); }   .si-75  .si-pct { color: #ff7733; }
+    .si-67  { background: rgba(255,90,0,0.17); }   .si-67  .si-pct { color: #ff8855; }
     .si-50  { background: rgba(200,100,0,0.15); }  .si-50  .si-pct { color: #ffaa44; }
+    .si-42  { background: rgba(190,110,0,0.14); }  .si-42  .si-pct { color: #ffb866; }
     .si-25  { background: rgba(150,120,0,0.13); }  .si-25  .si-pct { color: #ffcc44; }
     .si-10  { background: rgba(50,50,50,0.22); }   .si-10  .si-pct { color: rgba(255,200,200,0.45); }
 
@@ -765,7 +937,7 @@
   <div class="card stats" id="card2">
     <div class="stats-body">
     <div class="avatar-wrap">
-      <img src="avatar_server.png" class="avatar" alt="Discord Server">
+      <img src="avatar_server.png" class="avatar" alt="Mezets — оформление Discord-сервера">
     </div>
     <div class="name">Mezets</div>
 
@@ -817,9 +989,39 @@
   <a class="btn bottom-nav-btn" href="https://discord.com/channels/1399737445783965768/1412874304160268378" target="_blank">Портфолио</a>
 </div>
 
+<!-- SEO-ТЕКСТ: описание услуг для поисковиков и людей -->
+<section class="seo-text">
+  <h1>Mezets — оформление Discord, ВК, YouTube и Twitch для RP-серверов</h1>
+  <p>
+    Я занимаюсь <strong>оформлением Discord-серверов</strong>, групп ВК, превью для YouTube,
+    оформлением Twitch и форумных аккаунтов/разделов. Основная аудитория — игроки и администрация
+    RP-проектов: <strong>Province RP</strong>, <strong>GPA 5 RP</strong>, <strong>Majestik</strong> и
+    <strong>Arizona RP</strong>. Делаю аватарки, баннеры, фоны приглашений и анимированное
+    оформление под стиль конкретного сервера.
+  </p>
+  <p>
+    Помимо дизайна, я делаю <strong>ботов для Discord, Telegram и VK</strong> —
+    под задачи модерации, статистики, заявок и автоматизации сервера или группы.
+  </p>
+  <h2>Что делаю</h2>
+  <ul>
+    <li>Оформление Discord-серверов (баннеры, аватарки, роли, приглашения)</li>
+    <li>Оформление групп ВК (обложки, аватарки, дизайн меню)</li>
+    <li>Превью и оформление YouTube-каналов</li>
+    <li>Оформление Twitch-профилей</li>
+    <li>Оформление форумных аккаунтов и разделов</li>
+    <li>Боты для Discord, Telegram, VK</li>
+    <li>Оформление под RP-сервера: Province RP, GPA 5 RP, Majestik, Arizona RP</li>
+  </ul>
+</section>
+
 <!-- КНОПКА ОТКРЫТЬ РУЛЕТКУ -->
 <div class="koleso-btn" onclick="openRoulette()" title="Рулетка скидок">
   <img src="koleso.png" alt="Рулетка">
+  <span class="koleso-hint" id="kolesoHint">
+    Тут можно получить скидку
+    <span class="koleso-hint-close" id="kolesoHintClose" title="Скрыть">✕</span>
+  </span>
 </div>
 
 <!-- ОВЕРЛЕЙ РУЛЕТКИ -->
@@ -921,16 +1123,20 @@
   const VISUAL = {
     10:  { pct: '10%',  cls: 'si-10'  },
     25:  { pct: '25%',  cls: 'si-25'  },
+    42:  { pct: '42%',  cls: 'si-42'  },
     50:  { pct: '50%',  cls: 'si-50'  },
+    67:  { pct: '67%',  cls: 'si-67'  },
     75:  { pct: '75%',  cls: 'si-75'  },
     100: { pct: '100%', cls: 'si-100' },
   };
-  const VISUAL_LIST = [10, 25, 50, 75, 100];
+  const VISUAL_LIST = [10, 25, 42, 50, 67, 75, 100];
 
   const RESULT_PHRASE = {
     10:  'больше только в фильмах',
     25:  'ну нармальна',
+    42:  'братуха повезло',
     50:  'жэст',
+    67:  'красава, лови удачу',
     75:  'ну пачти',
     100: 'везунчик епта :3',
   };
@@ -1021,6 +1227,7 @@
     if (TEST_KEY) {
       loginBlock.style.display = 'none';
       spinBlock.style.display  = 'block';
+      stopIdleStrip();
 
       const btn = document.getElementById('spinBtn');
 
@@ -1040,6 +1247,7 @@
       loginBlock.style.display = 'block';
       spinBlock.style.display  = 'none';
       setupLoginButton();
+      buildIdleStrip();
       return;
     }
 
@@ -1052,12 +1260,14 @@
         loginBlock.style.display = 'block';
         spinBlock.style.display  = 'none';
         setupLoginButton();
+        buildIdleStrip();
         return;
       }
 
       loginBlock.style.display = 'none';
       spinBlock.style.display  = 'block';
       document.getElementById('loggedAs').textContent = 'Вы вошли через Discord';
+      stopIdleStrip();
 
       if (!data.can_spin) {
         btn.textContent   = 'Уже крутил';
@@ -1072,6 +1282,7 @@
       }
     } catch(e) {
       console.error('Ошибка проверки статуса', e);
+      buildIdleStrip();
     }
   }
 
@@ -1079,6 +1290,7 @@
      АНИМАЦИЯ ПОЛОСЫ
   ========================= */
   function buildStrip(winnerDiscount) {
+    stripEl.classList.remove('idle-scroll');
     stripEl.innerHTML = '';
     for (let i = 0; i < TOTAL; i++) {
       const disc = (i === WIN_IDX)
@@ -1090,6 +1302,34 @@
       el.innerHTML = `<span class="si-pct">${v.pct}</span><span class="si-label">скидка</span>`;
       stripEl.appendChild(el);
     }
+  }
+
+  /* Декоративная лента, бегущая фоном до авторизации через Discord.
+     Не участвует в реальном спине — просто заполняет полосу и
+     дублирует её x2 для бесшовной CSS-анимации (idleScroll: -50%). */
+  function buildIdleStrip() {
+    stripEl.classList.remove('idle-scroll');
+    stripEl.style.transition = 'none';
+    stripEl.style.transform  = 'translateX(0)';
+    stripEl.innerHTML = '';
+    const half = [];
+    for (let i = 0; i < TOTAL; i++) {
+      half.push(VISUAL_LIST[Math.floor(Math.random() * VISUAL_LIST.length)]);
+    }
+    for (let rep = 0; rep < 2; rep++) {
+      half.forEach(disc => {
+        const v  = VISUAL[disc];
+        const el = document.createElement('div');
+        el.className = `strip-item ${v.cls}`;
+        el.innerHTML = `<span class="si-pct">${v.pct}</span><span class="si-label">скидка</span>`;
+        stripEl.appendChild(el);
+      });
+    }
+    requestAnimationFrame(() => stripEl.classList.add('idle-scroll'));
+  }
+
+  function stopIdleStrip() {
+    stripEl.classList.remove('idle-scroll');
   }
 
   function runAnimation(winnerDiscount, code) {
@@ -1197,6 +1437,24 @@
   }
   function closeOnBg(e) {
     if (e.target === document.getElementById('rouletteOverlay')) closeRoulette();
+  }
+
+  /* =========================
+     ПОДСКАЗКА НА КНОПКЕ РУЛЕТКИ
+  ========================= */
+  const KOLESO_HINT_KEY = 'mezets_koleso_hint_closed';
+  const kolesoHint      = document.getElementById('kolesoHint');
+  const kolesoHintClose = document.getElementById('kolesoHintClose');
+
+  if (localStorage.getItem(KOLESO_HINT_KEY) === '1' && kolesoHint) {
+    kolesoHint.style.display = 'none';
+  }
+  if (kolesoHintClose) {
+    kolesoHintClose.addEventListener('click', (e) => {
+      e.stopPropagation();
+      localStorage.setItem(KOLESO_HINT_KEY, '1');
+      kolesoHint.style.display = 'none';
+    });
   }
 
   /* =========================
