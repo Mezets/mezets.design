@@ -214,6 +214,162 @@
     .star { font-size: 22px; color: rgba(255,255,255,0.2); transition: color .3s, text-shadow .3s; }
     .star.full { color: #ff2a2a; text-shadow: 0 0 10px rgba(255,40,40,0.9), 0 0 24px rgba(255,0,0,0.6); }
 
+    /* ========================= ПОРТФОЛИО ========================= */
+    .portfolio-section {
+      position: relative;
+      z-index: 2;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 10px 24px 30px;
+    }
+    .portfolio-title {
+      font-size: 13px;
+      color: #ff3b3b;
+      letter-spacing: 1px;
+      text-align: center;
+      margin-bottom: 18px;
+      text-shadow: 0 0 12px rgba(255,40,40,0.6), 0 0 26px rgba(255,0,0,0.3);
+    }
+    .portfolio-track-wrap {
+      overflow: hidden;
+      width: 100%;
+      cursor: grab;
+      mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+    }
+    .portfolio-track-wrap.dragging { cursor: grabbing; }
+    .portfolio-track {
+      display: flex;
+      gap: 14px;
+      will-change: transform;
+    }
+    .portfolio-track.auto-scroll {
+      animation: portfolioAutoScroll 32s linear infinite;
+    }
+    @keyframes portfolioAutoScroll {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .portfolio-track.auto-scroll { animation: none; }
+    }
+    .portfolio-card {
+      flex-shrink: 0;
+      width: 180px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(255,0,0,0.22);
+      background: rgba(255,0,0,0.04);
+      box-shadow: 0 0 20px rgba(255,0,0,0.08);
+      cursor: pointer;
+      transition: border-color .2s, box-shadow .2s, transform .2s;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .portfolio-card:hover {
+      border-color: rgba(255,0,0,0.45);
+      box-shadow: 0 0 28px rgba(255,0,0,0.18);
+      transform: translateY(-3px);
+    }
+    .portfolio-card img {
+      width: 100%;
+      height: 130px;
+      object-fit: cover;
+      display: block;
+      pointer-events: none;
+    }
+    .portfolio-card-info {
+      padding: 9px 10px;
+    }
+    .portfolio-card-type {
+      font-size: 8px;
+      color: rgba(255,225,225,0.9);
+      line-height: 1.6;
+      letter-spacing: .3px;
+    }
+    .portfolio-card-time {
+      font-size: 7px;
+      color: rgba(255,150,150,0.55);
+      margin-top: 4px;
+      letter-spacing: .3px;
+    }
+    @media (max-width: 600px) {
+      .portfolio-section { padding: 6px 12px 24px; }
+      .portfolio-card { width: 140px; }
+      .portfolio-card img { height: 100px; }
+    }
+
+    /* ── ОКНО ПРОСМОТРА РАБОТЫ ── */
+    .portfolio-modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(8px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .3s;
+      padding: 20px;
+    }
+    .portfolio-modal-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .portfolio-modal {
+      position: relative;
+      max-width: 560px;
+      max-height: 88vh;
+      width: 100%;
+      border-radius: 18px;
+      background: rgba(10,0,0,0.95);
+      border: 1px solid rgba(255,0,0,0.3);
+      box-shadow: 0 0 60px rgba(255,0,0,0.22);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .portfolio-modal-close {
+      position: absolute;
+      top: 12px; right: 14px;
+      width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      color: #fff;
+      background: rgba(0,0,0,0.5);
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 2;
+      transition: background .2s;
+    }
+    .portfolio-modal-close:hover { background: rgba(255,0,0,0.6); }
+    .portfolio-modal-img {
+      width: 100%;
+      max-height: 65vh;
+      object-fit: contain;
+      display: block;
+      background: #000;
+    }
+    .portfolio-modal-info {
+      padding: 16px 20px;
+      text-align: center;
+    }
+    .portfolio-modal-type {
+      font-size: 11px;
+      color: #ff5555;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+      line-height: 1.6;
+    }
+    .portfolio-modal-time {
+      font-size: 9px;
+      color: rgba(255,200,200,0.6);
+      letter-spacing: .5px;
+      line-height: 1.6;
+    }
+
     /* ========================= SEO-ТЕКСТ ========================= */
     .seo-text {
       position: relative;
@@ -986,7 +1142,26 @@
 <div class="bottom-nav">
   <a class="btn bottom-nav-btn" href="/mezets.design/prices">Цены на оформление</a>
   <a class="btn bottom-nav-btn" href="/mezets.design/rules">Правила оформления</a>
-  <a class="btn bottom-nav-btn" href="https://discord.com/channels/1399737445783965768/1412874304160268378" target="_blank">Портфолио</a>
+</div>
+
+<!-- ПОРТФОЛИО -->
+<section class="portfolio-section">
+  <div class="portfolio-title">Мои работы</div>
+  <div class="portfolio-track-wrap">
+    <div class="portfolio-track" id="portfolioTrack"></div>
+  </div>
+</section>
+
+<!-- ОКНО ПРОСМОТРА РАБОТЫ -->
+<div class="portfolio-modal-overlay" id="portfolioModalOverlay" onclick="closePortfolioOnBg(event)">
+  <div class="portfolio-modal">
+    <div class="portfolio-modal-close" onclick="closePortfolioModal()">✕</div>
+    <img class="portfolio-modal-img" id="portfolioModalImg" src="" alt="Работа">
+    <div class="portfolio-modal-info">
+      <div class="portfolio-modal-type" id="portfolioModalType"></div>
+      <div class="portfolio-modal-time" id="portfolioModalTime"></div>
+    </div>
+  </div>
 </div>
 
 <!-- SEO-ТЕКСТ: описание услуг для поисковиков и людей -->
@@ -1671,6 +1846,136 @@
   }
   if (!noMotion) animate();
   else for (let d of dots) { ctx.beginPath(); ctx.arc(d.x,d.y,d.r,0,Math.PI*2); ctx.fillStyle='rgba(255,0,0,0.6)'; ctx.fill(); }
+
+  /* =========================================================
+     ПОРТФОЛИО
+     Чтобы добавить новую работу — допиши объект в конец массива
+     PORTFOLIO_ITEMS ниже. Три поля:
+       img  — имя файла фото, лежит в папке portfolio/
+       type — что за работа ("Аватарка", "Баннер",
+              "Оформление форумного аккаунта" и т.п.)
+       time — за сколько выполнена ("1 день", "3 часа" и т.п.)
+     Пример:
+       { img: "portfolio/work12.png", type: "Баннер сервера", time: "1 день" },
+  ========================================================= */
+  const PORTFOLIO_ITEMS = [
+    { img: "portfolio/work1.png", type: "Аватарка",                        time: "1 день"  },
+    { img: "portfolio/work2.png", type: "Шапка профиля",                   time: "2 дня"   },
+    { img: "portfolio/work3.png", type: "Баннер сервера",                  time: "1 день"  },
+    { img: "portfolio/work4.png", type: "Оформление форумного аккаунта",   time: "2 дня"   },
+  ];
+
+  const portfolioTrack        = document.getElementById('portfolioTrack');
+  const portfolioTrackWrap    = portfolioTrack ? portfolioTrack.parentElement : null;
+  const portfolioModalOverlay = document.getElementById('portfolioModalOverlay');
+  const portfolioModalImg     = document.getElementById('portfolioModalImg');
+  const portfolioModalType    = document.getElementById('portfolioModalType');
+  const portfolioModalTime    = document.getElementById('portfolioModalTime');
+
+  function openPortfolioModal(item) {
+    portfolioModalImg.src           = item.img;
+    portfolioModalType.textContent  = item.type;
+    portfolioModalTime.textContent  = `Срок выполнения: ${item.time}`;
+    portfolioModalOverlay.classList.add('open');
+  }
+  function closePortfolioModal() {
+    portfolioModalOverlay.classList.remove('open');
+  }
+  function closePortfolioOnBg(e) {
+    if (e.target === portfolioModalOverlay) closePortfolioModal();
+  }
+
+  function renderPortfolio() {
+    if (!portfolioTrack || PORTFOLIO_ITEMS.length === 0) return;
+    portfolioTrack.innerHTML = '';
+    // Дублируем набор x2 для бесшовной автопрокрутки (-50%)
+    for (let rep = 0; rep < 2; rep++) {
+      PORTFOLIO_ITEMS.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'portfolio-card';
+        card.innerHTML = `
+          <img src="${item.img}" alt="${item.type}" loading="lazy">
+          <div class="portfolio-card-info">
+            <div class="portfolio-card-type">${item.type}</div>
+            <div class="portfolio-card-time">${item.time}</div>
+          </div>
+        `;
+        card.addEventListener('click', () => {
+          if (!portfolioDragged) openPortfolioModal(item);
+        });
+        portfolioTrack.appendChild(card);
+      });
+    }
+    if (PORTFOLIO_ITEMS.length > 1) {
+      portfolioTrack.classList.add('auto-scroll');
+    }
+  }
+
+  /* Перетаскивание мышью/тапом — на время drag глушим автопрокрутку
+     и клик по карточке (чтобы свайп не считался кликом). */
+  let portfolioDown     = false;
+  let portfolioDragged  = false;
+  let portfolioStartX   = 0;
+  let portfolioScrollX  = 0;
+  let portfolioBaseX    = 0;
+
+  function getTrackTranslateX() {
+    const tr = window.getComputedStyle(portfolioTrack).transform;
+    if (tr === 'none') return 0;
+    const m = tr.match(/matrix\(([^)]+)\)/);
+    if (!m) return 0;
+    return parseFloat(m[1].split(',')[4]) || 0;
+  }
+
+  function portfolioPointerDown(e) {
+    if (!portfolioTrackWrap) return;
+    portfolioDown    = true;
+    portfolioDragged = false;
+    portfolioStartX  = (e.touches ? e.touches[0].clientX : e.clientX);
+    portfolioBaseX   = getTrackTranslateX();
+    portfolioTrack.classList.remove('auto-scroll');
+    portfolioTrack.style.transition = 'none';
+    portfolioTrack.style.transform  = `translateX(${portfolioBaseX}px)`;
+    portfolioTrackWrap.classList.add('dragging');
+  }
+  function portfolioPointerMove(e) {
+    if (!portfolioDown) return;
+    const x    = (e.touches ? e.touches[0].clientX : e.clientX);
+    const diff = x - portfolioStartX;
+    if (Math.abs(diff) > 4) portfolioDragged = true;
+    portfolioScrollX = portfolioBaseX + diff;
+    portfolioTrack.style.transform = `translateX(${portfolioScrollX}px)`;
+  }
+  function portfolioPointerUp() {
+    if (!portfolioDown) return;
+    portfolioDown = false;
+    portfolioTrackWrap.classList.remove('dragging');
+
+    // Нормализуем позицию в пределы одной копии ленты, чтобы не
+    // уехать в пустоту, затем возвращаем автопрокрутку.
+    const halfWidth = portfolioTrack.scrollWidth / 2;
+    let x = portfolioScrollX % halfWidth;
+    if (x > 0) x -= halfWidth;
+    portfolioTrack.style.transform = `translateX(${x}px)`;
+
+    setTimeout(() => { portfolioDragged = false; }, 50);
+    setTimeout(() => {
+      portfolioTrack.style.transition = '';
+      portfolioTrack.style.transform  = '';
+      if (PORTFOLIO_ITEMS.length > 1) portfolioTrack.classList.add('auto-scroll');
+    }, 300);
+  }
+
+  if (portfolioTrackWrap) {
+    portfolioTrackWrap.addEventListener('mousedown',  portfolioPointerDown);
+    portfolioTrackWrap.addEventListener('touchstart', portfolioPointerDown, { passive: true });
+    window.addEventListener('mousemove',  portfolioPointerMove);
+    window.addEventListener('touchmove',  portfolioPointerMove, { passive: true });
+    window.addEventListener('mouseup',    portfolioPointerUp);
+    window.addEventListener('touchend',   portfolioPointerUp);
+  }
+
+  renderPortfolio();
 
 </script>
 </body>
