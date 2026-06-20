@@ -221,6 +221,7 @@
       max-width: 1000px;
       margin: 0 auto;
       padding: 10px 24px 30px;
+      perspective: 1000px;
     }
     .portfolio-title {
       font-size: 13px;
@@ -235,6 +236,7 @@
       width: 100%;
       cursor: grab;
       touch-action: pan-y;
+      padding: 10px 0;
       mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
       -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
     }
@@ -253,15 +255,16 @@
       background: rgba(255,0,0,0.04);
       box-shadow: 0 0 20px rgba(255,0,0,0.08);
       cursor: pointer;
-      transition: border-color .2s, box-shadow .2s, transform .2s;
+      transition: border-color .2s, box-shadow .2s, transform .1s ease-out;
       user-select: none;
       -webkit-user-select: none;
       position: relative;
+      transform-style: preserve-3d;
+      will-change: transform;
     }
     .portfolio-card:hover {
       border-color: rgba(255,0,0,0.45);
       box-shadow: 0 0 28px rgba(255,0,0,0.18);
-      transform: translateY(-3px);
     }
     .portfolio-card img,
     .portfolio-card video {
@@ -321,6 +324,7 @@
       pointer-events: none;
       transition: opacity .3s;
       padding: 20px;
+      perspective: 1200px;
     }
     .portfolio-modal-overlay.open {
       opacity: 1;
@@ -338,6 +342,9 @@
       overflow: hidden;
       display: flex;
       flex-direction: column;
+      transform-style: preserve-3d;
+      will-change: transform;
+      transition: border-color .25s, box-shadow .25s, transform .1s ease-out;
     }
     .portfolio-modal-close {
       position: absolute;
@@ -711,13 +718,13 @@
     .maint-toast {
       position: fixed;
       bottom: 120px;
-      left: 28px;
+      right: 28px;
       z-index: 999;
-      width: 280px;
+      width: 240px;
       background: rgba(8,0,0,0.97);
       border: 1px solid rgba(255,0,0,0.4);
       border-radius: 18px;
-      padding: 18px 18px 16px;
+      padding: 14px 14px 12px;
       font-family: 'Press Start 2P', monospace;
       box-shadow: 0 0 50px rgba(255,0,0,0.2);
       transform: translateY(20px);
@@ -766,7 +773,8 @@
       .main { gap: 24px; padding: 40px 16px; }
       .card { width: 100%; max-width: 340px; }
       .koleso-btn { width: 56px; height: 56px; bottom: 16px; right: 16px; }
-      .maint-toast { bottom: 84px; left: 12px; right: 12px; width: auto; }
+      .maint-toast { bottom: 84px; right: 8px; left: auto; width: 200px; }
+      .float-winners { display: none; }
       .bottom-nav-btn { width: 100%; max-width: 340px; }
       .bottom-nav { padding: 8px 16px 40px; gap: 12px; }
       .home-arrow { width: 38px; height: 38px; top: 12px; left: 12px; }
@@ -1024,6 +1032,85 @@
       line-height: 2;
       padding: 20px 0;
     }
+
+    /* Победители внутри рулетки */
+    .roulette-winners {
+      margin-bottom: 18px;
+      border-bottom: 1px solid rgba(255,0,0,0.15);
+      padding-bottom: 14px;
+    }
+    .roulette-winners-title {
+      font-size: 8px;
+      color: rgba(255,150,150,0.6);
+      letter-spacing: 1px;
+      text-align: center;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+    .roulette-winners-list {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      max-height: 160px;
+      overflow-y: auto;
+    }
+    .roulette-winners-list::-webkit-scrollbar { width: 2px; }
+    .roulette-winners-list::-webkit-scrollbar-thumb { background: rgba(255,0,0,0.2); border-radius: 2px; }
+    .roulette-winner-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: rgba(255,0,0,0.04);
+      border: 1px solid rgba(255,0,0,0.12);
+      animation: reviewFadeIn .3s ease forwards;
+      opacity: 0;
+    }
+    .roulette-winner-avatar {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid rgba(255,0,0,0.25);
+      flex-shrink: 0;
+    }
+    .roulette-winner-avatar-placeholder {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: rgba(255,0,0,0.12);
+      border: 1px solid rgba(255,0,0,0.25);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+    .roulette-winner-info { flex: 1; min-width: 0; }
+    .roulette-winner-name {
+      font-size: 7px;
+      color: rgba(255,225,225,0.85);
+      line-height: 1.5;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .roulette-winner-meta {
+      font-size: 6px;
+      color: rgba(255,150,150,0.45);
+      margin-top: 2px;
+      letter-spacing: .3px;
+    }
+    .roulette-winner-badge {
+      font-size: 9px;
+      color: #ff2a2a;
+      text-shadow: 0 0 6px rgba(255,0,0,0.6);
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+    .roulette-winners-empty {
+      font-size: 7px;
+      color: rgba(255,150,150,0.35);
+      text-align: center;
+      padding: 10px 0;
+    }
     @media (max-width: 760px) {
       .winners-card { width: 100%; max-width: 340px; }
     }
@@ -1228,6 +1315,7 @@
       .flying-cow { width: 38px; }
     }
 
+
   </style>
 </head>
 <body>
@@ -1298,13 +1386,6 @@
     </div>
   </div>
 
-  <!-- ПОСЛЕДНИЕ ПОБЕДИТЕЛИ РУЛЕТКИ -->
-  <div class="winners-card" id="winnersCard">
-    <div class="winners-title">Последние победители</div>
-    <div class="winners-list" id="winnersList">
-      <div class="winners-empty">Никто ещё не крутил...</div>
-    </div>
-  </div>
 
 </div>
 
@@ -1381,6 +1462,13 @@
 
     <div class="roulette-close" onclick="closeRoulette()">✕</div>
     <div class="roulette-title">Рулетка скидок</div>
+
+    <div class="roulette-winners">
+      <div class="roulette-winners-title">Последние победители</div>
+      <div class="roulette-winners-list" id="rouletteWinnersList">
+        <div class="roulette-winners-empty">Никто ещё не крутил...</div>
+      </div>
+    </div>
 
     <div class="strip-wrap">
       <div class="strip-arrow"></div>
@@ -1977,10 +2065,6 @@
   const reviewsCard = document.querySelector('.reviews-card');
   if (reviewsCard) tilt(reviewsCard);
 
-  // 3D наклон для карточки победителей
-  const winnersCard = document.getElementById('winnersCard');
-  if (winnersCard) tilt(winnersCard);
-
   // 3D наклон для карточки заказа
   const orderCard = document.getElementById('orderCard');
   if (orderCard) tilt(orderCard);
@@ -2040,30 +2124,33 @@
      ПОСЛЕДНИЕ ПОБЕДИТЕЛИ
   ========================= */
   const DISCOUNT_EMOJI = {10:'🎟️',25:'🎫',42:'🐄',50:'🎯',67:'🔥',75:'💎',100:'👑'};
+  const WEIGHTS = {10:130,25:46,42:22,50:18,67:7,75:5,100:1};
+  const WEIGHTS_TOTAL = Object.values(WEIGHTS).reduce((a,b)=>a+b,0);
+  function getChance(discount) { return (WEIGHTS[discount]/WEIGHTS_TOTAL*100).toFixed(2)+'%'; }
 
-  function renderWinners(winners) {
-    const list = document.getElementById('winnersList');
+  function renderRouletteWinners(winners) {
+    const list = document.getElementById('rouletteWinnersList');
     if (!list) return;
     if (!winners || winners.length === 0) {
-      list.innerHTML = '<div class="winners-empty">Никто ещё не крутил...</div>';
+      list.innerHTML = '<div class="roulette-winners-empty">Никто ещё не крутил...</div>';
       return;
     }
     list.innerHTML = '';
     winners.forEach((w, i) => {
       const item = document.createElement('div');
-      item.className = 'winner-item';
-      item.style.animationDelay = `${i * 80}ms`;
+      item.className = 'roulette-winner-item';
+      item.style.animationDelay = `${i * 60}ms`;
       const avatarHtml = w.avatar
-        ? `<img class="winner-avatar" src="${w.avatar}" alt="${w.username}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="winner-avatar-placeholder" style="display:none">🎰</div>`
-        : `<div class="winner-avatar-placeholder">🎰</div>`;
+        ? `<img class="roulette-winner-avatar" src="${w.avatar}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="roulette-winner-avatar-placeholder" style="display:none">🎰</div>`
+        : `<div class="roulette-winner-avatar-placeholder">🎰</div>`;
       const emoji = DISCOUNT_EMOJI[w.discount] || '🎰';
       item.innerHTML = `
         ${avatarHtml}
-        <div class="winner-info">
-          <div class="winner-name">${w.username}</div>
-          <div class="winner-date">${w.date}</div>
+        <div class="roulette-winner-info">
+          <div class="roulette-winner-name">${w.username}</div>
+          <div class="roulette-winner-meta">${w.date} · шанс ${getChance(w.discount)}</div>
         </div>
-        <div class="winner-badge">${emoji} ${w.discount}%</div>
+        <div class="roulette-winner-badge">${emoji} ${w.discount}%</div>
       `;
       list.appendChild(item);
     });
@@ -2073,7 +2160,7 @@
     try {
       const res  = await fetch(`${API}/last-winners`, { mode: 'cors' });
       const data = await res.json();
-      renderWinners(data.winners);
+      renderRouletteWinners(data.winners);
     } catch(e) {}
   }
 
@@ -2177,7 +2264,6 @@
     { img: "portfolio/png/ff7f32b0d6ba1011.png", type: "Оформление форумных разделов", time: "1 день" },
     { img: "portfolio/png/11beebc137b1f5e9.png", type: "Оформление группы ВК", time: "2 дня" },
     { img: "portfolio/mp4/9c45641283169ca6.mp4", type: "Анимированное оформление форумного аккаунта", time: "2 дня" },
-    { img: "portfolio/gif/2473ba2234504e66.gif", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
     { img: "portfolio/png/4fb69b3f3e108103.png", type: "Оформление форумного аккаунта", time: "1 день" },
    { img: "portfolio/mp4/ae016f282b171634.mp4", type: "Анимированное оформление форумного аккаунта", time: "2 дня" },
 {
@@ -2197,7 +2283,6 @@
     { img: "portfolio/mp4/5abbc31fb75cc879.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
     { img: "portfolio/png/2.png", type: "Оформление форумного аккаунта", time: "1 день" },
     { img: "portfolio/mp4/9aea3cf2d065ca86.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
-    { img: "portfolio/gif/1.gif", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
     { img: "portfolio/png/a3e33aad31bfabfe.png", type: "Оформление форумного аккаунта", time: "1 день" },
     { img: "portfolio/mp4/b48e6dd5bea5da15.mp4", type: "Анимированное оформление форумного аккаунта", time: "2 дня" },
     { img: "portfolio/mp4/3a39b97d42947ac6.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
@@ -2219,6 +2304,24 @@
   const portfolioModalNext    = document.getElementById('portfolioModalNext');
   const portfolioModalDots    = document.getElementById('portfolioModalDots');
 
+  // 3D наклон для полного просмотра работы (объявляем здесь, после инициализации переменной)
+  const portfolioModal = document.querySelector('.portfolio-modal');
+  if (portfolioModal && portfolioModalOverlay) {
+    portfolioModalOverlay.addEventListener('mousemove', e => {
+      const r = portfolioModal.getBoundingClientRect();
+      if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) {
+        portfolioModal.style.transform = 'rotateY(0) rotateX(0)';
+        return;
+      }
+      const x = (e.clientX - r.left) / r.width  - 0.5;
+      const y = (e.clientY - r.top)  / r.height - 0.5;
+      portfolioModal.style.transform = `rotateY(${x*8}deg) rotateX(${-y*8}deg)`;
+    });
+    portfolioModalOverlay.addEventListener('mouseleave', () => {
+      portfolioModal.style.transform = 'rotateY(0) rotateX(0)';
+    });
+  }
+
   let currentGroup = null;
   let currentIndex = 0;
 
@@ -2226,19 +2329,36 @@
     const items = currentGroup;
     const item  = items[currentIndex];
 
-    if (isVideoSrc(item.img)) {
-      portfolioModalImg.style.display = 'none';
-      portfolioModalImg.removeAttribute('src');
-      portfolioModalVid.src = item.img;
-      portfolioModalVid.style.display = 'block';
-      portfolioModalVid.currentTime = 0;
-      portfolioModalVid.play().catch(() => {});
+    const mediaWrap = document.getElementById('portfolioModalMediaWrap');
+
+    // Плавный переход: скрываем → меняем → показываем
+    const doSwitch = () => {
+      if (isVideoSrc(item.img)) {
+        portfolioModalImg.style.display = 'none';
+        portfolioModalImg.removeAttribute('src');
+        portfolioModalVid.src = item.img;
+        portfolioModalVid.style.display = 'block';
+        portfolioModalVid.currentTime = 0;
+        portfolioModalVid.play().catch(() => {});
+      } else {
+        portfolioModalVid.pause();
+        portfolioModalVid.removeAttribute('src');
+        portfolioModalVid.style.display = 'none';
+        portfolioModalImg.src = item.img;
+        portfolioModalImg.style.display = 'block';
+      }
+      mediaWrap.style.opacity = '1';
+    };
+
+    if (mediaWrap.style.opacity === '0') {
+      doSwitch();
     } else {
-      portfolioModalVid.pause();
-      portfolioModalVid.removeAttribute('src');
-      portfolioModalVid.style.display = 'none';
-      portfolioModalImg.src = item.img;
-      portfolioModalImg.style.display = 'block';
+      mediaWrap.style.transition = 'opacity .25s ease';
+      mediaWrap.style.opacity = '0';
+      setTimeout(() => {
+        doSwitch();
+        mediaWrap.style.opacity = '1';
+      }, 250);
     }
 
     portfolioModalType.textContent = item.type;
@@ -2359,6 +2479,21 @@
         card.addEventListener('click', () => {
           if (!portfolioDragged) openPortfolioModal(items);
         });
+
+        // 3D наклон только для первого набора (не дублей)
+        if (rep === 0) {
+          card.addEventListener('mousemove', e => {
+            if (portfolioDown) return;
+            const r = card.getBoundingClientRect();
+            const x = (e.clientX - r.left) / r.width  - 0.5;
+            const y = (e.clientY - r.top)  / r.height - 0.5;
+            card.style.transform = `rotateY(${x*14}deg) rotateX(${-y*14}deg) scale(1.04) translateY(-4px)`;
+          });
+          card.addEventListener('mouseleave', () => {
+            card.style.transform = '';
+          });
+        }
+
         portfolioTrack.appendChild(card);
       });
     }
