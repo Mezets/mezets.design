@@ -1137,6 +1137,8 @@
 
 <audio id="spinSound" src="roulette-spin.mp3" preload="auto"></audio>
 <audio id="stopSound" src="win.mp3" preload="auto"></audio>
+<audio id="rouletteCowSound" src="cow.mp3" preload="auto"></audio>
+<audio id="sound67" src="67.mp3" preload="auto"></audio>
 
 <canvas id="bg"></canvas>
 <div class="fluff-wrap">
@@ -1591,9 +1593,18 @@
       stripEl.style.transform  = `translateX(-${targetX}px)`;
       setTimeout(() => {
         document.getElementById('spinSound').pause();
-        document.getElementById('stopSound').currentTime = 0;
-        document.getElementById('stopSound').play();
+        if (winnerDiscount === 42) {
+          const s = document.getElementById('rouletteCowSound');
+          s.currentTime = 0; s.play().catch(() => {});
+        } else if (winnerDiscount === 67) {
+          const s = document.getElementById('sound67');
+          s.currentTime = 0; s.play().catch(() => {});
+        } else {
+          document.getElementById('stopSound').currentTime = 0;
+          document.getElementById('stopSound').play().catch(() => {});
+        }
         lastCode = code;
+        localStorage.setItem('mezets_spin_result', JSON.stringify({ discount: winnerDiscount, code }));
         document.getElementById('resultPct').innerHTML =
           `Скидка ${VISUAL[winnerDiscount].pct}!<br><span style="font-size:10px;color:rgba(255,200,200,0.7)">${RESULT_PHRASE[winnerDiscount]}</span>`;
         document.getElementById('resultPct').classList.add('show');
@@ -1617,19 +1628,17 @@
     }));
   }
 
-  /* =========================
-     ВЗРЫВ ЧАСТИЦ
-  ========================= */
+  let spinning = false;
+  let lastCode = null;
+
   function burstParticles() {
     const COUNT  = 48;
     const cx     = window.innerWidth  / 2;
     const cy     = window.innerHeight / 2;
     const colors = ['#ff2a2a','#ff6b6b','#ff9b9b','#ffcccc','#ffffff','#ff4500'];
-
     for (let i = 0; i < COUNT; i++) {
-      const p = document.createElement('div');
+      const p     = document.createElement('div');
       p.className = 'burst-particle';
-
       const size  = Math.random() * 10 + 4;
       const angle = (Math.PI * 2 / COUNT) * i + (Math.random() - 0.5) * 0.5;
       const dist  = Math.random() * 220 + 80;
@@ -1637,22 +1646,11 @@
       const by    = Math.sin(angle) * dist;
       const dur   = Math.random() * 600 + 800;
       const color = colors[Math.floor(Math.random() * colors.length)];
-
-      p.style.cssText = `
-        left: ${cx}px; top: ${cy}px;
-        width: ${size}px; height: ${size}px;
-        background: ${color};
-        box-shadow: 0 0 ${size * 2}px ${color};
-        --bx: ${bx}px; --by: ${by}px;
-        animation: burst-fly ${dur}ms ease-out forwards;
-      `;
+      p.style.cssText = `left:${cx}px;top:${cy}px;width:${size}px;height:${size}px;background:${color};box-shadow:0 0 ${size*2}px ${color};--bx:${bx}px;--by:${by}px;animation:burst-fly ${dur}ms ease-out forwards;`;
       document.body.appendChild(p);
       setTimeout(() => p.remove(), dur + 50);
     }
   }
-
-  let spinning = false;
-  let lastCode = null;
 
   async function spin() {
     if (spinning) return;
