@@ -126,6 +126,7 @@
     }
 
     /* ── RULE CARD ── */
+    .rules-grid { perspective: 1200px; }
     .rule {
       display: flex;
       gap: 14px;
@@ -133,7 +134,9 @@
       border-radius: 14px;
       background: rgba(255,0,0,0.04);
       border: 1px solid rgba(255,0,0,0.13);
-      transition: border-color .2s, box-shadow .2s;
+      transition: border-color .25s, box-shadow .25s, transform .1s ease-out;
+      transform-style: preserve-3d;
+      will-change: transform;
       opacity: 0;
       animation: fadeUp .4s ease forwards;
     }
@@ -401,6 +404,19 @@
     requestAnimationFrame(animate);
   }
   if (!noMotion) animate();
+
+  // 3D tilt on rule cards
+  if (!noMotion) {
+    document.querySelectorAll('.rule').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const r = card.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width  - .5;
+        const y = (e.clientY - r.top)  / r.height - .5;
+        card.style.transform = `rotateY(${x*14}deg) rotateX(${-y*14}deg) scale(1.03)`;
+      });
+      card.addEventListener('mouseleave', () => { card.style.transform = ''; });
+    });
+  }
 </script>
 </body>
 </html>
