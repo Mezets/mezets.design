@@ -689,7 +689,7 @@ async function uploadWork() {
     const indexFile = await getFile('index.html');
     if (!indexFile) throw new Error('index.html не найден в репозитории');
 
-    let html = atob(indexFile.content.replace(/\n/g, ''));
+    let html = decodeURIComponent(escape(atob(indexFile.content.replace(/\n/g, ''))));
 
     /* 6. Строим новую запись */
     const imgRef = `${folder}/${fname}`;
@@ -773,7 +773,7 @@ async function loadWorks() {
   try {
     const indexFile = await getFile('index.html');
     if (!indexFile) throw new Error('index.html не найден');
-    const html = atob(indexFile.content.replace(/\n/g, ''));
+    const html = decodeURIComponent(escape(atob(indexFile.content.replace(/\n/g, ''))));
 
     const items = parsePortfolioItems(html);
     document.getElementById('worksCount').textContent = items.length;
@@ -832,7 +832,7 @@ async function deleteWork(idx) {
   try {
     const indexFile = await getFile('index.html');
     if (!indexFile) throw new Error('index.html не найден');
-    let html = atob(indexFile.content.replace(/\n/g, ''));
+    let html = decodeURIComponent(escape(atob(indexFile.content.replace(/\n/g, ''))));
 
     const start = html.indexOf('const PORTFOLIO_ITEMS = [');
     const end   = html.indexOf('\n  ];', start);
@@ -903,7 +903,7 @@ async function loadPrices() {
     const f = await getFile('prices/index.html');
     if (!f) throw new Error('prices/index.html не найден');
     pricesFileSha = f.sha;
-    const rawHtml = atob(f.content.replace(/\n/g, ''));
+    const rawHtml = decodeURIComponent(escape(atob(f.content.replace(/\n/g, ''))));
     pricesData = parsePrices(rawHtml);
     renderPrices();
   } catch(e) {
@@ -1010,7 +1010,7 @@ async function savePrices() {
   try {
     const f = await getFile('prices/index.html');
     if (!f) throw new Error('prices/index.html не найден');
-    let rawHtml = atob(f.content.replace(/\n/g, ''));
+    let rawHtml = decodeURIComponent(escape(atob(f.content.replace(/\n/g, ''))));
 
     // Перестраиваем все секции с ценами
     const sections = {};
@@ -1074,7 +1074,7 @@ async function loadRules() {
   try {
     const f = await getFile('rules/index.html');
     if (!f) throw new Error('rules/index.html не найден');
-    const rawHtml = atob(f.content.replace(/\n/g, ''));
+    const rawHtml = decodeURIComponent(escape(atob(f.content.replace(/\n/g, ''))));
     rulesData = parseRules(rawHtml);
     renderRules();
   } catch(e) {
@@ -1183,7 +1183,7 @@ async function saveRules() {
   try {
     const f = await getFile('rules/index.html');
     if (!f) throw new Error('rules/index.html не найден');
-    let rawHtml = atob(f.content.replace(/\n/g, ''));
+    let rawHtml = decodeURIComponent(escape(atob(f.content.replace(/\n/g, ''))));
 
     // Строим новый HTML блок правил
     const newRulesHtml = rulesData.map((rule, idx) => {
