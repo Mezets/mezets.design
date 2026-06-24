@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mezets — Админка</title>
+  <link rel="icon" type="image/png" href="/favicon.png">
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -94,6 +95,47 @@
       box-shadow: 0 0 14px rgba(255,0,0,0.12);
     }
     textarea { resize: vertical; min-height: 60px; }
+
+    /* ── WYSIWYG EDITOR ── */
+    .rich-toolbar {
+      display: flex; flex-wrap: wrap; gap: 4px;
+      padding: 6px 8px;
+      background: rgba(255,0,0,0.06);
+      border: 1px solid rgba(255,0,0,0.2);
+      border-bottom: none;
+      border-radius: 10px 10px 0 0;
+    }
+    .rich-toolbar button {
+      font-family: monospace; font-size: 11px; font-weight: bold;
+      padding: 4px 9px; border-radius: 5px; border: 1px solid rgba(255,0,0,0.2);
+      background: rgba(255,0,0,0.04); color: rgba(255,180,180,0.9);
+      cursor: pointer; transition: background .15s, border-color .15s;
+      line-height: 1;
+    }
+    .rich-toolbar button:hover { background: rgba(255,0,0,0.15); border-color: rgba(255,0,0,0.4); }
+    .rich-toolbar button.active { background: rgba(255,0,0,0.2); border-color: rgba(255,0,0,0.5); }
+    .rich-toolbar .tb-sep { width: 1px; background: rgba(255,0,0,0.15); margin: 2px 2px; }
+    .rich-editor {
+      width: 100%; min-height: 80px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,0,0,0.22);
+      border-top: none;
+      border-radius: 0 0 10px 10px;
+      padding: 10px 12px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 8px; color: rgba(255,200,200,0.9);
+      line-height: 1.9;
+      outline: none;
+      margin-bottom: 18px;
+    }
+    .rich-editor:focus { border-color: rgba(255,0,0,0.55); box-shadow: 0 0 14px rgba(255,0,0,0.1); }
+    .rich-editor .hi { color: #ffaaaa; }
+    .rich-editor-wrap { margin-bottom: 0; }
+    .rich-editor:empty:before {
+      content: attr(placeholder);
+      color: rgba(255,200,200,0.25);
+      pointer-events: none;
+    }
 
     /* ── ЗАГРУЗКА ФАЙЛА ── */
     .file-drop {
@@ -463,8 +505,19 @@
         <div class="card-title" style="font-size:8px;margin-bottom:14px">ДОБАВИТЬ ПРАВИЛО</div>
         <label>Заголовок</label>
         <input type="text" id="newRuleTitle" placeholder="Название правила">
-        <label>Текст (HTML можно: &lt;span class=&quot;hi&quot;&gt;...&lt;/span&gt; для подсветки)</label>
-        <textarea id="newRuleText" placeholder="Текст правила..."></textarea>
+        <label>Текст (выдели текст и нажми кнопку для подсветки)</label>
+        <div class="rich-editor-wrap">
+          <div class="rich-toolbar" id="newRuleToolbar">
+            <button onclick="rteCmd('newRuleEditor','bold')" title="Жирный"><b>B</b></button>
+            <button onclick="rteCmd('newRuleEditor','italic')" title="Курсив"><i>I</i></button>
+            <div class="tb-sep"></div>
+            <button onclick="rteHighlight('newRuleEditor')" title="Подсветить (hi)" style="color:#ffaaaa">★ hi</button>
+            <button onclick="rteRemoveHi('newRuleEditor')" title="Убрать подсветку">✕ hi</button>
+            <div class="tb-sep"></div>
+            <button onclick="rteInsert('newRuleEditor','<br>')" title="Перенос строки">↵ br</button>
+          </div>
+          <div class="rich-editor" id="newRuleEditor" contenteditable="true" placeholder="Текст правила..."></div>
+        </div>
         <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:18px">
           <input type="checkbox" id="newRuleImportant" style="width:auto;margin:0;accent-color:#ff2a2a">
           <span>Важное правило (красная рамка)</span>
@@ -1141,18 +1194,35 @@ function renderRules() {
     row1.appendChild(impChk);
     row1.appendChild(del);
 
-    // Текст
-    const textTA = document.createElement('textarea');
-    textTA.value = rule.text;
-    textTA.style.cssText = 'width:100%;margin-bottom:0;font-size:7px;padding:7px 10px;min-height:70px;resize:vertical';
-    textTA.oninput = () => { rulesData[idx].text = textTA.value; };
+    // WYSIWYG toolbar
+    const edId = 'rte_' + idx;
+    const toolbar = document.createElement('div');
+    toolbar.className = 'rich-toolbar';
+    toolbar.innerHTML = `
+      <button onclick="rteCmd('${edId}','bold')" title="Жирный"><b>B</b></button>
+      <button onclick="rteCmd('${edId}','italic')" title="Курсив"><i>I</i></button>
+      <div class="tb-sep"></div>
+      <button onclick="rteHighlight('${edId}')" title="Подсветить (hi)" style="color:#ffaaaa">★ hi</button>
+      <button onclick="rteRemoveHi('${edId}')" title="Убрать подсветку">✕ hi</button>
+      <div class="tb-sep"></div>
+      <button onclick="rteInsert('${edId}','<br>')" title="Перенос строки">↵ br</button>
+    `;
+
+    // Rich editor
+    const editor = document.createElement('div');
+    editor.id = edId;
+    editor.className = 'rich-editor';
+    editor.contentEditable = 'true';
+    editor.innerHTML = rule.text;
+    editor.oninput = () => { rulesData[idx].text = editor.innerHTML; };
 
     const hint = document.createElement('div');
     hint.style.cssText = 'font-size:6px;color:rgba(255,200,200,0.25);line-height:1.8;margin-top:4px';
-    hint.textContent = 'Чекбокс справа = важное правило (красная рамка)';
+    hint.textContent = 'Выдели текст → нажми ★ hi для подсветки красным';
 
     wrap.appendChild(row1);
-    wrap.appendChild(textTA);
+    wrap.appendChild(toolbar);
+    wrap.appendChild(editor);
     wrap.appendChild(hint);
     container.appendChild(wrap);
   });
@@ -1160,15 +1230,16 @@ function renderRules() {
 
 function addRule() {
   const title     = document.getElementById('newRuleTitle').value.trim();
-  const text      = document.getElementById('newRuleText').value.trim();
+  const editor    = document.getElementById('newRuleEditor');
+  const text      = editor ? editor.innerHTML.trim() : '';
   const important = document.getElementById('newRuleImportant').checked;
-  if (!title || !text) {
+  if (!title || !text || text === '<br>') {
     showStatus(document.getElementById('rulesStatus'), 'Заполни заголовок и текст', 'err');
     return;
   }
   rulesData.push({ title, text, important });
   document.getElementById('newRuleTitle').value = '';
-  document.getElementById('newRuleText').value  = '';
+  if (editor) editor.innerHTML = '';
   document.getElementById('newRuleImportant').checked = false;
   renderRules();
   showStatus(document.getElementById('rulesStatus'), 'Правило добавлено — не забудь сохранить!', 'info');
@@ -1220,6 +1291,52 @@ async function saveRules() {
   } finally {
     btn.disabled = false;
   }
+}
+
+/* ── WYSIWYG HELPERS ── */
+function rteCmd(edId, cmd) {
+  const ed = document.getElementById(edId);
+  if (!ed) return;
+  ed.focus();
+  document.execCommand(cmd, false, null);
+}
+
+function rteHighlight(edId) {
+  const ed = document.getElementById(edId);
+  if (!ed) return;
+  ed.focus();
+  const sel = window.getSelection();
+  if (!sel || sel.isCollapsed) return;
+  const range = sel.getRangeAt(0);
+  const span = document.createElement('span');
+  span.className = 'hi';
+  try { range.surroundContents(span); } catch(e) {
+    // fallback for partial selections
+    const frag = range.extractContents();
+    span.appendChild(frag);
+    range.insertNode(span);
+  }
+  sel.removeAllRanges();
+}
+
+function rteRemoveHi(edId) {
+  const ed = document.getElementById(edId);
+  if (!ed) return;
+  ed.querySelectorAll('span.hi').forEach(s => {
+    const parent = s.parentNode;
+    while (s.firstChild) parent.insertBefore(s.firstChild, s);
+    parent.removeChild(s);
+  });
+  // update rulesData
+  const idx = edId.startsWith('rte_') ? parseInt(edId.slice(4)) : -1;
+  if (idx >= 0 && rulesData[idx]) rulesData[idx].text = ed.innerHTML;
+}
+
+function rteInsert(edId, html) {
+  const ed = document.getElementById(edId);
+  if (!ed) return;
+  ed.focus();
+  document.execCommand('insertHTML', false, html);
 }
 
 </script>
