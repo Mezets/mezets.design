@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mezets — Админка</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scrollbar-width: thin; scrollbar-color: rgba(255,0,0,0.45) rgba(10,0,0,0.6); }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: rgba(10,0,0,0.6); }
+    ::-webkit-scrollbar-thumb { background: rgba(255,0,0,0.45); border-radius: 6px; }
+
+    html, body {
+      font-family: 'Press Start 2P', monospace;
+      background: #050000;
+      min-height: 100vh;
+      color: rgba(255,200,200,0.85);
+      overflow-x: hidden;
+    }
+
+    canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 560px;
+      margin: 0 auto;
+      padding: 48px 20px 80px;
+    }
+
+    .logo {
+      font-size: 13px;
+      color: #ff2a2a;
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+      text-shadow: 0 0 18px rgba(255,0,0,0.55);
+    }
+    .logo-sub {
+      font-size: 7px;
+      color: rgba(255,200,200,0.35);
+      letter-spacing: 1px;
+      margin-bottom: 40px;
+    }
+
+    /* ── КАРТОЧКА ── */
+    .card {
+      background: rgba(12,0,0,0.82);
+      border: 1px solid rgba(255,0,0,0.22);
+      border-radius: 18px;
+      padding: 28px 24px;
+      margin-bottom: 20px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 40px rgba(255,0,0,0.06);
+    }
+
+    .card-title {
+      font-size: 9px;
+      color: #ff2a2a;
+      letter-spacing: 1px;
+      margin-bottom: 20px;
+    }
+
+    /* ── ПОЛЯ ── */
+    label {
+      display: block;
+      font-size: 7px;
+      color: rgba(255,200,200,0.45);
+      letter-spacing: 1px;
+      margin-bottom: 7px;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    textarea,
+    select {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,0,0,0.22);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 8px;
+      color: rgba(255,200,200,0.9);
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+      margin-bottom: 18px;
+      line-height: 1.7;
+    }
+    input:focus, textarea:focus, select:focus {
+      border-color: rgba(255,0,0,0.55);
+      box-shadow: 0 0 14px rgba(255,0,0,0.12);
+    }
+    textarea { resize: vertical; min-height: 60px; }
+
+    /* ── ЗАГРУЗКА ФАЙЛА ── */
+    .file-drop {
+      border: 2px dashed rgba(255,0,0,0.3);
+      border-radius: 14px;
+      padding: 28px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: .2s;
+      margin-bottom: 18px;
+      position: relative;
+    }
+    .file-drop:hover, .file-drop.drag { border-color: rgba(255,0,0,0.7); background: rgba(255,0,0,0.04); }
+    .file-drop input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+    .file-drop-icon { font-size: 22px; margin-bottom: 10px; }
+    .file-drop-label { font-size: 8px; color: rgba(255,200,200,0.5); line-height: 1.8; }
+    .file-drop-name { font-size: 8px; color: #ff4444; margin-top: 8px; line-height: 1.6; word-break: break-all; }
+
+    /* ── ПРЕВЬЮ ── */
+    .preview-wrap {
+      margin-bottom: 18px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(255,0,0,0.18);
+      display: none;
+      background: rgba(0,0,0,0.4);
+      text-align: center;
+    }
+    .preview-wrap img, .preview-wrap video {
+      max-width: 100%;
+      max-height: 260px;
+      display: block;
+      margin: 0 auto;
+    }
+
+    /* ── КНОПКИ ── */
+    .btn {
+      width: 100%;
+      padding: 16px 12px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 9px;
+      line-height: 1.6;
+      background: linear-gradient(135deg, rgba(255,0,0,0.18), rgba(180,0,0,0.1));
+      border: 1px solid rgba(255,0,0,0.5);
+      border-radius: 12px;
+      color: #ff3b3b;
+      cursor: pointer;
+      transition: .2s;
+      letter-spacing: 1px;
+    }
+    .btn:hover:not(:disabled) { background: rgba(255,0,0,0.22); box-shadow: 0 0 22px rgba(255,0,0,0.3); transform: translateY(-1px); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    .btn-sm {
+      width: auto;
+      padding: 8px 14px;
+      font-size: 7px;
+      background: transparent;
+      border-color: rgba(255,0,0,0.3);
+    }
+    .btn-sm:hover:not(:disabled) { background: rgba(255,0,0,0.1); box-shadow: none; transform: none; }
+
+    /* ── ПРОГРЕСС ── */
+    .progress-wrap {
+      display: none;
+      margin-top: 14px;
+    }
+    .progress-bar-bg {
+      height: 6px;
+      background: rgba(255,0,0,0.1);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 8px;
+      border: 1px solid rgba(255,0,0,0.2);
+    }
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #ff2a2a, #ff6b6b);
+      border-radius: 10px;
+      width: 0%;
+      transition: width .3s ease;
+      box-shadow: 0 0 10px rgba(255,0,0,0.4);
+    }
+    .progress-label {
+      font-size: 7px;
+      color: rgba(255,200,200,0.55);
+      letter-spacing: 1px;
+      line-height: 1.8;
+    }
+
+    /* ── СТАТУС ── */
+    .status {
+      font-size: 7px;
+      line-height: 2;
+      letter-spacing: 0.5px;
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      display: none;
+    }
+    .status.ok { color: rgba(100,255,100,0.85); background: rgba(0,255,0,0.06); border: 1px solid rgba(0,255,0,0.2); display: block; }
+    .status.err { color: rgba(255,120,120,0.9); background: rgba(255,0,0,0.06); border: 1px solid rgba(255,0,0,0.25); display: block; }
+    .status.info { color: rgba(255,200,200,0.6); background: rgba(255,0,0,0.04); border: 1px solid rgba(255,0,0,0.15); display: block; }
+
+    /* ── ТОКЕН ── */
+    .token-row {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      margin-bottom: 6px;
+    }
+    .token-row input { margin-bottom: 0; flex: 1; }
+
+    /* ── СПИСОК РАБОТ ── */
+    .works-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .work-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255,0,0,0.04);
+      border: 1px solid rgba(255,0,0,0.14);
+      border-radius: 12px;
+      padding: 10px 14px;
+    }
+    .work-thumb {
+      width: 52px;
+      height: 36px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid rgba(255,0,0,0.2);
+      background: rgba(0,0,0,0.4);
+      flex-shrink: 0;
+    }
+    .work-info { flex: 1; min-width: 0; }
+    .work-type { font-size: 7px; color: #ff4444; line-height: 1.7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .work-file { font-size: 6px; color: rgba(255,200,200,0.35); line-height: 1.6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .work-del {
+      font-size: 10px;
+      color: rgba(255,0,0,0.4);
+      cursor: pointer;
+      transition: .2s;
+      flex-shrink: 0;
+      padding: 4px 8px;
+      border-radius: 8px;
+    }
+    .work-del:hover { color: #ff2a2a; background: rgba(255,0,0,0.1); }
+
+    .divider {
+      height: 1px;
+      background: rgba(255,0,0,0.1);
+      margin: 6px 0 18px;
+    }
+
+    .hint {
+      font-size: 6px;
+      color: rgba(255,200,200,0.3);
+      line-height: 2;
+      letter-spacing: 0.5px;
+      margin-top: -12px;
+      margin-bottom: 18px;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 6px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(255,0,0,0.12);
+      border: 1px solid rgba(255,0,0,0.25);
+      color: #ff4444;
+      letter-spacing: 1px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    /* ── ЛОГИН ЭКРАН ── */
+    #loginScreen { display: block; }
+    #mainScreen { display: none; }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 22px;
+    }
+    .tab {
+      flex: 1;
+      padding: 10px 6px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 7px;
+      line-height: 1.6;
+      border-radius: 10px;
+      border: 1px solid rgba(255,0,0,0.2);
+      background: transparent;
+      color: rgba(255,200,200,0.45);
+      cursor: pointer;
+      transition: .2s;
+      letter-spacing: 0.5px;
+    }
+    .tab.active {
+      border-color: rgba(255,0,0,0.55);
+      color: #ff3b3b;
+      background: rgba(255,0,0,0.08);
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── СЧЁТЧИК ── */
+    .counter {
+      font-size: 7px;
+      color: rgba(255,200,200,0.35);
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+    }
+    .counter span { color: #ff4444; }
+  </style>
+</head>
+<body>
+
+<canvas id="bg"></canvas>
+
+<div class="wrap">
+  <div class="logo">MEZETS.DESIGN</div>
+  <div class="logo-sub">ПАНЕЛЬ УПРАВЛЕНИЯ</div>
+
+  <!-- ──── ЭКРАН ВХОДА ──── -->
+  <div id="loginScreen">
+    <div class="card">
+      <div class="card-title">🔑 ВХОД</div>
+
+      <label>GitHub Personal Access Token</label>
+      <div class="token-row">
+        <input type="password" id="tokenInput" placeholder="ghp_xxxxxxxxxxxx">
+        <button class="btn btn-sm" onclick="showToken()">👁</button>
+      </div>
+      <div class="hint">
+        Создать токен: github.com → Settings → Developer Settings<br>
+        → Personal access tokens → Tokens (classic)<br>
+        Права: ✅ repo (полный доступ)
+      </div>
+
+      <label>Репозиторий (owner/repo)</label>
+      <input type="text" id="repoInput" placeholder="Mezets/mezets.design" value="Mezets/mezets.design">
+
+      <label>Ветка</label>
+      <input type="text" id="branchInput" placeholder="main" value="main">
+
+      <button class="btn" onclick="login()">Войти</button>
+      <div class="status" id="loginStatus"></div>
+    </div>
+  </div>
+
+  <!-- ──── ГЛАВНЫЙ ЭКРАН ──── -->
+  <div id="mainScreen">
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('upload')">📤 ЗАГРУЗИТЬ</button>
+      <button class="tab" onclick="switchTab('manage')">📋 РАБОТЫ</button>
+    </div>
+
+    <!-- ── ВКЛАДКА: ЗАГРУЗИТЬ ── -->
+    <div id="tabUpload" class="tab-panel active">
+      <div class="card">
+        <div class="card-title">📁 НОВАЯ РАБОТА</div>
+
+        <label>Файл (PNG / JPG / GIF / MP4 до 50 MB)</label>
+        <div class="file-drop" id="fileDrop">
+          <input type="file" id="fileInput" accept=".png,.jpg,.jpeg,.gif,.mp4,.webm" onchange="onFileSelect(this)">
+          <div class="file-drop-icon">🎨</div>
+          <div class="file-drop-label">Перетащи файл или нажми</div>
+          <div class="file-drop-name" id="fileDropName"></div>
+        </div>
+
+        <div class="preview-wrap" id="previewWrap">
+          <img id="previewImg" style="display:none">
+          <video id="previewVid" muted loop playsinline style="display:none"></video>
+        </div>
+
+        <label>Тип работы</label>
+        <input type="text" id="workType" placeholder="Анимированное оформление форумного аккаунта">
+
+        <label>Срок выполнения</label>
+        <input type="text" id="workTime" placeholder="1 день">
+
+        <label>Группа (необязательно)</label>
+        <input type="text" id="workGroup" placeholder="Оставь пустым, если одиночная работа">
+        <div class="hint">Если введёшь название группы (например «vk_batch_1»), работа объединится в слайдер с другими работами этой группы</div>
+
+        <button class="btn" id="uploadBtn" onclick="uploadWork()">Загрузить работу</button>
+
+        <div class="progress-wrap" id="progressWrap">
+          <div class="progress-bar-bg"><div class="progress-bar" id="progressBar"></div></div>
+          <div class="progress-label" id="progressLabel">Подготовка...</div>
+        </div>
+
+        <div class="status" id="uploadStatus"></div>
+      </div>
+    </div>
+
+    <!-- ── ВКЛАДКА: РАБОТЫ ── -->
+    <div id="tabManage" class="tab-panel">
+      <div class="card">
+        <div class="card-title">📋 ВСЕ РАБОТЫ <span class="badge" id="worksCount">0</span></div>
+        <div class="counter">Работы из <span>PORTFOLIO_ITEMS</span> в index.html</div>
+        <button class="btn btn-sm" onclick="loadWorks()" style="margin-bottom:16px">🔄 Обновить список</button>
+        <div id="worksList" class="works-list">
+          <div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /mainScreen -->
+</div><!-- /wrap -->
+
+<script>
+/* ── КОНФИГ ── */
+const GH_API = 'https://api.github.com';
+let TOKEN = '', REPO = '', BRANCH = '';
+
+/* ── ЧАСТИЦЫ ── */
+const canvas = document.getElementById('bg');
+const ctx    = canvas.getContext('2d');
+function resize() { canvas.width = innerWidth; canvas.height = innerHeight; }
+resize(); addEventListener('resize', resize);
+let dots = [];
+function initDots() {
+  dots = [];
+  const n = Math.round((innerWidth * innerHeight) / 12000);
+  for (let i = 0; i < n; i++) dots.push({
+    x: Math.random()*canvas.width, y: Math.random()*canvas.height,
+    r: Math.random()*1.2+0.3, dx:(Math.random()-.5)*.12, dy:(Math.random()-.5)*.12
+  });
+}
+initDots(); addEventListener('resize', initDots);
+(function animate() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  for (let d of dots) {
+    ctx.beginPath(); ctx.arc(d.x,d.y,d.r,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,0,0,0.5)'; ctx.fill();
+    d.x+=d.dx; d.y+=d.dy;
+    if(d.x<0)d.x=canvas.width; if(d.x>canvas.width)d.x=0;
+    if(d.y<0)d.y=canvas.height; if(d.y>canvas.height)d.y=0;
+  }
+  requestAnimationFrame(animate);
+})();
+
+/* ── DRAG & DROP ── */
+const fileDrop = document.getElementById('fileDrop');
+fileDrop.addEventListener('dragover', e => { e.preventDefault(); fileDrop.classList.add('drag'); });
+fileDrop.addEventListener('dragleave', () => fileDrop.classList.remove('drag'));
+fileDrop.addEventListener('drop', e => {
+  e.preventDefault();
+  fileDrop.classList.remove('drag');
+  if (e.dataTransfer.files[0]) {
+    document.getElementById('fileInput').files = e.dataTransfer.files;
+    onFileSelect(document.getElementById('fileInput'));
+  }
+});
+
+/* ── ПРЕВЬЮ ── */
+function onFileSelect(input) {
+  const file = input.files[0];
+  if (!file) return;
+  document.getElementById('fileDropName').textContent = file.name + ' (' + (file.size/1024/1024).toFixed(2) + ' MB)';
+  const pw = document.getElementById('previewWrap');
+  const pi = document.getElementById('previewImg');
+  const pv = document.getElementById('previewVid');
+  pw.style.display = 'block';
+  if (file.type.startsWith('video/')) {
+    pi.style.display = 'none';
+    pv.style.display = 'block';
+    pv.src = URL.createObjectURL(file);
+    pv.play().catch(()=>{});
+  } else {
+    pv.style.display = 'none';
+    pi.style.display = 'block';
+    pi.src = URL.createObjectURL(file);
+  }
+}
+
+/* ── ПОКАЗАТЬ/СКРЫТЬ ТОКЕН ── */
+function showToken() {
+  const inp = document.getElementById('tokenInput');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+/* ── ВКЛАДКИ ── */
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['upload','manage'][i]===tab));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+  if (tab === 'manage') loadWorks();
+}
+
+/* ── ВХОД ── */
+async function login() {
+  const token  = document.getElementById('tokenInput').value.trim();
+  const repo   = document.getElementById('repoInput').value.trim();
+  const branch = document.getElementById('branchInput').value.trim();
+  const status = document.getElementById('loginStatus');
+
+  if (!token || !repo) { showStatus(status, 'Заполни токен и репозиторий', 'err'); return; }
+
+  showStatus(status, 'Проверяю доступ...', 'info');
+
+  try {
+    const res = await ghFetch(`/repos/${repo}`, token);
+    if (!res.ok) throw new Error('Нет доступа к репозиторию. Проверь токен и права repo.');
+    TOKEN  = token;
+    REPO   = repo;
+    BRANCH = branch || 'main';
+    localStorage.setItem('mz_token', token);
+    localStorage.setItem('mz_repo', repo);
+    localStorage.setItem('mz_branch', BRANCH);
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('mainScreen').style.display = 'block';
+    showStatus(status, '', '');
+  } catch(e) {
+    showStatus(status, e.message, 'err');
+  }
+}
+
+/* ── АВТО-ЛОГИН ── */
+window.addEventListener('DOMContentLoaded', () => {
+  const t = localStorage.getItem('mz_token');
+  const r = localStorage.getItem('mz_repo');
+  const b = localStorage.getItem('mz_branch');
+  if (t && r) {
+    document.getElementById('tokenInput').value = t;
+    document.getElementById('repoInput').value  = r;
+    if (b) document.getElementById('branchInput').value = b;
+    login();
+  }
+});
+
+/* ── GITHUB API ── */
+function ghFetch(path, token, opts) {
+  return fetch(GH_API + path, Object.assign({
+    headers: {
+      'Authorization': 'token ' + (token || TOKEN),
+      'Accept': 'application/vnd.github.v3+json',
+      'Content-Type': 'application/json',
+    }
+  }, opts));
+}
+
+/* ── ПОЛУЧИТЬ ФАЙЛ (SHA + КОНТЕНТ) ── */
+async function getFile(path) {
+  const res = await ghFetch(`/repos/${REPO}/contents/${path}?ref=${BRANCH}`);
+  if (!res.ok) return null;
+  return res.json();
+}
+
+/* ── ПРОГРЕСС ── */
+function setProgress(pct, label) {
+  document.getElementById('progressWrap').style.display = 'block';
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = label;
+}
+
+/* ── ЗАГРУЗКА РАБОТЫ ── */
+async function uploadWork() {
+  const fileInput = document.getElementById('fileInput');
+  const workType  = document.getElementById('workType').value.trim();
+  const workTime  = document.getElementById('workTime').value.trim();
+  const workGroup = document.getElementById('workGroup').value.trim();
+  const status    = document.getElementById('uploadStatus');
+  const btn       = document.getElementById('uploadBtn');
+
+  if (!fileInput.files[0]) { showStatus(status, 'Выбери файл!', 'err'); return; }
+  if (!workType)            { showStatus(status, 'Укажи тип работы!', 'err'); return; }
+  if (!workTime)            { showStatus(status, 'Укажи срок выполнения!', 'err'); return; }
+
+  const file = fileInput.files[0];
+  const maxMB = 50;
+  if (file.size > maxMB * 1024 * 1024) { showStatus(status, `Файл больше ${maxMB} MB!`, 'err'); return; }
+
+  btn.disabled = true;
+  showStatus(status, '', '');
+
+  try {
+    /* 1. Читаем файл как base64 */
+    setProgress(10, 'Читаю файл...');
+    const b64 = await toBase64(file);
+
+    /* 2. Определяем папку */
+    const isVideo = /\.(mp4|webm|mov)$/i.test(file.name);
+    const folder  = isVideo ? 'portfolio/mp4' : 'portfolio/png';
+    const fname   = sanitizeFilename(file.name);
+    const ghPath  = `${folder}/${fname}`;
+
+    /* 3. Проверяем нет ли такого файла уже */
+    setProgress(25, 'Проверяю репозиторий...');
+    const existing = await getFile(ghPath);
+
+    /* 4. Коммитим файл */
+    setProgress(45, 'Загружаю файл...');
+    const fileBody = {
+      message: `[admin] add portfolio: ${fname}`,
+      content: b64,
+      branch: BRANCH,
+    };
+    if (existing) fileBody.sha = existing.sha;
+
+    const uploadRes = await ghFetch(`/repos/${REPO}/contents/${ghPath}`, TOKEN, {
+      method: 'PUT',
+      body: JSON.stringify(fileBody),
+    });
+    if (!uploadRes.ok) {
+      const err = await uploadRes.json();
+      throw new Error(err.message || 'Ошибка загрузки файла');
+    }
+
+    /* 5. Читаем index.html */
+    setProgress(65, 'Обновляю index.html...');
+    const indexFile = await getFile('index.html');
+    if (!indexFile) throw new Error('index.html не найден в репозитории');
+
+    let html = atob(indexFile.content.replace(/\n/g, ''));
+
+    /* 6. Строим новую запись */
+    const imgRef = `${folder}/${fname}`;
+    let newEntry;
+    if (workGroup) {
+      // Ищем существующую группу с таким именем в комментарии
+      const groupTag = `/* group:${workGroup} */`;
+      const itemObj  = `      { img: "${imgRef}", type: "${workType}", time: "${workTime}" }`;
+
+      if (html.includes(groupTag)) {
+        // Дописываем в конец группы перед закрывающей скобкой
+        html = html.replace(
+          new RegExp(`(/\\* group:${escapeRegex(workGroup)} \\*/[\\s\\S]*?)(\\s*\\]\\s*\\})`),
+          (match, before, close) => `${before},\n${itemObj}${close}`
+        );
+      } else {
+        // Создаём новую группу
+        newEntry = `{\n  ${groupTag}\n  group: [\n${itemObj},\n  ]\n},`;
+        html = insertAfterLastItem(html, newEntry);
+      }
+    } else {
+      newEntry = `    { img: "${imgRef}", type: "${workType}", time: "${workTime}" },`;
+      html = insertAfterLastItem(html, newEntry);
+    }
+
+    /* 7. Коммитим index.html */
+    setProgress(85, 'Сохраняю index.html...');
+    const htmlB64 = btoa(unescape(encodeURIComponent(html)));
+    const htmlRes = await ghFetch(`/repos/${REPO}/contents/index.html`, TOKEN, {
+      method: 'PUT',
+      body: JSON.stringify({
+        message: `[admin] portfolio: add ${fname}`,
+        content: htmlB64,
+        sha: indexFile.sha,
+        branch: BRANCH,
+      }),
+    });
+    if (!htmlRes.ok) {
+      const err = await htmlRes.json();
+      throw new Error('Файл загружен, но index.html не обновился: ' + (err.message || ''));
+    }
+
+    setProgress(100, 'Готово!');
+    showStatus(status, `✅ Работа загружена!\nФайл: ${ghPath}\nСайт обновится через ~30 секунд.`, 'ok');
+
+    /* Сброс формы */
+    fileInput.value = '';
+    document.getElementById('fileDropName').textContent = '';
+    document.getElementById('previewWrap').style.display = 'none';
+    document.getElementById('workType').value  = '';
+    document.getElementById('workTime').value  = '';
+    document.getElementById('workGroup').value = '';
+
+    setTimeout(() => { document.getElementById('progressWrap').style.display = 'none'; }, 3000);
+
+  } catch(e) {
+    showStatus(status, '❌ ' + e.message, 'err');
+    document.getElementById('progressWrap').style.display = 'none';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+/* ── ВСТАВКА НОВОЙ ЗАПИСИ В КОНЕЦ PORTFOLIO_ITEMS ── */
+function insertAfterLastItem(html, newEntry) {
+  // Ищем последний }; или }, перед закрытием массива '];'
+  const marker = '  ];'; // конец PORTFOLIO_ITEMS
+  const idx = html.lastIndexOf(marker);
+  if (idx === -1) throw new Error('Не удалось найти PORTFOLIO_ITEMS в index.html');
+  // Вставляем перед закрывающей строкой
+  return html.slice(0, idx) + newEntry + '\n' + html.slice(idx);
+}
+
+function escapeRegex(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+/* ── ЗАГРУЗКА СПИСКА РАБОТ ── */
+async function loadWorks() {
+  const container = document.getElementById('worksList');
+  container.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div>';
+
+  try {
+    const indexFile = await getFile('index.html');
+    if (!indexFile) throw new Error('index.html не найден');
+    const html = atob(indexFile.content.replace(/\n/g, ''));
+
+    const items = parsePortfolioItems(html);
+    document.getElementById('worksCount').textContent = items.length;
+
+    if (!items.length) { container.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Работ пока нет</div>'; return; }
+
+    container.innerHTML = '';
+    const baseUrl = `https://raw.githubusercontent.com/${REPO}/${BRANCH}/`;
+
+    items.slice().reverse().forEach((item, revIdx) => {
+      const realIdx = items.length - 1 - revIdx;
+      const el = document.createElement('div');
+      el.className = 'work-item';
+
+      const isVideo = /\.(mp4|webm)$/i.test(item.img);
+      const thumbHtml = isVideo
+        ? `<video class="work-thumb" src="${baseUrl}${item.img}" muted playsinline preload="metadata"></video>`
+        : `<img class="work-thumb" src="${baseUrl}${item.img}" alt="">`;
+
+      el.innerHTML = `
+        ${thumbHtml}
+        <div class="work-info">
+          <div class="work-type">${item.type}</div>
+          <div class="work-file">${item.img}</div>
+        </div>
+        <div class="work-del" title="Удалить из index.html" onclick="deleteWork(${realIdx})">✕</div>
+      `;
+      container.appendChild(el);
+    });
+  } catch(e) {
+    container.innerHTML = `<div style="font-size:7px;color:rgba(255,100,100,0.7);line-height:2">Ошибка: ${e.message}</div>`;
+  }
+}
+
+/* ── ПАРСИНГ PORTFOLIO_ITEMS ── */
+function parsePortfolioItems(html) {
+  const start = html.indexOf('const PORTFOLIO_ITEMS = [');
+  const end   = html.indexOf('\n  ];', start);
+  if (start === -1 || end === -1) return [];
+  const block = html.slice(start, end);
+  const items = [];
+  // Матч одиночных записей
+  const single = /\{\s*img:\s*"([^"]+)",\s*type:\s*"([^"]+)",\s*time:\s*"([^"]+)"\s*\}/g;
+  let m;
+  while ((m = single.exec(block)) !== null) {
+    items.push({ img: m[1], type: m[2], time: m[3] });
+  }
+  return items;
+}
+
+/* ── УДАЛИТЬ РАБОТУ ── */
+async function deleteWork(idx) {
+  if (!confirm('Удалить запись из PORTFOLIO_ITEMS?\n(Файл в репозитории останется)')) return;
+
+  const container = document.getElementById('worksList');
+  try {
+    const indexFile = await getFile('index.html');
+    if (!indexFile) throw new Error('index.html не найден');
+    let html = atob(indexFile.content.replace(/\n/g, ''));
+
+    const start = html.indexOf('const PORTFOLIO_ITEMS = [');
+    const end   = html.indexOf('\n  ];', start);
+    if (start === -1 || end === -1) throw new Error('Не найден PORTFOLIO_ITEMS');
+
+    const block  = html.slice(start, end);
+    const single = /\{\s*img:\s*"([^"]+)",\s*type:\s*"([^"]+)",\s*time:\s*"([^"]+)"\s*\}/g;
+    let i = 0, m, toRemove = null, toRemoveFull = null;
+    while ((m = single.exec(block)) !== null) {
+      if (i === idx) { toRemove = m[0]; toRemoveFull = m[0]; break; }
+      i++;
+    }
+    if (!toRemove) throw new Error('Запись не найдена');
+
+    // Удаляем строку с этой записью (включая ведущие пробелы и запятую)
+    const lineRx = new RegExp(`\\s*\\{\\s*img:\\s*"${escapeRegex(toRemove.match(/img:\s*"([^"]+)"/)[1])}"[^}]+\\},?`);
+    html = html.replace(lineRx, '');
+
+    const htmlB64 = btoa(unescape(encodeURIComponent(html)));
+    const res = await ghFetch(`/repos/${REPO}/contents/index.html`, TOKEN, {
+      method: 'PUT',
+      body: JSON.stringify({
+        message: '[admin] portfolio: remove item',
+        content: htmlB64,
+        sha: indexFile.sha,
+        branch: BRANCH,
+      }),
+    });
+    if (!res.ok) throw new Error('Не удалось обновить index.html');
+    await loadWorks();
+  } catch(e) {
+    alert('Ошибка: ' + e.message);
+  }
+}
+
+/* ── ХЕЛПЕРЫ ── */
+function toBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload  = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = () => reject(new Error('Не удалось прочитать файл'));
+    reader.readAsDataURL(file);
+  });
+}
+
+function sanitizeFilename(name) {
+  // Оставляем только безопасные символы, пробелы→_
+  return name.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9._\-()]/g, '');
+}
+
+function showStatus(el, msg, type) {
+  el.textContent = msg;
+  el.className   = 'status' + (type ? ' ' + type : '');
+  if (!type) el.style.display = 'none';
+}
+</script>
+</body>
+</html>
