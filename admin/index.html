@@ -321,7 +321,7 @@
 <canvas id="bg"></canvas>
 
 <div class="wrap">
-  <div class="logo" style="display:flex;align-items:center;gap:14px"><img src="https://mezets.github.io/mezets.design/favicon.png" alt="" style="width:48px;height:48px;border-radius:10px;image-rendering:pixelated;flex-shrink:0;box-shadow:0 0 18px rgba(255,0,0,0.4)"><span style="font-size:22px;letter-spacing:3px">Mezets</span></div>
+  <div class="logo" style="display:flex;align-items:center;gap:14px"><img src="https://mezets.github.io/mezets.design/favicon.png" alt="" style="width:48px;height:48px;image-rendering:pixelated;flex-shrink:0"><span style="font-size:22px;letter-spacing:3px">Mezets</span></div>
   <div class="logo-sub">ПАНЕЛЬ УПРАВЛЕНИЯ</div>
 
   <!-- ──── ЭКРАН ВХОДА ──── -->
@@ -334,7 +334,7 @@
         <input type="password" id="tokenInput" placeholder="ghp_xxxxxxxxxxxx">
         <button class="btn btn-sm" onclick="showToken()">👁</button>
       </div>
-      <div class="hint">
+      <div class="hint" style="margin-top:6px;margin-bottom:18px">
         Нужен токен GitHub →
         <a href="https://github.com/settings/tokens/new?scopes=repo&description=mezets-admin" target="_blank" style="color:#ff4444;text-decoration:underline">Создать токен</a>
         (галочка <b style="color:rgba(255,200,200,0.7)">repo</b> уже выбрана по ссылке)
