@@ -357,6 +357,8 @@
     <div class="tabs">
       <button class="tab active" onclick="switchTab('upload')">📤 ЗАГРУЗИТЬ</button>
       <button class="tab" onclick="switchTab('manage')">📋 РАБОТЫ</button>
+      <button class="tab" onclick="switchTab('prices')">💰 ЦЕНЫ</button>
+      <button class="tab" onclick="switchTab('rules')">📜 ПРАВИЛА</button>
     </div>
 
     <!-- ── ВКЛАДКА: ЗАГРУЗИТЬ ── -->
@@ -407,6 +409,74 @@
         <div id="worksList" class="works-list">
           <div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div>
         </div>
+      </div>
+    </div>
+
+    <!-- ВКЛАДКА: ЦЕНЫ -->
+    <div id="tabPrices" class="tab-panel">
+      <div class="card">
+        <div class="card-title">РЕДАКТОР ЦЕН</div>
+        <div class="counter">Редактирует <span>prices/index.html</span></div>
+        <button class="btn btn-sm" onclick="loadPrices()" style="margin-bottom:16px">Загрузить актуальные цены</button>
+        <div id="pricesSections"></div>
+
+        <div style="height:1px;background:rgba(255,0,0,0.1);margin:20px 0"></div>
+
+        <div class="card-title" style="font-size:8px;margin-bottom:14px">ДОБАВИТЬ ПОЗИЦИЮ</div>
+        <label>Раздел</label>
+        <select id="newItemSection">
+          <option value="Базовое">Базовое</option>
+          <option value="Discord">Discord</option>
+          <option value="Twitch">Twitch</option>
+          <option value="YouTube">YouTube</option>
+          <option value="VK">VK</option>
+          <option value="Форум">Форум</option>
+          <option value="Боты">Боты</option>
+        </select>
+        <label>Название</label>
+        <input type="text" id="newItemName" placeholder="Аватарка для сервера">
+        <label>Цена</label>
+        <input type="text" id="newItemPrice" placeholder="300 или по договоренности">
+        <button class="btn" style="margin-bottom:20px" onclick="addPriceItem()">Добавить позицию</button>
+
+        <div style="height:1px;background:rgba(255,0,0,0.1);margin-bottom:20px"></div>
+
+        <button class="btn" id="savePricesBtn" onclick="savePrices()" style="background:rgba(0,180,0,0.08);border-color:rgba(0,200,0,0.3);color:#55ff55">
+          СОХРАНИТЬ ВСЕ ИЗМЕНЕНИЯ
+        </button>
+        <div class="status" id="pricesStatus"></div>
+      </div>
+    </div>
+
+
+    <!-- ВКЛАДКА: ПРАВИЛА -->
+    <div id="tabRules" class="tab-panel">
+      <div class="card">
+        <div class="card-title">РЕДАКТОР ПРАВИЛ</div>
+        <div class="counter">Редактирует <span>rules/index.html</span></div>
+        <button class="btn btn-sm" onclick="loadRules()" style="margin-bottom:16px">Загрузить актуальные правила</button>
+
+        <div id="rulesList"></div>
+
+        <div style="height:1px;background:rgba(255,0,0,0.1);margin:20px 0"></div>
+
+        <div class="card-title" style="font-size:8px;margin-bottom:14px">ДОБАВИТЬ ПРАВИЛО</div>
+        <label>Заголовок</label>
+        <input type="text" id="newRuleTitle" placeholder="Название правила">
+        <label>Текст (HTML можно: &lt;span class=&quot;hi&quot;&gt;...&lt;/span&gt; для подсветки)</label>
+        <textarea id="newRuleText" placeholder="Текст правила..."></textarea>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:18px">
+          <input type="checkbox" id="newRuleImportant" style="width:auto;margin:0;accent-color:#ff2a2a">
+          <span>Важное правило (красная рамка)</span>
+        </label>
+        <button class="btn" style="margin-bottom:20px" onclick="addRule()">Добавить правило</button>
+
+        <div style="height:1px;background:rgba(255,0,0,0.1);margin-bottom:20px"></div>
+
+        <button class="btn" id="saveRulesBtn" onclick="saveRules()" style="background:rgba(0,180,0,0.08);border-color:rgba(0,200,0,0.3);color:#55ff55">
+          СОХРАНИТЬ ВСЕ ИЗМЕНЕНИЯ
+        </button>
+        <div class="status" id="rulesStatus"></div>
       </div>
     </div>
 
@@ -487,10 +557,12 @@ function showToken() {
 
 /* ── ВКЛАДКИ ── */
 function switchTab(tab) {
-  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['upload','manage'][i]===tab));
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['upload','manage','prices','rules'][i]===tab));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
   if (tab === 'manage') loadWorks();
+  if (tab === 'prices') loadPrices();
+  if (tab === 'rules') loadRules();
 }
 
 /* ── ВХОД ── */
@@ -816,6 +888,340 @@ function showStatus(el, msg, type) {
   el.className   = 'status' + (type ? ' ' + type : '');
   if (!type) el.style.display = 'none';
 }
+
+/* ── РЕДАКТОР ЦЕН ── */
+
+// Текущие данные цен в памяти
+let pricesData = []; // [{section, name, price}, ...]
+let pricesFileSha = '';
+
+async function loadPrices() {
+  const container = document.getElementById('pricesSections');
+  container.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div>';
+  showStatus(document.getElementById('pricesStatus'), '', '');
+  try {
+    const f = await getFile('prices/index.html');
+    if (!f) throw new Error('prices/index.html не найден');
+    pricesFileSha = f.sha;
+    const rawHtml = atob(f.content.replace(/\n/g, ''));
+    pricesData = parsePrices(rawHtml);
+    renderPrices();
+  } catch(e) {
+    container.innerHTML = '<div style="font-size:7px;color:rgba(255,100,100,0.7);line-height:2">Ошибка: ' + e.message + '</div>';
+  }
+}
+
+function parsePrices(rawHtml) {
+  // Парсим все section-label и item внутри каждой секции
+  const items = [];
+  // Ищем блоки <div class="section">...</div>
+  const sectionRx = /<div class="section">\s*<div class="section-label">([^<]+)<\/div>([\s\S]*?)<\/div>\s*<\/div>/g;
+  const itemRx = /<div class="item-row"><span class="item-dot"><\/span><span class="item-name">([^<]+)<\/span><\/div><span class="item-price">([^<]+)<\/span>/g;
+  let sm;
+  while ((sm = sectionRx.exec(rawHtml)) !== null) {
+    const section = sm[1].trim();
+    const block   = sm[2];
+    let im;
+    itemRx.lastIndex = 0;
+    while ((im = itemRx.exec(block)) !== null) {
+      items.push({ section, name: im[1].trim(), price: im[2].trim() });
+    }
+  }
+  return items;
+}
+
+function renderPrices() {
+  const container = document.getElementById('pricesSections');
+  container.innerHTML = '';
+
+  // Группируем по секциям
+  const sections = {};
+  pricesData.forEach((item, idx) => {
+    if (!sections[item.section]) sections[item.section] = [];
+    sections[item.section].push({ ...item, idx });
+  });
+
+  Object.entries(sections).forEach(([section, items]) => {
+    const secEl = document.createElement('div');
+    secEl.style.cssText = 'margin-bottom:20px';
+
+    const secLabel = document.createElement('div');
+    secLabel.style.cssText = 'font-size:8px;color:#ff2a2a;letter-spacing:1px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(255,0,0,0.15)';
+    secLabel.textContent = section;
+    secEl.appendChild(secLabel);
+
+    items.forEach(({ name, price, idx }) => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;gap:8px;align-items:center;margin-bottom:8px';
+
+      const nameInp = document.createElement('input');
+      nameInp.type = 'text';
+      nameInp.value = name;
+      nameInp.style.cssText = 'flex:2;margin-bottom:0;font-size:7px;padding:8px 10px';
+      nameInp.oninput = () => { pricesData[idx].name = nameInp.value; };
+
+      const priceInp = document.createElement('input');
+      priceInp.type = 'text';
+      priceInp.value = price;
+      priceInp.style.cssText = 'flex:1;margin-bottom:0;font-size:7px;padding:8px 10px';
+      priceInp.oninput = () => { pricesData[idx].price = priceInp.value; };
+
+      const del = document.createElement('div');
+      del.className = 'work-del';
+      del.textContent = '✕';
+      del.title = 'Удалить позицию';
+      del.onclick = () => { pricesData.splice(idx, 1); renderPrices(); };
+
+      row.appendChild(nameInp);
+      row.appendChild(priceInp);
+      row.appendChild(del);
+      secEl.appendChild(row);
+    });
+
+    container.appendChild(secEl);
+  });
+
+  if (!pricesData.length) {
+    container.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Нажми "Загрузить актуальные цены"</div>';
+  }
+}
+
+function addPriceItem() {
+  const section = document.getElementById('newItemSection').value;
+  const name    = document.getElementById('newItemName').value.trim();
+  const price   = document.getElementById('newItemPrice').value.trim();
+  if (!name || !price) {
+    showStatus(document.getElementById('pricesStatus'), 'Заполни название и цену', 'err');
+    return;
+  }
+  pricesData.push({ section, name, price });
+  document.getElementById('newItemName').value  = '';
+  document.getElementById('newItemPrice').value = '';
+  renderPrices();
+  showStatus(document.getElementById('pricesStatus'), 'Позиция добавлена — не забудь сохранить!', 'info');
+}
+
+async function savePrices() {
+  const status = document.getElementById('pricesStatus');
+  const btn    = document.getElementById('savePricesBtn');
+  btn.disabled = true;
+  showStatus(status, 'Читаю prices/index.html...', 'info');
+
+  try {
+    const f = await getFile('prices/index.html');
+    if (!f) throw new Error('prices/index.html не найден');
+    let rawHtml = atob(f.content.replace(/\n/g, ''));
+
+    // Перестраиваем все секции с ценами
+    const sections = {};
+    pricesData.forEach(item => {
+      if (!sections[item.section]) sections[item.section] = [];
+      sections[item.section].push(item);
+    });
+
+    // Заменяем HTML каждой секции
+    // Ищем существующие section-label и заменяем их содержимое
+    Object.entries(sections).forEach(([section, items], si) => {
+      const itemsHtml = items.map((it, ii) => {
+        const delay = (0.05 + (si * 3 + ii) * 0.05).toFixed(2);
+        return `      <div class="item" style="animation-delay:${delay}s">\n        <div class="item-row"><span class="item-dot"></span><span class="item-name">${escHtml(it.name)}</span></div><span class="item-price">${escHtml(it.price)}</span>\n      </div>`;
+      }).join('\n');
+
+      const sectionRx = new RegExp(
+        '(<div class="section">\\s*<div class="section-label">' + escapeRegex(section) + '<\\/div>\\s*<div class="items-grid">)([\\s\\S]*?)(<\\/div>\\s*<\\/div>)',
+        'g'
+      );
+      rawHtml = rawHtml.replace(sectionRx, (m, before, _old, after) => {
+        return before + '\n' + itemsHtml + '\n    ' + after;
+      });
+    });
+
+    showStatus(status, 'Сохраняю...', 'info');
+    const b64 = btoa(unescape(encodeURIComponent(rawHtml)));
+    const res = await ghFetch('/repos/' + REPO + '/contents/prices/index.html', TOKEN, {
+      method: 'PUT',
+      body: JSON.stringify({
+        message: '[admin] update prices',
+        content: b64,
+        sha: f.sha,
+        branch: BRANCH,
+      }),
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message || 'GitHub API error');
+    }
+    showStatus(status, 'Цены сохранены! Сайт обновится через ~30 сек.', 'ok');
+  } catch(e) {
+    showStatus(status, 'Ошибка: ' + e.message, 'err');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+
+/* ── РЕДАКТОР ПРАВИЛ ── */
+let rulesData = []; // [{title, text, important}, ...]
+
+async function loadRules() {
+  const container = document.getElementById('rulesList');
+  container.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div>';
+  showStatus(document.getElementById('rulesStatus'), '', '');
+  try {
+    const f = await getFile('rules/index.html');
+    if (!f) throw new Error('rules/index.html не найден');
+    const rawHtml = atob(f.content.replace(/\n/g, ''));
+    rulesData = parseRules(rawHtml);
+    renderRules();
+  } catch(e) {
+    container.innerHTML = '<div style="font-size:7px;color:rgba(255,100,100,0.7);line-height:2">Ошибка: ' + e.message + '</div>';
+  }
+}
+
+function parseRules(rawHtml) {
+  const items = [];
+  // Матч: <div class="rule[important]" ...><div class="rule-num">NN</div><div class="rule-body">...<div class="rule-title">...</div><div class="rule-text">...</div>
+  const ruleRx = /<div class="rule([^"]*)"[^>]*>\s*<div class="rule-num">[^<]*<\/div>\s*<div class="rule-body">\s*<div class="rule-title">([^<]*)<\/div>\s*<div class="rule-text">([\s\S]*?)<\/div>\s*<\/div>\s*<\/div>/g;
+  let m;
+  while ((m = ruleRx.exec(rawHtml)) !== null) {
+    items.push({
+      important: m[1].includes('important'),
+      title: m[2].trim(),
+      text: m[3].trim()
+    });
+  }
+  return items;
+}
+
+function renderRules() {
+  const container = document.getElementById('rulesList');
+  container.innerHTML = '';
+  if (!rulesData.length) {
+    container.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Нажми "Загрузить актуальные правила"</div>';
+    return;
+  }
+  rulesData.forEach((rule, idx) => {
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'background:rgba(255,0,0,0.04);border:1px solid rgba(255,0,0,0.15);border-radius:12px;padding:14px;margin-bottom:10px';
+    if (rule.important) wrap.style.borderColor = 'rgba(255,0,0,0.3)';
+
+    // Заголовок + удалить
+    const row1 = document.createElement('div');
+    row1.style.cssText = 'display:flex;gap:8px;align-items:center;margin-bottom:8px';
+
+    const numBadge = document.createElement('div');
+    numBadge.style.cssText = 'font-size:7px;color:rgba(255,80,80,0.5);flex-shrink:0;min-width:22px';
+    numBadge.textContent = String(idx+1).padStart(2,'0');
+
+    const titleInp = document.createElement('input');
+    titleInp.type = 'text';
+    titleInp.value = rule.title;
+    titleInp.style.cssText = 'flex:1;margin-bottom:0;font-size:7px;padding:7px 10px';
+    titleInp.oninput = () => { rulesData[idx].title = titleInp.value; };
+
+    const impChk = document.createElement('input');
+    impChk.type = 'checkbox';
+    impChk.checked = rule.important;
+    impChk.title = 'Важное';
+    impChk.style.cssText = 'width:14px;height:14px;flex-shrink:0;accent-color:#ff2a2a;cursor:pointer';
+    impChk.onchange = () => { rulesData[idx].important = impChk.checked; wrap.style.borderColor = impChk.checked ? 'rgba(255,0,0,0.3)' : 'rgba(255,0,0,0.15)'; };
+
+    const del = document.createElement('div');
+    del.className = 'work-del';
+    del.textContent = '✕';
+    del.title = 'Удалить правило';
+    del.onclick = () => { rulesData.splice(idx, 1); renderRules(); };
+
+    row1.appendChild(numBadge);
+    row1.appendChild(titleInp);
+    row1.appendChild(impChk);
+    row1.appendChild(del);
+
+    // Текст
+    const textTA = document.createElement('textarea');
+    textTA.value = rule.text;
+    textTA.style.cssText = 'width:100%;margin-bottom:0;font-size:7px;padding:7px 10px;min-height:70px;resize:vertical';
+    textTA.oninput = () => { rulesData[idx].text = textTA.value; };
+
+    const hint = document.createElement('div');
+    hint.style.cssText = 'font-size:6px;color:rgba(255,200,200,0.25);line-height:1.8;margin-top:4px';
+    hint.textContent = 'Чекбокс справа = важное правило (красная рамка)';
+
+    wrap.appendChild(row1);
+    wrap.appendChild(textTA);
+    wrap.appendChild(hint);
+    container.appendChild(wrap);
+  });
+}
+
+function addRule() {
+  const title     = document.getElementById('newRuleTitle').value.trim();
+  const text      = document.getElementById('newRuleText').value.trim();
+  const important = document.getElementById('newRuleImportant').checked;
+  if (!title || !text) {
+    showStatus(document.getElementById('rulesStatus'), 'Заполни заголовок и текст', 'err');
+    return;
+  }
+  rulesData.push({ title, text, important });
+  document.getElementById('newRuleTitle').value = '';
+  document.getElementById('newRuleText').value  = '';
+  document.getElementById('newRuleImportant').checked = false;
+  renderRules();
+  showStatus(document.getElementById('rulesStatus'), 'Правило добавлено — не забудь сохранить!', 'info');
+}
+
+async function saveRules() {
+  const status = document.getElementById('rulesStatus');
+  const btn    = document.getElementById('saveRulesBtn');
+  btn.disabled = true;
+  showStatus(status, 'Читаю rules/index.html...', 'info');
+
+  try {
+    const f = await getFile('rules/index.html');
+    if (!f) throw new Error('rules/index.html не найден');
+    let rawHtml = atob(f.content.replace(/\n/g, ''));
+
+    // Строим новый HTML блок правил
+    const newRulesHtml = rulesData.map((rule, idx) => {
+      const num     = String(idx+1).padStart(2,'0');
+      const delay   = (0.04 + idx * 0.05).toFixed(2);
+      const cls     = rule.important ? 'rule important' : 'rule';
+      return `  <div class="${cls}" style="animation-delay:${delay}s">\n    <div class="rule-num">${num}</div>\n    <div class="rule-body">\n      <div class="rule-title">${escHtml(rule.title)}</div>\n      <div class="rule-text">\n        ${rule.text}\n      </div>\n    </div>\n  </div>`;
+    }).join('\n\n');
+
+    // Заменяем содержимое rules-grid
+    rawHtml = rawHtml.replace(
+      /(<div class="rules-grid">)[\s\S]*?(<\/div><!-- \/rules-grid -->)/,
+      '$1\n\n' + newRulesHtml + '\n\n  $2'
+    );
+
+    showStatus(status, 'Сохраняю...', 'info');
+    const b64 = btoa(unescape(encodeURIComponent(rawHtml)));
+    const res = await ghFetch('/repos/' + REPO + '/contents/rules/index.html', TOKEN, {
+      method: 'PUT',
+      body: JSON.stringify({
+        message: '[admin] update rules',
+        content: b64,
+        sha: f.sha,
+        branch: BRANCH,
+      }),
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message || 'GitHub API error');
+    }
+    showStatus(status, 'Правила сохранены! Сайт обновится через ~30 сек.', 'ok');
+  } catch(e) {
+    showStatus(status, 'Ошибка: ' + e.message, 'err');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
 </script>
 </body>
 </html>
