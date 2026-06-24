@@ -321,7 +321,7 @@
 <canvas id="bg"></canvas>
 
 <div class="wrap">
-  <div class="logo">MEZETS.DESIGN</div>
+  <div class="logo" style="display:flex;align-items:center;gap:10px"><img src="https://mezets.github.io/mezets.design/favicon.png" alt="" style="width:26px;height:26px;border-radius:6px;image-rendering:pixelated;flex-shrink:0"><span>Mezets</span></div>
   <div class="logo-sub">ПАНЕЛЬ УПРАВЛЕНИЯ</div>
 
   <!-- ──── ЭКРАН ВХОДА ──── -->
@@ -335,9 +335,9 @@
         <button class="btn btn-sm" onclick="showToken()">👁</button>
       </div>
       <div class="hint">
-        Создать токен: github.com → Settings → Developer Settings<br>
-        → Personal access tokens → Tokens (classic)<br>
-        Права: ✅ repo (полный доступ)
+        Нужен токен GitHub →
+        <a href="https://github.com/settings/tokens/new?scopes=repo&description=mezets-admin" target="_blank" style="color:#ff4444;text-decoration:underline">Создать токен</a>
+        (галочка <b style="color:rgba(255,200,200,0.7)">repo</b> уже выбрана по ссылке)
       </div>
 
       <label>Репозиторий (owner/repo)</label>
