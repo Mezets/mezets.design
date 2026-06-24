@@ -146,6 +146,7 @@
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
       gap: 8px;
+      perspective: 1200px;
     }
 
     /* ── ITEM CARD ── */
@@ -158,14 +159,15 @@
       border-radius: 12px;
       background: rgba(255,0,0,0.04);
       border: 1px solid rgba(255,0,0,0.14);
-      transition: border-color .2s, box-shadow .2s, transform .15s;
+      transition: border-color .25s, box-shadow .25s, transform .1s ease-out;
+      transform-style: preserve-3d;
+      will-change: transform;
       opacity: 0;
       animation: fadeUp .45s ease forwards;
     }
     .item:hover {
       border-color: rgba(255,0,0,0.32);
       box-shadow: 0 0 22px rgba(255,0,0,0.09);
-      transform: translateY(-2px);
     }
     .item-row {
       display: flex;
@@ -211,12 +213,16 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
+      perspective: 1000px;
     }
     .pay-block {
       padding: 14px 18px;
       border-radius: 12px;
       background: rgba(255,0,0,0.04);
       border: 1px solid rgba(255,0,0,0.14);
+      transition: border-color .25s, box-shadow .25s, transform .1s ease-out;
+      transform-style: preserve-3d;
+      will-change: transform;
       opacity: 0;
       animation: fadeUp .45s ease forwards;
     }
@@ -473,6 +479,19 @@
     requestAnimationFrame(animate);
   }
   if (!noMotion) animate();
+
+  // 3D tilt on item and pay cards
+  if (!noMotion) {
+    document.querySelectorAll('.item, .pay-block').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const r = card.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width  - .5;
+        const y = (e.clientY - r.top)  / r.height - .5;
+        card.style.transform = `rotateY(${x*12}deg) rotateX(${-y*12}deg) scale(1.02)`;
+      });
+      card.addEventListener('mouseleave', () => { card.style.transform = ''; });
+    });
+  }
 </script>
 </body>
 </html>
