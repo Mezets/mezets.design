@@ -2326,11 +2326,6 @@
     { img: "portfolio/mp4/b48e6dd5bea5da15.mp4", type: "Анимированное оформление форумного аккаунта", time: "2 дня" },
     { img: "portfolio/mp4/3a39b97d42947ac6.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
     { img: "portfolio/png/ec777b88d33127a8.png", type: "Оформление форумного аккаунта", time: "2 дня" },
-{
-  /* group:skil17128092026 */
-  group: [
-  ]
-},
   ];
 
   function isVideoSrc(src) {
@@ -2499,6 +2494,7 @@
     for (let rep = 0; rep < 2; rep++) {
       PORTFOLIO_ITEMS.forEach(entry => {
         const items = entry.group ? entry.group : [entry];
+        if (!items.length || !items[0] || !items[0].img) return; // пропускаем пустые/битые записи
         const cover = items[0];
 
         const card = document.createElement('div');
