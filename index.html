@@ -62,14 +62,44 @@
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
+    /* ── ПЕРЕМЕННЫЕ ТЕМЫ ──
+       Тёмная тема (по умолчанию) не меняется вообще.
+       В светлой теме переопределяются только "чёрные" фоны на белые. */
+    :root {
+      --bg-page: #050000;
+      --bg-scroll: rgba(10,0,0,0.6);
+      --bg-overlay-8: rgba(0,0,0,0.8);
+      --bg-panel-95: rgba(10,0,0,0.95);
+      --bg-panel-92: rgba(10,0,0,0.92);
+      --bg-circle-5: rgba(0,0,0,0.5);
+      --bg-circle-55: rgba(0,0,0,0.55);
+      --bg-fs-overlay: rgba(0,0,0,0.93);
+      --bg-koleso-btn: rgba(10,0,0,0.6);
+      --bg-roulette-overlay: rgba(0,0,0,0.75);
+      --fg-onblack: #fff;
+    }
+    body.light-theme {
+      --bg-page: #ffffff;
+      --bg-scroll: rgba(255,255,255,0.6);
+      --bg-overlay-8: rgba(255,255,255,0.8);
+      --bg-panel-95: rgba(255,255,255,0.95);
+      --bg-panel-92: rgba(255,255,255,0.92);
+      --bg-circle-5: rgba(255,255,255,0.5);
+      --bg-circle-55: rgba(255,255,255,0.55);
+      --bg-fs-overlay: rgba(255,255,255,0.93);
+      --bg-koleso-btn: rgba(255,255,255,0.6);
+      --bg-roulette-overlay: rgba(255,255,255,0.75);
+      --fg-onblack: #111;
+    }
+
     /* ── КАСТОМНЫЙ СКРОЛЛБАР ── */
-    html { scrollbar-width: thin; scrollbar-color: rgba(255,0,0,0.45) rgba(10,0,0,0.6); }
+    html { scrollbar-width: thin; scrollbar-color: rgba(255,0,0,0.45) var(--bg-scroll); }
     ::-webkit-scrollbar { width: 10px; }
-    ::-webkit-scrollbar-track { background: rgba(10,0,0,0.6); }
+    ::-webkit-scrollbar-track { background: var(--bg-scroll); }
     ::-webkit-scrollbar-thumb {
       background: rgba(255,0,0,0.45);
       border-radius: 6px;
-      border: 2px solid rgba(10,0,0,0.6);
+      border: 2px solid var(--bg-scroll);
       box-shadow: 0 0 6px rgba(255,0,0,0.3);
     }
     ::-webkit-scrollbar-thumb:hover {
@@ -79,7 +109,7 @@
 
     html, body {
       font-family: 'Press Start 2P', monospace;
-      background: #050000;
+      background: var(--bg-page);
       min-height: 100vh;
       overflow-x: hidden;
     }
@@ -187,7 +217,7 @@
     .stats-body { flex: 1; }
     .stat-block { margin: 18px 0; }
     .big {
-      font-size: 17px; line-height: 1.6; color: white; font-variant-numeric: tabular-nums;
+      font-size: 17px; line-height: 1.6; color: var(--fg-onblack); font-variant-numeric: tabular-nums;
       text-shadow: 0 0 10px rgba(255,255,255,0.45), 0 0 22px rgba(255,0,0,0.25);
       animation: beacon 4.5s ease-in-out infinite;
     }
@@ -322,7 +352,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(0,0,0,0.8);
+      background: var(--bg-overlay-8);
       backdrop-filter: blur(8px);
       opacity: 0;
       pointer-events: none;
@@ -340,7 +370,7 @@
       max-height: 90vh;
       width: 100%;
       border-radius: 18px;
-      background: rgba(10,0,0,0.95);
+      background: var(--bg-panel-95);
       border: 1px solid rgba(255,0,0,0.3);
       box-shadow: 0 0 60px rgba(255,0,0,0.22);
       overflow: hidden;
@@ -356,8 +386,8 @@
       width: 28px; height: 28px;
       display: flex; align-items: center; justify-content: center;
       font-size: 16px;
-      color: #fff;
-      background: rgba(0,0,0,0.5);
+      color: var(--fg-onblack);
+      background: var(--bg-circle-5);
       border-radius: 50%;
       cursor: pointer;
       z-index: 3;
@@ -380,8 +410,8 @@
       width: 36px; height: 36px;
       display: flex; align-items: center; justify-content: center;
       font-size: 20px;
-      color: #fff;
-      background: rgba(0,0,0,0.5);
+      color: var(--fg-onblack);
+      background: var(--bg-circle-5);
       border: 1px solid rgba(255,0,0,0.35);
       border-radius: 50%;
       cursor: pointer;
@@ -431,7 +461,7 @@
       bottom: 12px; right: 12px;
       width: 40px; height: 40px;
       display: flex; align-items: center; justify-content: center;
-      background: rgba(0,0,0,0.55);
+      background: var(--bg-circle-55);
       border: 1px solid rgba(255,0,0,0.4);
       border-radius: 50%;
       cursor: pointer;
@@ -450,7 +480,7 @@
     /* ── ПОЛНОЭКРАННЫЙ ПРОСМОТР ФОТО ── */
     .portfolio-fs-overlay {
       position: fixed; inset: 0; z-index: 500;
-      background: rgba(0,0,0,0.93);
+      background: var(--bg-fs-overlay);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       display: flex; align-items: center; justify-content: center;
@@ -478,7 +508,7 @@
       display: block;
       border-radius: 10px;
       box-shadow: 0 0 70px rgba(255,0,0,0.25);
-      transition: transform .3s cubic-bezier(.2,.8,.2,1);
+      transition: transform .3s cubic-bezier(.2,.8,.2,1), opacity .18s ease;
       user-select: none;
       -webkit-user-drag: none;
     }
@@ -486,7 +516,7 @@
       position: fixed; top: 22px; right: 26px;
       width: 44px; height: 44px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 20px; color: #fff;
+      font-size: 20px; color: var(--fg-onblack);
       background: rgba(255,0,0,0.15);
       border: 1px solid rgba(255,0,0,0.4);
       border-radius: 50%;
@@ -495,6 +525,30 @@
       transition: background .2s, transform .35s cubic-bezier(.3,1.4,.4,1);
     }
     .portfolio-fs-close:hover { background: rgba(255,0,0,0.55); transform: rotate(90deg); }
+    .portfolio-fs-arrow {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 52px; height: 52px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px;
+      color: var(--fg-onblack);
+      background: rgba(255,0,0,0.15);
+      border: 1px solid rgba(255,0,0,0.4);
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 3;
+      user-select: none;
+      transition: background .2s, transform .2s;
+    }
+    .portfolio-fs-arrow:hover { background: rgba(255,0,0,0.55); transform: translateY(-50%) scale(1.08); }
+    .portfolio-fs-arrow.left { left: 22px; }
+    .portfolio-fs-arrow.right { right: 22px; }
+    @media (max-width: 640px) {
+      .portfolio-fs-arrow { width: 40px; height: 40px; font-size: 20px; }
+      .portfolio-fs-arrow.left { left: 8px; }
+      .portfolio-fs-arrow.right { right: 8px; }
+    }
     .portfolio-fs-hint {
       position: absolute;
       bottom: -32px; left: 50%; transform: translateX(-50%);
@@ -519,6 +573,37 @@
     .portfolio-loupe.active { opacity: 1; transform: scale(1); }
     @media (max-width: 640px) {
       .portfolio-loupe { display: none; }
+    }
+
+    /* ── ПЕРЕКЛЮЧАТЕЛЬ ТЕМЫ (солнце/луна) ── */
+    .theme-switch {
+      position: fixed;
+      top: 18px; right: 18px;
+      z-index: 400;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      padding: 4px;
+      border-radius: 999px;
+      background: var(--bg-panel-95);
+      border: 1px solid rgba(255,0,0,0.3);
+      box-shadow: 0 0 20px rgba(255,0,0,0.15);
+    }
+    .theme-switch-btn {
+      display: flex; align-items: center; justify-content: center;
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      cursor: pointer;
+      color: rgba(255,120,120,0.55);
+      background: transparent;
+      transition: background .25s, color .25s, transform .2s;
+    }
+    .theme-switch-btn svg { width: 17px; height: 17px; }
+    .theme-switch-btn:hover { transform: scale(1.08); }
+    .theme-switch-btn.active {
+      color: #fff;
+      background: linear-gradient(135deg, #ff2a2a, #b00000);
+      box-shadow: 0 0 14px rgba(255,0,0,0.5);
     }
 
     /* ========================= SEO-ТЕКСТ ========================= */
@@ -571,6 +656,27 @@
       .seo-text h1 { font-size: 11px; }
     }
 
+    /* Светлая тема: основной абзац и список услуг тоже были
+       светло-розовыми — делаем их тёмными для читаемости на белом фоне. */
+    body.light-theme .seo-text {
+      color: #3a1010;
+    }
+    body.light-theme .seo-text h2 {
+      color: #ff3b3b;
+    }
+    body.light-theme .seo-text strong {
+      color: #b00000;
+    }
+    body.light-theme .portfolio-card-type {
+      color: #3a1010;
+    }
+    body.light-theme .portfolio-card-time {
+      color: rgba(180,20,20,0.75);
+    }
+    body.light-theme .portfolio-modal-time {
+      color: rgba(180,20,20,0.75);
+    }
+
     .koleso-btn {
       position: fixed;
       bottom: 28px;
@@ -583,7 +689,7 @@
       border: 2px solid rgba(255,0,0,0.4);
       box-shadow: 0 0 20px rgba(255,0,0,0.3);
       transition: transform .2s, box-shadow .2s;
-      background: rgba(10,0,0,0.6);
+      background: var(--bg-koleso-btn);
     }
     .koleso-btn img {
       width: 100%;
@@ -605,7 +711,7 @@
       width: 150px;
       padding: 8px 26px 8px 12px;
       border-radius: 10px;
-      background: rgba(10,0,0,0.95);
+      background: var(--bg-panel-95);
       border: 1px solid rgba(255,0,0,0.4);
       color: #ff8a8a;
       font-family: 'Press Start 2P', monospace;
@@ -650,7 +756,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(0,0,0,0.75);
+      background: var(--bg-roulette-overlay);
       backdrop-filter: blur(6px);
       opacity: 0;
       pointer-events: none;
@@ -666,7 +772,7 @@
       max-width: 95vw;
       padding: 32px 28px;
       border-radius: 22px;
-      background: rgba(10,0,0,0.92);
+      background: var(--bg-panel-92);
       border: 1px solid rgba(255,0,0,0.3);
       box-shadow: 0 0 40px rgba(255,0,0,0.14);
       text-align: center;
@@ -821,6 +927,26 @@
     .logged-as {
       font-size: 8px; color: rgba(150,255,150,0.7);
       margin-bottom: 14px; line-height: 1.6;
+    }
+
+    /* Светлая тема: приглушённый розовый текст рулетки был еле виден
+       на белом фоне — делаем его тёмно-красным вместо светло-розового. */
+    body.light-theme .roulette-winners-title,
+    body.light-theme .roulette-winners-empty,
+    body.light-theme .roulette-winner-meta,
+    body.light-theme .chance-item,
+    body.light-theme .login-hint {
+      color: rgba(180,20,20,0.75);
+    }
+    body.light-theme .roulette-winner-name {
+      color: #3a0a0a;
+    }
+    body.light-theme .logged-as {
+      color: rgba(20,140,20,0.85);
+    }
+    body.light-theme .label {
+      color: rgba(180,20,20,0.8);
+      text-shadow: none;
     }
 
     /* ========================= MAINTENANCE TOAST ========================= */
@@ -1442,6 +1568,25 @@
 <audio id="sound67" src="67.mp3" preload="auto"></audio>
 
 <canvas id="bg"></canvas>
+
+<div class="theme-switch" id="themeSwitch">
+  <div class="theme-switch-btn" id="themeBtnDark" title="Тёмная тема" onclick="setTheme('dark')">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </div>
+  <div class="theme-switch-btn" id="themeBtnLight" title="Светлая тема" onclick="setTheme('light')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"></circle>
+      <line x1="12" y1="2" x2="12" y2="4"></line>
+      <line x1="12" y1="20" x2="12" y2="22"></line>
+      <line x1="4.93" y1="4.93" x2="6.34" y2="6.34"></line>
+      <line x1="17.66" y1="17.66" x2="19.07" y2="19.07"></line>
+      <line x1="2" y1="12" x2="4" y2="12"></line>
+      <line x1="20" y1="12" x2="22" y2="12"></line>
+      <line x1="4.93" y1="19.07" x2="6.34" y2="17.66"></line>
+      <line x1="17.66" y1="6.34" x2="19.07" y2="4.93"></line>
+    </svg>
+  </div>
+</div>
 <div class="fluff-wrap">
   <div class="fluff fluff-1"></div>
   <div class="fluff fluff-2"></div>
@@ -1542,6 +1687,8 @@
 <!-- ПОЛНОЭКРАННЫЙ ПРОСМОТР ФОТО С ЛУПОЙ -->
 <div class="portfolio-fs-overlay" id="portfolioFsOverlay" onclick="closePortfolioFullscreenOnBg(event)">
   <div class="portfolio-fs-close" onclick="closePortfolioFullscreen()">✕</div>
+  <div class="portfolio-fs-arrow left" id="portfolioFsPrev" onclick="portfolioFsStep(-1, event)" style="display:none">‹</div>
+  <div class="portfolio-fs-arrow right" id="portfolioFsNext" onclick="portfolioFsStep(1, event)" style="display:none">›</div>
   <div class="portfolio-fs-img-wrap" id="portfolioFsImgWrap">
     <img class="portfolio-fs-img" id="portfolioFsImg" src="" alt="Работа — полный экран" draggable="false">
     <div class="portfolio-loupe" id="portfolioLoupe"></div>
@@ -1650,6 +1797,104 @@
 
 
 <script>
+
+  /* =========================================================
+     ПОРТФОЛИО
+     Чтобы добавить новую работу — допиши объект в конец массива
+     PORTFOLIO_ITEMS ниже. Три поля:
+       img  — имя файла, лежит в папке portfolio/
+              поддерживаются картинки (.png/.jpg/.gif) и видео (.mp4)
+       type — что за работа ("Аватарка", "Баннер",
+              "Оформление форумного аккаунта" и т.п.)
+       time — за сколько выполнена ("1 день", "3 часа" и т.п.)
+     Пример:
+       { img: "portfolio/work12.png", type: "Баннер сервера", time: "1 день" },
+       { img: "portfolio/work13.mp4", type: "Анимированный баннер", time: "1 день" },
+
+     Чтобы объединить НЕСКОЛЬКО работ в одно окошко (с листанием
+     по стрелкам/точкам/свайпом при открытии) — оберни их в group:
+       {
+         group: [
+           { img: "portfolio/a.png", type: "Работа 1", time: "1 день" },
+           { img: "portfolio/b.png", type: "Работа 2", time: "1 день" },
+         ]
+       }
+  ========================================================= */
+  const PORTFOLIO_ITEMS = [
+    { img: "portfolio/mp4/f2c72d40df4751e3.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/mp4/1.mp4", type: "Анимированное оформление форумного аккаунта", time: "3 дня" },
+    { img: "portfolio/png/02072026.png", type: "Оформление форумного раздела", time: "2 дня" },
+    {
+      group: [
+    { img: "portfolio/png/280620261.png", type: "Оформление форумного аккаунта и раздела", time: "1 день" },
+    { img: "portfolio/png/280620262.png", type: "Оформление форумного аккаунта и раздела", time: "1 день" },
+  ]
+},
+    { img: "portfolio/mp4/d61caa09fc0a7268.mp4", type: "Анимированное оформление форумного аккаунта", time: "2 дня" },
+    { img: "portfolio/mp4/c5e015abe5ef5d24.mp4", type: "Анимированное оформление форумного аккаунта", time: "14 дней / С учётом ожиданий" },
+    { img: "portfolio/mp4/6e1c16cb73a4f0c7.mp4", type: "Анимированное оформление форумного аккаунта", time: "3 дня" },
+    { img: "portfolio/mp4/e826c60c70506a4e.mp4", type: "Анимированное оформление форумного аккаунта", time: "2 дня" },
+    { img: "portfolio/mp4/9cce42308c66a6fa.mp4", type: "Анимированное оформление форумного аккаунта", time: "2 дня" },
+    { img: "portfolio/mp4/637c6ea26a1fc236.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/mp4/c110732042b25a2b.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/mp4/2b5b754da85608e5.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/mp4/ca37069f0cb26cf0.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+{
+  group: [
+    { img: "portfolio/png/vk (3).png", type: "Оформление группы ВК", time: "2 дня" },
+    { img: "portfolio/png/vk (1).png", type: "Оформление группы ВК", time: "2 дня" },
+    { img: "portfolio/png/vk (2).png", type: "Оформление группы ВК", time: "2 дня" },
+  ]
+},
+    { img: "portfolio/png/321.png", type: "Оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/mp4/9eae1af972e0c792.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/png/d48ccf921236f3c2126.png", type: "Оформление группы ВК", time: "1 день" },
+    { img: "portfolio/mp4/bc06898fd6fc67ab.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/png/a3290f724f898e3f.png", type: "Оформление форумного аккаунта", time: "1 день" },
+{
+  group: [
+    { img: "portfolio/mp4/21808c23072837b1.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/mp4/66fad8f99e42d879.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+  ]
+},
+    { img: "portfolio/mp4/c.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/png/148604a323a84573.png", type: "Оформление форумного аккаунта", time: "2 дня" },
+    { img: "portfolio/mp4/feedf0a20e18c140.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+{
+  group: [
+    { img: "portfolio/png/tv (2).png", type: "Оформление Twitch", time: "1 день" },
+    { img: "portfolio/png/tv (1).png", type: "Оформление Twitch", time: "1 день" },
+  ]
+},
+    { img: "portfolio/png/9ac3993015b2b9cf.png", type: "Оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/png/ff7f32b0d6ba1011.png", type: "Оформление форумных разделов", time: "1 день" },
+    { img: "portfolio/png/11beebc137b1f5e9.png", type: "Оформление группы ВК", time: "2 дня" },
+    { img: "portfolio/mp4/9c45641283169ca6.mp4", type: "Анимированное оформление форумного аккаунта", time: "2 дня" },
+    { img: "portfolio/png/4fb69b3f3e108103.png", type: "Оформление форумного аккаунта", time: "1 день" },
+   { img: "portfolio/mp4/ae016f282b171634.mp4", type: "Анимированное оформление форумного аккаунта", time: "2 дня" },
+{
+  group: [
+    { img: "portfolio/png/dvizhpervih (6).png", type: "Оформление для <<Движения первых>>", time: "2 месяца / С учётом ожиданий" },
+    { img: "portfolio/png/dvizhpervih (7).png", type: "Оформление для <<Движения первых>>", time: "2 месяца / С учётом ожиданий" },
+    { img: "portfolio/png/dvizhpervih (8).png", type: "Оформление для <<Движения первых>>", time: "2 месяца / С учётом ожиданий" },
+    { img: "portfolio/png/dvizhpervih (1).png", type: "Оформление для <<Движения первых>>", time: "2 месяца / С учётом ожиданий" },
+    { img: "portfolio/png/dvizhpervih (2).png", type: "Оформление для <<Движения первых>>", time: "2 месяца / С учётом ожиданий" },
+    { img: "portfolio/png/dvizhpervih (3).png", type: "Оформление для <<Движения первых>>", time: "2 месяца / С учётом ожиданий" },
+    { img: "portfolio/png/dvizhpervih (5).png", type: "Оформление для <<Движения первых>>", time: "2 месяца / С учётом ожиданий" },
+    { img: "portfolio/png/dvizhpervih (4).png", type: "Оформление для <<Движения первых>>", time: "2 месяца / С учётом ожиданий" },
+  ]
+},
+    { img: "portfolio/png/9ef13f1bfc538763.png", type: "Оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/png/prev.png", type: "Превью для YouTube", time: "2 дня" },
+    { img: "portfolio/mp4/5abbc31fb75cc879.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/png/2.png", type: "Оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/mp4/9aea3cf2d065ca86.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/png/a3e33aad31bfabfe.png", type: "Оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/mp4/b48e6dd5bea5da15.mp4", type: "Анимированное оформление форумного аккаунта", time: "2 дня" },
+    { img: "portfolio/mp4/3a39b97d42947ac6.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/png/ec777b88d33127a8.png", type: "Оформление форумного аккаунта", time: "2 дня" },
+  ];
+
 
   /* =========================
      ЛЕТАЮЩАЯ КОРОВА
@@ -2317,6 +2562,43 @@
   /* =========================
      ЧАСТИЦЫ
   ========================= */
+  /* =========================================================
+     ПЕРЕКЛЮЧАТЕЛЬ ТЕМЫ
+     Приоритет: сохранённый выбор в куки → тема системы (ПК/телефона) → тёмная.
+     Выбор пользователя всегда сохраняется в куки на год.
+  ========================================================= */
+  function getCookie(name) {
+    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    return match ? decodeURIComponent(match[2]) : null;
+  }
+  function setCookie(name, value, days) {
+    const d = new Date();
+    d.setTime(d.getTime() + days * 24 * 60 * 60 * 1000);
+    document.cookie = `${name}=${encodeURIComponent(value)}; expires=${d.toUTCString()}; path=/; SameSite=Lax`;
+  }
+
+  const themeBtnDark  = document.getElementById('themeBtnDark');
+  const themeBtnLight = document.getElementById('themeBtnLight');
+
+  function setTheme(theme, save = true) {
+    document.body.classList.toggle('light-theme', theme === 'light');
+    if (themeBtnDark && themeBtnLight) {
+      themeBtnDark.classList.toggle('active', theme === 'dark');
+      themeBtnLight.classList.toggle('active', theme === 'light');
+    }
+    if (save) setCookie('theme', theme, 365);
+  }
+
+  (function initTheme() {
+    const saved = getCookie('theme');
+    if (saved === 'dark' || saved === 'light') {
+      setTheme(saved, false);
+    } else {
+      const systemPrefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+      setTheme(systemPrefersLight ? 'light' : 'dark', false);
+    }
+  })();
+
   const canvas = document.getElementById('bg');
   const ctx    = canvas.getContext('2d');
   function resize() { canvas.width = innerWidth; canvas.height = innerHeight; }
@@ -2345,104 +2627,6 @@
   }
   if (!noMotion) animate();
   else for (let d of dots) { ctx.beginPath(); ctx.arc(d.x,d.y,d.r,0,Math.PI*2); ctx.fillStyle='rgba(255,0,0,0.6)'; ctx.fill(); }
-
-  /* =========================================================
-     ПОРТФОЛИО
-     Чтобы добавить новую работу — допиши объект в конец массива
-     PORTFOLIO_ITEMS ниже. Три поля:
-       img  — имя файла, лежит в папке portfolio/
-              поддерживаются картинки (.png/.jpg/.gif) и видео (.mp4)
-       type — что за работа ("Аватарка", "Баннер",
-              "Оформление форумного аккаунта" и т.п.)
-       time — за сколько выполнена ("1 день", "3 часа" и т.п.)
-     Пример:
-       { img: "portfolio/work12.png", type: "Баннер сервера", time: "1 день" },
-       { img: "portfolio/work13.mp4", type: "Анимированный баннер", time: "1 день" },
-
-     Чтобы объединить НЕСКОЛЬКО работ в одно окошко (с листанием
-     по стрелкам/точкам/свайпом при открытии) — оберни их в group:
-       {
-         group: [
-           { img: "portfolio/a.png", type: "Работа 1", time: "1 день" },
-           { img: "portfolio/b.png", type: "Работа 2", time: "1 день" },
-         ]
-       }
-  ========================================================= */
-  const PORTFOLIO_ITEMS = [
-    { img: "portfolio/mp4/f2c72d40df4751e3.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
-    { img: "portfolio/mp4/1.mp4", type: "Анимированное оформление форумного аккаунта", time: "3 дня" },
-    { img: "portfolio/png/02072026.png", type: "Оформление форумного раздела", time: "2 дня" },
-    {
-      group: [
-    { img: "portfolio/png/280620261.png", type: "Оформление форумного аккаунта и раздела", time: "1 день" },
-    { img: "portfolio/png/280620262.png", type: "Оформление форумного аккаунта и раздела", time: "1 день" },
-  ]
-},
-    { img: "portfolio/mp4/d61caa09fc0a7268.mp4", type: "Анимированное оформление форумного аккаунта", time: "2 дня" },
-    { img: "portfolio/mp4/c5e015abe5ef5d24.mp4", type: "Анимированное оформление форумного аккаунта", time: "14 дней / С учётом ожиданий" },
-    { img: "portfolio/mp4/6e1c16cb73a4f0c7.mp4", type: "Анимированное оформление форумного аккаунта", time: "3 дня" },
-    { img: "portfolio/mp4/e826c60c70506a4e.mp4", type: "Анимированное оформление форумного аккаунта", time: "2 дня" },
-    { img: "portfolio/mp4/9cce42308c66a6fa.mp4", type: "Анимированное оформление форумного аккаунта", time: "2 дня" },
-    { img: "portfolio/mp4/637c6ea26a1fc236.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
-    { img: "portfolio/mp4/c110732042b25a2b.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
-    { img: "portfolio/mp4/2b5b754da85608e5.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
-    { img: "portfolio/mp4/ca37069f0cb26cf0.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
-{
-  group: [
-    { img: "portfolio/png/vk (3).png", type: "Оформление группы ВК", time: "2 дня" },
-    { img: "portfolio/png/vk (1).png", type: "Оформление группы ВК", time: "2 дня" },
-    { img: "portfolio/png/vk (2).png", type: "Оформление группы ВК", time: "2 дня" },
-  ]
-},
-    { img: "portfolio/png/321.png", type: "Оформление форумного аккаунта", time: "1 день" },
-    { img: "portfolio/mp4/9eae1af972e0c792.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
-    { img: "portfolio/png/d48ccf921236f3c2126.png", type: "Оформление группы ВК", time: "1 день" },
-    { img: "portfolio/mp4/bc06898fd6fc67ab.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
-    { img: "portfolio/png/a3290f724f898e3f.png", type: "Оформление форумного аккаунта", time: "1 день" },
-{
-  group: [
-    { img: "portfolio/mp4/21808c23072837b1.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
-    { img: "portfolio/mp4/66fad8f99e42d879.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
-  ]
-},
-    { img: "portfolio/mp4/c.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
-    { img: "portfolio/png/148604a323a84573.png", type: "Оформление форумного аккаунта", time: "2 дня" },
-    { img: "portfolio/mp4/feedf0a20e18c140.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
-{
-  group: [
-    { img: "portfolio/png/tv (2).png", type: "Оформление Twitch", time: "1 день" },
-    { img: "portfolio/png/tv (1).png", type: "Оформление Twitch", time: "1 день" },
-  ]
-},
-    { img: "portfolio/png/9ac3993015b2b9cf.png", type: "Оформление форумного аккаунта", time: "1 день" },
-    { img: "portfolio/png/ff7f32b0d6ba1011.png", type: "Оформление форумных разделов", time: "1 день" },
-    { img: "portfolio/png/11beebc137b1f5e9.png", type: "Оформление группы ВК", time: "2 дня" },
-    { img: "portfolio/mp4/9c45641283169ca6.mp4", type: "Анимированное оформление форумного аккаунта", time: "2 дня" },
-    { img: "portfolio/png/4fb69b3f3e108103.png", type: "Оформление форумного аккаунта", time: "1 день" },
-   { img: "portfolio/mp4/ae016f282b171634.mp4", type: "Анимированное оформление форумного аккаунта", time: "2 дня" },
-{
-  group: [
-    { img: "portfolio/png/dvizhpervih (6).png", type: "Оформление для <<Движения первых>>", time: "2 месяца / С учётом ожиданий" },
-    { img: "portfolio/png/dvizhpervih (7).png", type: "Оформление для <<Движения первых>>", time: "2 месяца / С учётом ожиданий" },
-    { img: "portfolio/png/dvizhpervih (8).png", type: "Оформление для <<Движения первых>>", time: "2 месяца / С учётом ожиданий" },
-    { img: "portfolio/png/dvizhpervih (1).png", type: "Оформление для <<Движения первых>>", time: "2 месяца / С учётом ожиданий" },
-    { img: "portfolio/png/dvizhpervih (2).png", type: "Оформление для <<Движения первых>>", time: "2 месяца / С учётом ожиданий" },
-    { img: "portfolio/png/dvizhpervih (3).png", type: "Оформление для <<Движения первых>>", time: "2 месяца / С учётом ожиданий" },
-    { img: "portfolio/png/dvizhpervih (5).png", type: "Оформление для <<Движения первых>>", time: "2 месяца / С учётом ожиданий" },
-    { img: "portfolio/png/dvizhpervih (4).png", type: "Оформление для <<Движения первых>>", time: "2 месяца / С учётом ожиданий" },
-  ]
-},
-    { img: "portfolio/png/9ef13f1bfc538763.png", type: "Оформление форумного аккаунта", time: "1 день" },
-    { img: "portfolio/png/prev.png", type: "Превью для YouTube", time: "2 дня" },
-    { img: "portfolio/mp4/5abbc31fb75cc879.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
-    { img: "portfolio/png/2.png", type: "Оформление форумного аккаунта", time: "1 день" },
-    { img: "portfolio/mp4/9aea3cf2d065ca86.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
-    { img: "portfolio/png/a3e33aad31bfabfe.png", type: "Оформление форумного аккаунта", time: "1 день" },
-    { img: "portfolio/mp4/b48e6dd5bea5da15.mp4", type: "Анимированное оформление форумного аккаунта", time: "2 дня" },
-    { img: "portfolio/mp4/3a39b97d42947ac6.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
-    { img: "portfolio/png/ec777b88d33127a8.png", type: "Оформление форумного аккаунта", time: "2 дня" },
-  ];
-
   function isVideoSrc(src) {
     return /\.(mp4|webm|mov)$/i.test(src || '');
   }
@@ -2573,34 +2757,77 @@
   const portfolioFsOverlay = document.getElementById('portfolioFsOverlay');
   const portfolioFsImgWrap = document.getElementById('portfolioFsImgWrap');
   const portfolioFsImg     = document.getElementById('portfolioFsImg');
+  const portfolioFsPrev    = document.getElementById('portfolioFsPrev');
+  const portfolioFsNext    = document.getElementById('portfolioFsNext');
   const portfolioLoupe     = document.getElementById('portfolioLoupe');
   const portfolioFsHint    = document.getElementById('portfolioFsHint');
   const portfolioHasHover  = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-  const LOUPE_ZOOM = 2.4;
+  const LOUPE_ZOOM = 1.6;
+
+  function resetFsZoomState() {
+    portfolioFsImgWrap.classList.remove('zoomed');
+    portfolioFsImg.style.transform = '';
+    portfolioLoupe.classList.remove('active');
+  }
+
+  function updateFsArrows() {
+    if (!portfolioFsPrev || !portfolioFsNext) return;
+    const multi = currentGroup && currentGroup.length > 1;
+    portfolioFsPrev.style.display = multi ? 'flex' : 'none';
+    portfolioFsNext.style.display = multi ? 'flex' : 'none';
+  }
 
   function openPortfolioFullscreen(e) {
     if (e) e.stopPropagation();
     if (!portfolioModalImg.src || portfolioModalImg.style.display === 'none') return;
+    portfolioFsImg.style.opacity = '1';
     portfolioFsImg.src = portfolioModalImg.src;
-    portfolioFsImgWrap.classList.remove('zoomed');
-    portfolioFsImg.style.transform = '';
+    resetFsZoomState();
     if (portfolioFsHint) portfolioFsHint.textContent = portfolioHasHover
       ? 'наведите курсор — приблизить'
       : 'тапните по фото — зум';
+    updateFsArrows();
     portfolioFsOverlay.classList.add('open');
     document.body.style.overflow = 'hidden';
   }
   function closePortfolioFullscreen() {
     if (!portfolioFsOverlay) return;
     portfolioFsOverlay.classList.remove('open');
-    portfolioFsImgWrap.classList.remove('zoomed');
-    portfolioFsImg.style.transform = '';
-    portfolioLoupe.classList.remove('active');
+    resetFsZoomState();
     document.body.style.overflow = '';
   }
   function closePortfolioFullscreenOnBg(e) {
     if (e.target === portfolioFsOverlay) closePortfolioFullscreen();
   }
+
+  /* Переключение фото группы прямо в полноэкранном режиме —
+     синхронизируется с окном просмотра позади (те же currentGroup/currentIndex),
+     пропускает видео (в фулскрине показываются только фото), плавно меняет кадр. */
+  function portfolioFsStep(dir, e) {
+    if (e) e.stopPropagation();
+    if (!currentGroup || currentGroup.length < 2) return;
+    let idx = currentIndex;
+    let tries = 0;
+    do {
+      idx = (idx + dir + currentGroup.length) % currentGroup.length;
+      tries++;
+    } while (isVideoSrc(currentGroup[idx].img) && tries < currentGroup.length);
+    if (isVideoSrc(currentGroup[idx].img)) return; // в группе нет других фото
+    currentIndex = idx;
+    showModalSlide();
+    resetFsZoomState();
+    portfolioFsImg.style.opacity = '0';
+    setTimeout(() => {
+      portfolioFsImg.src = currentGroup[currentIndex].img;
+      portfolioFsImg.style.opacity = '1';
+    }, 160);
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (!portfolioFsOverlay || !portfolioFsOverlay.classList.contains('open')) return;
+    if (e.key === 'ArrowRight') portfolioFsStep(1);
+    if (e.key === 'ArrowLeft') portfolioFsStep(-1);
+  });
 
   if (portfolioHasHover && portfolioFsImgWrap) {
     portfolioFsImgWrap.addEventListener('mousemove', (e) => {
@@ -2623,10 +2850,28 @@
     });
     portfolioFsImgWrap.addEventListener('mouseleave', () => portfolioLoupe.classList.remove('active'));
   } else if (portfolioFsImgWrap) {
+    let fsTapDragged = false;
     portfolioFsImgWrap.addEventListener('click', (e) => {
       e.stopPropagation();
+      if (fsTapDragged) { fsTapDragged = false; return; }
       const zoomed = portfolioFsImgWrap.classList.toggle('zoomed');
       portfolioFsImg.style.transform = zoomed ? 'scale(2.1)' : '';
+    });
+
+    /* Свайп по фото в фулскрине — листает группу (если это не одиночный тап) */
+    let fsSwipeStartX = null;
+    portfolioFsOverlay.addEventListener('touchstart', (e) => {
+      fsSwipeStartX = e.touches[0].clientX;
+      fsTapDragged = false;
+    }, { passive: true });
+    portfolioFsOverlay.addEventListener('touchmove', (e) => {
+      if (fsSwipeStartX !== null && Math.abs(e.touches[0].clientX - fsSwipeStartX) > 10) fsTapDragged = true;
+    }, { passive: true });
+    portfolioFsOverlay.addEventListener('touchend', (e) => {
+      if (fsSwipeStartX === null || !currentGroup || currentGroup.length < 2) { fsSwipeStartX = null; return; }
+      const diff = e.changedTouches[0].clientX - fsSwipeStartX;
+      fsSwipeStartX = null;
+      if (Math.abs(diff) > 40) { fsTapDragged = true; portfolioFsStep(diff > 0 ? -1 : 1); }
     });
   }
 
