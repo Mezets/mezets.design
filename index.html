@@ -151,6 +151,96 @@
       100% { transform: translate(70vw, 70vh); }
     }
 
+    /* ── ШАРИКИ НА ДР ── */
+    .balloons-wrap {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .balloon {
+      position: absolute;
+      bottom: -260px;
+      width: 70px;
+      height: 88px;
+      border-radius: 50% 50% 48% 48% / 58% 58% 42% 42%;
+      opacity: 0.9;
+      animation: balloonFloat linear infinite;
+      box-shadow: inset -10px -12px 20px rgba(0,0,0,0.25), inset 8px 10px 16px rgba(255,255,255,0.18), 0 0 22px rgba(255,0,0,0.25);
+    }
+    .balloon::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      bottom: -3px;
+      width: 0; height: 0;
+      transform: translateX(-50%);
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 9px solid rgba(120,0,0,0.9);
+    }
+    .balloon::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 100%;
+      width: 1px;
+      height: 90px;
+      background: rgba(255,80,80,0.35);
+      transform: translateX(-50%);
+    }
+    .balloon-red    { background: radial-gradient(circle at 32% 28%, #ff5c5c, #d40000 70%, #8c0000); }
+    .balloon-white  { background: radial-gradient(circle at 32% 28%, #ffffff, #f2f2f2 60%, #cfcfcf); box-shadow: inset -10px -12px 20px rgba(0,0,0,0.12), inset 8px 10px 16px rgba(255,255,255,0.5), 0 0 22px rgba(255,0,0,0.15); }
+    .balloon-stripe {
+      background:
+        repeating-linear-gradient(115deg, #ff2b2b 0 14px, #ffffff 14px 28px);
+      box-shadow: inset -10px -12px 20px rgba(0,0,0,0.2), inset 8px 10px 16px rgba(255,255,255,0.35), 0 0 22px rgba(255,0,0,0.2);
+    }
+
+    .balloon-l1 { left: 0.5%; width: 60px; height: 76px; animation-duration: 15s; animation-delay: -2s;  }
+    .balloon-l2 { left: 4.5%; width: 78px; height: 98px; animation-duration: 19s; animation-delay: -9s;  }
+    .balloon-l3 { left: 0%;   width: 52px; height: 66px; animation-duration: 13s; animation-delay: -5s;  }
+    .balloon-l4 { left: 8.5%; width: 46px; height: 58px; animation-duration: 16s; animation-delay: -12s; }
+    .balloon-l5 { left: 2.5%; width: 66px; height: 84px; animation-duration: 22s; animation-delay: -1s;  }
+    .balloon-l6 { left: 6.5%; width: 40px; height: 52px; animation-duration: 12s; animation-delay: -7.5s;}
+    .balloon-l7 { left: 10.5%;width: 56px; height: 70px; animation-duration: 20s; animation-delay: -15s; }
+    .balloon-l8 { left: 3.5%; width: 34px; height: 44px; animation-duration: 10s; animation-delay: -3.5s; }
+    .balloon-l9 { left: 12%;  width: 64px; height: 80px; animation-duration: 24s; animation-delay: -18s; }
+
+    .balloon-r1 { right: 0.5%; width: 62px; height: 78px; animation-duration: 17s; animation-delay: -4s;  }
+    .balloon-r2 { right: 5%;   width: 80px; height: 100px;animation-duration: 21s; animation-delay: -11s; }
+    .balloon-r3 { right: 0%;   width: 50px; height: 64px; animation-duration: 14s; animation-delay: -7s;  }
+    .balloon-r4 { right: 9%;   width: 44px; height: 56px; animation-duration: 18s; animation-delay: -3s;  }
+    .balloon-r5 { right: 2.5%; width: 68px; height: 86px; animation-duration: 23s; animation-delay: -14s; }
+    .balloon-r6 { right: 7%;   width: 38px; height: 50px; animation-duration: 11s; animation-delay: -6s;  }
+    .balloon-r7 { right: 10.5%;width: 58px; height: 72px; animation-duration: 19s; animation-delay: -16s; }
+    .balloon-r8 { right: 3.5%; width: 36px; height: 46px; animation-duration: 10.5s; animation-delay: -2.5s;}
+    .balloon-r9 { right: 12%;  width: 62px; height: 78px; animation-duration: 25s; animation-delay: -19s; }
+
+    @keyframes balloonFloat {
+      0%   { transform: translateY(0) translateX(0) rotate(-3deg); }
+      25%  { transform: translateY(-28vh) translateX(12px) rotate(3deg); }
+      50%  { transform: translateY(-56vh) translateX(-10px) rotate(-4deg); }
+      75%  { transform: translateY(-84vh) translateX(10px) rotate(3deg); }
+      100% { transform: translateY(-115vh) translateX(0) rotate(-3deg); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .balloon { animation: none; display: none; }
+    }
+    @media (max-width: 700px) {
+      .balloon-l2, .balloon-r2, .balloon-l5, .balloon-r5,
+      .balloon-l7, .balloon-r7, .balloon-l9, .balloon-r9 { display: none; }
+    }
+
+    /* ── САЛЮТЫ ── */
+    #fireworks {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+
     .main {
       display: flex;
       flex-wrap: wrap;
@@ -1592,6 +1682,30 @@
   <div class="fluff fluff-2"></div>
 </div>
 
+<div class="balloons-wrap">
+  <div class="balloon balloon-red balloon-l1"></div>
+  <div class="balloon balloon-white balloon-l2"></div>
+  <div class="balloon balloon-stripe balloon-l3"></div>
+  <div class="balloon balloon-white balloon-l4"></div>
+  <div class="balloon balloon-red balloon-l5"></div>
+  <div class="balloon balloon-stripe balloon-l6"></div>
+  <div class="balloon balloon-red balloon-l7"></div>
+  <div class="balloon balloon-white balloon-l8"></div>
+  <div class="balloon balloon-stripe balloon-l9"></div>
+
+  <div class="balloon balloon-white balloon-r1"></div>
+  <div class="balloon balloon-red balloon-r2"></div>
+  <div class="balloon balloon-stripe balloon-r3"></div>
+  <div class="balloon balloon-red balloon-r4"></div>
+  <div class="balloon balloon-white balloon-r5"></div>
+  <div class="balloon balloon-stripe balloon-r6"></div>
+  <div class="balloon balloon-white balloon-r7"></div>
+  <div class="balloon balloon-red balloon-r8"></div>
+  <div class="balloon balloon-stripe balloon-r9"></div>
+</div>
+
+<canvas id="fireworks"></canvas>
+
 <div class="main">
 
   <!-- КАРТОЧКА DISCORD-СЕРВЕРА -->
@@ -2627,6 +2741,98 @@
   }
   if (!noMotion) animate();
   else for (let d of dots) { ctx.beginPath(); ctx.arc(d.x,d.y,d.r,0,Math.PI*2); ctx.fillStyle='rgba(255,0,0,0.6)'; ctx.fill(); }
+
+  /* ── ПРАЗДНИК ТОЛЬКО 4 ИЮЛЯ (00:00–24:00 по местному времени) ── */
+  function isHolidayWindow() {
+    const now = new Date();
+    return now.getMonth() === 6 && now.getDate() === 4; // месяцы с 0: 6 = июль
+  }
+  const balloonsWrapEl = document.querySelector('.balloons-wrap');
+  const fwCanvasEl      = document.getElementById('fireworks');
+  const holidayActive   = isHolidayWindow();
+  if (!holidayActive) {
+    if (balloonsWrapEl) balloonsWrapEl.style.display = 'none';
+    if (fwCanvasEl) fwCanvasEl.style.display = 'none';
+  }
+
+  /* ── САЛЮТЫ ── */
+  (function fireworksInit() {
+    const fwCanvas = document.getElementById('fireworks');
+    if (!fwCanvas || noMotion || !holidayActive) return;
+    const fwCtx = fwCanvas.getContext('2d');
+    function fwResize() { fwCanvas.width = innerWidth; fwCanvas.height = innerHeight; }
+    fwResize(); addEventListener('resize', fwResize);
+
+    const FW_COLORS = ['#ff2b2b','#ff5c5c','#ffffff','#ffe5e5','#ff0000'];
+    let particles = [];
+    let rockets   = [];
+
+    function spawnRocket() {
+      const targetX = innerWidth * (0.06 + Math.random()*0.88);
+      const targetY = innerHeight * (0.1 + Math.random()*0.4);
+      rockets.push({
+        x: targetX, y: innerHeight + 20,
+        targetY, vy: -(Math.random()*3 + 6),
+        color: FW_COLORS[Math.floor(Math.random()*FW_COLORS.length)]
+      });
+    }
+
+    function explode(x, y, color) {
+      const count = 40 + Math.floor(Math.random()*20);
+      for (let i = 0; i < count; i++) {
+        const angle = (Math.PI * 2 * i) / count + Math.random()*0.2;
+        const speed = Math.random()*3.2 + 1.2;
+        particles.push({
+          x, y,
+          vx: Math.cos(angle)*speed,
+          vy: Math.sin(angle)*speed,
+          life: 1,
+          decay: Math.random()*0.012 + 0.012,
+          color
+        });
+      }
+    }
+
+    function fwTick() {
+      fwCtx.clearRect(0, 0, fwCanvas.width, fwCanvas.height);
+
+      rockets.forEach(r => { r.y += r.vy; });
+      rockets = rockets.filter(r => {
+        fwCtx.beginPath();
+        fwCtx.arc(r.x, r.y, 2.4, 0, Math.PI*2);
+        fwCtx.fillStyle = r.color;
+        fwCtx.fill();
+        if (r.y <= r.targetY) { explode(r.x, r.y, r.color); return false; }
+        return true;
+      });
+
+      particles.forEach(p => {
+        p.x += p.vx; p.y += p.vy;
+        p.vy += 0.035;
+        p.life -= p.decay;
+      });
+      particles = particles.filter(p => p.life > 0);
+      particles.forEach(p => {
+        fwCtx.globalAlpha = Math.max(p.life, 0);
+        fwCtx.beginPath();
+        fwCtx.arc(p.x, p.y, 2, 0, Math.PI*2);
+        fwCtx.fillStyle = p.color;
+        fwCtx.fill();
+      });
+      fwCtx.globalAlpha = 1;
+
+      requestAnimationFrame(fwTick);
+    }
+
+    function scheduleRocket() {
+      spawnRocket();
+      if (Math.random() < 0.4) spawnRocket();
+      setTimeout(scheduleRocket, 400 + Math.random()*700);
+    }
+
+    scheduleRocket();
+    fwTick();
+  })();
   function isVideoSrc(src) {
     return /\.(mp4|webm|mov)$/i.test(src || '');
   }
