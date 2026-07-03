@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Скачать работу | Mezets</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/png" href="/mezets.design/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    font-family: 'Press Start 2P', monospace;
+    background: #050000;
+    min-height: 100vh;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 24px;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* фоновое свечение, как на основном сайте */
+  .fluff-wrap { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+  .fluff {
+    position: absolute; width: 700px; height: 700px; border-radius: 50%;
+    filter: blur(110px); opacity: 0.25;
+    background: radial-gradient(circle, rgba(255,0,0,0.9), rgba(180,0,0,0.3), transparent 70%);
+    top: -200px; left: -150px;
+  }
+  .fluff2 {
+    position: absolute; width: 500px; height: 500px; border-radius: 50%;
+    filter: blur(110px); opacity: 0.18;
+    background: radial-gradient(circle, rgba(255,60,0,0.8), rgba(200,0,0,0.2), transparent 70%);
+    bottom: -180px; right: -150px;
+  }
+
+  .card {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 420px;
+    padding: 36px 28px;
+    border-radius: 22px;
+    background: rgba(255,0,0,0.05);
+    border: 1px solid rgba(255,0,0,0.2);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 0 40px rgba(255,0,0,0.12);
+    text-align: center;
+  }
+
+  .icon {
+    width: 64px; height: 64px; margin: 0 auto 22px;
+    color: #ff3b3b;
+  }
+  .icon svg { width: 100%; height: 100%; filter: drop-shadow(0 0 10px rgba(255,0,0,0.5)); }
+
+  .title {
+    font-size: 13px;
+    line-height: 1.8;
+    color: #ff2a2a;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    text-shadow: 0 0 12px rgba(255,40,40,0.7), 0 0 28px rgba(255,0,0,0.35);
+  }
+
+  .filename {
+    font-size: 9px;
+    line-height: 1.7;
+    color: rgba(255,200,200,0.75);
+    word-break: break-all;
+    margin-bottom: 28px;
+  }
+
+  .btn {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    padding: 16px 12px; text-align: center; text-decoration: none;
+    font-family: 'Press Start 2P', monospace; font-size: 11px; line-height: 1.6;
+    color: #fff; border-radius: 12px;
+    background: rgba(255,0,0,0.75); border: 1px solid rgba(255,0,0,0.5);
+    box-shadow: 0 0 18px rgba(255,0,0,0.25);
+    transition: .2s; position: relative; overflow: hidden;
+    cursor: pointer;
+  }
+  .btn::before {
+    content: ""; position: absolute; top: 0; left: -120%; width: 120%; height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.25), transparent);
+    transition: .5s;
+  }
+  .btn:hover::before { left: 120%; }
+  .btn:hover { transform: scale(1.03); box-shadow: 0 0 36px rgba(255,0,0,0.4); }
+  .btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+  .home-link {
+    display: inline-block;
+    margin-top: 22px;
+    font-size: 8px;
+    letter-spacing: 1px;
+    color: rgba(255,200,200,0.55);
+    text-decoration: none;
+  }
+  .home-link:hover { color: #ff3b3b; }
+
+  .error { font-size: 10px; line-height: 1.9; color: rgba(255,200,200,0.75); }
+</style>
+</head>
+<body>
+
+<div class="fluff-wrap">
+  <div class="fluff"></div>
+  <div class="fluff2"></div>
+</div>
+
+<div class="card" id="card">
+  <!-- контент подставляется скриптом -->
+</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const file = params.get('f');
+  const title = params.get('title');
+  const card = document.getElementById('card');
+
+  if (!file) {
+    card.innerHTML = `
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 8v4M12 16h.01"/>
+        </svg>
+      </div>
+      <div class="title">Файл не указан</div>
+      <div class="error">Ссылка неполная.<br>Попросите отправителя прислать её ещё раз.</div>
+      <a class="home-link" href="/mezets.design/">← На главную</a>
+    `;
+  } else {
+    const fileUrl = '/mezets.design/raboti/' + encodeURIComponent(file).replace(/%2F/g, '/');
+    const displayName = title ? decodeURIComponent(title) : file;
+
+    card.innerHTML = `
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/>
+        </svg>
+      </div>
+      <div class="title">Ваша работа готова</div>
+      <div class="filename">${displayName}</div>
+      <a class="btn" href="${fileUrl}" download>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/>
+        </svg>
+        Скачать
+      </a>
+      <a class="home-link" href="/mezets.design/">← На главную</a>
+    `;
+  }
+</script>
+
+</body>
+</html>
