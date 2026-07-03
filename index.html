@@ -1039,6 +1039,27 @@
       text-shadow: none;
     }
 
+    /* Светлая тема: приглушённый розовый текст отзывов был еле виден
+       на белом фоне — делаем его тёмно-красным вместо светло-розового. */
+    body.light-theme .review-date,
+    body.light-theme .review-order,
+    body.light-theme .reviews-loading {
+      color: rgba(150,20,20,0.65);
+    }
+    body.light-theme .review-comment {
+      color: rgba(60,10,10,0.85);
+    }
+    body.light-theme .review-star {
+      color: rgba(0,0,0,0.15);
+    }
+    body.light-theme .review-item {
+      background: rgba(255,0,0,0.03);
+      border-color: rgba(255,0,0,0.16);
+    }
+    body.light-theme .review-avatar-placeholder {
+      color: rgba(150,20,20,0.85);
+    }
+
     /* ========================= MAINTENANCE TOAST ========================= */
     .maint-toast {
       position: fixed;
