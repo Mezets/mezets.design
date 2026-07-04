@@ -44,10 +44,30 @@
 
     html, body {
       font-family: 'Press Start 2P', monospace;
-      background: #050000;
+      background: var(--bg-page);
       min-height: 100vh;
       overflow-x: hidden;
-      color: white;
+      color: var(--fg-onblack);
+      transition: background .3s, color .3s;
+    }
+
+    /* ── ПЕРЕМЕННЫЕ ТЕМЫ ── */
+    :root {
+      --bg-page: #050000;
+      --bg-panel-95: rgba(10,0,0,0.95);
+      --fg-onblack: #fff;
+    }
+    body.light-theme {
+      --bg-page: #ffffff;
+      --bg-panel-95: rgba(255,255,255,0.95);
+      --fg-onblack: #111;
+    }
+
+    *, *::before, *::after {
+      transition: background-color .3s ease, border-color .3s ease, color .3s ease, box-shadow .3s ease;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition: none !important; }
     }
 
     canvas { position: fixed; inset: 0; z-index: 0; }
@@ -102,6 +122,47 @@
     }
     .home-arrow svg { width: 18px; height: 18px; display: block; }
     .home-arrow:hover { transform: scale(1.1) translateX(-2px); border-color: rgba(255,0,0,0.5); box-shadow: 0 0 26px rgba(255,0,0,0.3); }
+
+    /* ── ПЕРЕКЛЮЧАТЕЛЬ ТЕМЫ (солнце/луна) ── */
+    .theme-switch {
+      position: fixed;
+      top: 18px; right: 18px;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      padding: 4px;
+      border-radius: 999px;
+      background: var(--bg-panel-95);
+      border: 1px solid rgba(255,0,0,0.3);
+      box-shadow: 0 0 20px rgba(255,0,0,0.15);
+    }
+    .theme-switch-btn {
+      display: flex; align-items: center; justify-content: center;
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      cursor: pointer;
+      color: rgba(255,120,120,0.55);
+      background: transparent;
+      transition: background .25s, color .25s, transform .2s;
+    }
+    .theme-switch-btn svg { width: 17px; height: 17px; }
+    .theme-switch-btn:hover { transform: scale(1.08); }
+    .theme-switch-btn.active {
+      color: #fff;
+      background: linear-gradient(135deg, #ff2a2a, #b00000);
+      box-shadow: 0 0 14px rgba(255,0,0,0.5);
+    }
+
+    /* ── СВЕТЛАЯ ТЕМА: переопределения текста, который был
+       светло-розовым/белым и терялся на белом фоне ── */
+    body.light-theme .page-sub { color: rgba(120,20,20,0.55); }
+    body.light-theme .page-seo-text { color: rgba(90,10,10,0.65); }
+    body.light-theme .section-label { color: rgba(180,20,20,0.75); }
+    body.light-theme .item-name { color: #2a0a0a; }
+    body.light-theme .pay-method { color: rgba(60,10,10,0.85); }
+    body.light-theme .commission-text { color: rgba(150,45,0,0.9); }
+    body.light-theme .cta-label { color: rgba(120,20,20,0.5); }
 
     /* ── HEADER ── */
     .page-header {
@@ -309,6 +370,25 @@
   </svg>
 </a>
 
+<div class="theme-switch" id="themeSwitch">
+  <div class="theme-switch-btn" id="themeBtnDark" title="Тёмная тема" onclick="setTheme('dark')">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </div>
+  <div class="theme-switch-btn" id="themeBtnLight" title="Светлая тема" onclick="setTheme('light')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"></circle>
+      <line x1="12" y1="2" x2="12" y2="4"></line>
+      <line x1="12" y1="20" x2="12" y2="22"></line>
+      <line x1="4.93" y1="4.93" x2="6.34" y2="6.34"></line>
+      <line x1="17.66" y1="17.66" x2="19.07" y2="19.07"></line>
+      <line x1="2" y1="12" x2="4" y2="12"></line>
+      <line x1="20" y1="12" x2="22" y2="12"></line>
+      <line x1="4.93" y1="19.07" x2="6.34" y2="17.66"></line>
+      <line x1="17.66" y1="6.34" x2="19.07" y2="4.93"></line>
+    </svg>
+  </div>
+</div>
+
 <canvas id="bg"></canvas>
 <div class="fluff-wrap">
   <div class="fluff fluff-1"></div>
@@ -451,6 +531,43 @@
 </div>
 
 <script>
+  /* =========================================================
+     ПЕРЕКЛЮЧАТЕЛЬ ТЕМЫ
+     Приоритет: сохранённый выбор в куки → тема системы → тёмная.
+     Куки общие с главной страницей — тема синхронна по всему сайту.
+  ========================================================= */
+  function getCookie(name) {
+    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    return match ? decodeURIComponent(match[2]) : null;
+  }
+  function setCookie(name, value, days) {
+    const d = new Date();
+    d.setTime(d.getTime() + days * 24 * 60 * 60 * 1000);
+    document.cookie = `${name}=${encodeURIComponent(value)}; expires=${d.toUTCString()}; path=/; SameSite=Lax`;
+  }
+
+  const themeBtnDark  = document.getElementById('themeBtnDark');
+  const themeBtnLight = document.getElementById('themeBtnLight');
+
+  function setTheme(theme, save = true) {
+    document.body.classList.toggle('light-theme', theme === 'light');
+    if (themeBtnDark && themeBtnLight) {
+      themeBtnDark.classList.toggle('active', theme === 'dark');
+      themeBtnLight.classList.toggle('active', theme === 'light');
+    }
+    if (save) setCookie('theme', theme, 365);
+  }
+
+  (function initTheme() {
+    const saved = getCookie('theme');
+    if (saved === 'dark' || saved === 'light') {
+      setTheme(saved, false);
+    } else {
+      const systemPrefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+      setTheme(systemPrefersLight ? 'light' : 'dark', false);
+    }
+  })();
+
   /* ЧАСТИЦЫ */
   const canvas = document.getElementById('bg');
   const ctx    = canvas.getContext('2d');
