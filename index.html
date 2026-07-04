@@ -28,6 +28,8 @@
 
   <link rel="icon" type="image/png" href="/favicon.png">
   <link rel="shortcut icon" href="/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
   <!-- Schema.org: структурированные данные для поисковиков -->
@@ -62,9 +64,7 @@
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    /* ── ПЕРЕМЕННЫЕ ТЕМЫ ──
-       Тёмная тема (по умолчанию) не меняется вообще.
-       В светлой теме переопределяются только "чёрные" фоны на белые. */
+    /* ── ПЕРЕМЕННЫЕ ТЕМЫ ── Тёмная тема (по умолчанию) не меняется вообще. В светлой теме переопределяются только "чёрные" фоны на белые. */
     :root {
       --bg-page: #050000;
       --bg-scroll: rgba(10,0,0,0.6);
@@ -115,15 +115,26 @@
       transition: background .3s;
     }
 
-    /* ── ПЛАВНАЯ СМЕНА ТЕМЫ ──
-       Даём мягкий переход всем элементам, у которых нет
-       собственной анимации transform/цвета — переключение
-       тёмная/светлая тема больше не "дёргает" интерфейс. */
-    *, *::before, *::after {
+    /* ── ПЛАВНАЯ СМЕНА ТЕМЫ ── Раньше transition вешался на ВСЕ элементы страницы (*), включая иконки, точки конфетти, шарики и т.д. — это лишняя нагрузка на пересчёт стилей при каждом кадре анимации. Теперь transition только на контейнерах и тексте, у которых реально меняется цвет при переключении темы. */
+    body, .card, .stats-body, .reviews-card, .reviews-list,
+    .theme-switch, .theme-switch-btn, .koleso-btn,
+    .name, .age-badge, .label, .seo-text, .seo-text h2, .seo-text strong,
+    .portfolio-card-type, .portfolio-card-time, .portfolio-modal-time,
+    .review-item, .review-comment, .review-date, .review-order,
+    .roulette-winners-title, .roulette-winners-empty, .roulette-winner-meta,
+    .roulette-winner-name, .chance-item, .login-hint, .logged-as,
+    .winner-item, .roulette-winner-item {
       transition: background-color .3s ease, border-color .3s ease, color .3s ease, box-shadow .3s ease;
     }
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { transition: none !important; }
+      body, .card, .stats-body, .reviews-card, .reviews-list,
+      .theme-switch, .theme-switch-btn, .koleso-btn,
+      .name, .age-badge, .label, .seo-text, .seo-text h2, .seo-text strong,
+      .portfolio-card-type, .portfolio-card-time, .portfolio-modal-time,
+      .review-item, .review-comment, .review-date, .review-order,
+      .roulette-winners-title, .roulette-winners-empty, .roulette-winner-meta,
+      .roulette-winner-name, .chance-item, .login-hint, .logged-as,
+      .winner-item, .roulette-winner-item { transition: none !important; }
     }
 
     body {
@@ -800,32 +811,12 @@
       .seo-text h1 { font-size: 11px; }
     }
 
-    /* Светлая тема: основной абзац и список услуг тоже были
-       светло-розовыми — делаем их тёмными для читаемости на белом фоне. */
-    body.light-theme .seo-text {
-      color: #3a1010;
-    }
-    body.light-theme .seo-text h2 {
-      color: #ff3b3b;
-    }
-    body.light-theme .seo-text strong {
-      color: #b00000;
-    }
-    body.light-theme .portfolio-card-type {
-      color: #3a1010;
-    }
-    body.light-theme .portfolio-card-time {
-      color: rgba(180,20,20,0.75);
-    }
-    body.light-theme .portfolio-modal-time {
-      color: rgba(180,20,20,0.75);
-    }
-    /* Бейдж "16 лет" был белым текстом на почти белом фоне —
-       в светлой теме делаем его тёмно-красным, чтобы не пропадал. */
-    body.light-theme .age-badge {
-      color: #b00000;
-      background: rgba(255,0,0,0.06);
-    }
+    /* Светлая тема: тексты, которые были светло-розовыми/белыми и терялись на белом фоне */
+    body.light-theme .seo-text, body.light-theme .portfolio-card-type { color: #3a1010; }
+    body.light-theme .seo-text h2 { color: #ff3b3b; }
+    body.light-theme .seo-text strong, body.light-theme .age-badge { color: #b00000; }
+    body.light-theme .portfolio-card-time, body.light-theme .portfolio-modal-time { color: rgba(180,20,20,0.75); }
+    body.light-theme .age-badge { background: rgba(255,0,0,0.06); }
 
     .koleso-btn {
       position: fixed;
@@ -1079,8 +1070,7 @@
       margin-bottom: 14px; line-height: 1.6;
     }
 
-    /* Светлая тема: приглушённый розовый текст рулетки был еле виден
-       на белом фоне — делаем его тёмно-красным вместо светло-розового. */
+    /* Светлая тема: приглушённый розовый текст рулетки был еле виден на белом фоне — делаем его тёмно-красным вместо светло-розового. */
     body.light-theme .roulette-winners-title,
     body.light-theme .roulette-winners-empty,
     body.light-theme .roulette-winner-meta,
@@ -1099,8 +1089,7 @@
       text-shadow: none;
     }
 
-    /* Светлая тема: приглушённый розовый текст отзывов был еле виден
-       на белом фоне — делаем его тёмно-красным вместо светло-розового. */
+    /* Светлая тема: приглушённый розовый текст отзывов был еле виден на белом фоне — делаем его тёмно-красным вместо светло-розового. */
     body.light-theme .review-date,
     body.light-theme .review-order,
     body.light-theme .reviews-loading {
@@ -1367,20 +1356,9 @@
       text-shadow: 0 0 12px rgba(255,40,40,0.7), 0 0 28px rgba(255,0,0,0.35);
     }
     .winners-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      overflow-y: auto;
-      flex: 1;
-      min-height: 0;
-      padding-right: 2px;
-      scrollbar-width: thin;
-      scrollbar-color: rgba(255,0,0,0.35) transparent;
+      display: flex; flex-direction: column; gap: 10px;
+      overflow-y: auto; flex: 1; min-height: 0; padding-right: 2px;
     }
-    .winners-list::-webkit-scrollbar { width: 6px; }
-    .winners-list::-webkit-scrollbar-track { background: transparent; }
-    .winners-list::-webkit-scrollbar-thumb { background: rgba(255,0,0,0.35); border-radius: 6px; }
-    .winners-list::-webkit-scrollbar-thumb:hover { background: rgba(255,30,30,0.55); }
     .winner-item {
       padding: 12px 12px 10px;
       border-radius: 14px;
@@ -1458,18 +1436,9 @@
       text-transform: uppercase;
     }
     .roulette-winners-list {
-      display: flex;
-      flex-direction: column;
-      gap: 7px;
-      max-height: 160px;
-      overflow-y: auto;
-      scrollbar-width: thin;
-      scrollbar-color: rgba(255,0,0,0.35) transparent;
+      display: flex; flex-direction: column; gap: 7px;
+      max-height: 160px; overflow-y: auto;
     }
-    .roulette-winners-list::-webkit-scrollbar { width: 6px; }
-    .roulette-winners-list::-webkit-scrollbar-track { background: transparent; }
-    .roulette-winners-list::-webkit-scrollbar-thumb { background: rgba(255,0,0,0.35); border-radius: 6px; }
-    .roulette-winners-list::-webkit-scrollbar-thumb:hover { background: rgba(255,30,30,0.55); }
     .roulette-winner-item {
       display: flex;
       align-items: center;
@@ -1562,21 +1531,19 @@
     }
 
     .reviews-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      overflow-y: auto;
-      padding-right: 4px;
-      flex: 1;
-      min-height: 0;
+      display: flex; flex-direction: column; gap: 12px;
+      overflow-y: auto; padding-right: 4px; flex: 1; min-height: 0;
+    }
+
+    /* Общий тонкий скроллбар — используется списком отзывов и обоими списками победителей рулетки */
+    .reviews-list, .winners-list, .roulette-winners-list {
       scrollbar-width: thin;
       scrollbar-color: rgba(255,0,0,0.35) transparent;
     }
-
-    .reviews-list::-webkit-scrollbar { width: 6px; }
-    .reviews-list::-webkit-scrollbar-track { background: transparent; }
-    .reviews-list::-webkit-scrollbar-thumb { background: rgba(255,0,0,0.35); border-radius: 6px; }
-    .reviews-list::-webkit-scrollbar-thumb:hover { background: rgba(255,30,30,0.55); }
+    .reviews-list::-webkit-scrollbar, .winners-list::-webkit-scrollbar, .roulette-winners-list::-webkit-scrollbar { width: 6px; }
+    .reviews-list::-webkit-scrollbar-track, .winners-list::-webkit-scrollbar-track, .roulette-winners-list::-webkit-scrollbar-track { background: transparent; }
+    .reviews-list::-webkit-scrollbar-thumb, .winners-list::-webkit-scrollbar-thumb, .roulette-winners-list::-webkit-scrollbar-thumb { background: rgba(255,0,0,0.35); border-radius: 6px; }
+    .reviews-list::-webkit-scrollbar-thumb:hover, .winners-list::-webkit-scrollbar-thumb:hover, .roulette-winners-list::-webkit-scrollbar-thumb:hover { background: rgba(255,30,30,0.55); }
 
     @keyframes reviewFadeIn {
       from { opacity: 0; transform: translateY(10px); }
@@ -2041,28 +2008,7 @@
 
 <script>
 
-  /* =========================================================
-     ПОРТФОЛИО
-     Чтобы добавить новую работу — допиши объект в конец массива
-     PORTFOLIO_ITEMS ниже. Три поля:
-       img  — имя файла, лежит в папке portfolio/
-              поддерживаются картинки (.png/.jpg/.gif) и видео (.mp4)
-       type — что за работа ("Аватарка", "Баннер",
-              "Оформление форумного аккаунта" и т.п.)
-       time — за сколько выполнена ("1 день", "3 часа" и т.п.)
-     Пример:
-       { img: "portfolio/work12.png", type: "Баннер сервера", time: "1 день" },
-       { img: "portfolio/work13.mp4", type: "Анимированный баннер", time: "1 день" },
-
-     Чтобы объединить НЕСКОЛЬКО работ в одно окошко (с листанием
-     по стрелкам/точкам/свайпом при открытии) — оберни их в group:
-       {
-         group: [
-           { img: "portfolio/a.png", type: "Работа 1", time: "1 день" },
-           { img: "portfolio/b.png", type: "Работа 2", time: "1 день" },
-         ]
-       }
-  ========================================================= */
+  /* ========================================================= ПОРТФОЛИО Чтобы добавить новую работу — допиши объект в конец массива PORTFOLIO_ITEMS ниже. Три поля: img — имя файла, лежит в папке portfolio/ поддерживаются картинки (.png/.jpg/.gif) и видео (.mp4) type — что за работа ("Аватарка", "Баннер", "Оформление форумного аккаунта" и т.п.) time — за сколько выполнена ("1 день", "3 часа" и т.п.) Пример: { img: "portfolio/work12.png", type: "Баннер сервера", time: "1 день" }, { img: "portfolio/work13.mp4", type: "Анимированный баннер", time: "1 день" }, Чтобы объединить НЕСКОЛЬКО работ в одно окошко (с листанием по стрелкам/точкам/свайпом при открытии) — оберни их в group: { group: [ { img: "portfolio/a.png", type: "Работа 1", time: "1 день" }, { img: "portfolio/b.png", type: "Работа 2", time: "1 день" }, ] } ========================================================= */
   const PORTFOLIO_ITEMS = [
     { img: "portfolio/mp4/f2c72d40df4751e3.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
     { img: "portfolio/mp4/1.mp4", type: "Анимированное оформление форумного аккаунта", time: "3 дня" },
@@ -2139,9 +2085,7 @@
   ];
 
 
-  /* =========================
-     ЛЕТАЮЩАЯ КОРОВА
-  ========================= */
+  /* ========================= ЛЕТАЮЩАЯ КОРОВА ========================= */
   (function() {
     const cow = document.getElementById('flyingCow');
     const cowSound = document.getElementById('cowSound');
@@ -2169,10 +2113,7 @@
     }, 42000);
   })();
 
-  /* =========================
-     КОНФИГ
-     ВАЖНО: меняй этот адрес на актуальный адрес туннеля/бэкенда!
-  ========================= */
+  /* ========================= КОНФИГ ВАЖНО: меняй этот адрес на актуальный адрес туннеля/бэкенда! ========================= */
   const API = 'https://mez.up.railway.app';
 
   const VISUAL = {
@@ -2202,9 +2143,7 @@
 
   const stripEl = document.getElementById('strip');
 
-  /* =========================
-     MAINTENANCE
-  ========================= */
+  /* ========================= MAINTENANCE ========================= */
   function showMaint(msg) {
     if (msg) document.getElementById('maintToastMsg').innerHTML = msg;
     document.getElementById('maintToast').classList.add('show');
@@ -2223,18 +2162,14 @@
   checkMaintenance();
   setInterval(checkMaintenance, 5000);
 
-  /* =========================
-     ТЕСТОВЫЙ РЕЖИМ
-  ========================= */
+  /* ========================= ТЕСТОВЫЙ РЕЖИМ ========================= */
   function getTestKeyFromUrl() {
     const params = new URLSearchParams(window.location.search);
     return params.get('test_key');
   }
   const TEST_KEY = getTestKeyFromUrl();
 
-  /* =========================
-     СЕССИЯ DISCORD
-  ========================= */
+  /* ========================= СЕССИЯ DISCORD ========================= */
   function getSessionFromUrl() {
     const params = new URLSearchParams(window.location.search);
     return params.get('session');
@@ -2257,9 +2192,7 @@
     return getStoredSession();
   }
 
-  /* =========================
-     ЛОГИН ЧЕРЕЗ DISCORD
-  ========================= */
+  /* ========================= ЛОГИН ЧЕРЕЗ DISCORD ========================= */
   async function setupLoginButton() {
     try {
       const res  = await fetch(`${API}/discord-login-url`, { mode: 'cors' });
@@ -2270,9 +2203,7 @@
     }
   }
 
-  /* =========================
-     ПРОВЕРКА СТАТУСА
-  ========================= */
+  /* ========================= ПРОВЕРКА СТАТУСА ========================= */
   async function checkCanSpin() {
 
     const loginBlock = document.getElementById('loginBlock');
@@ -2341,9 +2272,7 @@
     }
   }
 
-  /* =========================
-     АНИМАЦИЯ ПОЛОСЫ
-  ========================= */
+  /* ========================= АНИМАЦИЯ ПОЛОСЫ ========================= */
   function buildStrip(winnerDiscount) {
     idleStripRunning = false;
     stripEl.classList.remove('idle-scroll');
@@ -2362,12 +2291,7 @@
 
   let idleStripRunning = false;
 
-  /* Декоративная лента, бегущая фоном до авторизации через Discord.
-     Не участвует в реальном спине — просто заполняет полосу и
-     дублирует её x2 для бесшовной CSS-анимации (idleScroll: -50%).
-     ВАЖНО: строится только один раз и дальше не трогается, иначе
-     при каждом открытии рулетки (checkCanSpin) лента дёргано
-     телепортировалась бы на новые случайные цифры. */
+  /* Декоративная лента, бегущая фоном до авторизации через Discord. Не участвует в реальном спине — просто заполняет полосу и дублирует её x2 для бесшовной CSS-анимации (idleScroll: -50%). ВАЖНО: строится только один раз и дальше не трогается, иначе при каждом открытии рулетки (checkCanSpin) лента дёргано телепортировалась бы на новые случайные цифры. */
   function buildIdleStrip() {
     if (idleStripRunning) return;
     idleStripRunning = true;
@@ -2535,9 +2459,7 @@
     if (e.target === document.getElementById('rouletteOverlay')) closeRoulette();
   }
 
-  /* =========================
-     ПОДСКАЗКА НА КНОПКЕ РУЛЕТКИ
-  ========================= */
+  /* ========================= ПОДСКАЗКА НА КНОПКЕ РУЛЕТКИ ========================= */
   const KOLESO_HINT_KEY = 'mezets_koleso_hint_closed';
   const kolesoHint      = document.getElementById('kolesoHint');
   const kolesoHintClose = document.getElementById('kolesoHintClose');
@@ -2553,9 +2475,7 @@
     });
   }
 
-  /* =========================
-     ОТЗЫВЫ ИЗ DISCORD
-  ========================= */
+  /* ========================= ОТЗЫВЫ ИЗ DISCORD ========================= */
   function renderReview(r, idx, list) {
     const stars = [1,2,3,4,5].map(i =>
       `<span class="review-star ${i <= r.rating ? 'on' : ''}">★</span>`
@@ -2663,9 +2583,7 @@
   loadStats();
   setInterval(loadStats, 5000);
 
-  /* =========================
-     3D НАКЛОН
-  ========================= */
+  /* ========================= 3D НАКЛОН ========================= */
   function tilt(card) {
     card.addEventListener('mousemove', e => {
       const r = card.getBoundingClientRect();
@@ -2704,9 +2622,7 @@
   const orderCard = document.getElementById('orderCard');
   if (orderCard) tilt(orderCard);
 
-  /* =========================
-     ФОРМА ЗАКАЗА
-  ========================= */
+  /* ========================= ФОРМА ЗАКАЗА ========================= */
   async function submitOrder() {
     const discord = document.getElementById('orderDiscord').value.trim();
     const wishes  = document.getElementById('orderWishes').value.trim();
@@ -2755,9 +2671,7 @@
 
 
 
-  /* =========================
-     ПОСЛЕДНИЕ ПОБЕДИТЕЛИ
-  ========================= */
+  /* ========================= ПОСЛЕДНИЕ ПОБЕДИТЕЛИ ========================= */
   const DISCOUNT_EMOJI = {10:'🎟️',25:'🎫',42:'🐄',50:'🎯',67:'🔥',75:'💎',100:'👑'};
   const WEIGHTS = {10:130,25:46,42:22,50:18,67:7,75:5,100:1};
   const WEIGHTS_TOTAL = Object.values(WEIGHTS).reduce((a,b)=>a+b,0);
@@ -2802,14 +2716,8 @@
   loadWinners();
   setInterval(loadWinners, 15000);
 
-  /* =========================
-     ЧАСТИЦЫ
-  ========================= */
-  /* =========================================================
-     ПЕРЕКЛЮЧАТЕЛЬ ТЕМЫ
-     Приоритет: сохранённый выбор в куки → тема системы (ПК/телефона) → тёмная.
-     Выбор пользователя всегда сохраняется в куки на год.
-  ========================================================= */
+  /* ========================= ЧАСТИЦЫ ========================= */
+  /* ========================================================= ПЕРЕКЛЮЧАТЕЛЬ ТЕМЫ Приоритет: сохранённый выбор в куки → тема системы (ПК/телефона) → тёмная. Выбор пользователя всегда сохраняется в куки на год. ========================================================= */
   function getCookie(name) {
     const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
     return match ? decodeURIComponent(match[2]) : null;
@@ -2847,9 +2755,10 @@
   function resize() { canvas.width = innerWidth; canvas.height = innerHeight; }
   resize(); addEventListener('resize', resize);
   let dots = [];
+  const MAX_DOTS = 160; // потолок, чтобы на широких/4K экранах не считались тысячи точек каждый кадр
   function initDots() {
     dots = [];
-    const n = Math.round((innerWidth * innerHeight) / 9000);
+    const n = Math.min(Math.round((innerWidth * innerHeight) / 9000), MAX_DOTS);
     for (let i = 0; i < n; i++) dots.push({
       x: Math.random()*canvas.width, y: Math.random()*canvas.height,
       r: Math.random()*1.3+0.3, dx:(Math.random()-.5)*.15, dy:(Math.random()-.5)*.15
@@ -2857,6 +2766,7 @@
   }
   initDots(); addEventListener('resize', initDots);
   const noMotion = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  let dotsRafId = null;
   function animate() {
     ctx.clearRect(0,0,canvas.width,canvas.height);
     for (let d of dots) {
@@ -2866,10 +2776,22 @@
       if(d.x<0)d.x=canvas.width; if(d.x>canvas.width)d.x=0;
       if(d.y<0)d.y=canvas.height; if(d.y>canvas.height)d.y=0;
     }
-    requestAnimationFrame(animate);
+    dotsRafId = requestAnimationFrame(animate);
   }
   if (!noMotion) animate();
   else for (let d of dots) { ctx.beginPath(); ctx.arc(d.x,d.y,d.r,0,Math.PI*2); ctx.fillStyle='rgba(255,0,0,0.6)'; ctx.fill(); }
+
+  // Пауза анимации частиц, когда вкладка свёрнута/неактивна —
+  // не тратим CPU и батарею, пока страницу всё равно не видно.
+  document.addEventListener('visibilitychange', () => {
+    if (noMotion) return;
+    if (document.hidden) {
+      if (dotsRafId) cancelAnimationFrame(dotsRafId);
+      dotsRafId = null;
+    } else if (!dotsRafId) {
+      animate();
+    }
+  });
 
   /* ── ПРАЗДНИК ТОЛЬКО 4 ИЮЛЯ (00:00–24:00 по местному времени) ── */
   function isHolidayWindow() {
@@ -2878,10 +2800,14 @@
   }
   const balloonsWrapEl = document.querySelector('.balloons-wrap');
   const fwCanvasEl      = document.getElementById('fireworks');
+  const partyHatEl      = document.querySelector('.party-hat');
+  const ageBadgeEl      = document.querySelector('.age-badge');
   const holidayActive   = isHolidayWindow();
   if (!holidayActive) {
     if (balloonsWrapEl) balloonsWrapEl.style.display = 'none';
     if (fwCanvasEl) fwCanvasEl.style.display = 'none';
+    if (partyHatEl) partyHatEl.style.display = 'none';
+    if (ageBadgeEl) ageBadgeEl.style.display = 'none';
   }
 
   /* ── САЛЮТЫ ── */
@@ -3079,15 +3005,7 @@
     if (e.target === portfolioModalOverlay) closePortfolioModal();
   }
 
-  /* =========================================================
-     ПОЛНОЭКРАННЫЙ ПРОСМОТР ФОТО С ЛУПОЙ
-     Кнопка-лупа на фото в модалке открывает отдельный оверлей
-     с плавной анимацией масштабирования (scale + fade).
-     На устройствах с настоящим курсором (мышь) при наведении
-     появляется круглая лупа с приближённым фрагментом фото.
-     На тач-устройствах лупы нет — вместо неё тап переключает
-     обычный зум с плавным transform.
-  ========================================================= */
+  /* ========================================================= ПОЛНОЭКРАННЫЙ ПРОСМОТР ФОТО С ЛУПОЙ Кнопка-лупа на фото в модалке открывает отдельный оверлей с плавной анимацией масштабирования (scale + fade). На устройствах с настоящим курсором (мышь) при наведении появляется круглая лупа с приближённым фрагментом фото. На тач-устройствах лупы нет — вместо неё тап переключает обычный зум с плавным transform. ========================================================= */
   const portfolioZoomBtn   = document.getElementById('portfolioZoomBtn');
   const portfolioFsOverlay = document.getElementById('portfolioFsOverlay');
   const portfolioFsImgWrap = document.getElementById('portfolioFsImgWrap');
@@ -3135,9 +3053,7 @@
     if (e.target === portfolioFsOverlay) closePortfolioFullscreen();
   }
 
-  /* Переключение фото группы прямо в полноэкранном режиме —
-     синхронизируется с окном просмотра позади (те же currentGroup/currentIndex),
-     пропускает видео (в фулскрине показываются только фото), плавно меняет кадр. */
+  /* Переключение фото группы прямо в полноэкранном режиме — синхронизируется с окном просмотра позади (те же currentGroup/currentIndex), пропускает видео (в фулскрине показываются только фото), плавно меняет кадр. */
   function portfolioFsStep(dir, e) {
     if (e) e.stopPropagation();
     if (!currentGroup || currentGroup.length < 2) return;
@@ -3230,8 +3146,7 @@
     });
   }
 
-  /* Видео в ленте играют только пока карточка видна на экране —
-     экономит ресурсы и даёт эффект "проигрывания при прокрутке" */
+  /* Видео в ленте играют только пока карточка видна на экране — экономит ресурсы и даёт эффект "проигрывания при прокрутке" */
   const portfolioVidObserver = ('IntersectionObserver' in window)
     ? new IntersectionObserver((entries) => {
         entries.forEach(entry => {
@@ -3312,15 +3227,7 @@
     }
   }
 
-  /* =========================================================
-     ПРОКРУТКА ЛЕНТЫ — единый JS-источник позиции.
-     Раньше автопрокрутка шла через CSS @keyframes, а драг —
-     через инлайн-transform поверх неё: при отпускании мышки/пальца
-     позиции конфликтовали и ленту резко перебрасывало в случайное
-     место ("баговалась" при свайпе). Теперь и автопрокрутка, и драг
-     управляют ОДНОЙ переменной portfolioX через requestAnimationFrame —
-     никаких рывков и скачков в любую сторону.
-  ========================================================= */
+  /* ========================================================= ПРОКРУТКА ЛЕНТЫ — единый JS-источник позиции. Раньше автопрокрутка шла через CSS @keyframes, а драг — через инлайн-transform поверх неё: при отпускании мышки/пальца позиции конфликтовали и ленту резко перебрасывало в случайное место ("баговалась" при свайпе). Теперь и автопрокрутка, и драг управляют ОДНОЙ переменной portfolioX через requestAnimationFrame — никаких рывков и скачков в любую сторону. ========================================================= */
   let portfolioX        = 0;     // текущая позиция трека (<= 0)
   let portfolioDown     = false;
   let portfolioDragged  = false;
@@ -3351,6 +3258,13 @@
   }
 
   function portfolioTick(ts) {
+    if (document.hidden) {
+      // Вкладка свёрнута — не считаем dt (иначе после возврата
+      // лента резко прыгнет на "накопленное" за это время расстояние)
+      portfolioLastTs = null;
+      requestAnimationFrame(portfolioTick);
+      return;
+    }
     if (portfolioLastTs === null) portfolioLastTs = ts;
     const dt = (ts - portfolioLastTs) / 1000;
     portfolioLastTs = ts;
