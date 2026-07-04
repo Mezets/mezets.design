@@ -112,6 +112,18 @@
       background: var(--bg-page);
       min-height: 100vh;
       overflow-x: hidden;
+      transition: background .3s;
+    }
+
+    /* ── ПЛАВНАЯ СМЕНА ТЕМЫ ──
+       Даём мягкий переход всем элементам, у которых нет
+       собственной анимации transform/цвета — переключение
+       тёмная/светлая тема больше не "дёргает" интерфейс. */
+    *, *::before, *::after {
+      transition: background-color .3s ease, border-color .3s ease, color .3s ease, box-shadow .3s ease;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition: none !important; }
     }
 
     body {
@@ -807,6 +819,12 @@
     }
     body.light-theme .portfolio-modal-time {
       color: rgba(180,20,20,0.75);
+    }
+    /* Бейдж "16 лет" был белым текстом на почти белом фоне —
+       в светлой теме делаем его тёмно-красным, чтобы не пропадал. */
+    body.light-theme .age-badge {
+      color: #b00000;
+      background: rgba(255,0,0,0.06);
     }
 
     .koleso-btn {
