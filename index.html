@@ -273,7 +273,49 @@
     .avatar-wrap { position: relative; width: 115px; margin: 0 auto 12px; }
     .avatar { width: 115px; height: 115px; border-radius: 50%; object-fit: cover; display: block; border: 2px solid rgba(255,0,0,0.35); }
 
-    .name { text-align: center; font-size: 15px; line-height: 1.6; color: #ff2a2a; margin-bottom: 22px; letter-spacing: 1px; text-shadow: 0 0 12px rgba(255,40,40,0.7), 0 0 28px rgba(255,0,0,0.35); }
+    /* ── ПРАЗДНИЧНЫЙ КОЛПАК НА АВАТАРКЕ ── */
+    .party-hat {
+      position: absolute;
+      top: -36px;
+      left: 50%;
+      width: 66px;
+      height: 80px;
+      transform: translateX(-58%) rotate(-16deg);
+      transform-origin: bottom center;
+      z-index: 2;
+      filter: drop-shadow(0 3px 6px rgba(0,0,0,0.4)) drop-shadow(0 0 22px rgba(255,0,0,0.25));
+      pointer-events: none;
+      animation: hatWiggle 3.2s ease-in-out infinite;
+    }
+    @keyframes hatWiggle {
+      0%, 100% { transform: translateX(-58%) rotate(-16deg); }
+      50%      { transform: translateX(-58%) rotate(-12deg); }
+    }
+
+    .name-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 22px;
+    }
+
+    .name { text-align: center; font-size: 15px; line-height: 1.6; color: #ff2a2a; letter-spacing: 1px; text-shadow: 0 0 12px rgba(255,40,40,0.7), 0 0 28px rgba(255,0,0,0.35); }
+
+    .age-badge {
+      font-size: 9px;
+      line-height: 1;
+      color: #fff;
+      letter-spacing: 0.5px;
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 9px;
+      border-radius: 20px;
+      background: rgba(255,0,0,0.12);
+      border: 1px solid rgba(255,0,0,0.35);
+      box-shadow: 0 0 14px rgba(255,0,0,0.25);
+      white-space: nowrap;
+    }
 
     .btn {
       display: flex; align-items: center; justify-content: center;
@@ -1734,8 +1776,45 @@
     <div class="stats-body">
     <div class="avatar-wrap">
       <img src="avatar_server.png" class="avatar" alt="Mezets — оформление Discord-сервера">
+      <svg class="party-hat" viewBox="0 0 100 122" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="hatCone" cx="32%" cy="26%" r="85%">
+            <stop offset="0%" stop-color="#ff5c5c"/>
+            <stop offset="70%" stop-color="#d40000"/>
+            <stop offset="100%" stop-color="#8c0000"/>
+          </radialGradient>
+          <radialGradient id="hatPompom" cx="32%" cy="26%" r="80%">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="55%" stop-color="#ffe9b8"/>
+            <stop offset="100%" stop-color="#d99a00"/>
+          </radialGradient>
+          <pattern id="hatStripe" width="15" height="15" patternUnits="userSpaceOnUse" patternTransform="rotate(65)">
+            <rect width="15" height="15" fill="#ffffff"/>
+            <rect width="7.5" height="15" fill="#ff2b2b"/>
+          </pattern>
+        </defs>
+
+        <!-- резинка-ремешок -->
+        <path d="M 20 104 Q 50 122 80 104" fill="none" stroke="#8c0000" stroke-width="2.5" stroke-linecap="round" opacity="0.85"/>
+
+        <!-- конус колпака: глянцевый градиент как у шариков -->
+        <polygon points="50,8 14,104 86,104" fill="url(#hatCone)" stroke="#7a0000" stroke-width="1.5"/>
+
+        <!-- тёмная тень снизу-справа, как inset у шариков -->
+        <polygon points="58,60 86,104 66,104" fill="#4a0000" opacity="0.35"/>
+
+        <!-- полосатый ободок в стиле balloon-stripe -->
+        <polygon points="18,92 82,92 86,104 14,104" fill="url(#hatStripe)" stroke="#7a0000" stroke-width="1"/>
+
+        <!-- помпон на макушке: глянцевый как шарик -->
+        <circle cx="50" cy="12" r="11" fill="url(#hatPompom)" stroke="#c98a00" stroke-width="1"/>
+        <ellipse cx="45" cy="8" rx="4" ry="3" fill="#ffffff" opacity="0.7"/>
+      </svg>
     </div>
-    <div class="name">Mezets</div>
+    <div class="name-row">
+      <div class="name">Mezets</div>
+      <div class="age-badge">🎉 16 лет</div>
+    </div>
 
     <div class="stat-block">
       <div class="big" id="orders">0</div>
