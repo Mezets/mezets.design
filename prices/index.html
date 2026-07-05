@@ -611,7 +611,19 @@
     if (!banEnforced) {
       banEnforced = true;
       const snd = document.getElementById('banSound');
-      if (snd) { snd.currentTime = 0; snd.play().catch(()=>{}); }
+      if (snd) {
+        snd.currentTime = 0;
+        const playPromise = snd.play();
+        if (playPromise && playPromise.catch) {
+          playPromise.catch(() => {
+            // Браузер заблокировал автовоспроизведение без клика — играем при первом взаимодействии
+            const retry = () => { snd.currentTime = 0; snd.play().catch(()=>{}); };
+            document.addEventListener('click', retry, { once: true });
+            document.addEventListener('keydown', retry, { once: true });
+            document.addEventListener('touchstart', retry, { once: true });
+          });
+        }
+      }
 
       document.addEventListener('keydown', e => {
         if (e.key === 'F12') e.preventDefault();
