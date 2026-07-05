@@ -402,6 +402,7 @@
       <button class="tab" onclick="switchTab('prices')">💰 ЦЕНЫ</button>
       <button class="tab" onclick="switchTab('rules')">📜 ПРАВИЛА</button>
       <button class="tab" onclick="switchTab('users')">👤 ЮЗЕРЫ</button>
+      <button class="tab" onclick="switchTab('maint')">🛠️ ТЕХРАБОТЫ</button>
     </div>
 
     <!-- ── ВКЛАДКА: ЗАГРУЗИТЬ ── -->
@@ -547,6 +548,13 @@
         </div>
         <div class="hint" style="margin-top:6px">Тот же ключ, что задан в переменной ADMIN_TEST_KEY на бэкенде (Railway)</div>
 
+        <label>Мастер-ключ для бана (не сохраняется, вводить каждый раз)</label>
+        <div class="token-row">
+          <input type="password" id="masterKeyInput" placeholder="master key">
+          <button class="btn btn-sm" onclick="showMasterKey()">👁</button>
+        </div>
+        <div class="hint" style="margin-top:6px">MASTER_BAN_KEY на бэкенде. Нужен для бана/разбана/стоп-листа — нигде не хранится, обнуляется при перезагрузке страницы.</div>
+
         <input type="text" id="usersSearch" placeholder="Поиск: ник / Discord ID / IP / fingerprint" oninput="renderUsers()">
 
         <button class="btn btn-sm" onclick="loadUsers()" style="margin-bottom:16px">🔄 Обновить список</button>
@@ -555,6 +563,64 @@
           <div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Введи ключ и нажми «Обновить список»</div>
         </div>
         <div class="status" id="usersStatus"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🎯 СТОП-ЛИСТ (авто-бан по ID) <span class="badge" id="watchlistCount">0</span></div>
+        <div class="counter">Впиши Discord ID заранее — как только он авторизуется на сайте, он забанится автоматически, а его данные (IP, ник, аватар, fingerprint) сохранятся</div>
+
+        <label>Discord ID</label>
+        <input type="text" id="watchDiscordId" placeholder="например 582219322236338205">
+        <label>Причина</label>
+        <input type="text" id="watchReason" placeholder="Причина (необязательно)">
+        <button class="btn" onclick="addToWatchlist()">Добавить в стоп-лист</button>
+
+        <div style="height:1px;background:rgba(255,0,0,0.1);margin:18px 0"></div>
+
+        <button class="btn btn-sm" onclick="loadWatchlist()" style="margin-bottom:16px">🔄 Обновить стоп-лист</button>
+        <div id="watchlistList" class="works-list">
+          <div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Список пуст или не загружен</div>
+        </div>
+        <div class="status" id="watchlistStatus"></div>
+      </div>
+    </div>
+
+    <!-- ВКЛАДКА: ТЕХРАБОТЫ -->
+    <div id="tabMaint" class="tab-panel">
+      <div class="card">
+        <div class="card-title">🛠️ ТОСТ ТЕХ. НЕПОЛАДОК <span class="badge" id="maintOnBadge">—</span></div>
+        <div class="counter">Управляет всплывающим тостом на главной странице сайта</div>
+
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:18px">
+          <input type="checkbox" id="maintOnChk" style="width:auto;margin:0;accent-color:#ff2a2a">
+          <span>Показывать тост техработ на сайте</span>
+        </label>
+
+        <label>Заголовок</label>
+        <input type="text" id="maintTitleInput" placeholder="Тех. неполадки">
+
+        <label>Текст (выдели текст и нажми кнопку для подсветки)</label>
+        <div class="rich-editor-wrap">
+          <div class="rich-toolbar">
+            <button onclick="rteCmd('maintMsgEditor','bold')" title="Жирный"><b>B</b></button>
+            <button onclick="rteCmd('maintMsgEditor','italic')" title="Курсив"><i>I</i></button>
+            <div class="tb-sep"></div>
+            <button onclick="rteHighlight('maintMsgEditor')" title="Подсветить (hi)" style="color:#ffaaaa">★ hi</button>
+            <button onclick="rteRemoveHi('maintMsgEditor')" title="Убрать подсветку">✕ hi</button>
+            <div class="tb-sep"></div>
+            <button onclick="rteInsert('maintMsgEditor','<br>')" title="Перенос строки">↵ br</button>
+          </div>
+          <div class="rich-editor" id="maintMsgEditor" contenteditable="true" placeholder="Текст тоста..."></div>
+        </div>
+
+        <button class="btn btn-sm" onclick="loadMaintenance()" style="margin-bottom:16px">🔄 Загрузить текущий текст</button>
+
+        <div style="height:1px;background:rgba(255,0,0,0.1);margin-bottom:20px"></div>
+
+        <button class="btn" id="saveMaintBtn" onclick="saveMaintenance()" style="background:rgba(0,180,0,0.08);border-color:rgba(0,200,0,0.3);color:#55ff55">
+          СОХРАНИТЬ И ПРИМЕНИТЬ
+        </button>
+        <div class="status" id="maintStatus"></div>
       </div>
     </div>
 
@@ -643,15 +709,21 @@ function showApiKey() {
   inp.type = inp.type === 'password' ? 'text' : 'password';
 }
 
+function showMasterKey() {
+  const inp = document.getElementById('masterKeyInput');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
 /* ── ВКЛАДКИ ── */
 function switchTab(tab) {
-  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['upload','manage','prices','rules','users'][i]===tab));
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['upload','manage','prices','rules','users','maint'][i]===tab));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
   if (tab === 'manage') loadWorks();
   if (tab === 'prices') loadPrices();
   if (tab === 'rules') loadRules();
-  if (tab === 'users' && apiKey) loadUsers();
+  if (tab === 'users' && apiKey) { loadUsers(); loadWatchlist(); }
+  if (tab === 'maint' && apiKey) loadMaintenance();
 }
 
 /* ── ВХОД ── */
@@ -1452,11 +1524,18 @@ function renderUsers() {
   }).join('');
 }
 
+function getMasterKey() {
+  return document.getElementById('masterKeyInput').value.trim();
+}
+
 async function banUser(discordId) {
+  const masterKey = getMasterKey();
+  if (!masterKey) { showStatus(document.getElementById('usersStatus'), 'Введи мастер-ключ (не сохраняется)', 'err'); return; }
   const reason = prompt('Причина бана (можно пусто):', '') || '';
   const status = document.getElementById('usersStatus');
   try {
-    const res = await fetch(`${BOT_API}/admin/ban?key=${encodeURIComponent(apiKey)}&discord_id=${encodeURIComponent(discordId)}&reason=${encodeURIComponent(reason)}`);
+    const res = await fetch(`${BOT_API}/admin/ban?key=${encodeURIComponent(apiKey)}&master_key=${encodeURIComponent(masterKey)}&discord_id=${encodeURIComponent(discordId)}&reason=${encodeURIComponent(reason)}`);
+    if (res.status === 403) throw new Error('Неверный мастер-ключ');
     if (!res.ok) throw new Error('Не удалось забанить');
     showStatus(status, 'Пользователь забанен', 'ok');
     loadUsers();
@@ -1466,15 +1545,152 @@ async function banUser(discordId) {
 }
 
 async function unbanUser(discordId) {
+  const masterKey = getMasterKey();
+  if (!masterKey) { showStatus(document.getElementById('usersStatus'), 'Введи мастер-ключ (не сохраняется)', 'err'); return; }
   if (!confirm('Снять бан с этого пользователя?')) return;
   const status = document.getElementById('usersStatus');
   try {
-    const res = await fetch(`${BOT_API}/admin/unban?key=${encodeURIComponent(apiKey)}&discord_id=${encodeURIComponent(discordId)}`);
+    const res = await fetch(`${BOT_API}/admin/unban?key=${encodeURIComponent(apiKey)}&master_key=${encodeURIComponent(masterKey)}&discord_id=${encodeURIComponent(discordId)}`);
+    if (res.status === 403) throw new Error('Неверный мастер-ключ');
     if (!res.ok) throw new Error('Не удалось разбанить');
     showStatus(status, 'Бан снят', 'ok');
     loadUsers();
   } catch(e) {
     showStatus(status, 'Ошибка: ' + e.message, 'err');
+  }
+}
+
+/* ── СТОП-ЛИСТ (авто-бан по Discord ID) ── */
+let WATCHLIST = [];
+
+async function addToWatchlist() {
+  const masterKey  = getMasterKey();
+  const status     = document.getElementById('watchlistStatus');
+  if (!masterKey) { showStatus(status, 'Введи мастер-ключ (не сохраняется)', 'err'); return; }
+  if (!apiKey)     { showStatus(status, 'Введи API-ключ бэкенда выше', 'err'); return; }
+
+  const discordId = document.getElementById('watchDiscordId').value.trim();
+  const reason    = document.getElementById('watchReason').value.trim();
+  if (!discordId) { showStatus(status, 'Впиши Discord ID', 'err'); return; }
+
+  try {
+    const res = await fetch(`${BOT_API}/admin/watchlist/add?key=${encodeURIComponent(apiKey)}&master_key=${encodeURIComponent(masterKey)}&discord_id=${encodeURIComponent(discordId)}&reason=${encodeURIComponent(reason)}`);
+    if (res.status === 403) throw new Error('Неверный ключ или мастер-ключ');
+    if (!res.ok) throw new Error('Не удалось добавить в стоп-лист');
+    const data = await res.json();
+    document.getElementById('watchDiscordId').value = '';
+    document.getElementById('watchReason').value = '';
+    showStatus(status, data.auto_banned_now
+      ? 'Добавлено — этот ID уже авторизовывался, забанен прямо сейчас'
+      : 'Добавлено в стоп-лист — забанится при следующей авторизации', 'ok');
+    loadWatchlist();
+  } catch(e) {
+    showStatus(status, 'Ошибка: ' + e.message, 'err');
+  }
+}
+
+async function loadWatchlist() {
+  const status = document.getElementById('watchlistStatus');
+  const list   = document.getElementById('watchlistList');
+  if (!apiKey) { showStatus(status, 'Введи API-ключ бэкенда выше', 'err'); return; }
+
+  list.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div>';
+  showStatus(status, '', '');
+
+  try {
+    const res = await fetch(`${BOT_API}/admin/watchlist?key=${encodeURIComponent(apiKey)}`);
+    if (res.status === 403) throw new Error('Неверный ключ');
+    if (!res.ok) throw new Error('Ошибка сервера');
+    const data = await res.json();
+    WATCHLIST = data.watchlist || [];
+    renderWatchlist();
+  } catch(e) {
+    list.innerHTML = '';
+    showStatus(status, 'Ошибка: ' + e.message, 'err');
+  }
+}
+
+function renderWatchlist() {
+  const list = document.getElementById('watchlistList');
+  document.getElementById('watchlistCount').textContent = WATCHLIST.length;
+
+  if (!WATCHLIST.length) {
+    list.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Стоп-лист пуст</div>';
+    return;
+  }
+
+  list.innerHTML = WATCHLIST.map(w => `
+    <div class="work-item">
+      <div class="work-info">
+        <div class="work-type">ID: ${escHtml(w.discord_id)}</div>
+        <div class="work-file">Причина: ${escHtml(w.reason || '—')}</div>
+        <div class="work-file">Добавлен: ${escHtml(w.added_at || '—')}</div>
+      </div>
+      <div class="work-del" onclick="removeFromWatchlist('${escHtml(w.discord_id)}')" title="Убрать из стоп-листа">✕</div>
+    </div>
+  `).join('');
+}
+
+async function removeFromWatchlist(discordId) {
+  const masterKey = getMasterKey();
+  const status = document.getElementById('watchlistStatus');
+  if (!masterKey) { showStatus(status, 'Введи мастер-ключ (не сохраняется)', 'err'); return; }
+  if (!confirm('Убрать этот ID из стоп-листа? (текущий бан, если уже наложен, снят не будет)')) return;
+  try {
+    const res = await fetch(`${BOT_API}/admin/watchlist/remove?key=${encodeURIComponent(apiKey)}&master_key=${encodeURIComponent(masterKey)}&discord_id=${encodeURIComponent(discordId)}`);
+    if (res.status === 403) throw new Error('Неверный ключ или мастер-ключ');
+    if (!res.ok) throw new Error('Не удалось убрать из стоп-листа');
+    showStatus(status, 'Убрано из стоп-листа', 'ok');
+    loadWatchlist();
+  } catch(e) {
+    showStatus(status, 'Ошибка: ' + e.message, 'err');
+  }
+}
+
+/* ── ТЕХРАБОТЫ ── */
+async function loadMaintenance() {
+  const status = document.getElementById('maintStatus');
+  if (!apiKey) { showStatus(status, 'Введи API-ключ бэкенда на вкладке ЮЗЕРЫ', 'err'); return; }
+  showStatus(status, 'Загрузка...', 'info');
+  try {
+    const res = await fetch(`${BOT_API}/maintenance-status`);
+    if (!res.ok) throw new Error('Ошибка сервера');
+    const data = await res.json();
+    document.getElementById('maintOnChk').checked = !!data.on;
+    document.getElementById('maintOnBadge').textContent = data.on ? 'ВКЛ' : 'ВЫКЛ';
+    document.getElementById('maintTitleInput').value = data.title || '';
+    document.getElementById('maintMsgEditor').innerHTML = data.msg || '';
+    showStatus(status, '', '');
+  } catch(e) {
+    showStatus(status, 'Ошибка: ' + e.message, 'err');
+  }
+}
+
+async function saveMaintenance() {
+  const status = document.getElementById('maintStatus');
+  const btn    = document.getElementById('saveMaintBtn');
+  if (!apiKey) { showStatus(status, 'Введи API-ключ бэкенда на вкладке ЮЗЕРЫ', 'err'); return; }
+
+  const on    = document.getElementById('maintOnChk').checked ? 1 : 0;
+  const title = document.getElementById('maintTitleInput').value.trim();
+  const msg   = document.getElementById('maintMsgEditor').innerHTML.trim();
+
+  btn.disabled = true;
+  showStatus(status, 'Сохраняю...', 'info');
+  try {
+    const params = new URLSearchParams({ key: apiKey, on: String(on) });
+    if (title) params.set('title', title);
+    if (msg)   params.set('msg', msg);
+    const res = await fetch(`${BOT_API}/set-maintenance?${params.toString()}`);
+    if (res.status === 403) throw new Error('Неверный API-ключ');
+    if (!res.ok) throw new Error('Не удалось сохранить');
+    const data = await res.json();
+    document.getElementById('maintOnBadge').textContent = data.on ? 'ВКЛ' : 'ВЫКЛ';
+    showStatus(status, 'Сохранено и применено на сайте!', 'ok');
+  } catch(e) {
+    showStatus(status, 'Ошибка: ' + e.message, 'err');
+  } finally {
+    btn.disabled = false;
   }
 }
 
