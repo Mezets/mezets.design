@@ -388,6 +388,15 @@
       <label>Ветка</label>
       <input type="text" id="branchInput" placeholder="main" value="main">
 
+      <div style="height:1px;background:rgba(255,0,0,0.1);margin:18px 0"></div>
+
+      <label>Ключ администратора (ADMIN_TEST_KEY)</label>
+      <div class="token-row">
+        <input type="password" id="gateAdminKeyInput" placeholder="admin key">
+        <button class="btn btn-sm" onclick="showGateAdminKey()">👁</button>
+      </div>
+      <div class="hint" style="margin-top:6px;margin-bottom:18px">Не сохраняется — вводить при каждом входе</div>
+
       <button class="btn" onclick="login()">Войти</button>
       <div class="status" id="loginStatus"></div>
     </div>
@@ -628,6 +637,14 @@
 </div><!-- /wrap -->
 
 <script>
+/* ── ЗАЩИТА ОТ ПРОСМОТРА ЧЕРЕЗ DEVTOOLS ── */
+document.addEventListener('contextmenu', e => e.preventDefault(), true);
+document.addEventListener('keydown', e => {
+  if (e.key === 'F12') e.preventDefault();
+  if (e.ctrlKey && e.shiftKey && ['I','J','C','K'].includes(e.key.toUpperCase())) e.preventDefault();
+  if (e.ctrlKey && e.key.toUpperCase() === 'U') e.preventDefault();
+}, true);
+
 /* ── КОНФИГ ── */
 const GH_API = 'https://api.github.com';
 let TOKEN = '', REPO = '', BRANCH = '';
@@ -714,6 +731,11 @@ function showMasterKey() {
   inp.type = inp.type === 'password' ? 'text' : 'password';
 }
 
+function showGateAdminKey() {
+  const inp = document.getElementById('gateAdminKeyInput');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
 /* ── ВКЛАДКИ ── */
 function switchTab(tab) {
   document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['upload','manage','prices','rules','users','maint'][i]===tab));
@@ -728,24 +750,38 @@ function switchTab(tab) {
 
 /* ── ВХОД ── */
 async function login() {
-  const token  = document.getElementById('tokenInput').value.trim();
-  const repo   = document.getElementById('repoInput').value.trim();
-  const branch = document.getElementById('branchInput').value.trim();
-  const status = document.getElementById('loginStatus');
+  const token     = document.getElementById('tokenInput').value.trim();
+  const repo      = document.getElementById('repoInput').value.trim();
+  const branch    = document.getElementById('branchInput').value.trim();
+  const adminKey  = document.getElementById('gateAdminKeyInput').value.trim();
+  const status    = document.getElementById('loginStatus');
 
   if (!token || !repo) { showStatus(status, 'Заполни токен и репозиторий', 'err'); return; }
+  if (!adminKey)        { showStatus(status, 'Введи ключ администратора', 'err'); return; }
 
   showStatus(status, 'Проверяю доступ...', 'info');
 
   try {
     const res = await ghFetch(`/repos/${repo}`, token);
     if (!res.ok) throw new Error('Нет доступа к репозиторию. Проверь токен и права repo.');
+
+    const keyRes = await fetch(`${BOT_API}/admin/users?key=${encodeURIComponent(adminKey)}`);
+    if (keyRes.status === 403) throw new Error('Неверный ключ администратора');
+    if (!keyRes.ok) throw new Error('Не удалось проверить ключ администратора (бэкенд недоступен)');
+    const keyData = await keyRes.json();
+
     TOKEN  = token;
     REPO   = repo;
     BRANCH = branch || 'main';
     localStorage.setItem('mz_token', token);
     localStorage.setItem('mz_repo', repo);
     localStorage.setItem('mz_branch', BRANCH);
+
+    // Ключ администратора нигде не сохраняется — только в памяти текущей вкладки
+    apiKey = adminKey;
+    USERS  = keyData.users || [];
+    document.getElementById('apiKeyInput').value = adminKey;
+
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('mainScreen').style.display = 'block';
     showStatus(status, '', '');
@@ -754,7 +790,7 @@ async function login() {
   }
 }
 
-/* ── АВТО-ЛОГИН ── */
+/* ── АВТО-ЗАПОЛНЕНИЕ (git-токен персистентен, admin key — никогда) ── */
 window.addEventListener('DOMContentLoaded', () => {
   const t = localStorage.getItem('mz_token');
   const r = localStorage.getItem('mz_repo');
@@ -763,12 +799,7 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('tokenInput').value = t;
     document.getElementById('repoInput').value  = r;
     if (b) document.getElementById('branchInput').value = b;
-    login();
-  }
-  const savedApiKey = localStorage.getItem('mz_apikey');
-  if (savedApiKey) {
-    apiKey = savedApiKey;
-    document.getElementById('apiKeyInput').value = savedApiKey;
+    // Контент НЕ открывается автоматически — нужно ввести admin key и нажать "Войти"
   }
 });
 
@@ -1460,7 +1491,6 @@ async function loadUsers() {
 
   if (!key) { showStatus(status, 'Введи API-ключ бэкенда', 'err'); return; }
   apiKey = key;
-  localStorage.setItem('mz_apikey', key);
 
   list.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div>';
   showStatus(status, '', '');
@@ -1647,7 +1677,7 @@ async function removeFromWatchlist(discordId) {
   }
 }
 
-/* ──ТЕХРАБОТЫ── */
+/* ── ТЕХРАБОТЫ ── */
 async function loadMaintenance() {
   const status = document.getElementById('maintStatus');
   if (!apiKey) { showStatus(status, 'Введи API-ключ бэкенда на вкладке ЮЗЕРЫ', 'err'); return; }
