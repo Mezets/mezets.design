@@ -1998,7 +1998,7 @@
 <div class="maint-toast" id="maintToast">
   <div class="maint-toast-head">
     <div class="maint-toast-dot"></div>
-    <div class="maint-toast-title">Тех. неполадки</div>
+    <div class="maint-toast-title" id="maintToastTitle">Тех. неполадки</div>
   </div>
   <div class="maint-toast-msg" id="maintToastMsg">
     Ведутся технические работы.<br>После 21:00 по МСК всё заработает!
@@ -2149,8 +2149,9 @@
   const stripEl = document.getElementById('strip');
 
   /* ========================= MAINTENANCE ========================= */
-  function showMaint(msg) {
+  function showMaint(msg, title) {
     if (msg) document.getElementById('maintToastMsg').innerHTML = msg;
+    if (title) document.getElementById('maintToastTitle').textContent = title;
     document.getElementById('maintToast').classList.add('show');
   }
   function hideMaint() {
@@ -2160,7 +2161,7 @@
     try {
       const res  = await fetch(`${API}/maintenance-status`, { mode: 'cors' });
       const data = await res.json();
-      if (data.on) showMaint(data.msg);
+      if (data.on) showMaint(data.msg, data.title);
       else hideMaint();
     } catch(e) {}
   }
