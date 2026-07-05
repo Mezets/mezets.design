@@ -1704,6 +1704,11 @@
   </style>
 </head>
 <body>
+<div id="banOverlay" style="display:none; position:fixed; inset:0; z-index:999999; background:radial-gradient(ellipse at center, #2a0000 0%, #050000 75%); color:#fff; align-items:center; justify-content:center; text-align:center; flex-direction:column; padding:24px;">
+  <div style="font-size:64px; line-height:1; margin-bottom:18px;">🚫</div>
+  <div style="font-size:28px; font-weight:800; margin-bottom:10px; letter-spacing:0.3px;">Вы забанены</div>
+  <div style="font-size:16px; color:#c99; max-width:420px;">Вам тут не рады. Доступ к сайту закрыт администратором.</div>
+</div>
 <a class="home-arrow" href="https://mezets.github.io/" title="На главную">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
     <line x1="19" y1="12" x2="5" y2="12"></line>
@@ -2192,6 +2197,71 @@
     return getStoredSession();
   }
 
+  /* ========================= BROWSER FINGERPRINT (псевдо-HWID) ========================= */
+  async function getBrowserFingerprint() {
+    try {
+      const cached = localStorage.getItem('mezets_fp');
+      if (cached) return cached;
+
+      let canvasHash = '';
+      try {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        ctx.textBaseline = 'top';
+        ctx.font = "14px 'Arial'";
+        ctx.fillText('mezets-fp-🔥', 2, 2);
+        canvasHash = canvas.toDataURL();
+      } catch(e) {}
+
+      const raw = [
+        navigator.userAgent,
+        navigator.language,
+        navigator.hardwareConcurrency || '',
+        navigator.deviceMemory || '',
+        screen.width + 'x' + screen.height + 'x' + screen.colorDepth,
+        Intl.DateTimeFormat().resolvedOptions().timeZone,
+        canvasHash
+      ].join('###');
+
+      const enc = new TextEncoder().encode(raw);
+      const digest = await crypto.subtle.digest('SHA-256', enc);
+      const hash = Array.from(new Uint8Array(digest))
+        .map(b => b.toString(16).padStart(2, '0')).join('');
+
+      localStorage.setItem('mezets_fp', hash);
+      return hash;
+    } catch(e) {
+      return '';
+    }
+  }
+
+  async function registerDevice() {
+    const session = currentSession();
+    const fp = await getBrowserFingerprint();
+    if (session) {
+      try {
+        await fetch(`${API}/register-device?session=${encodeURIComponent(session)}&fp=${encodeURIComponent(fp)}`, { mode: 'cors' });
+      } catch(e) {}
+    }
+    checkSiteBan(session, fp);
+  }
+  registerDevice();
+
+  async function checkSiteBan(session, fp) {
+    try {
+      const params = new URLSearchParams();
+      if (session) params.set('session', session);
+      if (fp) params.set('fp', fp);
+      const res  = await fetch(`${API}/check-ban?${params.toString()}`, { mode: 'cors' });
+      const data = await res.json();
+      if (data.banned) {
+        const overlay = document.getElementById('banOverlay');
+        overlay.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+      }
+    } catch(e) {}
+  }
+
   /* ========================= ЛОГИН ЧЕРЕЗ DISCORD ========================= */
   async function setupLoginButton() {
     try {
@@ -2252,8 +2322,18 @@
 
       loginBlock.style.display = 'none';
       spinBlock.style.display  = 'block';
-      document.getElementById('loggedAs').textContent = 'Вы вошли через Discord';
       stopIdleStrip();
+
+      if (data.banned) {
+        document.getElementById('loggedAs').textContent = 'Доступ заблокирован администратором';
+        btn.textContent   = 'Заблокировано';
+        btn.style.opacity = '0.4';
+        btn.style.cursor  = 'not-allowed';
+        btn.onclick       = null;
+        return;
+      }
+
+      document.getElementById('loggedAs').textContent = 'Вы вошли через Discord';
 
       if (!data.can_spin) {
         btn.textContent   = 'Уже крутил';
@@ -2422,6 +2502,15 @@
         btn.style.opacity = '0.4';
         btn.style.cursor  = 'not-allowed';
         document.getElementById('resultPct').textContent = 'Вы уже крутили!';
+        document.getElementById('resultPct').classList.add('show');
+        return;
+      }
+      if (data.error === 'banned') {
+        spinning = false;
+        btn.textContent   = 'Заблокировано';
+        btn.style.opacity = '0.4';
+        btn.style.cursor  = 'not-allowed';
+        document.getElementById('resultPct').textContent = 'Доступ заблокирован администратором';
         document.getElementById('resultPct').classList.add('show');
         return;
       }
