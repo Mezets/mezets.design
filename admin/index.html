@@ -401,6 +401,7 @@
       <button class="tab" onclick="switchTab('manage')">📋 РАБОТЫ</button>
       <button class="tab" onclick="switchTab('prices')">💰 ЦЕНЫ</button>
       <button class="tab" onclick="switchTab('rules')">📜 ПРАВИЛА</button>
+      <button class="tab" onclick="switchTab('users')">👤 ЮЗЕРЫ</button>
     </div>
 
     <!-- ── ВКЛАДКА: ЗАГРУЗИТЬ ── -->
@@ -533,6 +534,30 @@
       </div>
     </div>
 
+    <!-- ВКЛАДКА: ЮЗЕРЫ -->
+    <div id="tabUsers" class="tab-panel">
+      <div class="card">
+        <div class="card-title">👤 АВТОРИЗОВАННЫЕ <span class="badge" id="usersCount">0</span></div>
+        <div class="counter">IP · Fingerprint (псевдо-HWID) · Discord ID · ник · аватар</div>
+
+        <label>API-ключ бэкенда (ADMIN_TEST_KEY)</label>
+        <div class="token-row">
+          <input type="password" id="apiKeyInput" placeholder="admin key">
+          <button class="btn btn-sm" onclick="showApiKey()">👁</button>
+        </div>
+        <div class="hint" style="margin-top:6px">Тот же ключ, что задан в переменной ADMIN_TEST_KEY на бэкенде (Railway)</div>
+
+        <input type="text" id="usersSearch" placeholder="Поиск: ник / Discord ID / IP / fingerprint" oninput="renderUsers()">
+
+        <button class="btn btn-sm" onclick="loadUsers()" style="margin-bottom:16px">🔄 Обновить список</button>
+
+        <div id="usersList" class="works-list">
+          <div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Введи ключ и нажми «Обновить список»</div>
+        </div>
+        <div class="status" id="usersStatus"></div>
+      </div>
+    </div>
+
   </div><!-- /mainScreen -->
 </div><!-- /wrap -->
 
@@ -540,6 +565,11 @@
 /* ── КОНФИГ ── */
 const GH_API = 'https://api.github.com';
 let TOKEN = '', REPO = '', BRANCH = '';
+
+/* ── КОНФИГ БЭКЕНДА (бан/юзеры) ── */
+const BOT_API = 'https://mez.up.railway.app';
+let apiKey = '';
+let USERS = [];
 
 /* ── ЧАСТИЦЫ ── */
 const canvas = document.getElementById('bg');
@@ -608,14 +638,20 @@ function showToken() {
   inp.type = inp.type === 'password' ? 'text' : 'password';
 }
 
+function showApiKey() {
+  const inp = document.getElementById('apiKeyInput');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
 /* ── ВКЛАДКИ ── */
 function switchTab(tab) {
-  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['upload','manage','prices','rules'][i]===tab));
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['upload','manage','prices','rules','users'][i]===tab));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
   if (tab === 'manage') loadWorks();
   if (tab === 'prices') loadPrices();
   if (tab === 'rules') loadRules();
+  if (tab === 'users' && apiKey) loadUsers();
 }
 
 /* ── ВХОД ── */
@@ -656,6 +692,11 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('repoInput').value  = r;
     if (b) document.getElementById('branchInput').value = b;
     login();
+  }
+  const savedApiKey = localStorage.getItem('mz_apikey');
+  if (savedApiKey) {
+    apiKey = savedApiKey;
+    document.getElementById('apiKeyInput').value = savedApiKey;
   }
 });
 
@@ -1337,6 +1378,104 @@ function rteInsert(edId, html) {
   if (!ed) return;
   ed.focus();
   document.execCommand('insertHTML', false, html);
+}
+
+/* ── ЮЗЕРЫ / БАНЫ ── */
+async function loadUsers() {
+  const status = document.getElementById('usersStatus');
+  const list   = document.getElementById('usersList');
+  const key    = document.getElementById('apiKeyInput').value.trim();
+
+  if (!key) { showStatus(status, 'Введи API-ключ бэкенда', 'err'); return; }
+  apiKey = key;
+  localStorage.setItem('mz_apikey', key);
+
+  list.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div>';
+  showStatus(status, '', '');
+
+  try {
+    const res = await fetch(`${BOT_API}/admin/users?key=${encodeURIComponent(key)}`);
+    if (res.status === 403) throw new Error('Неверный ключ');
+    if (!res.ok) throw new Error('Ошибка сервера');
+    const data = await res.json();
+    USERS = data.users || [];
+    renderUsers();
+  } catch(e) {
+    list.innerHTML = '';
+    showStatus(status, 'Ошибка: ' + e.message, 'err');
+  }
+}
+
+function renderUsers() {
+  const q    = document.getElementById('usersSearch').value.trim().toLowerCase();
+  const list = document.getElementById('usersList');
+
+  const filtered = USERS.filter(u => {
+    if (!q) return true;
+    return [u.username, u.discord_id, u.ip, u.fingerprint]
+      .some(v => (v || '').toLowerCase().includes(q));
+  });
+
+  document.getElementById('usersCount').textContent = USERS.length;
+
+  if (!filtered.length) {
+    list.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Нет данных</div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(u => {
+    const fpShort = u.fingerprint ? escHtml(u.fingerprint.slice(0, 14)) + '…' : '—';
+    const bannedBadge = u.banned
+      ? '<span class="badge" style="background:rgba(255,0,0,0.22);border-color:rgba(255,0,0,0.5)">БАН</span>'
+      : '';
+    const reasonLine = (u.banned && u.ban_reason)
+      ? `<div class="work-file" style="color:rgba(255,120,120,0.6)">Причина: ${escHtml(u.ban_reason)}</div>`
+      : '';
+    const actionBtn = u.banned
+      ? `<button class="btn btn-sm" style="border-color:rgba(0,200,0,0.35);color:#55ff55" onclick="unbanUser('${escHtml(u.discord_id)}')">Разбан</button>`
+      : `<button class="btn btn-sm" style="border-color:rgba(255,0,0,0.4);color:#ff4444" onclick="banUser('${escHtml(u.discord_id)}')">Бан</button>`;
+
+    return `
+      <div class="work-item" style="align-items:flex-start;flex-wrap:wrap">
+        <img class="work-thumb" style="width:36px;height:36px;border-radius:50%" src="${escHtml(u.avatar || '')}" onerror="this.style.visibility='hidden'">
+        <div class="work-info">
+          <div class="work-type">${escHtml(u.username || 'неизвестно')} ${bannedBadge}</div>
+          <div class="work-file">ID: ${escHtml(u.discord_id)}</div>
+          <div class="work-file">IP: ${escHtml(u.ip || '—')}</div>
+          <div class="work-file">FP: ${fpShort}</div>
+          <div class="work-file">Вход: ${escHtml(u.last_seen || '—')}</div>
+          ${reasonLine}
+        </div>
+        ${actionBtn}
+      </div>
+    `;
+  }).join('');
+}
+
+async function banUser(discordId) {
+  const reason = prompt('Причина бана (можно пусто):', '') || '';
+  const status = document.getElementById('usersStatus');
+  try {
+    const res = await fetch(`${BOT_API}/admin/ban?key=${encodeURIComponent(apiKey)}&discord_id=${encodeURIComponent(discordId)}&reason=${encodeURIComponent(reason)}`);
+    if (!res.ok) throw new Error('Не удалось забанить');
+    showStatus(status, 'Пользователь забанен', 'ok');
+    loadUsers();
+  } catch(e) {
+    showStatus(status, 'Ошибка: ' + e.message, 'err');
+  }
+}
+
+async function unbanUser(discordId) {
+  if (!confirm('Снять бан с этого пользователя?')) return;
+  const status = document.getElementById('usersStatus');
+  try {
+    const res = await fetch(`${BOT_API}/admin/unban?key=${encodeURIComponent(apiKey)}&discord_id=${encodeURIComponent(discordId)}`);
+    if (!res.ok) throw new Error('Не удалось разбанить');
+    showStatus(status, 'Бан снят', 'ok');
+    loadUsers();
+  } catch(e) {
+    showStatus(status, 'Ошибка: ' + e.message, 'err');
+  }
 }
 
 </script>
