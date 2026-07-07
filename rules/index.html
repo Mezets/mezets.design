@@ -549,6 +549,13 @@
     }
     if (!banEnforced) {
       banEnforced = true;
+
+      // Полностью стираем страницу — остаётся только окно бана.
+      // Даже если кто-то уберёт оверлей через консоль, восстанавливать уже нечего.
+      Array.from(document.body.children).forEach(el => {
+        if (el.id !== 'banOverlay' && el.id !== 'banSound') el.remove();
+      });
+
       const snd = document.getElementById('banSound');
       if (snd) {
         snd.currentTime = 0;
@@ -573,16 +580,32 @@
 
       const mo = new MutationObserver(() => {
         const ov = document.getElementById('banOverlay');
-        if (!ov || ov.style.display !== 'flex' || !document.body.contains(ov)) {
+        if (!ov || ov.style.display !== 'flex') {
           location.reload();
         }
       });
-      mo.observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['style','class'] });
+      mo.observe(overlay, { attributes: true, attributeFilter: ['style','class'] });
+      mo.observe(document.body, { childList: true });
 
       setInterval(() => {
         const ov = document.getElementById('banOverlay');
         if (ov) { ov.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
       }, 800);
+
+      // Грубая эвристика "открыты ли devtools" (по разнице размеров окна).
+      // Не панацея (можно обойти отстыкованным окном/другим браузером),
+      // но мешает спокойно пользоваться консолью пока активен бан.
+      let ddtWarned = false;
+      setInterval(() => {
+        const wDiff = window.outerWidth  - window.innerWidth;
+        const hDiff = window.outerHeight - window.innerHeight;
+        if (wDiff > 160 || hDiff > 160) {
+          if (!ddtWarned) { ddtWarned = true; }
+          location.reload();
+        } else {
+          ddtWarned = false;
+        }
+      }, 1000);
     }
   }
 
