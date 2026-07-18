@@ -367,13 +367,12 @@
     .tab-panel.active { display: block; animation: tabFadeIn .4s cubic-bezier(.16,1,.3,1); }
 
     /* ── ВКЛАДКА ЮЗЕРЫ: 3 колонки ── */
-    #tabUsers.active {
-      width: 94vw;
-      max-width: 1180px;
-      position: relative;
-      left: 50%;
-      transform: translateX(-50%);
-    }
+    /* Раньше ширина/центрирование этой вкладки делались через transform: translateX(-50%),
+       а fade-in анимация (.tab-panel.active) тоже анимирует transform — один transform
+       перебивал другой, из-за чего окна дёргано прыгали влево, а потом скачком в центр.
+       Теперь расширяем сам .wrap через max-width (с transition), никакого transform-конфликта. */
+    .wrap { transition: max-width .35s cubic-bezier(.4,0,.2,1); }
+    .wrap.wrap-wide { max-width: 1180px; }
     .users-grid {
       display: flex;
       gap: 20px;
@@ -386,7 +385,7 @@
       margin-bottom: 0;
     }
     @media (max-width: 900px) {
-      #tabUsers.active { width: 100%; max-width: 560px; left: 0; transform: none; }
+      .wrap.wrap-wide { max-width: 560px; }
       .users-grid { display: block; }
       .users-grid > .card { margin-bottom: 20px; }
     }
@@ -830,6 +829,7 @@ function switchTab(tab) {
   tabButtons.forEach((t,i) => t.classList.toggle('active', order[i]===tab));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+  document.querySelector('.wrap').classList.toggle('wrap-wide', tab === 'users');
   moveTabIndicator();
   if (tab === 'manage') loadWorks();
   if (tab === 'prices') loadPrices();
