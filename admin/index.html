@@ -1674,13 +1674,18 @@ function renderUsers() {
     const bannedBadge = u.banned
       ? '<span class="badge" style="background:rgba(255,0,0,0.22);border-color:rgba(255,0,0,0.5)">БАН</span>'
       : '';
+    const locationLine = [u.country, u.region, u.city].filter(Boolean).join(', ') || '—';
 
     return `
       <div class="work-item clickable-item" onclick="showAuthDetail('${escHtml(String(u.discord_id))}')">
-        <img class="work-thumb" style="width:36px;height:36px;border-radius:50%" src="${escHtml(u.avatar || '')}" onerror="this.style.visibility='hidden'">
+        <div style="position:relative;width:36px;flex-shrink:0">
+          <img class="work-thumb" style="width:36px;height:36px;border-radius:50%" src="${escHtml(u.avatar || '')}" onerror="this.style.visibility='hidden'">
+          <div style="position:absolute;bottom:-3px;right:-4px;line-height:0">${flagImg(u.country_code, 15, 11)}</div>
+        </div>
         <div class="work-info">
           <div class="work-type">${escHtml(u.username || 'неизвестно')} ${bannedBadge}</div>
           <div class="work-file">ID: ${escHtml(u.discord_id)} · IP: ${escHtml(u.ip || '—')}</div>
+          <div class="work-file">📍 ${escHtml(locationLine)}</div>
           <div class="work-file">Вход: ${escHtml(u.last_seen || '—')}</div>
         </div>
       </div>
@@ -1691,13 +1696,14 @@ function renderUsers() {
 /* ── НЕАВТОРИЗОВАННЫЕ (гости без входа через Discord) ── */
 let UNAUTH_USERS = [];
 
-function flagImg(countryCode) {
+function flagImg(countryCode, w, h) {
+  w = w || 26; h = h || 19;
   if (!countryCode) {
-    return '<div style="width:26px;height:19px;border-radius:3px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,0,0,0.2)"></div>';
+    return `<div style="width:${w}px;height:${h}px;border-radius:3px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,0,0,0.2)"></div>`;
   }
   const cc = countryCode.toLowerCase();
   return `<img src="https://flagcdn.com/w40/${cc}.png" alt="${escHtml(countryCode.toUpperCase())}"
-            style="width:26px;height:19px;object-fit:cover;border-radius:3px;border:1px solid rgba(255,0,0,0.25);vertical-align:middle"
+            style="width:${w}px;height:${h}px;object-fit:cover;border-radius:3px;border:1px solid rgba(255,0,0,0.25);vertical-align:middle"
             onerror="this.style.visibility='hidden'">`;
 }
 
@@ -1776,6 +1782,7 @@ function showAuthDetail(discordId) {
   const u = USERS.find(x => String(x.discord_id) === String(discordId));
   if (!u) return;
   const fpFull = u.fingerprint || '—';
+  const locationLine = [u.country, u.region, u.city].filter(Boolean).join(', ') || '—';
   const bannedBadge = u.banned
     ? '<span class="badge" style="background:rgba(255,0,0,0.22);border-color:rgba(255,0,0,0.5)">БАН</span>'
     : '';
@@ -1788,7 +1795,10 @@ function showAuthDetail(discordId) {
 
   document.getElementById('userDetailBody').innerHTML = `
     <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px">
-      <img src="${escHtml(u.avatar || '')}" style="width:52px;height:52px;border-radius:50%;flex-shrink:0" onerror="this.style.visibility='hidden'">
+      <div style="position:relative;width:52px;flex-shrink:0">
+        <img src="${escHtml(u.avatar || '')}" style="width:52px;height:52px;border-radius:50%" onerror="this.style.visibility='hidden'">
+        <div style="position:absolute;bottom:-3px;right:-5px;line-height:0">${flagImg(u.country_code, 20, 14)}</div>
+      </div>
       <div>
         <div style="font-size:12px;color:#fff;font-weight:600;margin-bottom:6px">${escHtml(u.username || 'неизвестно')}</div>
         ${bannedBadge}
@@ -1796,6 +1806,7 @@ function showAuthDetail(discordId) {
     </div>
     <div class="detail-row"><b>Discord ID:</b> ${escHtml(u.discord_id)}</div>
     <div class="detail-row"><b>IP:</b> ${escHtml(u.ip || '—')}</div>
+    <div class="detail-row"><b>Местоположение:</b> ${escHtml(locationLine)}</div>
     <div class="detail-row"><b>Устройство:</b> ${escHtml([u.browser, u.os].filter(Boolean).join(' · ') || '—')}</div>
     <div class="detail-row"><b>Fingerprint:</b> ${escHtml(fpFull)}</div>
     <div class="detail-row"><b>Первый вход:</b> ${escHtml(u.first_seen || '—')}</div>
