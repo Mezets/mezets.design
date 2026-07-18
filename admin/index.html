@@ -324,6 +324,18 @@
       display: flex;
       gap: 8px;
       margin-bottom: 22px;
+      position: relative;
+    }
+    .tab-indicator {
+      position: absolute;
+      bottom: -1px;
+      height: 2px;
+      background: linear-gradient(90deg, rgba(255,0,0,0.9), rgba(255,90,90,0.9));
+      border-radius: 2px;
+      box-shadow: 0 0 10px rgba(255,0,0,0.65);
+      transition: left .35s cubic-bezier(.4,0,.2,1), width .35s cubic-bezier(.4,0,.2,1), opacity .2s;
+      pointer-events: none;
+      opacity: 0;
     }
     .tab {
       flex: 1;
@@ -336,17 +348,23 @@
       background: transparent;
       color: rgba(255,200,200,0.45);
       cursor: pointer;
-      transition: .2s;
+      transition: color .2s, border-color .2s, background .2s, transform .15s;
       letter-spacing: 0.5px;
     }
+    .tab:hover { color: rgba(255,200,200,0.75); border-color: rgba(255,0,0,0.35); }
+    .tab:active { transform: scale(.94); }
     .tab.active {
       border-color: rgba(255,0,0,0.55);
       color: #ff3b3b;
       background: rgba(255,0,0,0.08);
     }
 
+    @keyframes tabFadeIn {
+      from { opacity: 0; transform: translateY(10px) scale(.99); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
     .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
+    .tab-panel.active { display: block; animation: tabFadeIn .4s cubic-bezier(.16,1,.3,1); }
 
     /* ── ВКЛАДКА ЮЗЕРЫ: 3 колонки ── */
     #tabUsers.active {
@@ -430,13 +448,14 @@
   <!-- ──── ГЛАВНЫЙ ЭКРАН ──── -->
   <div id="mainScreen">
 
-    <div class="tabs">
+    <div class="tabs" id="tabsBar">
       <button class="tab active" onclick="switchTab('upload')">📤 ЗАГРУЗИТЬ</button>
       <button class="tab" onclick="switchTab('manage')">📋 РАБОТЫ</button>
       <button class="tab" onclick="switchTab('prices')">💰 ЦЕНЫ</button>
       <button class="tab" onclick="switchTab('rules')">📜 ПРАВИЛА</button>
       <button class="tab" onclick="switchTab('users')">👤 ЮЗЕРЫ</button>
       <button class="tab" onclick="switchTab('maint')">🛠️ ТЕХРАБОТЫ</button>
+      <div class="tab-indicator" id="tabIndicator"></div>
     </div>
 
     <!-- ── ВКЛАДКА: ЗАГРУЗИТЬ ── -->
@@ -806,15 +825,32 @@ function enterUsersGate() {
 
 /* ── ВКЛАДКИ ── */
 function switchTab(tab) {
-  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['upload','manage','prices','rules','users','maint'][i]===tab));
+  const order = ['upload','manage','prices','rules','users','maint'];
+  const tabButtons = document.querySelectorAll('.tab');
+  tabButtons.forEach((t,i) => t.classList.toggle('active', order[i]===tab));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+  moveTabIndicator();
   if (tab === 'manage') loadWorks();
   if (tab === 'prices') loadPrices();
   if (tab === 'rules') loadRules();
   if (tab === 'users' && apiKey) { loadUsers(); loadUnauthUsers(); loadWatchlist(); }
   if (tab === 'maint' && apiKey) loadMaintenance();
 }
+
+function moveTabIndicator() {
+  const bar = document.getElementById('tabsBar');
+  const indicator = document.getElementById('tabIndicator');
+  const active = bar.querySelector('.tab.active');
+  if (!bar || !indicator || !active) return;
+  indicator.style.opacity = '1';
+  indicator.style.left  = active.offsetLeft + 'px';
+  indicator.style.width = active.offsetWidth + 'px';
+}
+window.addEventListener('resize', moveTabIndicator);
+window.addEventListener('DOMContentLoaded', moveTabIndicator);
+// на случай если скрипт выполняется уже после DOMContentLoaded
+setTimeout(moveTabIndicator, 0);
 
 /* ── ВХОД ── */
 async function login() {
@@ -852,6 +888,7 @@ async function login() {
 
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('mainScreen').style.display = 'block';
+    moveTabIndicator();
     showStatus(status, '', '');
   } catch(e) {
     showStatus(status, e.message, 'err');
