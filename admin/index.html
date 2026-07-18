@@ -277,6 +277,27 @@
     .work-info { flex: 1; min-width: 0; }
     .work-type { font-size: 7px; color: #ff4444; line-height: 1.7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .work-file { font-size: 6px; color: rgba(255,200,200,0.35); line-height: 1.6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* ── Карточки юзеров/гостей: кликабельны, детали открываются в модалке ── */
+    .clickable-item { cursor: pointer; transition: .15s; }
+    .clickable-item:hover { background: rgba(255,0,0,0.09); border-color: rgba(255,0,0,0.3); transform: translateY(-1px); }
+    .guest-item { border-left: 3px solid rgba(255,80,80,0.4); }
+    .guest-item.banned { border-left-color: rgba(255,0,0,0.9); background: rgba(255,0,0,0.07); }
+
+    /* ── Модалка деталей ── */
+    #userDetailOverlay {
+      display: none; position: fixed; inset: 0; z-index: 99997;
+      background: rgba(0,0,0,0.65); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    #userDetailOverlay .card { max-width: 420px; width: 100%; max-height: 82vh; overflow: auto; position: relative; }
+    #userDetailClose {
+      position: absolute; top: 14px; right: 14px; background: none; border: none;
+      color: rgba(255,200,200,0.5); font-size: 16px; cursor: pointer; line-height: 1;
+    }
+    #userDetailClose:hover { color: #ff4444; }
+    .detail-row { font-size: 10px; color: rgba(255,210,210,0.65); line-height: 2; word-break: break-all; }
+    .detail-row b { color: rgba(255,230,230,0.9); font-weight: 600; }
     .work-del {
       font-size: 10px;
       color: rgba(255,0,0,0.4);
@@ -664,6 +685,14 @@
       </div>
     </div>
 
+    <!-- Модалка деталей юзера/гостя -->
+    <div id="userDetailOverlay" onclick="if(event.target===this) closeUserDetail()">
+      <div class="card">
+        <button id="userDetailClose" onclick="closeUserDetail()">✕</button>
+        <div id="userDetailBody"></div>
+      </div>
+    </div>
+
     <!-- ВКЛАДКА: ТЕХРАБОТЫ -->
     <div id="tabMaint" class="tab-panel">
       <div class="card">
@@ -831,6 +860,10 @@ function switchTab(tab) {
   document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
   document.querySelector('.wrap').classList.toggle('wrap-wide', tab === 'users');
   moveTabIndicator();
+  // .wrap меняет ширину анимированно (transition max-width .35s) — кнопки вкладок
+  // физически сдвигаются уже ПОСЛЕ этого клика, поэтому пересчитываем индикатор
+  // ещё раз, когда переход ширины реально завершится (плюс подстраховка по таймеру).
+  setTimeout(moveTabIndicator, 380);
   if (tab === 'manage') loadWorks();
   if (tab === 'prices') loadPrices();
   if (tab === 'rules') loadRules();
@@ -851,6 +884,13 @@ window.addEventListener('resize', moveTabIndicator);
 window.addEventListener('DOMContentLoaded', moveTabIndicator);
 // на случай если скрипт выполняется уже после DOMContentLoaded
 setTimeout(moveTabIndicator, 0);
+// доп. пересчёт по факту завершения анимации ширины .wrap (надёжнее, чем только таймер)
+document.addEventListener('DOMContentLoaded', () => {
+  const wrapEl = document.querySelector('.wrap');
+  if (wrapEl) wrapEl.addEventListener('transitionend', (e) => {
+    if (e.propertyName === 'max-width') moveTabIndicator();
+  });
+});
 
 /* ── ВХОД ── */
 async function login() {
@@ -1631,30 +1671,18 @@ function renderUsers() {
   }
 
   list.innerHTML = filtered.map(u => {
-    const fpShort = u.fingerprint ? escHtml(u.fingerprint.slice(0, 14)) + '…' : '—';
     const bannedBadge = u.banned
       ? '<span class="badge" style="background:rgba(255,0,0,0.22);border-color:rgba(255,0,0,0.5)">БАН</span>'
       : '';
-    const reasonLine = (u.banned && u.ban_reason)
-      ? `<div class="work-file" style="color:rgba(255,120,120,0.6)">Причина: ${escHtml(u.ban_reason)}</div>`
-      : '';
-    const actionBtn = u.banned
-      ? `<button class="btn btn-sm" style="border-color:rgba(0,200,0,0.35);color:#55ff55" onclick="unbanUser('${escHtml(u.discord_id)}')">Разбан</button>`
-      : `<button class="btn btn-sm" style="border-color:rgba(255,0,0,0.4);color:#ff4444" onclick="banUser('${escHtml(u.discord_id)}')">Бан</button>`;
 
     return `
-      <div class="work-item" style="align-items:flex-start;flex-wrap:wrap">
+      <div class="work-item clickable-item" onclick="showAuthDetail('${escHtml(String(u.discord_id))}')">
         <img class="work-thumb" style="width:36px;height:36px;border-radius:50%" src="${escHtml(u.avatar || '')}" onerror="this.style.visibility='hidden'">
         <div class="work-info">
           <div class="work-type">${escHtml(u.username || 'неизвестно')} ${bannedBadge}</div>
-          <div class="work-file">ID: ${escHtml(u.discord_id)}</div>
-          <div class="work-file">IP: ${escHtml(u.ip || '—')}</div>
-          <div class="work-file">Устройство: ${escHtml([u.browser, u.os].filter(Boolean).join(' · ') || '—')}</div>
-          <div class="work-file">FP: ${fpShort}</div>
+          <div class="work-file">ID: ${escHtml(u.discord_id)} · IP: ${escHtml(u.ip || '—')}</div>
           <div class="work-file">Вход: ${escHtml(u.last_seen || '—')}</div>
-          ${reasonLine}
         </div>
-        ${actionBtn}
       </div>
     `;
   }).join('');
@@ -1717,17 +1745,18 @@ function renderUnauthUsers() {
 
   list.innerHTML = filtered.map(u => {
     const locationLine = [u.country, u.region, u.city].filter(Boolean).join(', ') || '—';
-    const fpShort = u.fingerprint ? escHtml(u.fingerprint.slice(0, 14)) + '…' : '—';
+    const bannedClass = u.banned ? ' banned' : '';
+    const bannedBadge = u.banned
+      ? '<span class="badge" style="background:rgba(255,0,0,0.22);border-color:rgba(255,0,0,0.5)">БАН</span>'
+      : '';
 
     return `
-      <div class="work-item" style="align-items:flex-start;flex-wrap:wrap">
+      <div class="work-item clickable-item guest-item${bannedClass}" onclick="showGuestDetail(${u.id})">
         <div style="width:36px;text-align:center;padding-top:2px">${flagImg(u.country_code)}</div>
         <div class="work-info">
-          <div class="work-type">${escHtml(locationLine)}</div>
-          <div class="work-file">IP: ${escHtml(u.ip || '—')}</div>
-          <div class="work-file">Устройство: ${escHtml(u.device || '—')}</div>
-          <div class="work-file">FP: ${fpShort}</div>
-          <div class="work-file">Визитов: ${escHtml(String(u.visits ?? 1))} · Вход: ${escHtml(u.last_seen || '—')}</div>
+          <div class="work-type">${escHtml(locationLine)} ${bannedBadge}</div>
+          <div class="work-file">IP: ${escHtml(u.ip || '—')} · визитов: ${escHtml(String(u.visits ?? 1))}</div>
+          <div class="work-file">Вход: ${escHtml(u.last_seen || '—')}</div>
         </div>
       </div>
     `;
@@ -1736,6 +1765,111 @@ function renderUnauthUsers() {
 
 function getMasterKey() {
   return document.getElementById('masterKeyInput').value.trim();
+}
+
+/* ── МОДАЛКА ДЕТАЛЕЙ (юзер / гость) ── */
+function closeUserDetail() {
+  document.getElementById('userDetailOverlay').style.display = 'none';
+}
+
+function showAuthDetail(discordId) {
+  const u = USERS.find(x => String(x.discord_id) === String(discordId));
+  if (!u) return;
+  const fpFull = u.fingerprint || '—';
+  const bannedBadge = u.banned
+    ? '<span class="badge" style="background:rgba(255,0,0,0.22);border-color:rgba(255,0,0,0.5)">БАН</span>'
+    : '';
+  const reasonLine = (u.banned && u.ban_reason)
+    ? `<div class="detail-row" style="color:rgba(255,120,120,0.75)"><b>Причина бана:</b> ${escHtml(u.ban_reason)}</div>`
+    : '';
+  const actionBtn = u.banned
+    ? `<button class="btn" style="border-color:rgba(0,200,0,0.35);color:#55ff55;margin-top:16px" onclick="unbanUser('${escHtml(u.discord_id)}')">Разбан</button>`
+    : `<button class="btn" style="border-color:rgba(255,0,0,0.4);color:#ff4444;margin-top:16px" onclick="banUser('${escHtml(u.discord_id)}')">Бан</button>`;
+
+  document.getElementById('userDetailBody').innerHTML = `
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px">
+      <img src="${escHtml(u.avatar || '')}" style="width:52px;height:52px;border-radius:50%;flex-shrink:0" onerror="this.style.visibility='hidden'">
+      <div>
+        <div style="font-size:12px;color:#fff;font-weight:600;margin-bottom:6px">${escHtml(u.username || 'неизвестно')}</div>
+        ${bannedBadge}
+      </div>
+    </div>
+    <div class="detail-row"><b>Discord ID:</b> ${escHtml(u.discord_id)}</div>
+    <div class="detail-row"><b>IP:</b> ${escHtml(u.ip || '—')}</div>
+    <div class="detail-row"><b>Устройство:</b> ${escHtml([u.browser, u.os].filter(Boolean).join(' · ') || '—')}</div>
+    <div class="detail-row"><b>Fingerprint:</b> ${escHtml(fpFull)}</div>
+    <div class="detail-row"><b>Первый вход:</b> ${escHtml(u.first_seen || '—')}</div>
+    <div class="detail-row"><b>Последний вход:</b> ${escHtml(u.last_seen || '—')}</div>
+    ${reasonLine}
+    ${actionBtn}
+  `;
+  document.getElementById('userDetailOverlay').style.display = 'flex';
+}
+
+function showGuestDetail(id) {
+  const u = UNAUTH_USERS.find(x => Number(x.id) === Number(id));
+  if (!u) return;
+  const locationLine = [u.country, u.region, u.city].filter(Boolean).join(', ') || '—';
+  const bannedBadge = u.banned
+    ? '<span class="badge" style="background:rgba(255,0,0,0.22);border-color:rgba(255,0,0,0.5)">БАН</span>'
+    : '';
+  const reasonLine = (u.banned && u.ban_reason)
+    ? `<div class="detail-row" style="color:rgba(255,120,120,0.75)"><b>Причина бана:</b> ${escHtml(u.ban_reason)}</div>`
+    : '';
+  const actionBtn = u.banned
+    ? `<button class="btn" style="border-color:rgba(0,200,0,0.35);color:#55ff55;margin-top:16px" onclick="unbanGuest(${u.id})">Разбан</button>`
+    : `<button class="btn" style="border-color:rgba(255,0,0,0.4);color:#ff4444;margin-top:16px" onclick="banGuest(${u.id})">Бан</button>`;
+
+  document.getElementById('userDetailBody').innerHTML = `
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px">
+      ${flagImg(u.country_code)}
+      <div style="font-size:12px;color:#fff;font-weight:600">${escHtml(locationLine)}</div>
+      ${bannedBadge}
+    </div>
+    <div class="detail-row"><b>IP:</b> ${escHtml(u.ip || '—')}</div>
+    <div class="detail-row"><b>Устройство:</b> ${escHtml(u.device || '—')}</div>
+    <div class="detail-row"><b>Fingerprint:</b> ${escHtml(u.fingerprint || '—')}</div>
+    <div class="detail-row"><b>Визитов:</b> ${escHtml(String(u.visits ?? 1))}</div>
+    <div class="detail-row"><b>Первый визит:</b> ${escHtml(u.first_seen || '—')}</div>
+    <div class="detail-row"><b>Последний визит:</b> ${escHtml(u.last_seen || '—')}</div>
+    ${reasonLine}
+    ${actionBtn}
+  `;
+  document.getElementById('userDetailOverlay').style.display = 'flex';
+}
+
+async function banGuest(id) {
+  const masterKey = getMasterKey();
+  if (!masterKey) { showStatus(document.getElementById('unauthStatus'), 'Введи мастер-ключ (не сохраняется)', 'err'); return; }
+  const reason = prompt('Причина бана (можно пусто):', '') || '';
+  const status = document.getElementById('unauthStatus');
+  try {
+    const res = await fetch(`${BOT_API}/admin/ban-guest?key=${encodeURIComponent(apiKey)}&master_key=${encodeURIComponent(masterKey)}&id=${encodeURIComponent(id)}&reason=${encodeURIComponent(reason)}`);
+    if (res.status === 403) throw new Error('Неверный мастер-ключ');
+    if (!res.ok) throw new Error('Не удалось забанить');
+    showStatus(status, 'Гость забанен', 'ok');
+    closeUserDetail();
+    loadUnauthUsers();
+  } catch(e) {
+    showStatus(status, 'Ошибка: ' + e.message, 'err');
+  }
+}
+
+async function unbanGuest(id) {
+  const masterKey = getMasterKey();
+  if (!masterKey) { showStatus(document.getElementById('unauthStatus'), 'Введи мастер-ключ (не сохраняется)', 'err'); return; }
+  if (!confirm('Снять бан с этого гостя?')) return;
+  const status = document.getElementById('unauthStatus');
+  try {
+    const res = await fetch(`${BOT_API}/admin/unban-guest?key=${encodeURIComponent(apiKey)}&master_key=${encodeURIComponent(masterKey)}&id=${encodeURIComponent(id)}`);
+    if (res.status === 403) throw new Error('Неверный мастер-ключ');
+    if (!res.ok) throw new Error('Не удалось разбанить');
+    showStatus(status, 'Бан снят', 'ok');
+    closeUserDetail();
+    loadUnauthUsers();
+  } catch(e) {
+    showStatus(status, 'Ошибка: ' + e.message, 'err');
+  }
 }
 
 async function banUser(discordId) {
@@ -1748,6 +1882,7 @@ async function banUser(discordId) {
     if (res.status === 403) throw new Error('Неверный мастер-ключ');
     if (!res.ok) throw new Error('Не удалось забанить');
     showStatus(status, 'Пользователь забанен', 'ok');
+    closeUserDetail();
     loadUsers();
   } catch(e) {
     showStatus(status, 'Ошибка: ' + e.message, 'err');
@@ -1764,6 +1899,7 @@ async function unbanUser(discordId) {
     if (res.status === 403) throw new Error('Неверный мастер-ключ');
     if (!res.ok) throw new Error('Не удалось разбанить');
     showStatus(status, 'Бан снят', 'ok');
+    closeUserDetail();
     loadUsers();
   } catch(e) {
     showStatus(status, 'Ошибка: ' + e.message, 'err');
