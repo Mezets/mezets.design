@@ -348,6 +348,31 @@
     .tab-panel { display: none; }
     .tab-panel.active { display: block; }
 
+    /* ── ВКЛАДКА ЮЗЕРЫ: 3 колонки ── */
+    #tabUsers.active {
+      width: 94vw;
+      max-width: 1180px;
+      position: relative;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .users-grid {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+    .users-grid > .card {
+      flex: 1 1 320px;
+      min-width: 280px;
+      margin-bottom: 0;
+    }
+    @media (max-width: 900px) {
+      #tabUsers.active { width: 100%; max-width: 560px; left: 0; transform: none; }
+      .users-grid { display: block; }
+      .users-grid > .card { margin-bottom: 20px; }
+    }
+
     /* ── СЧЁТЧИК ── */
     .counter {
       font-size: 7px;
@@ -546,6 +571,7 @@
 
     <!-- ВКЛАДКА: ЮЗЕРЫ -->
     <div id="tabUsers" class="tab-panel">
+      <div class="users-grid">
       <div class="card">
         <div class="card-title">👤 АВТОРИЗОВАННЫЕ <span class="badge" id="usersCount">0</span></div>
         <div class="counter">IP · Fingerprint (псевдо-HWID) · Discord ID · ник · аватар</div>
@@ -576,7 +602,7 @@
 
       <div class="card">
         <div class="card-title">🌐 НЕАВТОРИЗОВАННЫЕ <span class="badge" id="unauthCount">0</span></div>
-        <div class="counter">Гости сайта без входа через Discord — IP · примерная геолокация · устройство · время визита</div>
+        <div class="counter">Гости сайта без входа через Discord — IP · геолокация · устройство · время визита</div>
 
         <input type="text" id="unauthSearch" placeholder="Поиск: IP / страна / город" oninput="renderUnauthUsers()">
 
@@ -605,6 +631,7 @@
           <div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Список пуст или не загружен</div>
         </div>
         <div class="status" id="watchlistStatus"></div>
+      </div>
       </div>
     </div>
 
@@ -1571,20 +1598,6 @@ function renderUsers() {
 /* ── НЕАВТОРИЗОВАННЫЕ (гости без входа через Discord) ── */
 let UNAUTH_USERS = [];
 
-// Пример-заглушка на случай, если бэкенд ещё не отдаёт данные по неавторизованным гостям
-const UNAUTH_EXAMPLE = [
-  {
-    ip: '178.176.xx.xx',
-    country: 'Россия',
-    country_code: 'RU',
-    region: 'Краснодарский край',
-    city: 'Анапа',
-    device: 'Chrome · Windows',
-    last_seen: 'пример',
-    is_example: true
-  }
-];
-
 function flagEmoji(countryCode) {
   if (!countryCode) return '🏳️';
   return countryCode.toUpperCase().replace(/./g, ch =>
@@ -1606,21 +1619,14 @@ async function loadUnauthUsers() {
   try {
     const res = await fetch(`${BOT_API}/admin/unauthorized?key=${encodeURIComponent(key)}`);
     if (res.status === 403) throw new Error('Неверный ключ');
-    if (res.status === 404) throw new Error('__NO_ENDPOINT__');
     if (!res.ok) throw new Error('Ошибка сервера');
     const data = await res.json();
     UNAUTH_USERS = data.unauthorized || data.users || [];
-    if (!UNAUTH_USERS.length) UNAUTH_USERS = UNAUTH_EXAMPLE;
     renderUnauthUsers();
   } catch(e) {
-    // Пока эндпоинта на бэкенде нет — показываем окно с примером расположения
-    UNAUTH_USERS = UNAUTH_EXAMPLE;
-    renderUnauthUsers();
-    if (e.message === '__NO_ENDPOINT__') {
-      showStatus(status, 'Эндпоинт /admin/unauthorized ещё не реализован на бэкенде — показан пример', 'info');
-    } else {
-      showStatus(status, 'Ошибка: ' + e.message + ' — показан пример', 'err');
-    }
+    list.innerHTML = '';
+    UNAUTH_USERS = [];
+    showStatus(status, 'Ошибка: ' + e.message, 'err');
   }
 }
 
@@ -1642,16 +1648,13 @@ function renderUnauthUsers() {
   }
 
   list.innerHTML = filtered.map(u => {
-    const exampleBadge = u.is_example
-      ? '<span class="badge" style="background:rgba(255,200,0,0.15);border-color:rgba(255,200,0,0.4);color:#ffd24d">ПРИМЕР</span>'
-      : '';
     const locationLine = [u.country, u.region, u.city].filter(Boolean).join(', ') || '—';
 
     return `
       <div class="work-item" style="align-items:flex-start;flex-wrap:wrap">
         <div style="font-size:22px;line-height:1;width:36px;text-align:center">${flagEmoji(u.country_code)}</div>
         <div class="work-info">
-          <div class="work-type">${escHtml(locationLine)} ${exampleBadge}</div>
+          <div class="work-type">${escHtml(locationLine)}</div>
           <div class="work-file">IP: ${escHtml(u.ip || '—')}</div>
           <div class="work-file">Устройство: ${escHtml(u.device || '—')}</div>
           <div class="work-file">Вход: ${escHtml(u.last_seen || '—')}</div>
