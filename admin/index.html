@@ -571,31 +571,42 @@
 
     <!-- ВКЛАДКА: ЮЗЕРЫ -->
     <div id="tabUsers" class="tab-panel">
-      <div class="users-grid">
-      <div class="card">
-        <div class="card-title">👤 АВТОРИЗОВАННЫЕ <span class="badge" id="usersCount">0</span></div>
-        <div class="counter">IP · Fingerprint (псевдо-HWID) · Discord ID · ник · аватар</div>
+
+      <!-- ── ГЕЙТ: сначала ключи, потом окна ── -->
+      <div class="card" id="usersGate" style="max-width:400px;margin-left:auto;margin-right:auto">
+        <div class="card-title">🔒 ДОСТУП К ЮЗЕРАМ</div>
+        <div class="counter">Введи ключи, чтобы открыть списки пользователей</div>
 
         <label>API-ключ бэкенда (ADMIN_TEST_KEY)</label>
         <div class="token-row">
-          <input type="password" id="apiKeyInput" placeholder="admin key">
+          <input type="password" id="apiKeyInput" placeholder="admin key" onkeydown="if(event.key==='Enter')enterUsersGate()">
           <button class="btn btn-sm" onclick="showApiKey()">👁</button>
         </div>
         <div class="hint" style="margin-top:6px">Тот же ключ, что задан в переменной ADMIN_TEST_KEY на бэкенде (Railway)</div>
 
         <label>Мастер-ключ для бана (не сохраняется, вводить каждый раз)</label>
         <div class="token-row">
-          <input type="password" id="masterKeyInput" placeholder="master key">
+          <input type="password" id="masterKeyInput" placeholder="master key" onkeydown="if(event.key==='Enter')enterUsersGate()">
           <button class="btn btn-sm" onclick="showMasterKey()">👁</button>
         </div>
-        <div class="hint" style="margin-top:6px">MASTER_BAN_KEY на бэкенде. Нужен для бана/разбана/стоп-листа — нигде не хранится, обнуляется при перезагрузке страницы.</div>
+        <div class="hint" style="margin-top:6px;margin-bottom:18px">MASTER_BAN_KEY на бэкенде. Нужен для бана/разбана/стоп-листа — нигде не хранится, обнуляется при перезагрузке страницы.</div>
+
+        <button class="btn" onclick="enterUsersGate()">Войти</button>
+        <div class="status" id="usersGateStatus"></div>
+      </div>
+
+      <!-- ── ОКНА: скрыты, пока не пройден гейт ── -->
+      <div class="users-grid" id="usersGridWrap" style="display:none">
+      <div class="card">
+        <div class="card-title">👤 АВТОРИЗОВАННЫЕ <span class="badge" id="usersCount">0</span></div>
+        <div class="counter">IP · Fingerprint (псевдо-HWID) · Discord ID · ник · аватар</div>
 
         <input type="text" id="usersSearch" placeholder="Поиск: ник / Discord ID / IP / fingerprint" oninput="renderUsers()">
 
         <button class="btn btn-sm" onclick="loadUsers()" style="margin-bottom:16px">🔄 Обновить список</button>
 
         <div id="usersList" class="works-list">
-          <div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Введи ключ и нажми «Обновить список»</div>
+          <div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div>
         </div>
         <div class="status" id="usersStatus"></div>
       </div>
@@ -609,7 +620,7 @@
         <button class="btn btn-sm" onclick="loadUnauthUsers()" style="margin-bottom:16px">🔄 Обновить список</button>
 
         <div id="unauthList" class="works-list">
-          <div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Введи ключ на вкладке выше и нажми «Обновить список»</div>
+          <div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div>
         </div>
         <div class="status" id="unauthStatus"></div>
       </div>
@@ -775,6 +786,22 @@ function showMasterKey() {
 function showGateAdminKey() {
   const inp = document.getElementById('gateAdminKeyInput');
   inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+/* ── ГЕЙТ ВКЛАДКИ ЮЗЕРЫ (сначала ключ — потом окна) ── */
+function enterUsersGate() {
+  const key    = document.getElementById('apiKeyInput').value.trim();
+  const status = document.getElementById('usersGateStatus');
+  if (!key) { showStatus(status, 'Введи API-ключ бэкенда', 'err'); return; }
+  apiKey = key;
+  showStatus(status, '', '');
+
+  document.getElementById('usersGate').style.display = 'none';
+  document.getElementById('usersGridWrap').style.display = 'flex';
+
+  loadUsers();
+  loadUnauthUsers();
+  loadWatchlist();
 }
 
 /* ── ВКЛАДКИ ── */
