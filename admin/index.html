@@ -1585,6 +1585,7 @@ function renderUsers() {
           <div class="work-type">${escHtml(u.username || 'неизвестно')} ${bannedBadge}</div>
           <div class="work-file">ID: ${escHtml(u.discord_id)}</div>
           <div class="work-file">IP: ${escHtml(u.ip || '—')}</div>
+          <div class="work-file">Устройство: ${escHtml([u.browser, u.os].filter(Boolean).join(' · ') || '—')}</div>
           <div class="work-file">FP: ${fpShort}</div>
           <div class="work-file">Вход: ${escHtml(u.last_seen || '—')}</div>
           ${reasonLine}
@@ -1598,11 +1599,14 @@ function renderUsers() {
 /* ── НЕАВТОРИЗОВАННЫЕ (гости без входа через Discord) ── */
 let UNAUTH_USERS = [];
 
-function flagEmoji(countryCode) {
-  if (!countryCode) return '🏳️';
-  return countryCode.toUpperCase().replace(/./g, ch =>
-    String.fromCodePoint(127397 + ch.charCodeAt(0))
-  );
+function flagImg(countryCode) {
+  if (!countryCode) {
+    return '<div style="width:26px;height:19px;border-radius:3px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,0,0,0.2)"></div>';
+  }
+  const cc = countryCode.toLowerCase();
+  return `<img src="https://flagcdn.com/w40/${cc}.png" alt="${escHtml(countryCode.toUpperCase())}"
+            style="width:26px;height:19px;object-fit:cover;border-radius:3px;border:1px solid rgba(255,0,0,0.25);vertical-align:middle"
+            onerror="this.style.visibility='hidden'">`;
 }
 
 async function loadUnauthUsers() {
@@ -1636,7 +1640,7 @@ function renderUnauthUsers() {
 
   const filtered = UNAUTH_USERS.filter(u => {
     if (!q) return true;
-    return [u.ip, u.country, u.region, u.city]
+    return [u.ip, u.country, u.region, u.city, u.fingerprint]
       .some(v => (v || '').toLowerCase().includes(q));
   });
 
@@ -1649,15 +1653,17 @@ function renderUnauthUsers() {
 
   list.innerHTML = filtered.map(u => {
     const locationLine = [u.country, u.region, u.city].filter(Boolean).join(', ') || '—';
+    const fpShort = u.fingerprint ? escHtml(u.fingerprint.slice(0, 14)) + '…' : '—';
 
     return `
       <div class="work-item" style="align-items:flex-start;flex-wrap:wrap">
-        <div style="font-size:22px;line-height:1;width:36px;text-align:center">${flagEmoji(u.country_code)}</div>
+        <div style="width:36px;text-align:center;padding-top:2px">${flagImg(u.country_code)}</div>
         <div class="work-info">
           <div class="work-type">${escHtml(locationLine)}</div>
           <div class="work-file">IP: ${escHtml(u.ip || '—')}</div>
           <div class="work-file">Устройство: ${escHtml(u.device || '—')}</div>
-          <div class="work-file">Вход: ${escHtml(u.last_seen || '—')}</div>
+          <div class="work-file">FP: ${fpShort}</div>
+          <div class="work-file">Визитов: ${escHtml(String(u.visits ?? 1))} · Вход: ${escHtml(u.last_seen || '—')}</div>
         </div>
       </div>
     `;
