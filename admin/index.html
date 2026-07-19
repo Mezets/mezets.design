@@ -345,18 +345,6 @@
       display: flex;
       gap: 8px;
       margin-bottom: 22px;
-      position: relative;
-    }
-    .tab-indicator {
-      position: absolute;
-      bottom: -1px;
-      height: 2px;
-      background: linear-gradient(90deg, rgba(255,0,0,0.9), rgba(255,90,90,0.9));
-      border-radius: 2px;
-      box-shadow: 0 0 10px rgba(255,0,0,0.65);
-      transition: left .35s cubic-bezier(.4,0,.2,1), width .35s cubic-bezier(.4,0,.2,1), opacity .2s;
-      pointer-events: none;
-      opacity: 0;
     }
     .tab {
       flex: 1;
@@ -439,11 +427,6 @@
         <input type="password" id="tokenInput" placeholder="ghp_xxxxxxxxxxxx">
         <button class="btn btn-sm" onclick="showToken()">👁</button>
       </div>
-      <div class="hint" style="margin-top:6px;margin-bottom:18px">
-        Нужен токен GitHub →
-        <a href="https://github.com/settings/tokens/new?scopes=repo&description=mezets-admin" target="_blank" style="color:#ff4444;text-decoration:underline">Создать токен</a>
-        (галочка <b style="color:rgba(255,200,200,0.7)">repo</b> уже выбрана по ссылке)
-      </div>
 
       <label>Репозиторий (owner/repo)</label>
       <input type="text" id="repoInput" placeholder="Mezets/mezets.design" value="Mezets/mezets.design">
@@ -458,9 +441,7 @@
         <input type="password" id="gateAdminKeyInput" placeholder="admin key">
         <button class="btn btn-sm" onclick="showGateAdminKey()">👁</button>
       </div>
-      <div class="hint" style="margin-top:6px;margin-bottom:18px">Не сохраняется — вводить при каждом входе</div>
-
-      <button class="btn" onclick="login()">Войти</button>
+<button class="btn" onclick="login()">Войти</button>
       <div class="status" id="loginStatus"></div>
     </div>
   </div>
@@ -475,7 +456,6 @@
       <button class="tab" onclick="switchTab('rules')">📜 ПРАВИЛА</button>
       <button class="tab" onclick="switchTab('users')">👤 ЮЗЕРЫ</button>
       <button class="tab" onclick="switchTab('maint')">🛠️ ТЕХРАБОТЫ</button>
-      <div class="tab-indicator" id="tabIndicator"></div>
     </div>
 
     <!-- ── ВКЛАДКА: ЗАГРУЗИТЬ ── -->
@@ -504,9 +484,7 @@
 
         <label>Группа (необязательно)</label>
         <input type="text" id="workGroup" placeholder="Оставь пустым, если одиночная работа">
-        <div class="hint">Если введёшь название группы (например «vk_batch_1»), работа объединится в слайдер с другими работами этой группы</div>
-
-        <button class="btn" id="uploadBtn" onclick="uploadWork()">Загрузить работу</button>
+<button class="btn" id="uploadBtn" onclick="uploadWork()">Загрузить работу</button>
 
         <div class="progress-wrap" id="progressWrap">
           <div class="progress-bar-bg"><div class="progress-bar" id="progressBar"></div></div>
@@ -521,8 +499,7 @@
     <div id="tabManage" class="tab-panel">
       <div class="card">
         <div class="card-title">📋 ВСЕ РАБОТЫ <span class="badge" id="worksCount">0</span></div>
-        <div class="counter">Работы из <span>PORTFOLIO_ITEMS</span> в index.html</div>
-        <button class="btn btn-sm" onclick="loadWorks()" style="margin-bottom:16px">🔄 Обновить список</button>
+<button class="btn btn-sm" onclick="cooldownClick(this,'works',loadWorks)" style="margin-bottom:16px">🔄 Обновить список</button>
         <div id="worksList" class="works-list">
           <div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div>
         </div>
@@ -533,8 +510,7 @@
     <div id="tabPrices" class="tab-panel">
       <div class="card">
         <div class="card-title">РЕДАКТОР ЦЕН</div>
-        <div class="counter">Редактирует <span>prices/index.html</span></div>
-        <button class="btn btn-sm" onclick="loadPrices()" style="margin-bottom:16px">Загрузить актуальные цены</button>
+<button class="btn btn-sm" onclick="cooldownClick(this,'prices',loadPrices)" style="margin-bottom:16px">Загрузить актуальные цены</button>
         <div id="pricesSections"></div>
 
         <div style="height:1px;background:rgba(255,0,0,0.1);margin:20px 0"></div>
@@ -570,8 +546,7 @@
     <div id="tabRules" class="tab-panel">
       <div class="card">
         <div class="card-title">РЕДАКТОР ПРАВИЛ</div>
-        <div class="counter">Редактирует <span>rules/index.html</span></div>
-        <button class="btn btn-sm" onclick="loadRules()" style="margin-bottom:16px">Загрузить актуальные правила</button>
+<button class="btn btn-sm" onclick="cooldownClick(this,'rules',loadRules)" style="margin-bottom:16px">Загрузить актуальные правила</button>
 
         <div id="rulesList"></div>
 
@@ -614,23 +589,17 @@
       <!-- ── ГЕЙТ: сначала ключи, потом окна ── -->
       <div class="card" id="usersGate" style="max-width:400px;margin-left:auto;margin-right:auto">
         <div class="card-title">🔒 ДОСТУП К ЮЗЕРАМ</div>
-        <div class="counter">Введи ключи, чтобы открыть списки пользователей</div>
-
-        <label>API-ключ бэкенда (ADMIN_TEST_KEY)</label>
+<label>API-ключ бэкенда (ADMIN_TEST_KEY)</label>
         <div class="token-row">
           <input type="password" id="apiKeyInput" placeholder="admin key" onkeydown="if(event.key==='Enter')enterUsersGate()">
           <button class="btn btn-sm" onclick="showApiKey()">👁</button>
         </div>
-        <div class="hint" style="margin-top:6px">Тот же ключ, что задан в переменной ADMIN_TEST_KEY на бэкенде (Railway)</div>
-
-        <label>Мастер-ключ для бана (не сохраняется, вводить каждый раз)</label>
+<label>Мастер-ключ для бана (не сохраняется, вводить каждый раз)</label>
         <div class="token-row">
           <input type="password" id="masterKeyInput" placeholder="master key" onkeydown="if(event.key==='Enter')enterUsersGate()">
           <button class="btn btn-sm" onclick="showMasterKey()">👁</button>
         </div>
-        <div class="hint" style="margin-top:6px;margin-bottom:18px">MASTER_BAN_KEY на бэкенде. Нужен для бана/разбана/стоп-листа — нигде не хранится, обнуляется при перезагрузке страницы.</div>
-
-        <button class="btn" onclick="enterUsersGate()">Войти</button>
+<button class="btn" onclick="enterUsersGate()">Войти</button>
         <div class="status" id="usersGateStatus"></div>
       </div>
 
@@ -638,11 +607,9 @@
       <div class="users-grid" id="usersGridWrap" style="display:none">
       <div class="card">
         <div class="card-title">👤 АВТОРИЗОВАННЫЕ <span class="badge" id="usersCount">0</span></div>
-        <div class="counter">IP · Fingerprint (псевдо-HWID) · Discord ID · ник · аватар</div>
+<input type="text" id="usersSearch" placeholder="Поиск: ник / Discord ID / IP / fingerprint" oninput="renderUsers()">
 
-        <input type="text" id="usersSearch" placeholder="Поиск: ник / Discord ID / IP / fingerprint" oninput="renderUsers()">
-
-        <button class="btn btn-sm" onclick="loadUsers()" style="margin-bottom:16px">🔄 Обновить список</button>
+        <button class="btn btn-sm" onclick="cooldownClick(this,'users',loadUsers)" style="margin-bottom:16px">🔄 Обновить список</button>
 
         <div id="usersList" class="works-list">
           <div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div>
@@ -652,11 +619,9 @@
 
       <div class="card">
         <div class="card-title">🌐 НЕАВТОРИЗОВАННЫЕ <span class="badge" id="unauthCount">0</span></div>
-        <div class="counter">Гости сайта без входа через Discord — IP · геолокация · устройство · время визита</div>
+<input type="text" id="unauthSearch" placeholder="Поиск: IP / страна / город" oninput="renderUnauthUsers()">
 
-        <input type="text" id="unauthSearch" placeholder="Поиск: IP / страна / город" oninput="renderUnauthUsers()">
-
-        <button class="btn btn-sm" onclick="loadUnauthUsers()" style="margin-bottom:16px">🔄 Обновить список</button>
+        <button class="btn btn-sm" onclick="cooldownClick(this,'unauth',loadUnauthUsers)" style="margin-bottom:16px">🔄 Обновить список</button>
 
         <div id="unauthList" class="works-list">
           <div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div>
@@ -666,9 +631,7 @@
 
       <div class="card">
         <div class="card-title">🎯 СТОП-ЛИСТ (авто-бан по ID) <span class="badge" id="watchlistCount">0</span></div>
-        <div class="counter">Впиши Discord ID заранее — как только он авторизуется на сайте, он забанится автоматически, а его данные (IP, ник, аватар, fingerprint) сохранятся</div>
-
-        <label>Discord ID</label>
+<label>Discord ID</label>
         <input type="text" id="watchDiscordId" placeholder="например 582219322236338205">
         <label>Причина</label>
         <input type="text" id="watchReason" placeholder="Причина (необязательно)">
@@ -676,7 +639,7 @@
 
         <div style="height:1px;background:rgba(255,0,0,0.1);margin:18px 0"></div>
 
-        <button class="btn btn-sm" onclick="loadWatchlist()" style="margin-bottom:16px">🔄 Обновить стоп-лист</button>
+        <button class="btn btn-sm" onclick="cooldownClick(this,'watchlist',loadWatchlist)" style="margin-bottom:16px">🔄 Обновить стоп-лист</button>
         <div id="watchlistList" class="works-list">
           <div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Список пуст или не загружен</div>
         </div>
@@ -697,9 +660,7 @@
     <div id="tabMaint" class="tab-panel">
       <div class="card">
         <div class="card-title">🛠️ ТОСТ ТЕХ. НЕПОЛАДОК <span class="badge" id="maintOnBadge">—</span></div>
-        <div class="counter">Управляет всплывающим тостом на главной странице сайта</div>
-
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:18px">
+<label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:18px">
           <input type="checkbox" id="maintOnChk" style="width:auto;margin:0;accent-color:#ff2a2a">
           <span>Показывать тост техработ на сайте</span>
         </label>
@@ -721,7 +682,7 @@
           <div class="rich-editor" id="maintMsgEditor" contenteditable="true" placeholder="Текст тоста..."></div>
         </div>
 
-        <button class="btn btn-sm" onclick="loadMaintenance()" style="margin-bottom:16px">🔄 Загрузить текущий текст</button>
+        <button class="btn btn-sm" onclick="cooldownClick(this,'maint',loadMaintenance)" style="margin-bottom:16px">🔄 Загрузить текущий текст</button>
 
         <div style="height:1px;background:rgba(255,0,0,0.1);margin-bottom:20px"></div>
 
@@ -751,6 +712,31 @@ let TOKEN = '', REPO = '', BRANCH = '';
 /* ── КОНФИГ БЭКЕНДА (бан/юзеры) ── */
 const BOT_API = 'https://mez.up.railway.app';
 let apiKey = '';
+
+/* ── КУЛДАУН НА КНОПКИ ОБНОВЛЕНИЯ (не чаще раза в 10 сек) ── */
+const _cooldowns = {};
+function cooldownClick(btn, key, fn) {
+  const now = Date.now();
+  const last = _cooldowns[key] || 0;
+  if (now - last < 10000) return; // кнопка и так задизейблена, но на всякий случай
+  _cooldowns[key] = now;
+  fn();
+
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  let remain = 10;
+  btn.textContent = `⏳ ${remain}с`;
+  const interval = setInterval(() => {
+    remain--;
+    if (remain <= 0) {
+      clearInterval(interval);
+      btn.disabled = false;
+      btn.textContent = originalText;
+    } else {
+      btn.textContent = `⏳ ${remain}с`;
+    }
+  }, 1000);
+}
 let USERS = [];
 
 /* ── ЧАСТИЦЫ ── */
@@ -859,38 +845,12 @@ function switchTab(tab) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
   document.querySelector('.wrap').classList.toggle('wrap-wide', tab === 'users');
-  moveTabIndicator();
-  // .wrap меняет ширину анимированно (transition max-width .35s) — кнопки вкладок
-  // физически сдвигаются уже ПОСЛЕ этого клика, поэтому пересчитываем индикатор
-  // ещё раз, когда переход ширины реально завершится (плюс подстраховка по таймеру).
-  setTimeout(moveTabIndicator, 380);
   if (tab === 'manage') loadWorks();
   if (tab === 'prices') loadPrices();
   if (tab === 'rules') loadRules();
   if (tab === 'users' && apiKey) { loadUsers(); loadUnauthUsers(); loadWatchlist(); }
   if (tab === 'maint' && apiKey) loadMaintenance();
 }
-
-function moveTabIndicator() {
-  const bar = document.getElementById('tabsBar');
-  const indicator = document.getElementById('tabIndicator');
-  const active = bar.querySelector('.tab.active');
-  if (!bar || !indicator || !active) return;
-  indicator.style.opacity = '1';
-  indicator.style.left  = active.offsetLeft + 'px';
-  indicator.style.width = active.offsetWidth + 'px';
-}
-window.addEventListener('resize', moveTabIndicator);
-window.addEventListener('DOMContentLoaded', moveTabIndicator);
-// на случай если скрипт выполняется уже после DOMContentLoaded
-setTimeout(moveTabIndicator, 0);
-// доп. пересчёт по факту завершения анимации ширины .wrap (надёжнее, чем только таймер)
-document.addEventListener('DOMContentLoaded', () => {
-  const wrapEl = document.querySelector('.wrap');
-  if (wrapEl) wrapEl.addEventListener('transitionend', (e) => {
-    if (e.propertyName === 'max-width') moveTabIndicator();
-  });
-});
 
 /* ── ВХОД ── */
 async function login() {
@@ -928,7 +888,6 @@ async function login() {
 
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('mainScreen').style.display = 'block';
-    moveTabIndicator();
     showStatus(status, '', '');
   } catch(e) {
     showStatus(status, e.message, 'err');
