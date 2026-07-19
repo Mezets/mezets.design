@@ -4,36 +4,102 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Правила оформления — Mezets | Discord, VK, YouTube для RP-серверов</title>
-  <meta name="description" content="Правила заказа оформления Discord-серверов, ВК, YouTube, Twitch и ботов от Mezets. Предоплата, сроки, правки. Работаю с Province RP, GPA 5 RP, Majestik, Arizona RP.">
+  <title>Mezets — оформление Discord, VK, YouTube, Twitch для RP-серверов | Province RP, GPA 5 RP, Majestik, Arizona</title>
+  <meta name="description" content="Mezets — оформление Discord-серверов, групп ВК, превью YouTube, Twitch и форумных аккаунтов. Работаю с игроками Province RP, GPA 5 RP, Majestik, Arizona. Также делаю ботов для Discord, Telegram и VK. Быстро, качественно, под ключ.">
+  <meta name="keywords" content="оформление discord, оформление вк, youtube оформление, province rp оформление, gpa 5 rp, majestik оформление, arizona rp, дискорд сервер, бот discord, бот telegram, бот vk, оформление группы вк, twitch оформление, оформление форума, форумный аккаунт">
+  <meta name="author" content="Mezets">
   <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://mezets.github.io/mezets.design/rules/">
+  <link rel="canonical" href="https://mezets.github.io/mezets.design/">
 
+  <!-- Open Graph -->
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://mezets.github.io/mezets.design/rules/">
-  <meta property="og:title" content="Правила оформления — Mezets">
-  <meta property="og:description" content="Правила заказа оформления Discord, ВК, YouTube, Twitch и ботов для RP-серверов.">
+  <meta property="og:url" content="https://mezets.github.io/mezets.design/">
+  <meta property="og:title" content="Mezets — оформление Discord, VK, YouTube, Twitch для RP-серверов">
+  <meta property="og:description" content="Оформление Discord, ВК, YouTube, Twitch и форумных аккаунтов для RP-проектов: Province RP, GPA 5 RP, Majestik, Arizona. Делаю ботов для Discord, Telegram, VK.">
   <meta property="og:image" content="https://mezets.github.io/mezets.design/avatar_server.png">
   <meta property="og:locale" content="ru_RU">
   <meta property="og:site_name" content="Mezets">
 
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Правила оформления — Mezets">
-  <meta name="twitter:description" content="Правила заказа оформления Discord, ВК, YouTube, Twitch и ботов.">
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Mezets — оформление Discord, VK, YouTube, Twitch для RP-серверов">
+  <meta name="twitter:description" content="Оформление Discord, ВК, YouTube, Twitch и форумных аккаунтов для RP-проектов: Province RP, GPA 5 RP, Majestik, Arizona. Делаю ботов для Discord, Telegram, VK.">
+  <meta name="twitter:image" content="https://mezets.github.io/mezets.design/avatar_server.png">
 
   <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="shortcut icon" href="/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <!-- Schema.org: структурированные данные для поисковиков -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "serviceType": "Оформление Discord, VK, YouTube, Twitch, форумов и разработка ботов",
+    "provider": {
+      "@type": "Person",
+      "name": "Mezets",
+      "url": "https://mezets.github.io/mezets.design/",
+      "sameAs": [
+        "https://discord.gg/aBJBmzS49e"
+      ]
+    },
+    "areaServed": "RU",
+    "audience": {
+      "@type": "Audience",
+      "audienceType": "RP-сервера: Province RP, GPA 5 RP, Majestik, Arizona RP"
+    },
+    "description": "Оформление Discord-серверов, групп ВК, превью YouTube, оформление Twitch и форумных аккаунтов/разделов, а также создание ботов для Discord, Telegram и VK для RP-проектов.",
+    "offers": {
+      "@type": "Offer",
+      "priceCurrency": "RUB",
+      "url": "https://mezets.github.io/mezets.design/prices/"
+    }
+  }
+  </script>
+
   <style>
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
+    /* ── ПЕРЕМЕННЫЕ ТЕМЫ ── Тёмная тема (по умолчанию) не меняется вообще. В светлой теме переопределяются только "чёрные" фоны на белые. */
+    :root {
+      --bg-page: #050000;
+      --bg-scroll: rgba(10,0,0,0.6);
+      --bg-overlay-8: rgba(0,0,0,0.8);
+      --bg-panel-95: rgba(10,0,0,0.95);
+      --bg-panel-92: rgba(10,0,0,0.92);
+      --bg-circle-5: rgba(0,0,0,0.5);
+      --bg-circle-55: rgba(0,0,0,0.55);
+      --bg-fs-overlay: rgba(0,0,0,0.93);
+      --bg-koleso-btn: rgba(10,0,0,0.6);
+      --bg-roulette-overlay: rgba(0,0,0,0.75);
+      --fg-onblack: #fff;
+    }
+    body.light-theme {
+      --bg-page: #ffffff;
+      --bg-scroll: rgba(255,255,255,0.6);
+      --bg-overlay-8: rgba(255,255,255,0.8);
+      --bg-panel-95: rgba(255,255,255,0.95);
+      --bg-panel-92: rgba(255,255,255,0.92);
+      --bg-circle-5: rgba(255,255,255,0.5);
+      --bg-circle-55: rgba(255,255,255,0.55);
+      --bg-fs-overlay: rgba(255,255,255,0.93);
+      --bg-koleso-btn: rgba(255,255,255,0.6);
+      --bg-roulette-overlay: rgba(255,255,255,0.75);
+      --fg-onblack: #111;
+    }
+
     /* ── КАСТОМНЫЙ СКРОЛЛБАР ── */
-    html { scrollbar-width: thin; scrollbar-color: rgba(255,0,0,0.45) rgba(10,0,0,0.6); }
+    html { scrollbar-width: thin; scrollbar-color: rgba(255,0,0,0.45) var(--bg-scroll); }
     ::-webkit-scrollbar { width: 10px; }
-    ::-webkit-scrollbar-track { background: rgba(10,0,0,0.6); }
+    ::-webkit-scrollbar-track { background: var(--bg-scroll); }
     ::-webkit-scrollbar-thumb {
       background: rgba(255,0,0,0.45);
       border-radius: 6px;
-      border: 2px solid rgba(10,0,0,0.6);
+      border: 2px solid var(--bg-scroll);
       box-shadow: 0 0 6px rgba(255,0,0,0.3);
     }
     ::-webkit-scrollbar-thumb:hover {
@@ -46,33 +112,43 @@
       background: var(--bg-page);
       min-height: 100vh;
       overflow-x: hidden;
-      color: var(--fg-onblack);
-      transition: background .3s, color .3s;
+      transition: background .3s;
     }
 
-    /* ── ПЕРЕМЕННЫЕ ТЕМЫ ── */
-    :root {
-      --bg-page: #050000;
-      --bg-panel-95: rgba(10,0,0,0.95);
-      --fg-onblack: #fff;
-    }
-    body.light-theme {
-      --bg-page: #ffffff;
-      --bg-panel-95: rgba(255,255,255,0.95);
-      --fg-onblack: #111;
-    }
-
-    *, *::before, *::after {
+    /* ── ПЛАВНАЯ СМЕНА ТЕМЫ ── Раньше transition вешался на ВСЕ элементы страницы (*), включая иконки, точки конфетти, шарики и т.д. — это лишняя нагрузка на пересчёт стилей при каждом кадре анимации. Теперь transition только на контейнерах и тексте, у которых реально меняется цвет при переключении темы. */
+    body, .card, .stats-body, .reviews-card, .reviews-list,
+    .theme-switch, .theme-switch-btn, .koleso-btn,
+    .name, .age-badge, .label, .seo-text, .seo-text h2, .seo-text strong,
+    .portfolio-card-type, .portfolio-card-time, .portfolio-modal-time,
+    .review-item, .review-comment, .review-date, .review-order,
+    .roulette-winners-title, .roulette-winners-empty, .roulette-winner-meta,
+    .roulette-winner-name, .chance-item, .login-hint, .logged-as,
+    .winner-item, .roulette-winner-item {
       transition: background-color .3s ease, border-color .3s ease, color .3s ease, box-shadow .3s ease;
     }
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { transition: none !important; }
+      body, .card, .stats-body, .reviews-card, .reviews-list,
+      .theme-switch, .theme-switch-btn, .koleso-btn,
+      .name, .age-badge, .label, .seo-text, .seo-text h2, .seo-text strong,
+      .portfolio-card-type, .portfolio-card-time, .portfolio-modal-time,
+      .review-item, .review-comment, .review-date, .review-order,
+      .roulette-winners-title, .roulette-winners-empty, .roulette-winner-meta,
+      .roulette-winner-name, .chance-item, .login-hint, .logged-as,
+      .winner-item, .roulette-winner-item { transition: none !important; }
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
     }
 
     canvas { position: fixed; inset: 0; z-index: 0; }
 
     .fluff-wrap { position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
-    .fluff { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.22; }
+    .fluff { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.25; }
     .fluff-1 {
       width: 700px; height: 700px;
       background: radial-gradient(circle, rgba(255,0,0,0.9), rgba(180,0,0,0.3), transparent 70%);
@@ -82,7 +158,7 @@
       width: 400px; height: 400px;
       background: radial-gradient(circle, rgba(255,60,0,0.8), rgba(200,0,0,0.2), transparent 70%);
       animation: moveFluff2 12s ease-in-out infinite;
-      opacity: 0.15;
+      opacity: 0.18;
     }
     @keyframes moveFluff1 {
       0%   { transform: translate(5vw,  10vh); }
@@ -98,33 +174,567 @@
       100% { transform: translate(70vw, 70vh); }
     }
 
-    .page {
-      position: relative;
-      z-index: 2;
-      max-width: 1250px;
-      margin: 0 auto;
-      padding: 32px 36px 24px;
+    /* ── ШАРИКИ НА ДР ── */
+    .balloons-wrap {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .balloon {
+      position: absolute;
+      bottom: -260px;
+      width: 70px;
+      height: 88px;
+      border-radius: 50% 50% 48% 48% / 58% 58% 42% 42%;
+      opacity: 0.9;
+      animation: balloonFloat linear infinite;
+      box-shadow: inset -10px -12px 20px rgba(0,0,0,0.25), inset 8px 10px 16px rgba(255,255,255,0.18), 0 0 22px rgba(255,0,0,0.25);
+    }
+    .balloon::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      bottom: -3px;
+      width: 0; height: 0;
+      transform: translateX(-50%);
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 9px solid rgba(120,0,0,0.9);
+    }
+    .balloon::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 100%;
+      width: 1px;
+      height: 90px;
+      background: rgba(255,80,80,0.35);
+      transform: translateX(-50%);
+    }
+    .balloon-red    { background: radial-gradient(circle at 32% 28%, #ff5c5c, #d40000 70%, #8c0000); }
+    .balloon-white  { background: radial-gradient(circle at 32% 28%, #ffffff, #f2f2f2 60%, #cfcfcf); box-shadow: inset -10px -12px 20px rgba(0,0,0,0.12), inset 8px 10px 16px rgba(255,255,255,0.5), 0 0 22px rgba(255,0,0,0.15); }
+    .balloon-stripe {
+      background:
+        repeating-linear-gradient(115deg, #ff2b2b 0 14px, #ffffff 14px 28px);
+      box-shadow: inset -10px -12px 20px rgba(0,0,0,0.2), inset 8px 10px 16px rgba(255,255,255,0.35), 0 0 22px rgba(255,0,0,0.2);
     }
 
-    .home-arrow {
-      position: fixed; top: 18px; left: 18px; z-index: 9999;
-      width: 42px; height: 42px;
-      display: flex; align-items: center; justify-content: center;
-      border-radius: 12px;
-      background: rgba(255,0,0,0.08); border: 1px solid rgba(255,0,0,0.25);
-      color: #ff2a2a; text-decoration: none;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 0 18px rgba(255,0,0,0.15);
-      transition: 0.2s ease;
+    .balloon-l1 { left: 0.5%; width: 60px; height: 76px; animation-duration: 15s; animation-delay: -2s;  }
+    .balloon-l2 { left: 4.5%; width: 78px; height: 98px; animation-duration: 19s; animation-delay: -9s;  }
+    .balloon-l3 { left: 0%;   width: 52px; height: 66px; animation-duration: 13s; animation-delay: -5s;  }
+    .balloon-l4 { left: 8.5%; width: 46px; height: 58px; animation-duration: 16s; animation-delay: -12s; }
+    .balloon-l5 { left: 2.5%; width: 66px; height: 84px; animation-duration: 22s; animation-delay: -1s;  }
+    .balloon-l6 { left: 6.5%; width: 40px; height: 52px; animation-duration: 12s; animation-delay: -7.5s;}
+    .balloon-l7 { left: 10.5%;width: 56px; height: 70px; animation-duration: 20s; animation-delay: -15s; }
+    .balloon-l8 { left: 3.5%; width: 34px; height: 44px; animation-duration: 10s; animation-delay: -3.5s; }
+    .balloon-l9 { left: 12%;  width: 64px; height: 80px; animation-duration: 24s; animation-delay: -18s; }
+
+    .balloon-r1 { right: 0.5%; width: 62px; height: 78px; animation-duration: 17s; animation-delay: -4s;  }
+    .balloon-r2 { right: 5%;   width: 80px; height: 100px;animation-duration: 21s; animation-delay: -11s; }
+    .balloon-r3 { right: 0%;   width: 50px; height: 64px; animation-duration: 14s; animation-delay: -7s;  }
+    .balloon-r4 { right: 9%;   width: 44px; height: 56px; animation-duration: 18s; animation-delay: -3s;  }
+    .balloon-r5 { right: 2.5%; width: 68px; height: 86px; animation-duration: 23s; animation-delay: -14s; }
+    .balloon-r6 { right: 7%;   width: 38px; height: 50px; animation-duration: 11s; animation-delay: -6s;  }
+    .balloon-r7 { right: 10.5%;width: 58px; height: 72px; animation-duration: 19s; animation-delay: -16s; }
+    .balloon-r8 { right: 3.5%; width: 36px; height: 46px; animation-duration: 10.5s; animation-delay: -2.5s;}
+    .balloon-r9 { right: 12%;  width: 62px; height: 78px; animation-duration: 25s; animation-delay: -19s; }
+
+    @keyframes balloonFloat {
+      0%   { transform: translateY(0) translateX(0) rotate(-3deg); }
+      25%  { transform: translateY(-28vh) translateX(12px) rotate(3deg); }
+      50%  { transform: translateY(-56vh) translateX(-10px) rotate(-4deg); }
+      75%  { transform: translateY(-84vh) translateX(10px) rotate(3deg); }
+      100% { transform: translateY(-115vh) translateX(0) rotate(-3deg); }
     }
-    .home-arrow svg { width: 18px; height: 18px; display: block; }
-    .home-arrow:hover { transform: scale(1.1) translateX(-2px); border-color: rgba(255,0,0,0.5); box-shadow: 0 0 26px rgba(255,0,0,0.3); }
+    @media (prefers-reduced-motion: reduce) {
+      .balloon { animation: none; display: none; }
+    }
+    @media (max-width: 700px) {
+      .balloon-l2, .balloon-r2, .balloon-l5, .balloon-r5,
+      .balloon-l7, .balloon-r7, .balloon-l9, .balloon-r9 { display: none; }
+    }
+
+    /* ── САЛЮТЫ ── */
+    #fireworks {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .main {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: stretch;
+      gap: 40px;
+      z-index: 2;
+      padding: 60px 20px;
+      perspective: 1200px;
+    }
+
+    .card {
+      width: 340px;
+      padding: 30px 26px;
+      border-radius: 22px;
+      background: rgba(255,0,0,0.05);
+      border: 1px solid rgba(255,0,0,0.2);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 0 40px rgba(255,0,0,0.12);
+      transition: border-color .25s, box-shadow .25s, transform .1s ease-out;
+      transform-style: preserve-3d;
+      will-change: transform;
+      cursor: default;
+      display: flex;
+      flex-direction: column;
+    }
+    .card:hover { border-color: rgba(255,0,0,0.4); box-shadow: 0 0 56px rgba(255,0,0,0.2); }
+
+    .avatar-wrap { position: relative; width: 115px; margin: 0 auto 12px; }
+    .avatar { width: 115px; height: 115px; border-radius: 50%; object-fit: cover; display: block; border: 2px solid rgba(255,0,0,0.35); }
+
+    /* ── ПРАЗДНИЧНЫЙ КОЛПАК НА АВАТАРКЕ ── */
+    .party-hat {
+      position: absolute;
+      top: -36px;
+      left: 50%;
+      width: 66px;
+      height: 80px;
+      transform: translateX(-58%) rotate(-16deg);
+      transform-origin: bottom center;
+      z-index: 2;
+      filter: drop-shadow(0 3px 6px rgba(0,0,0,0.4)) drop-shadow(0 0 22px rgba(255,0,0,0.25));
+      pointer-events: none;
+      animation: hatWiggle 3.2s ease-in-out infinite;
+    }
+    @keyframes hatWiggle {
+      0%, 100% { transform: translateX(-58%) rotate(-16deg); }
+      50%      { transform: translateX(-58%) rotate(-12deg); }
+    }
+
+    .name-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 22px;
+    }
+
+    .name { text-align: center; font-size: 15px; line-height: 1.6; color: #ff2a2a; letter-spacing: 1px; text-shadow: 0 0 12px rgba(255,40,40,0.7), 0 0 28px rgba(255,0,0,0.35); }
+
+    .age-badge {
+      font-size: 9px;
+      line-height: 1;
+      color: #fff;
+      letter-spacing: 0.5px;
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 9px;
+      border-radius: 20px;
+      background: rgba(255,0,0,0.12);
+      border: 1px solid rgba(255,0,0,0.35);
+      box-shadow: 0 0 14px rgba(255,0,0,0.25);
+      white-space: nowrap;
+    }
+
+    .btn {
+      display: flex; align-items: center; justify-content: center;
+      padding: 16px 12px; margin: 10px 0; text-align: center; text-decoration: none;
+      font-family: 'Press Start 2P', monospace; font-size: 11px; line-height: 1.6;
+      color: #ff3b3b; border-radius: 12px;
+      background: rgba(255,0,0,0.05); border: 1px solid rgba(255,0,0,0.25);
+      box-shadow: 0 0 18px rgba(255,0,0,0.1);
+      transition: .2s; position: relative; overflow: hidden;
+    }
+    .btn::before {
+      content: ""; position: absolute; top: 0; left: -120%; width: 120%; height: 100%;
+      background: linear-gradient(120deg, transparent, rgba(255,0,0,0.35), transparent);
+      transition: .5s;
+    }
+    .btn:hover::before { left: 120%; }
+    .btn:hover { transform: scale(1.04); border-color: rgba(255,0,0,0.5); box-shadow: 0 0 36px rgba(255,0,0,0.28); }
+
+    .discord-order-btn {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 16px 12px; margin-top: 16px; text-align: center; text-decoration: none;
+      font-family: 'Press Start 2P', monospace; font-size: 11px; line-height: 1.6;
+      color: #fff; border-radius: 12px;
+      background: #5865F2; border: 1px solid #5865F2;
+      transition: .2s; position: relative; overflow: hidden;
+    }
+    .discord-order-btn:hover { transform: scale(1.03); box-shadow: 0 0 24px rgba(88,101,242,0.5); }
+    .discord-order-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+    .stats { text-align: center; display: flex; flex-direction: column; flex: 1; }
+    .stats-body { flex: 1; }
+    .stat-block { margin: 18px 0; }
+    .big {
+      font-size: 17px; line-height: 1.6; color: var(--fg-onblack); font-variant-numeric: tabular-nums;
+      text-shadow: 0 0 10px rgba(255,255,255,0.45), 0 0 22px rgba(255,0,0,0.25);
+      animation: beacon 4.5s ease-in-out infinite;
+    }
+    .big.online-value {
+      display: flex; align-items: center; justify-content: center; gap: 10px; color: #ff3b3b;
+      text-shadow: 0 0 10px rgba(255,40,40,0.7), 0 0 24px rgba(255,0,0,0.4);
+      animation: beacon-red 4.5s ease-in-out infinite;
+    }
+    @keyframes beacon {
+      0%, 100% { text-shadow: 0 0 10px rgba(255,255,255,0.45), 0 0 22px rgba(255,0,0,0.25); }
+      50%      { text-shadow: 0 0 18px rgba(255,255,255,0.85), 0 0 40px rgba(255,0,0,0.6); }
+    }
+    @keyframes beacon-red {
+      0%, 100% { text-shadow: 0 0 10px rgba(255,40,40,0.7), 0 0 24px rgba(255,0,0,0.4); }
+      50%      { text-shadow: 0 0 18px rgba(255,80,80,1), 0 0 44px rgba(255,0,0,0.75); }
+    }
+    .live-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: #ff2a2a; box-shadow: 0 0 8px rgba(255,0,0,0.9);
+      animation: pulse 1.8s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.45;transform:scale(.85)} }
+    .label { font-size: 8px; line-height: 1.6; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,200,200,0.75); margin: 10px 0; display: flex; align-items: center; justify-content: center; text-shadow: 0 0 8px rgba(255,0,0,0.25); }
+    .stars { display: flex; justify-content: center; gap: 6px; margin: 10px 0; }
+    .star { font-size: 22px; color: rgba(255,255,255,0.2); transition: color .3s, text-shadow .3s; }
+    .star.full { color: #ff2a2a; text-shadow: 0 0 10px rgba(255,40,40,0.9), 0 0 24px rgba(255,0,0,0.6); }
+
+    /* ========================= ПОРТФОЛИО ========================= */
+    .portfolio-section {
+      position: relative;
+      z-index: 2;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 10px 24px 30px;
+      perspective: 1000px;
+    }
+    .portfolio-title {
+      font-size: 13px;
+      color: #ff3b3b;
+      letter-spacing: 1px;
+      text-align: center;
+      margin-bottom: 18px;
+      text-shadow: 0 0 12px rgba(255,40,40,0.6), 0 0 26px rgba(255,0,0,0.3);
+      animation: beacon-red 4.5s ease-in-out infinite;
+    }
+    .portfolio-track-wrap {
+      overflow: hidden;
+      width: 100%;
+      cursor: grab;
+      touch-action: pan-y;
+      padding: 10px 0;
+      border-radius: 16px;
+      box-shadow: 0 0 32px rgba(255,0,0,0.1);
+      mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+    }
+    .portfolio-track-wrap.dragging { cursor: grabbing; }
+    .portfolio-track {
+      display: flex;
+      gap: 14px;
+      will-change: transform;
+    }
+    .portfolio-card {
+      flex-shrink: 0;
+      width: 240px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(255,0,0,0.22);
+      background: rgba(255,0,0,0.04);
+      box-shadow: 0 0 22px rgba(255,0,0,0.1);
+      cursor: pointer;
+      transition: border-color .2s, box-shadow .2s, transform .1s ease-out;
+      user-select: none;
+      -webkit-user-select: none;
+      position: relative;
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+    .portfolio-card:hover {
+      border-color: rgba(255,0,0,0.45);
+      box-shadow: 0 0 40px rgba(255,0,0,0.22);
+    }
+    .portfolio-card img,
+    .portfolio-card video {
+      width: 100%;
+      height: 170px;
+      object-fit: cover;
+      display: block;
+      pointer-events: none;
+      background: #000;
+    }
+    .portfolio-card-info {
+      padding: 9px 10px;
+    }
+    .portfolio-card-type {
+      font-size: 8px;
+      color: rgba(255,225,225,0.9);
+      line-height: 1.6;
+      letter-spacing: .3px;
+    }
+    .portfolio-card-time {
+      font-size: 7px;
+      color: rgba(255,150,150,0.55);
+      margin-top: 4px;
+      letter-spacing: .3px;
+    }
+    .portfolio-card-badge {
+      position: absolute;
+      top: 8px; right: 8px;
+      background: rgba(8,0,0,0.85);
+      border: 1px solid rgba(255,0,0,0.4);
+      color: #ff9b9b;
+      font-size: 7px;
+      letter-spacing: .5px;
+      padding: 4px 7px;
+      border-radius: 8px;
+      pointer-events: none;
+      box-shadow: 0 0 10px rgba(255,0,0,0.25);
+    }
+    @media (max-width: 600px) {
+      .portfolio-section { padding: 6px 12px 24px; }
+      .portfolio-card { width: 175px; }
+      .portfolio-card img,
+      .portfolio-card video { height: 125px; }
+    }
+
+    /* ── ОКНО ПРОСМОТРА РАБОТЫ ── */
+    .portfolio-modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-overlay-8);
+      backdrop-filter: blur(8px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .3s;
+      padding: 20px;
+      perspective: 1200px;
+    }
+    .portfolio-modal-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .portfolio-modal {
+      position: relative;
+      max-width: 720px;
+      max-height: 90vh;
+      width: 100%;
+      border-radius: 18px;
+      background: var(--bg-panel-95);
+      border: 1px solid rgba(255,0,0,0.3);
+      box-shadow: 0 0 60px rgba(255,0,0,0.22);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transform-style: preserve-3d;
+      will-change: transform;
+      transition: border-color .25s, box-shadow .25s, transform .1s ease-out;
+    }
+    .portfolio-modal-close {
+      position: absolute;
+      top: 12px; right: 14px;
+      width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      color: var(--fg-onblack);
+      background: var(--bg-circle-5);
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 3;
+      transition: background .2s;
+    }
+    .portfolio-modal-close:hover { background: rgba(255,0,0,0.6); }
+    .portfolio-modal-media-wrap { position: relative; }
+    .portfolio-modal-img,
+    .portfolio-modal-vid {
+      width: 100%;
+      max-height: 72vh;
+      object-fit: contain;
+      display: block;
+      background: #000;
+    }
+    .portfolio-modal-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      color: var(--fg-onblack);
+      background: var(--bg-circle-5);
+      border: 1px solid rgba(255,0,0,0.35);
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 3;
+      user-select: none;
+      transition: background .2s;
+    }
+    .portfolio-modal-arrow:hover { background: rgba(255,0,0,0.6); }
+    .portfolio-modal-arrow.left { left: 12px; }
+    .portfolio-modal-arrow.right { right: 12px; }
+    .portfolio-modal-dots {
+      display: flex; justify-content: center; gap: 6px;
+      padding-top: 12px;
+    }
+    .portfolio-modal-dots span {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: rgba(255,0,0,0.25);
+      cursor: pointer;
+      transition: background .2s, transform .2s;
+    }
+    .portfolio-modal-dots span.active {
+      background: #ff3b3b;
+      transform: scale(1.3);
+      box-shadow: 0 0 8px rgba(255,0,0,0.6);
+    }
+    .portfolio-modal-info {
+      padding: 16px 20px;
+      text-align: center;
+    }
+    .portfolio-modal-type {
+      font-size: 11px;
+      color: #ff5555;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+      line-height: 1.6;
+    }
+    .portfolio-modal-time {
+      font-size: 9px;
+      color: rgba(255,200,200,0.6);
+      letter-spacing: .5px;
+      line-height: 1.6;
+    }
+
+    /* ── КНОПКА "ОТКРЫТЬ НА ВЕСЬ ЭКРАН" НА ФОТО В МОДАЛКЕ ── */
+    .portfolio-modal-zoom-btn {
+      position: absolute;
+      bottom: 12px; right: 12px;
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--bg-circle-55);
+      border: 1px solid rgba(255,0,0,0.4);
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 4;
+      color: #ff5555;
+      transition: transform .25s cubic-bezier(.3,1.4,.4,1), box-shadow .2s, background .2s;
+      box-shadow: 0 0 14px rgba(255,0,0,0.15);
+    }
+    .portfolio-modal-zoom-btn:hover {
+      transform: scale(1.12) rotate(6deg);
+      background: rgba(255,0,0,0.35);
+      box-shadow: 0 0 24px rgba(255,0,0,0.45);
+    }
+    .portfolio-modal-zoom-btn svg { width: 18px; height: 18px; }
+
+    /* ── ПОЛНОЭКРАННЫЙ ПРОСМОТР ФОТО ── */
+    .portfolio-fs-overlay {
+      position: fixed; inset: 0; z-index: 500;
+      background: var(--bg-fs-overlay);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .4s ease;
+    }
+    .portfolio-fs-overlay.open { opacity: 1; pointer-events: all; }
+    .portfolio-fs-img-wrap {
+      position: relative;
+      max-width: 96vw; max-height: 90vh;
+      display: flex; align-items: center; justify-content: center;
+      transform: scale(0.72);
+      opacity: 0;
+      transition: transform .5s cubic-bezier(.16,1.2,.3,1), opacity .35s ease;
+      cursor: zoom-in;
+    }
+    .portfolio-fs-overlay.open .portfolio-fs-img-wrap {
+      transform: scale(1);
+      opacity: 1;
+    }
+    .portfolio-fs-img-wrap.zoomed { cursor: zoom-out; }
+    .portfolio-fs-img {
+      max-width: 96vw; max-height: 90vh;
+      display: block;
+      border-radius: 10px;
+      box-shadow: 0 0 70px rgba(255,0,0,0.25);
+      transition: transform .3s cubic-bezier(.2,.8,.2,1), opacity .18s ease;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+    .portfolio-fs-close {
+      position: fixed; top: 22px; right: 26px;
+      width: 44px; height: 44px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; color: var(--fg-onblack);
+      background: rgba(255,0,0,0.15);
+      border: 1px solid rgba(255,0,0,0.4);
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 3;
+      transition: background .2s, transform .35s cubic-bezier(.3,1.4,.4,1);
+    }
+    .portfolio-fs-close:hover { background: rgba(255,0,0,0.55); transform: rotate(90deg); }
+    .portfolio-fs-arrow {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 52px; height: 52px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px;
+      color: var(--fg-onblack);
+      background: rgba(255,0,0,0.15);
+      border: 1px solid rgba(255,0,0,0.4);
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 3;
+      user-select: none;
+      transition: background .2s, transform .2s;
+    }
+    .portfolio-fs-arrow:hover { background: rgba(255,0,0,0.55); transform: translateY(-50%) scale(1.08); }
+    .portfolio-fs-arrow.left { left: 22px; }
+    .portfolio-fs-arrow.right { right: 22px; }
+    @media (max-width: 640px) {
+      .portfolio-fs-arrow { width: 40px; height: 40px; font-size: 20px; }
+      .portfolio-fs-arrow.left { left: 8px; }
+      .portfolio-fs-arrow.right { right: 8px; }
+    }
+    .portfolio-fs-hint {
+      position: absolute;
+      bottom: -32px; left: 50%; transform: translateX(-50%);
+      font-size: 9px; color: rgba(255,200,200,0.5);
+      letter-spacing: .5px; white-space: nowrap;
+    }
+    /* Лупа */
+    .portfolio-loupe {
+      position: absolute;
+      width: 190px; height: 190px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,60,60,0.75);
+      box-shadow: 0 0 0 5px rgba(0,0,0,0.4), 0 0 34px rgba(255,0,0,0.5), inset 0 0 22px rgba(255,0,0,0.15);
+      pointer-events: none;
+      background-repeat: no-repeat;
+      background-color: #000;
+      opacity: 0;
+      transform: scale(0.35);
+      transition: opacity .22s ease, transform .28s cubic-bezier(.3,1.5,.4,1);
+      z-index: 5;
+    }
+    .portfolio-loupe.active { opacity: 1; transform: scale(1); }
+    @media (max-width: 640px) {
+      .portfolio-loupe { display: none; }
+    }
 
     /* ── ПЕРЕКЛЮЧАТЕЛЬ ТЕМЫ (солнце/луна) ── */
     .theme-switch {
       position: fixed;
       top: 18px; right: 18px;
-      z-index: 9999;
+      z-index: 400;
       display: flex;
       align-items: center;
       gap: 2px;
@@ -151,186 +761,964 @@
       box-shadow: 0 0 14px rgba(255,0,0,0.5);
     }
 
-    /* ── СВЕТЛАЯ ТЕМА: переопределения текста, который был
-       светло-розовым/белым и терялся на белом фоне ── */
-    body.light-theme .page-sub { color: rgba(120,20,20,0.55); }
-    body.light-theme .rule-text { color: rgba(60,10,10,0.9); }
-    body.light-theme .rule-text .hi { color: #b00000; }
-    body.light-theme .rule-num { color: rgba(200,30,30,0.6); }
-    body.light-theme .rule.important { background: rgba(255,0,0,0.05); }
-    body.light-theme .footer-note { color: rgba(120,20,20,0.75); border-color: rgba(255,0,0,0.3); }
-    body.light-theme .cta-label { color: rgba(120,20,20,0.5); }
-
-    .page-header {
-      text-align: center;
-      margin-bottom: 18px;
-    }
-    .page-title {
-      font-size: 18px;
-      color: #ff2a2a;
-      letter-spacing: 2px;
-      line-height: 1.4;
-      margin-bottom: 8px;
-    }
-    .page-sub {
+    /* ========================= SEO-ТЕКСТ ========================= */
+    .seo-text {
+      position: relative;
+      z-index: 2;
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 0 24px 20px;
+      color: rgba(255,210,210,0.65);
       font-size: 9px;
-      color: rgba(255,200,200,0.4);
-      letter-spacing: 1px;
-      line-height: 1.8;
-    }
-
-    /* ── RULE GRID ── */
-    .rules-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-    }
-
-    /* ── RULE CARD ── */
-    .rules-grid { perspective: 1200px; }
-    .rule {
-      display: flex;
-      gap: 14px;
-      padding: 18px 20px;
-      border-radius: 14px;
-      background: rgba(255,0,0,0.04);
-      border: 1px solid rgba(255,0,0,0.13);
-      transition: border-color .25s, box-shadow .25s, transform .1s ease-out;
-      transform-style: preserve-3d;
-      will-change: transform;
-      opacity: 0;
-      animation: fadeUp .4s ease forwards;
-    }
-    .rule:hover {
-      border-color: rgba(255,0,0,0.28);
-      box-shadow: 0 0 20px rgba(255,0,0,0.07);
-    }
-
-    .rule-num {
-      font-size: 10px;
-      color: rgba(255,80,80,0.5);
-      flex-shrink: 0;
-      width: 24px;
-      padding-top: 2px;
-      text-align: right;
-    }
-
-    .rule-body { flex: 1; }
-
-    .rule-title {
-      font-size: 11px;
-      color: #ff5555;
-      letter-spacing: 1px;
-      margin-bottom: 8px;
-      line-height: 1.4;
-    }
-
-    .rule-text {
-      font-size: 9px;
-      color: rgba(255,230,230,0.9);
       line-height: 2;
       letter-spacing: .3px;
+      text-align: left;
     }
-
-    .rule-text .hi {
-      color: #ffaaaa;
-    }
-
-    .rule.important {
-      border-color: rgba(255,0,0,0.22);
-      background: rgba(255,0,0,0.07);
-    }
-
-    .divider {
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(255,0,0,0.15), transparent);
-      margin: 12px 0;
-    }
-
-    .footer-note {
-      margin-top: 16px;
-      padding: 12px 18px;
-      border-radius: 10px;
-      border: 1px dashed rgba(255,0,0,0.2);
-      font-size: 9px;
-      color: rgba(255,200,200,0.7);
-      line-height: 1.8;
+    .seo-text h1 {
+      font-size: 13px;
+      color: #ff3b3b;
+      line-height: 1.6;
+      margin-bottom: 14px;
+      letter-spacing: 1px;
       text-align: center;
-      letter-spacing: .5px;
+    }
+    .seo-text h2 {
+      font-size: 10px;
+      color: rgba(255,150,150,0.8);
+      letter-spacing: 1px;
+      margin: 16px 0 10px;
+      text-transform: uppercase;
+    }
+    .seo-text p { margin-bottom: 12px; }
+    .seo-text strong { color: rgba(255,180,180,0.95); }
+    .seo-text ul { list-style: none; padding: 0; }
+    .seo-text li {
+      padding-left: 16px;
+      position: relative;
+      margin-bottom: 8px;
+    }
+    .seo-text li::before {
+      content: "";
+      position: absolute;
+      left: 0; top: 7px;
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: #ff2a2a;
+      box-shadow: 0 0 5px rgba(255,0,0,0.7);
+    }
+    @media (max-width: 600px) {
+      .seo-text { font-size: 8px; padding: 0 16px 16px; }
+      .seo-text h1 { font-size: 11px; }
     }
 
-    .order-cta {
-      margin-top: 16px;
+    /* Светлая тема: тексты, которые были светло-розовыми/белыми и терялись на белом фоне */
+    body.light-theme .seo-text, body.light-theme .portfolio-card-type { color: #3a1010; }
+    body.light-theme .seo-text h2 { color: #ff3b3b; }
+    body.light-theme .seo-text strong, body.light-theme .age-badge { color: #b00000; }
+    body.light-theme .portfolio-card-time, body.light-theme .portfolio-modal-time { color: rgba(180,20,20,0.75); }
+    body.light-theme .age-badge { background: rgba(255,0,0,0.06); }
+
+    .koleso-btn {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      z-index: 100;
+      width: 80px;
+      height: 80px;
+      cursor: pointer;
+      border-radius: 50%;
+      border: 2px solid rgba(255,0,0,0.4);
+      box-shadow: 0 0 20px rgba(255,0,0,0.3);
+      transition: transform .2s, box-shadow .2s;
+      background: var(--bg-koleso-btn);
+    }
+    .koleso-btn img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      display: block;
+    }
+    .koleso-btn:hover {
+      transform: scale(1.12) rotate(10deg);
+      box-shadow: 0 0 34px rgba(255,0,0,0.6);
+    }
+    .koleso-btn:active { transform: scale(0.96); }
+
+    .koleso-hint {
+      position: absolute;
+      bottom: calc(100% + 10px);
+      right: 0;
+      width: 150px;
+      padding: 8px 26px 8px 12px;
+      border-radius: 10px;
+      background: var(--bg-panel-95);
+      border: 1px solid rgba(255,0,0,0.4);
+      color: #ff8a8a;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 7px;
+      line-height: 1.7;
+      text-align: center;
+      letter-spacing: .3px;
+      box-shadow: 0 0 18px rgba(255,0,0,0.25);
+      pointer-events: auto;
+    }
+    .koleso-hint::after {
+      content: "";
+      position: absolute;
+      top: 100%; right: 18px;
+      border: 6px solid transparent;
+      border-top-color: rgba(255,0,0,0.4);
+    }
+    .koleso-hint-close {
+      position: absolute;
+      top: 6px; right: 7px;
+      width: 14px; height: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px;
+      line-height: 1;
+      color: rgba(255,150,150,0.6);
+      cursor: pointer;
+      border-radius: 4px;
+      transition: color .2s, background .2s;
+    }
+    .koleso-hint-close:hover {
+      color: #ff4444;
+      background: rgba(255,0,0,0.15);
+    }
+    @media (max-width: 760px) {
+      .koleso-hint { width: 120px; font-size: 6px; right: -6px; }
+    }
+
+    .roulette-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-roulette-overlay);
+      backdrop-filter: blur(6px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .3s;
+    }
+    .roulette-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .roulette-box {
+      width: 420px;
+      max-width: 95vw;
+      padding: 32px 28px;
+      border-radius: 22px;
+      background: var(--bg-panel-92);
+      border: 1px solid rgba(255,0,0,0.3);
+      box-shadow: 0 0 40px rgba(255,0,0,0.14);
+      text-align: center;
+      position: relative;
+      transform-style: preserve-3d;
+      will-change: transform;
+      transition: border-color .25s, box-shadow .25s, transform .1s ease-out;
+      cursor: default;
+      max-height: 90vh;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+    .roulette-box:hover { border-color: rgba(255,0,0,0.5); box-shadow: 0 0 60px rgba(255,0,0,0.24); }
+    .roulette-overlay { perspective: 1200px; }
+
+    .roulette-close {
+      position: absolute;
+      top: 14px; right: 18px;
+      font-size: 18px;
+      color: rgba(255,100,100,0.7);
+      cursor: pointer;
+      font-family: monospace;
+      line-height: 1;
+      transition: color .2s;
+    }
+    .roulette-close:hover { color: #ff2a2a; }
+
+    .roulette-title {
+      font-size: 12px;
+      color: #ff2a2a;
+      letter-spacing: 1px;
+      margin-bottom: 22px;
+      line-height: 1.6;
+    }
+
+    /* Плейсхолдер: вкладки бесплатной */
+    .spin-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    .spin-tab {
+      flex: 1;
+      padding: 10px 6px;
+      font-size: 8px;
+      line-height: 1.6;
+      border-radius: 10px;
+      border: 1px solid rgba(255,0,0,0.25);
+      background: rgba(255,0,0,0.05);
+      color: rgba(255,200,200,0.7);
+      cursor: pointer;
+      transition: .2s;
+    }
+    .spin-tab.active {
+      border-color: rgba(255,0,0,0.6);
+      color: #ff3b3b;
+      background: rgba(255,0,0,0.12);
+    }
+
+    .strip-wrap {
+      width: 100%;
+      height: 70px;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      border: 1px solid rgba(255,0,0,0.3);
+      margin-bottom: 8px;
+    }
+    .strip-arrow {
+      position: absolute;
+      top: -2px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 13px solid #ff2a2a;
+      z-index: 20;
+      filter: drop-shadow(0 0 6px rgba(255,0,0,0.9));
+      pointer-events: none;
+    }
+    .strip-line {
+      position: absolute; top: 0; bottom: 0; left: 50%;
+      width: 2px; background: rgba(255,0,0,0.5);
+      transform: translateX(-50%); z-index: 9;
+    }
+    .strip { display: flex; height: 100%; will-change: transform; }
+    .strip.idle-scroll {
+      animation: idleScroll 5s linear infinite;
+    }
+    @keyframes idleScroll {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .strip.idle-scroll { animation: none; }
+    }
+    .strip-item {
+      flex-shrink: 0;
+      width: 90px; height: 100%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      font-family: 'Press Start 2P', monospace;
+      border-right: 1px solid rgba(255,0,0,0.12);
+    }
+    .strip-item .si-pct   { font-size: 17px; line-height: 1.2; }
+    .strip-item .si-label { font-size: 7px; color: rgba(255,200,200,0.6); margin-top: 4px; }
+
+    .si-100 { background: rgba(255,20,20,0.22); }  .si-100 .si-pct { color: #ff4444; }
+    .si-75  { background: rgba(255,80,0,0.18); }   .si-75  .si-pct { color: #ff7733; }
+    .si-67  { background: rgba(255,90,0,0.17); }   .si-67  .si-pct { color: #ff8855; }
+    .si-50  { background: rgba(200,100,0,0.15); }  .si-50  .si-pct { color: #ffaa44; }
+    .si-42  { background: rgba(190,110,0,0.14); }  .si-42  .si-pct { color: #ffb866; }
+    .si-25  { background: rgba(150,120,0,0.13); }  .si-25  .si-pct { color: #ffcc44; }
+    .si-10  { background: rgba(50,50,50,0.22); }   .si-10  .si-pct { color: rgba(255,200,200,0.45); }
+
+    .chances {
+      display: flex; justify-content: center; gap: 10px;
+      flex-wrap: wrap; margin: 8px 0 16px;
+    }
+    .chance-item { font-size: 7px; color: rgba(255,200,200,0.45); line-height: 1.8; }
+
+    .roulette-result { min-height: 68px; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 10px 0; }
+    .result-pct  { font-size: 20px; color: #ff2a2a; line-height: 1.6; opacity: 0; transition: opacity .4s; }
+    .result-code {
+      font-size: 10px; color: rgba(255,200,200,0.8); margin-top: 7px;
+      letter-spacing: 2px; opacity: 0; transition: opacity .4s .15s;
+      cursor: pointer; border: 1px dashed rgba(255,0,0,0.35);
+      padding: 6px 14px; border-radius: 8px;
+    }
+    .result-code:hover { border-color: rgba(255,0,0,0.7); background: rgba(255,0,0,0.06); }
+    .result-pct.show, .result-code.show { opacity: 1; }
+    .copied-msg { font-size: 8px; color: #ff4444; margin-top: 4px; opacity: 0; transition: opacity .3s; }
+    .copied-msg.show { opacity: 1; }
+
+    .discord-login-btn {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; padding: 16px 12px; margin-top: 4px;
+      font-family: 'Press Start 2P', monospace; font-size: 10px; line-height: 1.6;
+      color: #fff; border-radius: 12px; cursor: pointer; text-decoration: none;
+      background: #5865F2; border: 1px solid #5865F2;
+      transition: .2s;
+    }
+    .discord-login-btn:hover { transform: scale(1.03); box-shadow: 0 0 24px rgba(88,101,242,0.5); }
+
+    .login-hint {
+      font-size: 8px; color: rgba(255,200,200,0.5);
+      margin-top: 14px; line-height: 1.6;
+    }
+
+    .logged-as {
+      font-size: 8px; color: rgba(150,255,150,0.7);
+      margin-bottom: 14px; line-height: 1.6;
+    }
+
+    /* Светлая тема: приглушённый розовый текст рулетки был еле виден на белом фоне — делаем его тёмно-красным вместо светло-розового. */
+    body.light-theme .roulette-winners-title,
+    body.light-theme .roulette-winners-empty,
+    body.light-theme .roulette-winner-meta,
+    body.light-theme .chance-item,
+    body.light-theme .login-hint {
+      color: rgba(180,20,20,0.75);
+    }
+    body.light-theme .roulette-winner-name {
+      color: #3a0a0a;
+    }
+    body.light-theme .logged-as {
+      color: rgba(20,140,20,0.85);
+    }
+    body.light-theme .label {
+      color: rgba(180,20,20,0.8);
+      text-shadow: none;
+    }
+
+    /* Светлая тема: приглушённый розовый текст отзывов был еле виден на белом фоне — делаем его тёмно-красным вместо светло-розового. */
+    body.light-theme .review-date,
+    body.light-theme .review-order,
+    body.light-theme .reviews-loading {
+      color: rgba(150,20,20,0.65);
+    }
+    body.light-theme .review-comment {
+      color: rgba(60,10,10,0.85);
+    }
+    body.light-theme .review-star {
+      color: rgba(0,0,0,0.15);
+    }
+    body.light-theme .review-item {
+      background: rgba(255,0,0,0.03);
+      border-color: rgba(255,0,0,0.16);
+    }
+    body.light-theme .review-avatar-placeholder {
+      color: rgba(150,20,20,0.85);
+    }
+
+    /* ========================= MAINTENANCE TOAST ========================= */
+    .maint-toast {
+      position: fixed;
+      bottom: 28px;
+      left: 28px;
+      z-index: 999;
+      width: 240px;
+      background: rgba(8,0,0,0.97);
+      border: 1px solid rgba(255,0,0,0.4);
+      border-radius: 18px;
+      padding: 14px 14px 12px;
+      font-family: 'Press Start 2P', monospace;
+      box-shadow: 0 0 40px rgba(255,0,0,0.18);
+      transform: translateY(20px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .4s cubic-bezier(.22,1,.36,1), transform .4s cubic-bezier(.22,1,.36,1);
+    }
+    .maint-toast.show {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: none;
+    }
+    .maint-toast-head {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+    }
+    .maint-toast-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #ff2a2a; flex-shrink: 0;
+      animation: maint-tdot 1.8s ease-in-out infinite;
+    }
+    @keyframes maint-tdot {
+      0%,100%{opacity:1;box-shadow:0 0 6px rgba(255,0,0,.8)}
+      50%{opacity:.4;box-shadow:none}
+    }
+    .maint-toast-title { font-size: 9px; color: #ff2a2a; letter-spacing: 1px; line-height: 1.6; }
+    .maint-toast-msg {
+      font-size: 7px; color: rgba(255,200,200,.65);
+      line-height: 2; letter-spacing: .5px;
+    }
+
+    /* ========================= ЧАСТИЦЫ ВЗРЫВ ========================= */
+    .burst-particle {
+      position: fixed;
+      pointer-events: none;
+      border-radius: 50%;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+    }
+    @keyframes burst-fly {
+      0%   { opacity: 1; transform: translate(-50%, -50%) translate(0, 0) scale(1); }
+      100% { opacity: 0; transform: translate(-50%, -50%) translate(var(--bx), var(--by)) scale(0.2); }
+    }
+
+    @media (prefers-reduced-motion: reduce) { .live-dot, .fluff-1, .fluff-2 { animation: none; } }
+    @media (max-width: 760px) {
+      .main { gap: 24px; padding: 40px 16px; }
+      .card { width: 100%; max-width: 340px; }
+      .koleso-btn { width: 56px; height: 56px; bottom: 16px; right: 16px; }
+      .maint-toast { bottom: 16px; left: 8px; right: auto; width: 200px; }
+      .float-winners { display: none; }
+      .bottom-nav-btn { width: 100%; max-width: 340px; }
+      .bottom-nav { padding: 8px 16px 40px; gap: 12px; }
+      .home-arrow { width: 38px; height: 38px; top: 12px; left: 12px; }
+    }
+    @media (max-width: 400px) {
+      .name { font-size: 13px; }
+      .big { font-size: 15px; }
+      .discord-order-btn { font-size: 9px; padding: 14px 8px; }
+      .bottom-nav-btn { font-size: 9px; padding: 14px 8px; }
+    }
+
+    /* ── НИЖНИЕ КНОПКИ ── */
+    .bottom-nav {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      padding: 8px 20px 48px;
+      flex-wrap: wrap;
+    }
+    .bottom-nav-btn {
+      width: 260px;
+    }
+
+    /* ========================= ФОРМА ЗАКАЗА ========================= */
+    .order-card {
+      width: 360px;
+      padding: 26px 22px;
+      border-radius: 22px;
+      background: rgba(255,0,0,0.05);
+      border: 1px solid rgba(255,0,0,0.2);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 0 40px rgba(255,0,0,0.12);
       display: flex;
       flex-direction: column;
-      align-items: center;
-      gap: 10px;
+      gap: 16px;
+      transform-style: preserve-3d;
+      will-change: transform;
+      transition: border-color .25s, box-shadow .25s, transform .1s ease-out;
+      cursor: default;
     }
-    .cta-label {
-      font-size: 9px;
-      color: rgba(255,200,200,0.3);
+
+    .order-title {
+      font-size: 11px;
+      color: #ff2a2a;
       letter-spacing: 1px;
+      text-align: center;
+      line-height: 1.6;
     }
-    .cta-btn {
-      display: inline-flex; align-items: center; justify-content: center;
-      padding: 13px 26px;
-      font-family: 'Press Start 2P', monospace; font-size: 11px; line-height: 1.6;
+
+    .order-package {
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(255,0,0,0.06);
+      border: 1px solid rgba(255,0,0,0.18);
+    }
+    .order-package-title {
+      font-size: 8px;
+      color: rgba(255,200,200,0.5);
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+    .order-package-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 8px;
+      color: rgba(255,220,220,0.8);
+      line-height: 2;
+    }
+    .order-package-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: #ff2a2a;
+      box-shadow: 0 0 6px rgba(255,0,0,0.7);
+      flex-shrink: 0;
+    }
+
+    .order-field { display: flex; flex-direction: column; gap: 7px; }
+    .order-label {
+      font-size: 8px;
+      color: rgba(255,200,200,0.5);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .order-input, .order-textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: rgba(255,0,0,0.05);
+      border: 1px solid rgba(255,0,0,0.2);
+      color: rgba(255,220,220,0.9);
+      font-family: 'Press Start 2P', monospace;
+      font-size: 8px;
+      line-height: 1.6;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+      resize: none;
+    }
+    .order-input::placeholder, .order-textarea::placeholder {
+      color: rgba(255,150,150,0.25);
+    }
+    .order-input:focus, .order-textarea:focus {
+      border-color: rgba(255,0,0,0.45);
+      box-shadow: 0 0 14px rgba(255,0,0,0.1);
+    }
+    .order-textarea { height: 80px; }
+
+    .order-submit {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 16px 12px;
+      font-family: 'Press Start 2P', monospace; font-size: 10px; line-height: 1.6;
       color: #ff3b3b; border-radius: 12px;
       background: rgba(255,0,0,0.05); border: 1px solid rgba(255,0,0,0.25);
-      text-decoration: none;
-      transition: .2s; position: relative; overflow: hidden;
+      cursor: pointer; transition: .2s; position: relative; overflow: hidden;
+      width: 100%;
     }
-    .cta-btn::before {
+    .order-submit::before {
       content: ""; position: absolute; top: 0; left: -120%; width: 120%; height: 100%;
-      background: linear-gradient(120deg, transparent, rgba(255,0,0,0.3), transparent);
+      background: linear-gradient(120deg, transparent, rgba(255,0,0,0.35), transparent);
       transition: .5s;
     }
-    .cta-btn:hover::before { left: 120%; }
-    .cta-btn:hover { border-color: rgba(255,0,0,0.5); box-shadow: 0 0 28px rgba(255,0,0,0.13); transform: scale(1.03); }
+    .order-submit:hover::before { left: 120%; }
+    .order-submit:hover { transform: scale(1.03); border-color: rgba(255,0,0,0.5); }
+    .order-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-    @keyframes fadeUp {
+    .order-dc-btn {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 14px 12px; text-decoration: none;
+      font-family: 'Press Start 2P', monospace; font-size: 9px; line-height: 1.6;
+      color: #fff; border-radius: 12px;
+      background: #5865F2; border: 1px solid #5865F2;
+      transition: .2s; text-align: center;
+    }
+    .order-dc-btn:hover { transform: scale(1.03); box-shadow: 0 0 24px rgba(88,101,242,0.5); }
+
+    .order-divider {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 7px; color: rgba(255,150,150,0.3); letter-spacing: 1px;
+    }
+    .order-divider::before, .order-divider::after {
+      content: ""; flex: 1; height: 1px; background: rgba(255,0,0,0.12);
+    }
+
+    .order-status {
+      font-size: 8px; text-align: center; line-height: 1.8;
+      min-height: 20px; transition: opacity .3s;
+    }
+    .order-status.ok  { color: rgba(100,255,150,0.8); }
+    .order-status.err { color: rgba(255,100,100,0.8); }
+
+    @media (max-width: 760px) {
+      .order-card { width: 100%; max-width: 360px; }
+    }
+
+    /* ========================= ПОСЛЕДНИЕ ПОБЕДИТЕЛИ ========================= */
+    .winners-card {
+      width: 300px;
+      padding: 22px 20px;
+      border-radius: 22px;
+      background: rgba(255,0,0,0.05);
+      border: 1px solid rgba(255,0,0,0.2);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 0 40px rgba(255,0,0,0.12);
+      display: flex;
+      flex-direction: column;
+      max-height: 420px;
+      transform-style: preserve-3d;
+      will-change: transform;
+      transition: border-color .25s, box-shadow .25s, transform .1s ease-out;
+      cursor: default;
+    }
+    .winners-title {
+      font-size: 11px;
+      color: #ff2a2a;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+      text-align: center;
+      line-height: 1.6;
+      text-shadow: 0 0 12px rgba(255,40,40,0.7), 0 0 28px rgba(255,0,0,0.35);
+    }
+    .winners-list {
+      display: flex; flex-direction: column; gap: 10px;
+      overflow-y: auto; flex: 1; min-height: 0; padding-right: 2px;
+    }
+    .winner-item {
+      padding: 12px 12px 10px;
+      border-radius: 14px;
+      background: rgba(255,0,0,0.04);
+      border: 1px solid rgba(255,0,0,0.14);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: border-color .2s, box-shadow .2s;
+      animation: reviewFadeIn .4s ease forwards;
+      opacity: 0;
+    }
+    .winner-item:hover {
+      border-color: rgba(255,0,0,0.35);
+      box-shadow: 0 0 18px rgba(255,0,0,0.1);
+    }
+    .winner-avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid rgba(255,0,0,0.3);
+      flex-shrink: 0;
+    }
+    .winner-avatar-placeholder {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: rgba(255,0,0,0.15);
+      border: 1px solid rgba(255,0,0,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .winner-info { flex: 1; min-width: 0; }
+    .winner-name {
+      font-size: 8px;
+      color: rgba(255,225,225,0.9);
+      line-height: 1.6;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .winner-date {
+      font-size: 7px;
+      color: rgba(255,150,150,0.5);
+      margin-top: 2px;
+      letter-spacing: .3px;
+    }
+    .winner-badge {
+      font-size: 10px;
+      color: #ff2a2a;
+      text-shadow: 0 0 8px rgba(255,0,0,0.6);
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+    .winners-empty {
+      font-size: 8px;
+      color: rgba(255,150,150,0.4);
+      text-align: center;
+      line-height: 2;
+      padding: 20px 0;
+    }
+
+    /* Победители внутри рулетки */
+    .roulette-winners {
+      margin-bottom: 18px;
+      border-bottom: 1px solid rgba(255,0,0,0.15);
+      padding-bottom: 14px;
+    }
+    .roulette-winners-title {
+      font-size: 8px;
+      color: rgba(255,150,150,0.6);
+      letter-spacing: 1px;
+      text-align: center;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+    .roulette-winners-list {
+      display: flex; flex-direction: column; gap: 7px;
+      max-height: 160px; overflow-y: auto;
+    }
+    .roulette-winner-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: rgba(255,0,0,0.04);
+      border: 1px solid rgba(255,0,0,0.12);
+      animation: reviewFadeIn .3s ease forwards;
+      opacity: 0;
+    }
+    .roulette-winner-avatar {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid rgba(255,0,0,0.25);
+      flex-shrink: 0;
+    }
+    .roulette-winner-avatar-placeholder {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: rgba(255,0,0,0.12);
+      border: 1px solid rgba(255,0,0,0.25);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+    .roulette-winner-info { flex: 1; min-width: 0; }
+    .roulette-winner-name {
+      font-size: 7px;
+      color: rgba(255,225,225,0.85);
+      line-height: 1.5;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .roulette-winner-meta {
+      font-size: 6px;
+      color: rgba(255,150,150,0.45);
+      margin-top: 2px;
+      letter-spacing: .3px;
+    }
+    .roulette-winner-badge {
+      font-size: 9px;
+      color: #ff2a2a;
+      text-shadow: 0 0 6px rgba(255,0,0,0.6);
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+    .roulette-winners-empty {
+      font-size: 7px;
+      color: rgba(255,150,150,0.35);
+      text-align: center;
+      padding: 10px 0;
+    }
+    @media (max-width: 760px) {
+      .winners-card { width: 100%; max-width: 340px; }
+    }
+
+    /* ========================= ОТЗЫВЫ ========================= */
+    .reviews-card {
+      width: 340px;
+      padding: 26px 22px;
+      border-radius: 22px;
+      background: rgba(255,0,0,0.05);
+      border: 1px solid rgba(255,0,0,0.2);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 0 40px rgba(255,0,0,0.12);
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      max-height: 560px;
+      overflow: hidden;
+      transform-style: preserve-3d;
+      will-change: transform;
+      transition: border-color .25s, box-shadow .25s, transform .1s ease-out;
+      cursor: default;
+    }
+    .reviews-card:hover { border-color: rgba(255,0,0,0.4); box-shadow: 0 0 56px rgba(255,0,0,0.22); }
+
+    .reviews-title {
+      font-size: 11px;
+      color: #ff2a2a;
+      letter-spacing: 1px;
+      margin-bottom: 18px;
+      text-align: center;
+      line-height: 1.6;
+      text-shadow: 0 0 12px rgba(255,40,40,0.7), 0 0 28px rgba(255,0,0,0.35);
+    }
+
+    .reviews-list {
+      display: flex; flex-direction: column; gap: 12px;
+      overflow-y: auto; padding-right: 4px; flex: 1; min-height: 0;
+    }
+
+    /* Общий тонкий скроллбар — используется списком отзывов и обоими списками победителей рулетки */
+    .reviews-list, .winners-list, .roulette-winners-list {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,0,0,0.35) transparent;
+    }
+    .reviews-list::-webkit-scrollbar, .winners-list::-webkit-scrollbar, .roulette-winners-list::-webkit-scrollbar { width: 6px; }
+    .reviews-list::-webkit-scrollbar-track, .winners-list::-webkit-scrollbar-track, .roulette-winners-list::-webkit-scrollbar-track { background: transparent; }
+    .reviews-list::-webkit-scrollbar-thumb, .winners-list::-webkit-scrollbar-thumb, .roulette-winners-list::-webkit-scrollbar-thumb { background: rgba(255,0,0,0.35); border-radius: 6px; }
+    .reviews-list::-webkit-scrollbar-thumb:hover, .winners-list::-webkit-scrollbar-thumb:hover, .roulette-winners-list::-webkit-scrollbar-thumb:hover { background: rgba(255,30,30,0.55); }
+
+    @keyframes reviewFadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    @media (max-width: 600px) {
-      .page { padding: 70px 16px 60px; }
-      .page-title { font-size: 12px; }
-      .rule { gap: 12px; padding: 18px 16px; }
-      .rule-num { width: 18px; }
+    .review-item {
+      padding: 14px 14px 12px;
+      border-radius: 14px;
+      background: rgba(255,0,0,0.04);
+      border: 1px solid rgba(255,0,0,0.14);
+      transition: border-color .2s, box-shadow .2s, transform .2s ease;
+      flex-shrink: 0;
+      opacity: 0;
+      animation: reviewFadeIn .4s ease forwards;
+      transform-origin: center;
     }
+    .review-item:hover {
+      border-color: rgba(255,0,0,0.35);
+      box-shadow: 0 0 22px rgba(255,0,0,0.12);
+      transform: scale(1.035);
+      position: relative;
+      z-index: 5;
+    }
+
+    .review-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .review-avatar {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid rgba(255,0,0,0.3);
+      flex-shrink: 0;
+    }
+
+    .review-avatar-placeholder {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: rgba(255,0,0,0.15);
+      border: 1px solid rgba(255,0,0,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    .review-meta { flex: 1; min-width: 0; }
+    .review-author {
+      font-size: 9px;
+      color: #ff3b3b;
+      line-height: 1.4;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      text-shadow: 0 0 8px rgba(255,40,40,0.6), 0 0 18px rgba(255,0,0,0.3);
+    }
+    .review-date { font-size: 7px; color: rgba(255,200,200,0.4); margin-top: 3px; }
+
+    .review-stars { display: flex; gap: 3px; margin-bottom: 7px; }
+    .review-star { font-size: 13px; color: rgba(255,255,255,0.15); }
+    .review-star.on { color: #ff2a2a; text-shadow: 0 0 9px rgba(255,40,40,0.85), 0 0 18px rgba(255,0,0,0.5); }
+
+    .review-comment {
+      font-size: 8px;
+      color: rgba(255,220,220,0.75);
+      line-height: 1.8;
+      word-break: break-word;
+    }
+
+    .review-order {
+      font-size: 7px;
+      color: rgba(255,180,180,0.4);
+      margin-top: 6px;
+    }
+
+    .reviews-loading {
+      text-align: center;
+      font-size: 8px;
+      color: rgba(255,200,200,0.4);
+      padding: 20px 0;
+      line-height: 2;
+    }
+
+    @media (max-width: 760px) {
+      .reviews-card { width: 100%; max-width: 340px; max-height: 420px; }
+    }
+
+    .home-arrow {
+      position: fixed;
+      top: 18px;
+      left: 18px;
+      z-index: 9999;
+
+      width: 42px;
+      height: 42px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border-radius: 12px;
+
+      background: rgba(255, 0, 0, 0.08);
+      border: 1px solid rgba(255, 0, 0, 0.25);
+
+      color: #ff2a2a;
+      text-decoration: none;
+
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 18px rgba(255, 0, 0, 0.15);
+
+      transition: 0.2s ease;
+    }
+
+    .home-arrow svg {
+      width: 18px;
+      height: 18px;
+      display: block;
+    }
+
+    .home-arrow:hover {
+      transform: scale(1.1) translateX(-2px);
+      border-color: rgba(255, 0, 0, 0.5);
+      box-shadow: 0 0 26px rgba(255, 0, 0, 0.3);
+    }
+
+    /* ========================= ЛЕТАЮЩАЯ КОРОВА ========================= */
+    .flying-cow {
+      position: fixed;
+      top: -120px;
+      left: -120px;
+      width: 55px;
+      z-index: 1;
+      cursor: pointer;
+      pointer-events: none;
+      opacity: 0;
+      filter: drop-shadow(0 6px 16px rgba(0,0,0,0.5));
+      will-change: transform, opacity;
+    }
+    .flying-cow.fly {
+      pointer-events: all;
+      animation: cowFly 6s linear forwards;
+    }
+    .flying-cow:hover { transform: scale(1.15) rotate(-15deg); }
+    @keyframes cowFly {
+      0%   { opacity: 0; top: -5vh; left: 68vw; transform: rotate(35deg); }
+      8%   { opacity: 1; }
+      90%  { opacity: 1; }
+      100% { opacity: 0; top: 68vh; left: 102vw; transform: rotate(35deg); }
+    }
+    @media (max-width: 760px) {
+      .flying-cow { width: 38px; }
+    }
+
+
   </style>
 </head>
 <body>
-
 <div id="banOverlay" style="display:none; position:fixed; inset:0; z-index:999999; background:radial-gradient(ellipse at center, #2a0000 0%, #050000 75%); color:#fff; align-items:center; justify-content:center; text-align:center; flex-direction:column; padding:24px;">
   <div style="font-size:64px; line-height:1; margin-bottom:18px;">🚫</div>
   <div style="font-size:28px; font-weight:800; margin-bottom:10px; letter-spacing:0.3px;">Вы забанены</div>
   <div style="font-size:16px; color:#c99; max-width:420px;">Вам тут не рады. Доступ к сайту закрыт администратором.</div>
   <div id="banReasonLine" style="font-size:13px; color:#e88; max-width:420px; margin-top:14px; display:none;"></div>
 </div>
-<audio id="banSound" src="/mezets.design/ban.mp3" preload="auto"></audio>
+<audio id="banSound" src="ban.mp3" preload="auto"></audio>
 
 <div id="loadingGate" style="position:fixed; inset:0; z-index:999995; background:#050000; display:flex; align-items:center; justify-content:center;">
   <div style="width:38px;height:38px;border:3px solid rgba(255,40,40,0.2);border-top-color:#ff3b3b;border-radius:50%;animation:lgSpin .8s linear infinite;"></div>
 </div>
 <style>@keyframes lgSpin { to { transform: rotate(360deg); } }</style>
 
-<!-- ТОСТ ТЕХ. НЕПОЛАДОК -->
-<div id="maintToast" style="position:fixed; bottom:20px; right:20px; z-index:99990; max-width:280px; background:rgba(10,0,0,0.95); border:1px solid rgba(255,40,40,0.3); border-radius:12px; padding:14px 16px; transform:translateY(140%); transition:transform .35s ease; font-family:'Press Start 2P',monospace;">
-  <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-    <div style="width:8px;height:8px;border-radius:50%;background:#ff2a2a;flex-shrink:0;"></div>
-    <div id="maintToastTitle" style="font-size:9px;color:#fff;">Тех. неполадки</div>
-  </div>
-  <div id="maintToastMsg" style="font-size:8px;line-height:1.8;color:rgba(255,200,200,0.8);">
-    Ведутся технические работы.<br>Скоро всё заработает!
-  </div>
-</div>
-
-<a onclick="openDataPolicy()" style="position:fixed;left:14px;bottom:14px;z-index:500;font-size:7px;color:rgba(255,150,150,0.45);text-decoration:underline;cursor:pointer;font-family:'Press Start 2P',monospace;">Политика данных</a>
-
 <div id="dataPolicyOverlay" style="display:none; position:fixed; inset:0; z-index:99998; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:20px;">
-  <div style="background:#0d0202; border:1px solid rgba(255,40,40,0.25); border-radius:14px; max-width:680px; width:100%; max-height:80vh; overflow-y:auto; padding:28px; color:#eee; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; font-size:14px; line-height:1.65;">
+  <div style="background:#0d0202; border:1px solid rgba(255,40,40,0.25); border-radius:14px; max-width:680px; width:100%; max-height:80vh; overflow-y:auto; padding:28px; color:#eee; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; font-size:14px; line-height:1.65; box-shadow:0 0 60px rgba(255,0,0,0.15);">
     <div style="font-family:'Press Start 2P',monospace; font-size:13px; font-weight:400; margin-bottom:18px; color:#fff; line-height:1.6;">📄 Обработка персональных данных</div>
     <p style="margin-bottom:10px">При посещении настоящего сайта — независимо от того, авторизуетесь ли вы через Discord — администрация сайта автоматически собирает, обрабатывает и хранит следующие данные:</p>
     <ul style="margin:0 0 10px 18px; padding:0;">
@@ -343,16 +1731,22 @@
     <p style="margin-bottom:10px">Указанные данные обрабатываются исключительно в целях обеспечения корректной работы функционала сайта, предотвращения злоупотреблений (включая создание множественных учётных записей и обход ограничений доступа), а также для целей модерации, аналитики посещаемости и обеспечения безопасности сайта.</p>
     <p style="margin-bottom:10px">Персональные данные хранятся в течение периода, необходимого для достижения указанных целей, и не передаются третьим лицам, за исключением случаев, предусмотренных действующим законодательством.</p>
     <p style="margin-bottom:0">Если пользователь не согласен с условиями настоящего уведомления, ему следует покинуть сайт и воздержаться от дальнейшего его использования, а также от прохождения авторизации через Discord на данном сайте.</p>
-    <button onclick="closeDataPolicy()" style="margin-top:18px;width:100%;cursor:pointer;padding:10px;border:none;border-radius:8px;background:linear-gradient(180deg,#ff3b3b,#c81e1e);color:#fff;font-weight:700;">Понятно</button>
+    <button class="btn" onclick="closeDataPolicy()" style="margin-top:18px;width:100%;cursor:pointer">Понятно</button>
   </div>
 </div>
-
-<a class="home-arrow" href="https://mezets.github.io/mezets.design/" title="Назад">
+<a class="home-arrow" href="https://mezets.github.io/" title="На главную">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
     <line x1="19" y1="12" x2="5" y2="12"></line>
     <polyline points="12 19 5 12 12 5"></polyline>
   </svg>
 </a>
+
+<audio id="spinSound" src="roulette-spin.mp3" preload="auto"></audio>
+<audio id="stopSound" src="win.mp3" preload="auto"></audio>
+<audio id="rouletteCowSound" src="cow.mp3" preload="auto"></audio>
+<audio id="sound67" src="67.mp3" preload="auto"></audio>
+
+<canvas id="bg"></canvas>
 
 <div class="theme-switch" id="themeSwitch">
   <div class="theme-switch-btn" id="themeBtnDark" title="Тёмная тема" onclick="setTheme('dark')">
@@ -372,153 +1766,1177 @@
     </svg>
   </div>
 </div>
-
-<canvas id="bg"></canvas>
 <div class="fluff-wrap">
   <div class="fluff fluff-1"></div>
   <div class="fluff fluff-2"></div>
 </div>
 
-<div class="page">
+<div class="balloons-wrap">
+  <div class="balloon balloon-red balloon-l1"></div>
+  <div class="balloon balloon-white balloon-l2"></div>
+  <div class="balloon balloon-stripe balloon-l3"></div>
+  <div class="balloon balloon-white balloon-l4"></div>
+  <div class="balloon balloon-red balloon-l5"></div>
+  <div class="balloon balloon-stripe balloon-l6"></div>
+  <div class="balloon balloon-red balloon-l7"></div>
+  <div class="balloon balloon-white balloon-l8"></div>
+  <div class="balloon balloon-stripe balloon-l9"></div>
 
-  <div class="page-header">
-    <div class="page-title">Правила заказа</div>
-    <div class="page-sub">Прочитай перед оформлением · Это важно для нас обоих</div>
+  <div class="balloon balloon-white balloon-r1"></div>
+  <div class="balloon balloon-red balloon-r2"></div>
+  <div class="balloon balloon-stripe balloon-r3"></div>
+  <div class="balloon balloon-red balloon-r4"></div>
+  <div class="balloon balloon-white balloon-r5"></div>
+  <div class="balloon balloon-stripe balloon-r6"></div>
+  <div class="balloon balloon-white balloon-r7"></div>
+  <div class="balloon balloon-red balloon-r8"></div>
+  <div class="balloon balloon-stripe balloon-r9"></div>
+</div>
+
+<canvas id="fireworks"></canvas>
+
+<div class="main">
+
+  <!-- КАРТОЧКА DISCORD-СЕРВЕРА -->
+  <div class="card stats" id="card2">
+    <div class="stats-body">
+    <div class="avatar-wrap">
+      <img src="avatar_server.png" class="avatar" alt="Mezets — оформление Discord-сервера">
+      <svg class="party-hat" viewBox="0 0 100 122" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="hatCone" cx="32%" cy="26%" r="85%">
+            <stop offset="0%" stop-color="#ff5c5c"/>
+            <stop offset="70%" stop-color="#d40000"/>
+            <stop offset="100%" stop-color="#8c0000"/>
+          </radialGradient>
+          <radialGradient id="hatPompom" cx="32%" cy="26%" r="80%">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="55%" stop-color="#ffe9b8"/>
+            <stop offset="100%" stop-color="#d99a00"/>
+          </radialGradient>
+          <pattern id="hatStripe" width="15" height="15" patternUnits="userSpaceOnUse" patternTransform="rotate(65)">
+            <rect width="15" height="15" fill="#ffffff"/>
+            <rect width="7.5" height="15" fill="#ff2b2b"/>
+          </pattern>
+        </defs>
+
+        <!-- резинка-ремешок -->
+        <path d="M 20 104 Q 50 122 80 104" fill="none" stroke="#8c0000" stroke-width="2.5" stroke-linecap="round" opacity="0.85"/>
+
+        <!-- конус колпака: глянцевый градиент как у шариков -->
+        <polygon points="50,8 14,104 86,104" fill="url(#hatCone)" stroke="#7a0000" stroke-width="1.5"/>
+
+        <!-- тёмная тень снизу-справа, как inset у шариков -->
+        <polygon points="58,60 86,104 66,104" fill="#4a0000" opacity="0.35"/>
+
+        <!-- полосатый ободок в стиле balloon-stripe -->
+        <polygon points="18,92 82,92 86,104 14,104" fill="url(#hatStripe)" stroke="#7a0000" stroke-width="1"/>
+
+        <!-- помпон на макушке: глянцевый как шарик -->
+        <circle cx="50" cy="12" r="11" fill="url(#hatPompom)" stroke="#c98a00" stroke-width="1"/>
+        <ellipse cx="45" cy="8" rx="4" ry="3" fill="#ffffff" opacity="0.7"/>
+      </svg>
+    </div>
+    <div class="name-row">
+      <div class="name">Mezets</div>
+      <div class="age-badge">🎉 16 лет</div>
+    </div>
+
+    <div class="stat-block">
+      <div class="big" id="orders">0</div>
+      <div class="label">Выполнено заказов</div>
+    </div>
+
+    <div class="stat-block">
+      <div class="stars" id="stars">
+        <div class="star">★</div><div class="star">★</div><div class="star">★</div>
+        <div class="star">★</div><div class="star">★</div>
+      </div>
+      <div class="label">Рейтинг</div>
+    </div>
+    <div class="stat-block">
+      <div class="big" id="period" style="font-size:12px">—</div>
+      <div class="label">Период выполнения заказов</div>
+    </div>
+    <div class="stat-block">
+      <div class="big online-value">
+        <span class="live-dot"></span>
+        <span id="online">0</span>
+      </div>
+      <div class="label">Онлайн на сервере</div>
+    </div>
+    </div>
+
+    <a class="discord-order-btn" href="https://discord.gg/aBJBmzS49e" target="_blank">
+      <svg viewBox="0 0 127.14 96.36" fill="currentColor"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2A75.57,75.57,0,0,0,95.9,78.05c.87.65,1.76,1.33,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.9,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53.06s5-12.64,11.43-12.64S54,46.13,53.89,53.06,48.84,65.69,42.45,65.69Zm42.24,0c-6.27,0-11.44-5.69-11.44-12.63s5-12.64,11.44-12.64S96.23,46.13,96.12,53.06,91.08,65.69,84.69,65.69Z"/></svg>
+      Заказать оформление
+    </a>
   </div>
 
-  <div class="rules-grid">
-
-  <div class="rule important" style="animation-delay:0.04s">
-    <div class="rule-num">01</div>
-    <div class="rule-body">
-      <div class="rule-title">Начало работы</div>
-      <div class="rule-text">
-        Работа начинается после внесения <span class="hi">предоплаты — 50% от стоимости заказа</span>.<br>
-        Обычно предоплата не возвращается.
-      </div>
+  <!-- ОТЗЫВЫ ИЗ DISCORD -->
+  <div class="reviews-card">
+    <div class="reviews-title">Отзывы</div>
+    <div class="reviews-list" id="reviewsList">
+      <div class="reviews-loading">Загружаем отзывы...</div>
     </div>
   </div>
 
-  <div class="rule" style="animation-delay:0.09s">
-    <div class="rule-num">02</div>
-    <div class="rule-body">
-      <div class="rule-title">Правки</div>
-      <div class="rule-text">
-        <b>Правки бесплатные.</b><br>
-        Кардинальное изменение ТЗ в процессе работы оплачивается дополнительно: <span class="hi">+75%</span> от стоимости.
-      </div>
-    </div>
-  </div>
-
-  <div class="rule" style="animation-delay:0.14s">
-    <div class="rule-num">03</div>
-    <div class="rule-body">
-      <div class="rule-title">Сроки</div>
-      <div class="rule-text">
-        Сроки оговариваются заранее и зависят от сложности и загруженности.<br>
-        Обычно: <span class="hi">от 1 до 3 дней</span>.<br>
-      </div>
-    </div>
-  </div>
-
-  <div class="rule" style="animation-delay:0.19s">
-    <div class="rule-num">04</div>
-    <div class="rule-body">
-      <div class="rule-title">Скидки</div>
-      <div class="rule-text">
-        Скидки возможны и обсуждаемы при:<br><i>
-        — большом объёме работ<br>
-        — заказе нескольких оформлений<br>
-        — повторных заказах<br></i><i>— пришли от моих знакомых</i>
-      </div>
-    </div>
-  </div>
-
-  <div class="rule" style="animation-delay:0.24s">
-    <div class="rule-num">05</div>
-    <div class="rule-body">
-      <div class="rule-title">Передача работы</div>
-      <div class="rule-text">
-        Готовое оформление передаётся <span class="hi">после полной оплаты</span> в согласованном формате.
-      </div>
-    </div>
-  </div>
-
-  <div class="rule" style="animation-delay:0.29s">
-    <div class="rule-num">06</div>
-    <div class="rule-body">
-      <div class="rule-title">Предоплата</div>
-      <div class="rule-text">
-        Возврат предоплаты возможен <span class="hi">по договорённости</span> в отдельных случаях.
-      </div>
-    </div>
-  </div>
-
-  <div class="rule" style="animation-delay:0.34s">
-    <div class="rule-num">07</div>
-    <div class="rule-body">
-      <div class="rule-title">Завершение с возвратом</div>
-      <div class="rule-text">
-        В отдельных случаях работа может быть завершена с возвратом предоплаты, если мы не пришли к общему видению.
-      </div>
-    </div>
-  </div>
-
-  <div class="rule important" style="animation-delay:0.39s">
-    <div class="rule-num">08</div>
-    <div class="rule-body">
-      <div class="rule-title">Претензии после получения</div>
-      <div class="rule-text">
-        После передачи заказа у тебя есть 7<span class="hi">&nbsp;дней</span>&nbsp;для замечаний и недочётов.<br>
-        По истечении срока претензии могут не приниматься.
-      </div>
-    </div>
-  </div>
-
-  <div class="rule" style="animation-delay:0.44s">
-    <div class="rule-num">09</div>
-    <div class="rule-body">
-      <div class="rule-title">Дополнительно</div>
-      <div class="rule-text">
-        Для крупных заказов — возможность работы в <span class="hi">Discord с демонстрацией экрана</span>: обсуждаем детали, правки и видение вживую.<br><br>Во всех правилах я могу делать исключения к каждому клиенту.
-      </div>
-    </div>
-  </div>
-
-  <div class="rule important" style="animation-delay:0.49s">
-    <div class="rule-num">10</div>
-    <div class="rule-body">
-      <div class="rule-title">Промокоды</div>
-      <div class="rule-text">
-        Использовать промокод можно только 1 раз. <span class="hi">Скидка по промокоду не может быть использована, если вам выданы другие скидки на заказ.</span> Промокод привязан к вашему аккаунту и не может использоваться другими людьми.&nbsp;
-      </div>
-    </div>
-  </div>
-
-  </div><!-- /rules-grid -->
-
-  <div class="footer-note">
-    Оформляя заказ, ты соглашаешься с этими правилами
-  </div>
-
-  <div class="order-cta">
-    <div class="cta-label">Всё понятно?</div>
-    <a class="cta-btn" href="https://mezets.github.io/mezets.design/">Оформить заказ</a>
-  </div>
 
 </div>
 
-<script src="/common.js"></script>
+<!-- КНОПКИ ВНИЗУ ПО ЦЕНТРУ -->
+<div class="bottom-nav">
+  <a class="btn bottom-nav-btn" href="/mezets.design/prices">Цены на оформление</a>
+  <a class="btn bottom-nav-btn" href="/mezets.design/rules">Правила оформления</a>
+</div>
+
+<!-- ПОРТФОЛИО -->
+<section class="portfolio-section">
+  <div class="portfolio-title">Мои работы</div>
+  <div class="portfolio-track-wrap">
+    <div class="portfolio-track" id="portfolioTrack"></div>
+  </div>
+</section>
+
+<!-- ОКНО ПРОСМОТРА РАБОТЫ -->
+<div class="portfolio-modal-overlay" id="portfolioModalOverlay" onclick="closePortfolioOnBg(event)">
+  <div class="portfolio-modal">
+    <div class="portfolio-modal-close" onclick="closePortfolioModal()">✕</div>
+    <div class="portfolio-modal-media-wrap" id="portfolioModalMediaWrap">
+      <img class="portfolio-modal-img" id="portfolioModalImg" src="" alt="Работа" style="display:none">
+      <video class="portfolio-modal-vid" id="portfolioModalVid" muted loop playsinline controls style="display:none"></video>
+      <div class="portfolio-modal-arrow left" id="portfolioModalPrev" onclick="portfolioModalStep(-1, event)" style="display:none">‹</div>
+      <div class="portfolio-modal-arrow right" id="portfolioModalNext" onclick="portfolioModalStep(1, event)" style="display:none">›</div>
+      <div class="portfolio-modal-zoom-btn" id="portfolioZoomBtn" onclick="openPortfolioFullscreen(event)" title="Открыть на весь экран" style="display:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="11" cy="11" r="7"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          <line x1="11" y1="8" x2="11" y2="14"></line>
+          <line x1="8" y1="11" x2="14" y2="11"></line>
+        </svg>
+      </div>
+    </div>
+    <div class="portfolio-modal-dots" id="portfolioModalDots"></div>
+    <div class="portfolio-modal-info">
+      <div class="portfolio-modal-type" id="portfolioModalType"></div>
+      <div class="portfolio-modal-time" id="portfolioModalTime"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ПОЛНОЭКРАННЫЙ ПРОСМОТР ФОТО С ЛУПОЙ -->
+<div class="portfolio-fs-overlay" id="portfolioFsOverlay" onclick="closePortfolioFullscreenOnBg(event)">
+  <div class="portfolio-fs-close" onclick="closePortfolioFullscreen()">✕</div>
+  <div class="portfolio-fs-arrow left" id="portfolioFsPrev" onclick="portfolioFsStep(-1, event)" style="display:none">‹</div>
+  <div class="portfolio-fs-arrow right" id="portfolioFsNext" onclick="portfolioFsStep(1, event)" style="display:none">›</div>
+  <div class="portfolio-fs-img-wrap" id="portfolioFsImgWrap">
+    <img class="portfolio-fs-img" id="portfolioFsImg" src="" alt="Работа — полный экран" draggable="false">
+    <div class="portfolio-loupe" id="portfolioLoupe"></div>
+    <div class="portfolio-fs-hint" id="portfolioFsHint">наведите курсор — приблизить · тап на телефоне — зум</div>
+  </div>
+</div>
+
+<!-- SEO-ТЕКСТ: описание услуг для поисковиков и людей -->
+<section class="seo-text">
+  <h1>Mezets — оформление Discord, ВК, YouTube и Twitch для RP-серверов</h1>
+  <p>
+    Я занимаюсь <strong>оформлением Discord-серверов</strong>, групп ВК, превью для YouTube,
+    оформлением Twitch и форумных аккаунтов/разделов. Основная аудитория — игроки и администрация
+    RP-проектов: <strong>Province RP</strong>, <strong>GPA 5 RP</strong>, <strong>Majestik</strong> и
+    <strong>Arizona RP</strong>. Делаю аватарки, баннеры, фоны приглашений и анимированное
+    оформление под стиль конкретного сервера.
+  </p>
+  <p>
+    Помимо дизайна, я делаю <strong>ботов для Discord, Telegram и VK</strong> —
+    под задачи модерации, статистики, заявок и автоматизации сервера или группы.
+  </p>
+  <h2>Что делаю</h2>
+  <ul>
+    <li>Оформление Discord-серверов (баннеры, аватарки, роли, приглашения)</li>
+    <li>Оформление групп ВК (обложки, аватарки, дизайн меню)</li>
+    <li>Превью и оформление YouTube-каналов</li>
+    <li>Оформление Twitch-профилей</li>
+    <li>Оформление форумных аккаунтов и разделов</li>
+    <li>Боты для Discord, Telegram, VK</li>
+    <li>Оформление под RP-сервера: Province RP, GPA 5 RP, Majestik, Arizona RP</li>
+  </ul>
+</section>
+
+<!-- КНОПКА ОТКРЫТЬ РУЛЕТКУ -->
+<div class="koleso-btn" onclick="openRoulette()" title="Рулетка скидок">
+  <img src="koleso.png" alt="Рулетка">
+  <span class="koleso-hint" id="kolesoHint">
+    Тут можно получить скидку
+    <span class="koleso-hint-close" id="kolesoHintClose" title="Скрыть">✕</span>
+  </span>
+</div>
+
+<!-- ОВЕРЛЕЙ РУЛЕТКИ -->
+<div class="roulette-overlay" id="rouletteOverlay" onclick="closeOnBg(event)">
+  <div class="roulette-box" id="rouletteBox">
+
+    <div class="roulette-close" onclick="closeRoulette()">✕</div>
+    <div class="roulette-title">Рулетка скидок</div>
+
+    <div class="roulette-winners">
+      <div class="roulette-winners-title">Последние победители</div>
+      <div class="roulette-winners-list" id="rouletteWinnersList">
+        <div class="roulette-winners-empty">Никто ещё не крутил...</div>
+      </div>
+    </div>
+
+    <div class="strip-wrap">
+      <div class="strip-arrow"></div>
+      <div class="strip-line"></div>
+      <div class="strip" id="strip"></div>
+    </div>
+
+    <div class="chances">
+      <span class="chance-item">Испытай свою удачу &gt;:3</span>
+    </div>
+
+    <div class="roulette-result">
+      <div class="result-pct" id="resultPct"></div>
+      <div class="result-code" id="resultCode" onclick="copyCode()"></div>
+      <div class="copied-msg" id="copiedMsg">скопировано!</div>
+    </div>
+
+    <div id="loginBlock">
+      <a class="discord-login-btn" id="discordLoginBtn" href="#">
+        <svg viewBox="0 0 127.14 96.36" fill="currentColor" style="width:16px;height:16px;flex-shrink:0"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2A75.57,75.57,0,0,0,95.9,78.05c.87.65,1.76,1.33,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.9,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53.06s5-12.64,11.43-12.64S54,46.13,53.89,53.06,48.84,65.69,42.45,65.69Zm42.24,0c-6.27,0-11.44-5.69-11.44-12.63s5-12.64,11.44-12.64S96.23,46.13,96.12,53.06,91.08,65.69,84.69,65.69Z"/></svg>
+        Войти через Discord
+      </a>
+      <div class="login-hint">Нужно войти, чтобы крутить рулетку!</div>
+      <div class="login-hint" style="margin-top:6px;font-size:10px;opacity:0.7">
+        Используя сайт и входя через Discord, вы соглашаетесь с
+        <span onclick="openDataPolicy()" style="text-decoration:underline;cursor:pointer;color:#ff8888">условиями обработки данных</span>
+      </div>
+    </div>
+
+    <script>
+      function openDataPolicy() { document.getElementById('dataPolicyOverlay').style.display = 'flex'; }
+      function closeDataPolicy() { document.getElementById('dataPolicyOverlay').style.display = 'none'; }
+    </script>
+
+    <div id="spinBlock" style="display:none">
+      <div class="logged-as" id="loggedAs"></div>
+      <button class="btn" id="spinBtn" onclick="spin()" style="width:100%;cursor:pointer;border:none">
+        Крутить
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ТОСТ ТЕХ. НЕПОЛАДОК -->
+<div class="maint-toast" id="maintToast">
+  <div class="maint-toast-head">
+    <div class="maint-toast-dot"></div>
+    <div class="maint-toast-title" id="maintToastTitle">Тех. неполадки</div>
+  </div>
+  <div class="maint-toast-msg" id="maintToastMsg">
+    Ведутся технические работы.<br>После 21:00 по МСК всё заработает!
+  </div>
+</div>
+
+
+<!-- ЛЕТАЮЩАЯ КОРОВА -->
+<img src="cow.png" alt="cow" class="flying-cow" id="flyingCow" title="Жми на корову!">
+<audio id="cowSound" src="cow.mp3" preload="auto"></audio>
+
+
 <script>
 
-  function openDataPolicy() { document.getElementById('dataPolicyOverlay').style.display = 'flex'; }
-  function closeDataPolicy() { document.getElementById('dataPolicyOverlay').style.display = 'none'; }
+  /* ========================================================= ПОРТФОЛИО Чтобы добавить новую работу — допиши объект в конец массива PORTFOLIO_ITEMS ниже. Три поля: img — имя файла, лежит в папке portfolio/ поддерживаются картинки (.png/.jpg/.gif) и видео (.mp4) type — что за работа ("Аватарка", "Баннер", "Оформление форумного аккаунта" и т.п.) time — за сколько выполнена ("1 день", "3 часа" и т.п.) Пример: { img: "portfolio/work12.png", type: "Баннер сервера", time: "1 день" }, { img: "portfolio/work13.mp4", type: "Анимированный баннер", time: "1 день" }, Чтобы объединить НЕСКОЛЬКО работ в одно окошко (с листанием по стрелкам/точкам/свайпом при открытии) — оберни их в group: { group: [ { img: "portfolio/a.png", type: "Работа 1", time: "1 день" }, { img: "portfolio/b.png", type: "Работа 2", time: "1 день" }, ] } ========================================================= */
+  const PORTFOLIO_ITEMS = [
+    { img: "portfolio/mp4/f2c72d40df4751e3.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/mp4/1.mp4", type: "Анимированное оформление форумного аккаунта", time: "3 дня" },
+    { img: "portfolio/png/02072026.png", type: "Оформление форумного раздела", time: "2 дня" },
+    {
+      group: [
+    { img: "portfolio/png/280620261.png", type: "Оформление форумного аккаунта и раздела", time: "1 день" },
+    { img: "portfolio/png/280620262.png", type: "Оформление форумного аккаунта и раздела", time: "1 день" },
+  ]
+},
+    { img: "portfolio/mp4/d61caa09fc0a7268.mp4", type: "Анимированное оформление форумного аккаунта", time: "2 дня" },
+    { img: "portfolio/mp4/c5e015abe5ef5d24.mp4", type: "Анимированное оформление форумного аккаунта", time: "14 дней / С учётом ожиданий" },
+    { img: "portfolio/mp4/6e1c16cb73a4f0c7.mp4", type: "Анимированное оформление форумного аккаунта", time: "3 дня" },
+    { img: "portfolio/mp4/e826c60c70506a4e.mp4", type: "Анимированное оформление форумного аккаунта", time: "2 дня" },
+    { img: "portfolio/mp4/9cce42308c66a6fa.mp4", type: "Анимированное оформление форумного аккаунта", time: "2 дня" },
+    { img: "portfolio/mp4/637c6ea26a1fc236.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/mp4/c110732042b25a2b.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/mp4/2b5b754da85608e5.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/mp4/ca37069f0cb26cf0.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+{
+  group: [
+    { img: "portfolio/png/vk (3).png", type: "Оформление группы ВК", time: "2 дня" },
+    { img: "portfolio/png/vk (1).png", type: "Оформление группы ВК", time: "2 дня" },
+    { img: "portfolio/png/vk (2).png", type: "Оформление группы ВК", time: "2 дня" },
+  ]
+},
+    { img: "portfolio/png/321.png", type: "Оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/mp4/9eae1af972e0c792.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/png/d48ccf921236f3c2126.png", type: "Оформление группы ВК", time: "1 день" },
+    { img: "portfolio/mp4/bc06898fd6fc67ab.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/png/a3290f724f898e3f.png", type: "Оформление форумного аккаунта", time: "1 день" },
+{
+  group: [
+    { img: "portfolio/mp4/21808c23072837b1.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/mp4/66fad8f99e42d879.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+  ]
+},
+    { img: "portfolio/mp4/c.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/png/148604a323a84573.png", type: "Оформление форумного аккаунта", time: "2 дня" },
+    { img: "portfolio/mp4/feedf0a20e18c140.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+{
+  group: [
+    { img: "portfolio/png/tv (2).png", type: "Оформление Twitch", time: "1 день" },
+    { img: "portfolio/png/tv (1).png", type: "Оформление Twitch", time: "1 день" },
+  ]
+},
+    { img: "portfolio/png/9ac3993015b2b9cf.png", type: "Оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/png/ff7f32b0d6ba1011.png", type: "Оформление форумных разделов", time: "1 день" },
+    { img: "portfolio/png/11beebc137b1f5e9.png", type: "Оформление группы ВК", time: "2 дня" },
+    { img: "portfolio/mp4/9c45641283169ca6.mp4", type: "Анимированное оформление форумного аккаунта", time: "2 дня" },
+    { img: "portfolio/png/4fb69b3f3e108103.png", type: "Оформление форумного аккаунта", time: "1 день" },
+   { img: "portfolio/mp4/ae016f282b171634.mp4", type: "Анимированное оформление форумного аккаунта", time: "2 дня" },
+{
+  group: [
+    { img: "portfolio/png/dvizhpervih (6).png", type: "Оформление для <<Движения первых>>", time: "2 месяца / С учётом ожиданий" },
+    { img: "portfolio/png/dvizhpervih (7).png", type: "Оформление для <<Движения первых>>", time: "2 месяца / С учётом ожиданий" },
+    { img: "portfolio/png/dvizhpervih (8).png", type: "Оформление для <<Движения первых>>", time: "2 месяца / С учётом ожиданий" },
+    { img: "portfolio/png/dvizhpervih (1).png", type: "Оформление для <<Движения первых>>", time: "2 месяца / С учётом ожиданий" },
+    { img: "portfolio/png/dvizhpervih (2).png", type: "Оформление для <<Движения первых>>", time: "2 месяца / С учётом ожиданий" },
+    { img: "portfolio/png/dvizhpervih (3).png", type: "Оформление для <<Движения первых>>", time: "2 месяца / С учётом ожиданий" },
+    { img: "portfolio/png/dvizhpervih (5).png", type: "Оформление для <<Движения первых>>", time: "2 месяца / С учётом ожиданий" },
+    { img: "portfolio/png/dvizhpervih (4).png", type: "Оформление для <<Движения первых>>", time: "2 месяца / С учётом ожиданий" },
+  ]
+},
+    { img: "portfolio/png/9ef13f1bfc538763.png", type: "Оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/png/prev.png", type: "Превью для YouTube", time: "2 дня" },
+    { img: "portfolio/mp4/5abbc31fb75cc879.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/png/2.png", type: "Оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/mp4/9aea3cf2d065ca86.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/png/a3e33aad31bfabfe.png", type: "Оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/mp4/b48e6dd5bea5da15.mp4", type: "Анимированное оформление форумного аккаунта", time: "2 дня" },
+    { img: "portfolio/mp4/3a39b97d42947ac6.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/png/ec777b88d33127a8.png", type: "Оформление форумного аккаунта", time: "2 дня" },
+  ];
 
-  /* =========================================================
-     ПЕРЕКЛЮЧАТЕЛЬ ТЕМЫ
-     Приоритет: сохранённый выбор в куки → тема системы → тёмная.
-     Куки общие с главной страницей — тема синхронна по всему сайту.
-  ========================================================= */
+
+  /* ========================= ЛЕТАЮЩАЯ КОРОВА ========================= */
+  (function() {
+    const cow = document.getElementById('flyingCow');
+    const cowSound = document.getElementById('cowSound');
+
+    function launchCow() {
+      cow.classList.remove('fly');
+      // форсируем перезапуск анимации
+      void cow.offsetWidth;
+      cow.classList.add('fly');
+      // на всякий случай гарантированно скрываем после завершения анимации
+      setTimeout(() => {
+        cow.classList.remove('fly');
+      }, 6200);
+    }
+
+    cow.addEventListener('click', () => {
+      cowSound.currentTime = 0;
+      cowSound.play().catch(() => {});
+    });
+
+    // первый пролёт через 42 секунды, затем повтор каждые 42 секунды
+    setTimeout(() => {
+      launchCow();
+      setInterval(launchCow, 42000);
+    }, 42000);
+  })();
+
+  /* ========================= КОНФИГ ВАЖНО: меняй этот адрес на актуальный адрес туннеля/бэкенда! ========================= */
+  const API = 'https://mez.up.railway.app';
+
+  const VISUAL = {
+    10:  { pct: '10%',  cls: 'si-10'  },
+    25:  { pct: '25%',  cls: 'si-25'  },
+    42:  { pct: '42%',  cls: 'si-42'  },
+    50:  { pct: '50%',  cls: 'si-50'  },
+    67:  { pct: '67%',  cls: 'si-67'  },
+    75:  { pct: '75%',  cls: 'si-75'  },
+    100: { pct: '100%', cls: 'si-100' },
+  };
+  const VISUAL_LIST = [10, 25, 42, 50, 67, 75, 100];
+
+  const RESULT_PHRASE = {
+    10:  'больше только в фильмах',
+    25:  'ну нармальна',
+    42:  'Слава Богу 42🙏❤️СЛАВА 42🙏❤️АНГЕЛА ХРАНИТЕЛЯ 42 КАЖДОМУ ИЗ ВАС🙏❤️БОЖЕ ХРАНИ 42🙏❤️СПАСИБО ВАМ НАШИ БРАТУХИ🙏🏼❤️ХРАНИ БОсса💯Слава Богу 42🙏❤️СЛАВА 42🙏❤️АНГЕЛА ХРАНИТЕЛЯ 42',
+    50:  'жэст',
+    67:  'СИИИИКСССС СЕВЕЕЕЕН',
+    75:  'ну пачти',
+    100: 'везунчик епта :3',
+  };
+
+  const ITEM_W  = 90;
+  const TOTAL   = 44;
+  const WIN_IDX = 34;
+
+  const stripEl = document.getElementById('strip');
+
+  /* ========================= MAINTENANCE ========================= */
+  function showMaint(msg, title) {
+    if (msg) document.getElementById('maintToastMsg').innerHTML = msg;
+    if (title) document.getElementById('maintToastTitle').textContent = title;
+    document.getElementById('maintToast').classList.add('show');
+  }
+  function hideMaint() {
+    document.getElementById('maintToast').classList.remove('show');
+  }
+  async function checkMaintenance() {
+    try {
+      const res  = await fetch(`${API}/maintenance-status`, { mode: 'cors' });
+      const data = await res.json();
+      if (data.on) showMaint(data.msg, data.title);
+      else hideMaint();
+    } catch(e) {}
+  }
+  checkMaintenance();
+  setInterval(checkMaintenance, 60000);
+
+  /* ========================= ТЕСТОВЫЙ РЕЖИМ ========================= */
+  function getTestKeyFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('test_key');
+  }
+  const TEST_KEY = getTestKeyFromUrl();
+
+  /* ========================= СЕССИЯ DISCORD ========================= */
+  function getSessionFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('session');
+  }
+  function getStoredSession() {
+    return localStorage.getItem('mezets_session') || null;
+  }
+  function storeSession(token) {
+    localStorage.setItem('mezets_session', token);
+  }
+  (function initSession() {
+    const urlSession = getSessionFromUrl();
+    if (urlSession) {
+      storeSession(urlSession);
+      const cleanUrl = window.location.origin + window.location.pathname;
+      window.history.replaceState({}, document.title, cleanUrl);
+    }
+  })();
+  function currentSession() {
+    return getStoredSession();
+  }
+
+  /* ========================= BROWSER FINGERPRINT (псевдо-HWID) ========================= */
+  async function getBrowserFingerprint() {
+    try {
+      const cached = localStorage.getItem('mezets_fp');
+      if (cached) return cached;
+    } catch(e) {}
+
+    let canvasHash = '';
+    try {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      ctx.textBaseline = 'top';
+      ctx.font = "14px 'Arial'";
+      ctx.fillText('mezets-fp-🔥', 2, 2);
+      canvasHash = canvas.toDataURL();
+    } catch(e) {}
+
+    const raw = [
+      navigator.userAgent,
+      navigator.language,
+      navigator.hardwareConcurrency || '',
+      navigator.deviceMemory || '',
+      screen.width + 'x' + screen.height + 'x' + screen.colorDepth,
+      (Intl.DateTimeFormat().resolvedOptions().timeZone) || '',
+      canvasHash
+    ].join('###');
+
+    let hash = '';
+    try {
+      if (window.crypto && crypto.subtle && crypto.subtle.digest) {
+        const enc = new TextEncoder().encode(raw);
+        const digest = await crypto.subtle.digest('SHA-256', enc);
+        hash = Array.from(new Uint8Array(digest))
+          .map(b => b.toString(16).padStart(2, '0')).join('');
+      }
+    } catch(e) {}
+
+    if (!hash) {
+      // Web Crypto недоступен (встроенные браузеры, приватные режимы и т.п.) —
+      // считаем синхронный запасной хэш (FNV-1a), чтобы fingerprint всё равно не был пустым
+      let h = 0x811c9dc5;
+      for (let i = 0; i < raw.length; i++) {
+        h ^= raw.charCodeAt(i);
+        h = Math.imul(h, 0x01000193);
+      }
+      hash = 'fnv' + (h >>> 0).toString(16);
+    }
+
+    try { localStorage.setItem('mezets_fp', hash); } catch(e) {}
+    return hash;
+  }
+
+  async function registerDevice() {
+    const session = currentSession();
+    const fp = await getBrowserFingerprint();
+    if (session) {
+      fetch(`${API}/register-device?session=${encodeURIComponent(session)}&fp=${encodeURIComponent(fp)}`, { mode: 'cors' }).catch(()=>{});
+    }
+    // Трекинг визита для гостей — отправляем в фоне, не ждём ответа,
+    // чтобы не задерживать снятие экрана загрузки и проверку бана.
+    fetch(`${API}/track-visit?fp=${encodeURIComponent(fp)}&session=${encodeURIComponent(session || '')}`, { mode: 'cors' }).catch(()=>{});
+    checkSiteBan(session, fp);
+    setInterval(() => checkSiteBan(currentSession(), fp), 60000);
+  }
+  registerDevice();
+
+  let banEnforced = false;
+  function enforceBanOverlay(reason) {
+    const overlay = document.getElementById('banOverlay');
+    const reasonLine = document.getElementById('banReasonLine');
+    overlay.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    if (reason) {
+      reasonLine.textContent = 'Причина: ' + reason;
+      reasonLine.style.display = 'block';
+    }
+    if (!banEnforced) {
+      banEnforced = true;
+
+      // Полностью стираем страницу — остаётся только окно бана.
+      // Даже если кто-то уберёт оверлей через консоль, восстанавливать уже нечего.
+      Array.from(document.body.children).forEach(el => {
+        if (el.id !== 'banOverlay' && el.id !== 'banSound') el.remove();
+      });
+
+      const snd = document.getElementById('banSound');
+      if (snd) {
+        snd.currentTime = 0;
+        const playPromise = snd.play();
+        if (playPromise && playPromise.catch) {
+          playPromise.catch(() => {
+            // Браузер заблокировал автовоспроизведение без клика — играем при первом взаимодействии
+            const retry = () => { snd.currentTime = 0; snd.play().catch(()=>{}); };
+            document.addEventListener('click', retry, { once: true });
+            document.addEventListener('keydown', retry, { once: true });
+            document.addEventListener('touchstart', retry, { once: true });
+          });
+        }
+      }
+
+      // Не даём убрать окно бана через консоль/девтулзы
+      document.addEventListener('keydown', e => {
+        if (e.key === 'F12') e.preventDefault();
+        if (e.ctrlKey && e.shiftKey && ['I','J','C','K'].includes(e.key.toUpperCase())) e.preventDefault();
+        if (e.ctrlKey && e.key.toUpperCase() === 'U') e.preventDefault();
+      }, true);
+      document.addEventListener('contextmenu', e => e.preventDefault(), true);
+
+      const mo = new MutationObserver(() => {
+        const ov = document.getElementById('banOverlay');
+        if (!ov || ov.style.display !== 'flex') {
+          location.reload();
+        }
+      });
+      mo.observe(overlay, { attributes: true, attributeFilter: ['style','class'] });
+      mo.observe(document.body, { childList: true });
+
+      setInterval(() => {
+        const ov = document.getElementById('banOverlay');
+        if (ov) { ov.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+      }, 800);
+
+      // Грубая эвристика "открыты ли devtools" (по разнице размеров окна).
+      // Не панацея (можно обойти отстыкованным окном/другим браузером),
+      // но мешает спокойно пользоваться консолью пока активен бан.
+      let ddtWarned = false;
+      setInterval(() => {
+        const wDiff = window.outerWidth  - window.innerWidth;
+        const hDiff = window.outerHeight - window.innerHeight;
+        if (wDiff > 160 || hDiff > 160) {
+          if (!ddtWarned) { ddtWarned = true; }
+          location.reload();
+        } else {
+          ddtWarned = false;
+        }
+      }, 1000);
+    }
+  }
+
+  function hideLoadingGate() {
+    const gate = document.getElementById('loadingGate');
+    if (gate) gate.style.display = 'none';
+  }
+
+  async function checkSiteBan(session, fp) {
+    try {
+      const params = new URLSearchParams();
+      if (session) params.set('session', session);
+      if (fp) params.set('fp', fp);
+      const res  = await fetch(`${API}/check-ban?${params.toString()}`, { mode: 'cors' });
+      const data = await res.json();
+      if (data.banned) enforceBanOverlay(data.reason);
+      else hideLoadingGate();
+    } catch(e) {
+      hideLoadingGate(); // бэкенд недоступен — не блокируем сайт всем подряд
+    }
+  }
+  // Подстраховка: если проверка совсем зависла, не держим людей на загрузке вечно
+  setTimeout(hideLoadingGate, 6000);
+
+  /* ========================= ЛОГИН ЧЕРЕЗ DISCORD ========================= */
+  async function setupLoginButton() {
+    try {
+      const res  = await fetch(`${API}/discord-login-url`, { mode: 'cors' });
+      const data = await res.json();
+      document.getElementById('discordLoginBtn').href = data.url;
+    } catch(e) {
+      console.error('Не удалось получить ссылку логина', e);
+    }
+  }
+
+  /* ========================= ПРОВЕРКА СТАТУСА ========================= */
+  async function checkCanSpin() {
+
+    const loginBlock = document.getElementById('loginBlock');
+    const spinBlock  = document.getElementById('spinBlock');
+    const btn        = document.getElementById('spinBtn');
+
+    if (TEST_KEY) {
+      loginBlock.style.display = 'none';
+      spinBlock.style.display  = 'block';
+      stopIdleStrip();
+
+      const btn = document.getElementById('spinBtn');
+
+      document.getElementById('loggedAs').textContent = 'Тестовый режим (без ограничений)';
+
+      btn.textContent = 'Крутить';
+      btn.style.opacity = '1';
+      btn.style.cursor = 'pointer';
+
+      btn.onclick = spin;
+
+      return;
+    }
+
+    const session = currentSession();
+    if (!session) {
+      loginBlock.style.display = 'block';
+      spinBlock.style.display  = 'none';
+      setupLoginButton();
+      buildIdleStrip();
+      return;
+    }
+
+    try {
+      const res  = await fetch(`${API}/can-spin?session=${encodeURIComponent(session)}`, { mode: 'cors' });
+      const data = await res.json();
+
+      if (!data.logged_in) {
+        localStorage.removeItem('mezets_session');
+        loginBlock.style.display = 'block';
+        spinBlock.style.display  = 'none';
+        setupLoginButton();
+        buildIdleStrip();
+        return;
+      }
+
+      loginBlock.style.display = 'none';
+      spinBlock.style.display  = 'block';
+      stopIdleStrip();
+
+      if (data.banned) {
+        document.getElementById('loggedAs').textContent = 'Доступ заблокирован администратором';
+        btn.textContent   = 'Заблокировано';
+        btn.style.opacity = '0.4';
+        btn.style.cursor  = 'not-allowed';
+        btn.onclick       = null;
+        return;
+      }
+
+      document.getElementById('loggedAs').textContent = 'Вы вошли через Discord';
+
+      if (!data.can_spin) {
+        btn.textContent   = 'Уже крутил';
+        btn.style.opacity = '0.4';
+        btn.style.cursor  = 'not-allowed';
+        btn.onclick       = null;
+      } else {
+        btn.textContent   = 'Крутить';
+        btn.style.opacity = '1';
+        btn.style.cursor  = 'pointer';
+        btn.onclick       = spin;
+      }
+    } catch(e) {
+      console.error('Ошибка проверки статуса', e);
+      buildIdleStrip();
+    }
+  }
+
+  /* ========================= АНИМАЦИЯ ПОЛОСЫ ========================= */
+  function buildStrip(winnerDiscount) {
+    idleStripRunning = false;
+    stripEl.classList.remove('idle-scroll');
+    stripEl.innerHTML = '';
+    for (let i = 0; i < TOTAL; i++) {
+      const disc = (i === WIN_IDX)
+        ? winnerDiscount
+        : VISUAL_LIST[Math.floor(Math.random() * VISUAL_LIST.length)];
+      const v  = VISUAL[disc];
+      const el = document.createElement('div');
+      el.className = `strip-item ${v.cls}`;
+      el.innerHTML = `<span class="si-pct">${v.pct}</span><span class="si-label">скидка</span>`;
+      stripEl.appendChild(el);
+    }
+  }
+
+  let idleStripRunning = false;
+
+  /* Декоративная лента, бегущая фоном до авторизации через Discord. Не участвует в реальном спине — просто заполняет полосу и дублирует её x2 для бесшовной CSS-анимации (idleScroll: -50%). ВАЖНО: строится только один раз и дальше не трогается, иначе при каждом открытии рулетки (checkCanSpin) лента дёргано телепортировалась бы на новые случайные цифры. */
+  function buildIdleStrip() {
+    if (idleStripRunning) return;
+    idleStripRunning = true;
+
+    stripEl.classList.remove('idle-scroll');
+    stripEl.style.transition = 'none';
+    stripEl.style.transform  = 'translateX(0)';
+    stripEl.innerHTML = '';
+    const half = [];
+    for (let i = 0; i < TOTAL; i++) {
+      half.push(VISUAL_LIST[Math.floor(Math.random() * VISUAL_LIST.length)]);
+    }
+    for (let rep = 0; rep < 2; rep++) {
+      half.forEach(disc => {
+        const v  = VISUAL[disc];
+        const el = document.createElement('div');
+        el.className = `strip-item ${v.cls}`;
+        el.innerHTML = `<span class="si-pct">${v.pct}</span><span class="si-label">скидка</span>`;
+        stripEl.appendChild(el);
+      });
+    }
+    requestAnimationFrame(() => stripEl.classList.add('idle-scroll'));
+  }
+
+  function stopIdleStrip() {
+    idleStripRunning = false;
+    stripEl.classList.remove('idle-scroll');
+  }
+
+  function runAnimation(winnerDiscount, code) {
+    buildStrip(winnerDiscount);
+    const wrapW   = stripEl.parentElement.offsetWidth;
+    const targetX = WIN_IDX * ITEM_W + ITEM_W / 2 - wrapW / 2;
+    stripEl.style.transition = 'none';
+    stripEl.style.transform  = 'translateX(0)';
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      stripEl.style.transition = 'transform 3.4s cubic-bezier(0.17,0.67,0.10,1.0)';
+      stripEl.style.transform  = `translateX(-${targetX}px)`;
+      setTimeout(() => {
+        document.getElementById('spinSound').pause();
+        if (winnerDiscount === 42) {
+          const s = document.getElementById('rouletteCowSound');
+          s.currentTime = 0; s.play().catch(() => {});
+        } else if (winnerDiscount === 67) {
+          const s = document.getElementById('sound67');
+          s.currentTime = 0; s.play().catch(() => {});
+        } else {
+          document.getElementById('stopSound').currentTime = 0;
+          document.getElementById('stopSound').play().catch(() => {});
+        }
+        lastCode = code;
+        localStorage.setItem('mezets_spin_result', JSON.stringify({ discount: winnerDiscount, code }));
+        document.getElementById('resultPct').innerHTML =
+          `Скидка ${VISUAL[winnerDiscount].pct}!<br><span style="font-size:10px;color:rgba(255,200,200,0.7)">${RESULT_PHRASE[winnerDiscount]}</span>`;
+        document.getElementById('resultPct').classList.add('show');
+        document.getElementById('resultCode').textContent = code;
+        document.getElementById('resultCode').classList.add('show');
+        burstParticles();
+        spinning = false;
+        const btn = document.getElementById('spinBtn');
+        if (TEST_KEY) {
+          btn.textContent   = 'Крутить ещё';
+          btn.style.opacity = '1';
+          btn.style.cursor  = 'pointer';
+          btn.onclick       = spin;
+        } else {
+          btn.textContent   = 'Уже крутил';
+          btn.style.opacity = '0.4';
+          btn.style.cursor  = 'not-allowed';
+          btn.onclick       = null;
+        }
+      }, 3500);
+    }));
+  }
+
+  let spinning = false;
+  let lastCode = null;
+
+  function burstParticles() {
+    const COUNT  = 48;
+    const cx     = window.innerWidth  / 2;
+    const cy     = window.innerHeight / 2;
+    const colors = ['#ff2a2a','#ff6b6b','#ff9b9b','#ffcccc','#ffffff','#ff4500'];
+    for (let i = 0; i < COUNT; i++) {
+      const p     = document.createElement('div');
+      p.className = 'burst-particle';
+      const size  = Math.random() * 10 + 4;
+      const angle = (Math.PI * 2 / COUNT) * i + (Math.random() - 0.5) * 0.5;
+      const dist  = Math.random() * 220 + 80;
+      const bx    = Math.cos(angle) * dist;
+      const by    = Math.sin(angle) * dist;
+      const dur   = Math.random() * 600 + 800;
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      p.style.cssText = `left:${cx}px;top:${cy}px;width:${size}px;height:${size}px;background:${color};box-shadow:0 0 ${size*2}px ${color};--bx:${bx}px;--by:${by}px;animation:burst-fly ${dur}ms ease-out forwards;`;
+      document.body.appendChild(p);
+      setTimeout(() => p.remove(), dur + 50);
+    }
+  }
+
+  async function spin() {
+    if (spinning) return;
+    spinning = true;
+    const snd = document.getElementById('spinSound');
+    snd.pause(); snd.currentTime = 0; snd.play();
+
+    let url;
+    if (TEST_KEY) {
+      url = `${API}/spin?test_key=${encodeURIComponent(TEST_KEY)}`;
+    } else {
+      const session = currentSession();
+      if (!session) { checkCanSpin(); return; }
+      url = `${API}/spin?session=${encodeURIComponent(session)}`;
+    }
+
+    const btn = document.getElementById('spinBtn');
+    btn.textContent   = '...';
+    btn.style.opacity = '0.5';
+    document.getElementById('resultPct').classList.remove('show');
+    document.getElementById('resultCode').classList.remove('show');
+    document.getElementById('copiedMsg').classList.remove('show');
+
+    try {
+      const res  = await fetch(url, { mode: 'cors' });
+      const data = await res.json();
+      if (data.error === 'already_spun' && !TEST_KEY) {
+        spinning = false;
+        btn.textContent   = 'Уже крутил';
+        btn.style.opacity = '0.4';
+        btn.style.cursor  = 'not-allowed';
+        document.getElementById('resultPct').textContent = 'Вы уже крутили!';
+        document.getElementById('resultPct').classList.add('show');
+        return;
+      }
+      if (data.error === 'banned') {
+        spinning = false;
+        btn.textContent   = 'Заблокировано';
+        btn.style.opacity = '0.4';
+        btn.style.cursor  = 'not-allowed';
+        document.getElementById('resultPct').textContent = 'Доступ заблокирован администратором';
+        document.getElementById('resultPct').classList.add('show');
+        return;
+      }
+      if (data.error === 'not_logged_in') {
+        spinning = false;
+        localStorage.removeItem('mezets_session');
+        checkCanSpin();
+        return;
+      }
+      runAnimation(data.discount, data.code);
+    } catch(e) {
+      spinning = false;
+      btn.textContent   = 'Ошибка, попробуй ещё';
+      btn.style.opacity = '1';
+    }
+  }
+
+  function copyCode() {
+    if (!lastCode) return;
+    navigator.clipboard.writeText(lastCode).then(() => {
+      const msg = document.getElementById('copiedMsg');
+      msg.classList.add('show');
+      setTimeout(() => msg.classList.remove('show'), 1500);
+    });
+  }
+
+  function openRoulette() {
+    document.getElementById('rouletteOverlay').classList.add('open');
+    checkCanSpin();
+  }
+  function closeRoulette() {
+    document.getElementById('rouletteOverlay').classList.remove('open');
+  }
+  function closeOnBg(e) {
+    if (e.target === document.getElementById('rouletteOverlay')) closeRoulette();
+  }
+
+  /* ========================= ПОДСКАЗКА НА КНОПКЕ РУЛЕТКИ ========================= */
+  const KOLESO_HINT_KEY = 'mezets_koleso_hint_closed';
+  const kolesoHint      = document.getElementById('kolesoHint');
+  const kolesoHintClose = document.getElementById('kolesoHintClose');
+
+  if (localStorage.getItem(KOLESO_HINT_KEY) === '1' && kolesoHint) {
+    kolesoHint.style.display = 'none';
+  }
+  if (kolesoHintClose) {
+    kolesoHintClose.addEventListener('click', (e) => {
+      e.stopPropagation();
+      localStorage.setItem(KOLESO_HINT_KEY, '1');
+      kolesoHint.style.display = 'none';
+    });
+  }
+
+  /* ========================= ОТЗЫВЫ ИЗ DISCORD ========================= */
+  function renderReview(r, idx, list) {
+    const stars = [1,2,3,4,5].map(i =>
+      `<span class="review-star ${i <= r.rating ? 'on' : ''}">★</span>`
+    ).join('');
+    const avatar = r.avatar
+      ? `<img class="review-avatar" src="${r.avatar}" alt="" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'review-avatar-placeholder',textContent:'?'}))">`
+      : `<div class="review-avatar-placeholder">?</div>`;
+    const comment = r.comment ? `<div class="review-comment">${r.comment}</div>` : '';
+    const orderInfo = r.order
+      ? `<div class="review-order">Заказ ${r.order}${r.order_type ? ' · ' + r.order_type : ''}</div>`
+      : '';
+    const el = document.createElement('div');
+    el.className = 'review-item';
+    el.style.animationDelay = `${idx * 60}ms`;
+    el.innerHTML = `
+      <div class="review-header">
+        ${avatar}
+        <div class="review-meta">
+          <div class="review-author">${r.author}</div>
+          <div class="review-date">${r.date}</div>
+        </div>
+      </div>
+      <div class="review-stars">${stars}</div>
+      ${comment}
+      ${orderInfo}
+    `;
+    list.appendChild(el);
+  }
+
+  async function loadReviews() {
+    const list = document.getElementById('reviewsList');
+    try {
+      const res = await fetch(`${API}/api/reviews?limit=20`, { mode: 'cors' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (!data.reviews || data.reviews.length === 0) {
+        list.innerHTML = '<div class="reviews-loading">Отзывов пока нет</div>';
+        return;
+      }
+      list.innerHTML = '';
+      data.reviews.forEach((r, idx) => renderReview(r, idx, list));
+    } catch(e) {
+      console.error('Reviews fetch error:', e);
+      try {
+        const res2 = await fetch(`${API}/api/reviews?limit=20`);
+        if (!res2.ok) throw new Error(`HTTP ${res2.status}`);
+        const data2 = await res2.json();
+        if (data2.reviews && data2.reviews.length > 0) {
+          list.innerHTML = '';
+          data2.reviews.forEach((r, idx) => renderReview(r, idx, list));
+          return;
+        }
+      } catch(e2) { console.error('Fallback error:', e2); }
+      list.innerHTML = `<div class="reviews-loading">Ошибка загрузки.<br>Проверь консоль (F12)</div>`;
+    }
+  }
+  loadReviews();
+  setInterval(loadReviews, 60000);
+
+
+  function animateCount(el, target, duration) {
+    const start = performance.now();
+    function step(now) {
+      const p    = Math.min((now - start) / duration, 1);
+      const ease = p === 1 ? 1 : 1 - Math.pow(2, -10 * p);
+      el.textContent = Math.round(target * ease);
+      if (p < 1) requestAnimationFrame(step);
+      else el.textContent = target;
+    }
+    requestAnimationFrame(step);
+  }
+
+  function animateStars(count) {
+    document.querySelectorAll('#stars .star').forEach((s, i) => {
+      s.classList.remove('full');
+      if (i < count) setTimeout(() => s.classList.add('full'), i * 200);
+    });
+  }
+
+  function extractNumber(v) { const m = String(v||'').match(/(\d+)/); return m ? parseInt(m[1]) : 0; }
+  function extractRating(v) { const m = String(v||'').match(/([\d.]+)/); return m ? parseFloat(m[1]) : 0; }
+  function safe(v) { return v ?? '—'; }
+
+  let prevOrders = null, prevOnline = null, prevRating = null, firstLoad = true;
+
+  async function loadStats() {
+    try {
+      const res = await fetch(`${API}/stats?_=${Date.now()}`, { mode: 'cors', cache: 'no-store' });
+      if (!res.ok) throw new Error();
+      const d      = await res.json();
+      const orders = extractNumber(d.total_orders);
+      const online = typeof d.online === 'number' ? d.online : extractNumber(d.online);
+      const rating = Math.round(extractRating(d.average_rating));
+      if (firstLoad || prevOrders !== orders) { animateCount(document.getElementById('orders'), orders, firstLoad ? 1400 : 600); prevOrders = orders; }
+      if (firstLoad || prevOnline !== online) { animateCount(document.getElementById('online'), online, firstLoad ? 1000 : 500); prevOnline = online; }
+      if (firstLoad || prevRating !== rating) { animateStars(rating); prevRating = rating; }
+      document.getElementById('period').textContent = safe(d.period);
+      firstLoad = false;
+    } catch(e) {
+      document.getElementById('orders').textContent = '—';
+      document.getElementById('period').textContent = '—';
+      document.getElementById('online').textContent = '—';
+    }
+  }
+  loadStats();
+  setInterval(loadStats, 60000);
+
+  /* ========================= 3D НАКЛОН ========================= */
+  function tilt(card) {
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width  - 0.5;
+      const y = (e.clientY - r.top)  / r.height - 0.5;
+      card.style.transform = `rotateY(${x*16}deg) rotateX(${-y*16}deg) scale(1.02)`;
+    });
+    card.addEventListener('mouseleave', () => { card.style.transform = 'rotateY(0) rotateX(0) scale(1)'; });
+  }
+  tilt(document.getElementById('card2'));
+
+  // 3D наклон для карточки отзывов
+  const reviewsCard = document.querySelector('.reviews-card');
+  if (reviewsCard) tilt(reviewsCard);
+
+  // 3D наклон для рулетки
+  const rouletteOverlayEl = document.getElementById('rouletteOverlay');
+  const rouletteBoxEl     = document.getElementById('rouletteBox');
+  if (rouletteOverlayEl && rouletteBoxEl) {
+    rouletteOverlayEl.addEventListener('mousemove', e => {
+      const r = rouletteBoxEl.getBoundingClientRect();
+      if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) {
+        rouletteBoxEl.style.transform = 'rotateY(0) rotateX(0)';
+        return;
+      }
+      const x = (e.clientX - r.left) / r.width  - 0.5;
+      const y = (e.clientY - r.top)  / r.height - 0.5;
+      rouletteBoxEl.style.transform = `rotateY(${x*10}deg) rotateX(${-y*10}deg)`;
+    });
+    rouletteOverlayEl.addEventListener('mouseleave', () => {
+      rouletteBoxEl.style.transform = 'rotateY(0) rotateX(0)';
+    });
+  }
+
+  // 3D наклон для карточки заказа
+  const orderCard = document.getElementById('orderCard');
+  if (orderCard) tilt(orderCard);
+
+  /* ========================= ФОРМА ЗАКАЗА ========================= */
+  async function submitOrder() {
+    const discord = document.getElementById('orderDiscord').value.trim();
+    const wishes  = document.getElementById('orderWishes').value.trim();
+    const status  = document.getElementById('orderStatus');
+    const btn     = document.getElementById('orderSubmit');
+
+    if (!discord) {
+      status.textContent = 'Укажи Discord ник';
+      status.className = 'order-status err';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Отправка...';
+    status.textContent = '';
+    status.className = 'order-status';
+
+    try {
+      const res = await fetch(`${API}/api/order`, {
+        method: 'POST',
+        mode: 'cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ discord, wishes }),
+      });
+      const data = await res.json();
+      if (data.status === 'ok') {
+        status.textContent = 'Заявка отправлена! Ожидай ответа в Discord';
+        status.className = 'order-status ok';
+        document.getElementById('orderDiscord').value = '';
+        document.getElementById('orderWishes').value  = '';
+        btn.textContent = 'Отправлено ✓';
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.textContent = 'Отправить заявку';
+        }, 4000);
+      } else {
+        throw new Error(data.error || 'Ошибка');
+      }
+    } catch(e) {
+      status.textContent = e.message || 'Не удалось отправить';
+      status.className = 'order-status err';
+      btn.disabled = false;
+      btn.textContent = 'Отправить заявку';
+    }
+  }
+
+
+
+  /* ========================= ПОСЛЕДНИЕ ПОБЕДИТЕЛИ ========================= */
+  const DISCOUNT_EMOJI = {10:'🎟️',25:'🎫',42:'🐄',50:'🎯',67:'🔥',75:'💎',100:'👑'};
+  const WEIGHTS = {10:130,25:46,42:22,50:18,67:7,75:5,100:1};
+  const WEIGHTS_TOTAL = Object.values(WEIGHTS).reduce((a,b)=>a+b,0);
+  function getChance(discount) { return (WEIGHTS[discount]/WEIGHTS_TOTAL*100).toFixed(2)+'%'; }
+
+  function renderRouletteWinners(winners) {
+    const list = document.getElementById('rouletteWinnersList');
+    if (!list) return;
+    if (!winners || winners.length === 0) {
+      list.innerHTML = '<div class="roulette-winners-empty">Никто ещё не крутил...</div>';
+      return;
+    }
+    list.innerHTML = '';
+    winners.forEach((w, i) => {
+      const item = document.createElement('div');
+      item.className = 'roulette-winner-item';
+      item.style.animationDelay = `${i * 60}ms`;
+      const avatarHtml = w.avatar
+        ? `<img class="roulette-winner-avatar" src="${w.avatar}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="roulette-winner-avatar-placeholder" style="display:none">🎰</div>`
+        : `<div class="roulette-winner-avatar-placeholder">🎰</div>`;
+      const emoji = DISCOUNT_EMOJI[w.discount] || '🎰';
+      item.innerHTML = `
+        ${avatarHtml}
+        <div class="roulette-winner-info">
+          <div class="roulette-winner-name">${w.username}</div>
+          <div class="roulette-winner-meta">${w.date} · шанс ${getChance(w.discount)}</div>
+        </div>
+        <div class="roulette-winner-badge">${emoji} ${w.discount}%</div>
+      `;
+      list.appendChild(item);
+    });
+  }
+
+  async function loadWinners() {
+    try {
+      const res  = await fetch(`${API}/last-winners`, { mode: 'cors' });
+      const data = await res.json();
+      renderRouletteWinners(data.winners);
+    } catch(e) {}
+  }
+
+  loadWinners();
+  setInterval(loadWinners, 60000);
+
+  /* ========================= ЧАСТИЦЫ ========================= */
+  /* ========================================================= ПЕРЕКЛЮЧАТЕЛЬ ТЕМЫ Приоритет: сохранённый выбор в куки → тема системы (ПК/телефона) → тёмная. Выбор пользователя всегда сохраняется в куки на год. ========================================================= */
   function getCookie(name) {
     const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
     return match ? decodeURIComponent(match[2]) : null;
@@ -556,9 +2974,10 @@
   function resize() { canvas.width = innerWidth; canvas.height = innerHeight; }
   resize(); addEventListener('resize', resize);
   let dots = [];
+  const MAX_DOTS = 160; // потолок, чтобы на широких/4K экранах не считались тысячи точек каждый кадр
   function initDots() {
     dots = [];
-    const n = Math.round((innerWidth * innerHeight) / 9000);
+    const n = Math.min(Math.round((innerWidth * innerHeight) / 9000), MAX_DOTS);
     for (let i = 0; i < n; i++) dots.push({
       x: Math.random()*canvas.width, y: Math.random()*canvas.height,
       r: Math.random()*1.3+0.3, dx:(Math.random()-.5)*.15, dy:(Math.random()-.5)*.15
@@ -566,6 +2985,7 @@
   }
   initDots(); addEventListener('resize', initDots);
   const noMotion = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  let dotsRafId = null;
   function animate() {
     ctx.clearRect(0,0,canvas.width,canvas.height);
     for (let d of dots) {
@@ -575,22 +2995,541 @@
       if(d.x<0)d.x=canvas.width; if(d.x>canvas.width)d.x=0;
       if(d.y<0)d.y=canvas.height; if(d.y>canvas.height)d.y=0;
     }
-    requestAnimationFrame(animate);
+    dotsRafId = requestAnimationFrame(animate);
   }
   if (!noMotion) animate();
+  else for (let d of dots) { ctx.beginPath(); ctx.arc(d.x,d.y,d.r,0,Math.PI*2); ctx.fillStyle='rgba(255,0,0,0.6)'; ctx.fill(); }
 
-  // 3D tilt on rule cards
-  if (!noMotion) {
-    document.querySelectorAll('.rule').forEach(card => {
-      card.addEventListener('mousemove', e => {
-        const r = card.getBoundingClientRect();
-        const x = (e.clientX - r.left) / r.width  - .5;
-        const y = (e.clientY - r.top)  / r.height - .5;
-        card.style.transform = `rotateY(${x*14}deg) rotateX(${-y*14}deg) scale(1.03)`;
+  // Пауза анимации частиц, когда вкладка свёрнута/неактивна —
+  // не тратим CPU и батарею, пока страницу всё равно не видно.
+  document.addEventListener('visibilitychange', () => {
+    if (noMotion) return;
+    if (document.hidden) {
+      if (dotsRafId) cancelAnimationFrame(dotsRafId);
+      dotsRafId = null;
+    } else if (!dotsRafId) {
+      animate();
+    }
+  });
+
+  /* ── ПРАЗДНИК ТОЛЬКО 4 ИЮЛЯ (00:00–24:00 по местному времени) ── */
+  function isHolidayWindow() {
+    const now = new Date();
+    return now.getMonth() === 6 && now.getDate() === 4; // месяцы с 0: 6 = июль
+  }
+  const balloonsWrapEl = document.querySelector('.balloons-wrap');
+  const fwCanvasEl      = document.getElementById('fireworks');
+  const partyHatEl      = document.querySelector('.party-hat');
+  const ageBadgeEl      = document.querySelector('.age-badge');
+  const holidayActive   = isHolidayWindow();
+  if (!holidayActive) {
+    if (balloonsWrapEl) balloonsWrapEl.style.display = 'none';
+    if (fwCanvasEl) fwCanvasEl.style.display = 'none';
+    if (partyHatEl) partyHatEl.style.display = 'none';
+    if (ageBadgeEl) ageBadgeEl.style.display = 'none';
+  }
+
+  /* ── САЛЮТЫ ── */
+  (function fireworksInit() {
+    const fwCanvas = document.getElementById('fireworks');
+    if (!fwCanvas || noMotion || !holidayActive) return;
+    const fwCtx = fwCanvas.getContext('2d');
+    function fwResize() { fwCanvas.width = innerWidth; fwCanvas.height = innerHeight; }
+    fwResize(); addEventListener('resize', fwResize);
+
+    const FW_COLORS = ['#ff2b2b','#ff5c5c','#ffffff','#ffe5e5','#ff0000'];
+    let particles = [];
+    let rockets   = [];
+
+    function spawnRocket() {
+      const targetX = innerWidth * (0.06 + Math.random()*0.88);
+      const targetY = innerHeight * (0.1 + Math.random()*0.4);
+      rockets.push({
+        x: targetX, y: innerHeight + 20,
+        targetY, vy: -(Math.random()*3 + 6),
+        color: FW_COLORS[Math.floor(Math.random()*FW_COLORS.length)]
       });
-      card.addEventListener('mouseleave', () => { card.style.transform = ''; });
+    }
+
+    function explode(x, y, color) {
+      const count = 40 + Math.floor(Math.random()*20);
+      for (let i = 0; i < count; i++) {
+        const angle = (Math.PI * 2 * i) / count + Math.random()*0.2;
+        const speed = Math.random()*3.2 + 1.2;
+        particles.push({
+          x, y,
+          vx: Math.cos(angle)*speed,
+          vy: Math.sin(angle)*speed,
+          life: 1,
+          decay: Math.random()*0.012 + 0.012,
+          color
+        });
+      }
+    }
+
+    function fwTick() {
+      fwCtx.clearRect(0, 0, fwCanvas.width, fwCanvas.height);
+
+      rockets.forEach(r => { r.y += r.vy; });
+      rockets = rockets.filter(r => {
+        fwCtx.beginPath();
+        fwCtx.arc(r.x, r.y, 2.4, 0, Math.PI*2);
+        fwCtx.fillStyle = r.color;
+        fwCtx.fill();
+        if (r.y <= r.targetY) { explode(r.x, r.y, r.color); return false; }
+        return true;
+      });
+
+      particles.forEach(p => {
+        p.x += p.vx; p.y += p.vy;
+        p.vy += 0.035;
+        p.life -= p.decay;
+      });
+      particles = particles.filter(p => p.life > 0);
+      particles.forEach(p => {
+        fwCtx.globalAlpha = Math.max(p.life, 0);
+        fwCtx.beginPath();
+        fwCtx.arc(p.x, p.y, 2, 0, Math.PI*2);
+        fwCtx.fillStyle = p.color;
+        fwCtx.fill();
+      });
+      fwCtx.globalAlpha = 1;
+
+      requestAnimationFrame(fwTick);
+    }
+
+    function scheduleRocket() {
+      spawnRocket();
+      if (Math.random() < 0.4) spawnRocket();
+      setTimeout(scheduleRocket, 400 + Math.random()*700);
+    }
+
+    scheduleRocket();
+    fwTick();
+  })();
+  function isVideoSrc(src) {
+    return /\.(mp4|webm|mov)$/i.test(src || '');
+  }
+
+  const portfolioTrack        = document.getElementById('portfolioTrack');
+  const portfolioTrackWrap    = portfolioTrack ? portfolioTrack.parentElement : null;
+  const portfolioModalOverlay = document.getElementById('portfolioModalOverlay');
+  const portfolioModalImg     = document.getElementById('portfolioModalImg');
+  const portfolioModalVid     = document.getElementById('portfolioModalVid');
+  const portfolioModalType    = document.getElementById('portfolioModalType');
+  const portfolioModalTime    = document.getElementById('portfolioModalTime');
+  const portfolioModalPrev    = document.getElementById('portfolioModalPrev');
+  const portfolioModalNext    = document.getElementById('portfolioModalNext');
+  const portfolioModalDots    = document.getElementById('portfolioModalDots');
+
+  // 3D наклон для полного просмотра работы (объявляем здесь, после инициализации переменной)
+  const portfolioModal = document.querySelector('.portfolio-modal');
+  if (portfolioModal && portfolioModalOverlay) {
+    portfolioModalOverlay.addEventListener('mousemove', e => {
+      const r = portfolioModal.getBoundingClientRect();
+      if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) {
+        portfolioModal.style.transform = 'rotateY(0) rotateX(0)';
+        return;
+      }
+      const x = (e.clientX - r.left) / r.width  - 0.5;
+      const y = (e.clientY - r.top)  / r.height - 0.5;
+      portfolioModal.style.transform = `rotateY(${x*8}deg) rotateX(${-y*8}deg)`;
+    });
+    portfolioModalOverlay.addEventListener('mouseleave', () => {
+      portfolioModal.style.transform = 'rotateY(0) rotateX(0)';
     });
   }
+
+  let currentGroup = null;
+  let currentIndex = 0;
+
+  function showModalSlide() {
+    const items = currentGroup;
+    const item  = items[currentIndex];
+
+    const mediaWrap = document.getElementById('portfolioModalMediaWrap');
+
+    // Плавный переход: скрываем → меняем → показываем
+    const doSwitch = () => {
+      if (isVideoSrc(item.img)) {
+        portfolioModalImg.style.display = 'none';
+        portfolioModalImg.removeAttribute('src');
+        portfolioModalVid.src = item.img;
+        portfolioModalVid.style.display = 'block';
+        portfolioModalVid.currentTime = 0;
+        portfolioModalVid.play().catch(() => {});
+      } else {
+        portfolioModalVid.pause();
+        portfolioModalVid.removeAttribute('src');
+        portfolioModalVid.style.display = 'none';
+        portfolioModalImg.src = item.img;
+        portfolioModalImg.style.display = 'block';
+      }
+      mediaWrap.style.opacity = '1';
+      if (portfolioZoomBtn) portfolioZoomBtn.style.display = isVideoSrc(item.img) ? 'none' : 'flex';
+    };
+
+    if (mediaWrap.style.opacity === '0') {
+      doSwitch();
+    } else {
+      mediaWrap.style.transition = 'opacity .25s ease';
+      mediaWrap.style.opacity = '0';
+      setTimeout(() => {
+        doSwitch();
+        mediaWrap.style.opacity = '1';
+      }, 250);
+    }
+
+    portfolioModalType.textContent = item.type;
+    portfolioModalTime.textContent = `Срок выполнения: ${item.time}`;
+
+    const multi = items.length > 1;
+    portfolioModalPrev.style.display = multi ? 'flex' : 'none';
+    portfolioModalNext.style.display = multi ? 'flex' : 'none';
+
+    portfolioModalDots.innerHTML = '';
+    if (multi) {
+      items.forEach((_, i) => {
+        const dot = document.createElement('span');
+        if (i === currentIndex) dot.classList.add('active');
+        dot.addEventListener('click', (e) => {
+          e.stopPropagation();
+          currentIndex = i;
+          showModalSlide();
+        });
+        portfolioModalDots.appendChild(dot);
+      });
+    }
+  }
+
+  function portfolioModalStep(dir, e) {
+    if (e) e.stopPropagation();
+    if (!currentGroup) return;
+    currentIndex = (currentIndex + dir + currentGroup.length) % currentGroup.length;
+    showModalSlide();
+  }
+
+  function openPortfolioModal(items) {
+    currentGroup = items;
+    currentIndex = 0;
+    showModalSlide();
+    portfolioModalOverlay.classList.add('open');
+  }
+  function closePortfolioModal() {
+    portfolioModalOverlay.classList.remove('open');
+    portfolioModalVid.pause();
+    closePortfolioFullscreen();
+  }
+  function closePortfolioOnBg(e) {
+    if (e.target === portfolioModalOverlay) closePortfolioModal();
+  }
+
+  /* ========================================================= ПОЛНОЭКРАННЫЙ ПРОСМОТР ФОТО С ЛУПОЙ Кнопка-лупа на фото в модалке открывает отдельный оверлей с плавной анимацией масштабирования (scale + fade). На устройствах с настоящим курсором (мышь) при наведении появляется круглая лупа с приближённым фрагментом фото. На тач-устройствах лупы нет — вместо неё тап переключает обычный зум с плавным transform. ========================================================= */
+  const portfolioZoomBtn   = document.getElementById('portfolioZoomBtn');
+  const portfolioFsOverlay = document.getElementById('portfolioFsOverlay');
+  const portfolioFsImgWrap = document.getElementById('portfolioFsImgWrap');
+  const portfolioFsImg     = document.getElementById('portfolioFsImg');
+  const portfolioFsPrev    = document.getElementById('portfolioFsPrev');
+  const portfolioFsNext    = document.getElementById('portfolioFsNext');
+  const portfolioLoupe     = document.getElementById('portfolioLoupe');
+  const portfolioFsHint    = document.getElementById('portfolioFsHint');
+  const portfolioHasHover  = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const LOUPE_ZOOM = 1.6;
+
+  function resetFsZoomState() {
+    portfolioFsImgWrap.classList.remove('zoomed');
+    portfolioFsImg.style.transform = '';
+    portfolioLoupe.classList.remove('active');
+  }
+
+  function updateFsArrows() {
+    if (!portfolioFsPrev || !portfolioFsNext) return;
+    const multi = currentGroup && currentGroup.length > 1;
+    portfolioFsPrev.style.display = multi ? 'flex' : 'none';
+    portfolioFsNext.style.display = multi ? 'flex' : 'none';
+  }
+
+  function openPortfolioFullscreen(e) {
+    if (e) e.stopPropagation();
+    if (!portfolioModalImg.src || portfolioModalImg.style.display === 'none') return;
+    portfolioFsImg.style.opacity = '1';
+    portfolioFsImg.src = portfolioModalImg.src;
+    resetFsZoomState();
+    if (portfolioFsHint) portfolioFsHint.textContent = portfolioHasHover
+      ? 'наведите курсор — приблизить'
+      : 'тапните по фото — зум';
+    updateFsArrows();
+    portfolioFsOverlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closePortfolioFullscreen() {
+    if (!portfolioFsOverlay) return;
+    portfolioFsOverlay.classList.remove('open');
+    resetFsZoomState();
+    document.body.style.overflow = '';
+  }
+  function closePortfolioFullscreenOnBg(e) {
+    if (e.target === portfolioFsOverlay) closePortfolioFullscreen();
+  }
+
+  /* Переключение фото группы прямо в полноэкранном режиме — синхронизируется с окном просмотра позади (те же currentGroup/currentIndex), пропускает видео (в фулскрине показываются только фото), плавно меняет кадр. */
+  function portfolioFsStep(dir, e) {
+    if (e) e.stopPropagation();
+    if (!currentGroup || currentGroup.length < 2) return;
+    let idx = currentIndex;
+    let tries = 0;
+    do {
+      idx = (idx + dir + currentGroup.length) % currentGroup.length;
+      tries++;
+    } while (isVideoSrc(currentGroup[idx].img) && tries < currentGroup.length);
+    if (isVideoSrc(currentGroup[idx].img)) return; // в группе нет других фото
+    currentIndex = idx;
+    showModalSlide();
+    resetFsZoomState();
+    portfolioFsImg.style.opacity = '0';
+    setTimeout(() => {
+      portfolioFsImg.src = currentGroup[currentIndex].img;
+      portfolioFsImg.style.opacity = '1';
+    }, 160);
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (!portfolioFsOverlay || !portfolioFsOverlay.classList.contains('open')) return;
+    if (e.key === 'ArrowRight') portfolioFsStep(1);
+    if (e.key === 'ArrowLeft') portfolioFsStep(-1);
+  });
+
+  if (portfolioHasHover && portfolioFsImgWrap) {
+    portfolioFsImgWrap.addEventListener('mousemove', (e) => {
+      const r = portfolioFsImg.getBoundingClientRect();
+      if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) {
+        portfolioLoupe.classList.remove('active');
+        return;
+      }
+      const relX = e.clientX - r.left;
+      const relY = e.clientY - r.top;
+      const loupeSize = portfolioLoupe.offsetWidth;
+
+      portfolioLoupe.style.left = (relX - loupeSize / 2) + 'px';
+      portfolioLoupe.style.top  = (relY - loupeSize / 2) + 'px';
+      portfolioLoupe.style.backgroundImage = `url("${portfolioFsImg.src}")`;
+      portfolioLoupe.style.backgroundSize = `${r.width * LOUPE_ZOOM}px ${r.height * LOUPE_ZOOM}px`;
+      portfolioLoupe.style.backgroundPosition =
+        `${-(relX * LOUPE_ZOOM - loupeSize / 2)}px ${-(relY * LOUPE_ZOOM - loupeSize / 2)}px`;
+      portfolioLoupe.classList.add('active');
+    });
+    portfolioFsImgWrap.addEventListener('mouseleave', () => portfolioLoupe.classList.remove('active'));
+  } else if (portfolioFsImgWrap) {
+    let fsTapDragged = false;
+    portfolioFsImgWrap.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (fsTapDragged) { fsTapDragged = false; return; }
+      const zoomed = portfolioFsImgWrap.classList.toggle('zoomed');
+      portfolioFsImg.style.transform = zoomed ? 'scale(2.1)' : '';
+    });
+
+    /* Свайп по фото в фулскрине — листает группу (если это не одиночный тап) */
+    let fsSwipeStartX = null;
+    portfolioFsOverlay.addEventListener('touchstart', (e) => {
+      fsSwipeStartX = e.touches[0].clientX;
+      fsTapDragged = false;
+    }, { passive: true });
+    portfolioFsOverlay.addEventListener('touchmove', (e) => {
+      if (fsSwipeStartX !== null && Math.abs(e.touches[0].clientX - fsSwipeStartX) > 10) fsTapDragged = true;
+    }, { passive: true });
+    portfolioFsOverlay.addEventListener('touchend', (e) => {
+      if (fsSwipeStartX === null || !currentGroup || currentGroup.length < 2) { fsSwipeStartX = null; return; }
+      const diff = e.changedTouches[0].clientX - fsSwipeStartX;
+      fsSwipeStartX = null;
+      if (Math.abs(diff) > 40) { fsTapDragged = true; portfolioFsStep(diff > 0 ? -1 : 1); }
+    });
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && portfolioFsOverlay && portfolioFsOverlay.classList.contains('open')) {
+      closePortfolioFullscreen();
+    }
+  });
+
+  /* Свайп внутри открытого окна для листания группы работ */
+  let modalSwipeStartX = null;
+  if (portfolioModalOverlay) {
+    portfolioModalOverlay.addEventListener('touchstart', (e) => {
+      modalSwipeStartX = e.touches[0].clientX;
+    }, { passive: true });
+    portfolioModalOverlay.addEventListener('touchend', (e) => {
+      if (modalSwipeStartX === null || !currentGroup || currentGroup.length < 2) return;
+      const diff = e.changedTouches[0].clientX - modalSwipeStartX;
+      modalSwipeStartX = null;
+      if (Math.abs(diff) > 40) portfolioModalStep(diff > 0 ? -1 : 1);
+    });
+  }
+
+  /* Видео в ленте играют только пока карточка видна на экране — экономит ресурсы и даёт эффект "проигрывания при прокрутке" */
+  const portfolioVidObserver = ('IntersectionObserver' in window)
+    ? new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          const vid = entry.target;
+          if (entry.isIntersecting) vid.play().catch(() => {});
+          else vid.pause();
+        });
+      }, { threshold: 0.35 })
+    : null;
+
+  function buildCardMedia(coverItem) {
+    if (isVideoSrc(coverItem.img)) {
+      const vid = document.createElement('video');
+      vid.src = coverItem.img;
+      vid.muted = true;
+      vid.loop = true;
+      vid.playsInline = true;
+      vid.preload = 'metadata';
+      if (portfolioVidObserver) portfolioVidObserver.observe(vid);
+      return vid;
+    }
+    const img = document.createElement('img');
+    img.src = coverItem.img;
+    img.alt = coverItem.type;
+    img.loading = 'lazy';
+    return img;
+  }
+
+  function renderPortfolio() {
+    if (!portfolioTrack || PORTFOLIO_ITEMS.length === 0) return;
+    portfolioTrack.innerHTML = '';
+    // Дублируем набор x2 для бесшовной автопрокрутки (-50%)
+    for (let rep = 0; rep < 2; rep++) {
+      PORTFOLIO_ITEMS.forEach(entry => {
+        const items = entry.group ? entry.group : [entry];
+        if (!items.length || !items[0] || !items[0].img) return; // пропускаем пустые/битые записи
+        const cover = items[0];
+
+        const card = document.createElement('div');
+        card.className = 'portfolio-card';
+        card.appendChild(buildCardMedia(cover));
+
+        if (items.length > 1) {
+          const badge = document.createElement('div');
+          badge.className = 'portfolio-card-badge';
+          badge.textContent = `1/${items.length}`;
+          card.appendChild(badge);
+        }
+
+        const info = document.createElement('div');
+        info.className = 'portfolio-card-info';
+        info.innerHTML = `
+          <div class="portfolio-card-type">${cover.type}</div>
+          <div class="portfolio-card-time">${cover.time}</div>
+        `;
+        card.appendChild(info);
+
+        card.addEventListener('click', () => {
+          if (!portfolioDragged) openPortfolioModal(items);
+        });
+
+        // 3D наклон только для первого набора (не дублей)
+        if (rep === 0) {
+          card.addEventListener('mousemove', e => {
+            if (portfolioDown) return;
+            const r = card.getBoundingClientRect();
+            const x = (e.clientX - r.left) / r.width  - 0.5;
+            const y = (e.clientY - r.top)  / r.height - 0.5;
+            card.style.transform = `rotateY(${x*14}deg) rotateX(${-y*14}deg) scale(1.04) translateY(-4px)`;
+          });
+          card.addEventListener('mouseleave', () => {
+            card.style.transform = '';
+          });
+        }
+
+        portfolioTrack.appendChild(card);
+      });
+    }
+  }
+
+  /* ========================================================= ПРОКРУТКА ЛЕНТЫ — единый JS-источник позиции. Раньше автопрокрутка шла через CSS @keyframes, а драг — через инлайн-transform поверх неё: при отпускании мышки/пальца позиции конфликтовали и ленту резко перебрасывало в случайное место ("баговалась" при свайпе). Теперь и автопрокрутка, и драг управляют ОДНОЙ переменной portfolioX через requestAnimationFrame — никаких рывков и скачков в любую сторону. ========================================================= */
+  let portfolioX        = 0;     // текущая позиция трека (<= 0)
+  let portfolioDown     = false;
+  let portfolioDragged  = false;
+  let portfolioStartX   = 0;
+  let portfolioBaseX    = 0;
+  let portfolioPaused   = false;
+  let portfolioLastTs   = null;
+  const PORTFOLIO_SPEED = 36; // px/сек
+
+  const portfolioReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function portfolioHalfWidth() {
+    return portfolioTrack.scrollWidth / 2 || 1;
+  }
+
+  // Корректно сворачивает позицию в диапазон (-half, 0] независимо
+  // от направления — раньше это работало только при драге влево.
+  function portfolioWrap(x) {
+    const half = portfolioHalfWidth();
+    x = x % half;
+    if (x > 0) x -= half;
+    return x;
+  }
+
+  function portfolioApply(x) {
+    portfolioX = x;
+    portfolioTrack.style.transform = `translateX(${x}px)`;
+  }
+
+  function portfolioTick(ts) {
+    if (document.hidden) {
+      // Вкладка свёрнута — не считаем dt (иначе после возврата
+      // лента резко прыгнет на "накопленное" за это время расстояние)
+      portfolioLastTs = null;
+      requestAnimationFrame(portfolioTick);
+      return;
+    }
+    if (portfolioLastTs === null) portfolioLastTs = ts;
+    const dt = (ts - portfolioLastTs) / 1000;
+    portfolioLastTs = ts;
+    if (!portfolioPaused && !portfolioDown && PORTFOLIO_ITEMS.length > 1) {
+      portfolioApply(portfolioWrap(portfolioX - PORTFOLIO_SPEED * dt));
+    }
+    requestAnimationFrame(portfolioTick);
+  }
+
+  function portfolioPointerDown(e) {
+    if (!portfolioTrackWrap) return;
+    portfolioDown    = true;
+    portfolioDragged = false;
+    portfolioStartX  = (e.touches ? e.touches[0].clientX : e.clientX);
+    portfolioBaseX   = portfolioX;
+    portfolioTrackWrap.classList.add('dragging');
+  }
+  function portfolioPointerMove(e) {
+    if (!portfolioDown) return;
+    const x    = (e.touches ? e.touches[0].clientX : e.clientX);
+    const diff = x - portfolioStartX;
+    if (Math.abs(diff) > 4) portfolioDragged = true;
+    if (portfolioDragged && e.cancelable) e.preventDefault();
+    portfolioApply(portfolioWrap(portfolioBaseX + diff));
+  }
+  function portfolioPointerUp() {
+    if (!portfolioDown) return;
+    portfolioDown = false;
+    portfolioTrackWrap.classList.remove('dragging');
+    setTimeout(() => { portfolioDragged = false; }, 50);
+  }
+
+  if (portfolioTrackWrap) {
+    portfolioTrackWrap.addEventListener('mousedown',  portfolioPointerDown);
+    portfolioTrackWrap.addEventListener('touchstart', portfolioPointerDown, { passive: true });
+    window.addEventListener('mousemove',  portfolioPointerMove);
+    window.addEventListener('touchmove',  portfolioPointerMove, { passive: false });
+    window.addEventListener('mouseup',    portfolioPointerUp);
+    window.addEventListener('touchend',   portfolioPointerUp);
+    portfolioTrackWrap.addEventListener('mouseenter', () => { portfolioPaused = true;  });
+    portfolioTrackWrap.addEventListener('mouseleave', () => { portfolioPaused = false; });
+  }
+
+  renderPortfolio();
+  if (!portfolioReducedMotion) requestAnimationFrame(portfolioTick);
+
 </script>
 </body>
 </html>
