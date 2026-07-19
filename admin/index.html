@@ -713,6 +713,13 @@ let TOKEN = '', REPO = '', BRANCH = '';
 const BOT_API = 'https://mez.up.railway.app';
 let apiKey = '';
 
+/* ── Обёртка над fetch: ключи уходят заголовками, а не в URL (не светятся в логах) ── */
+function adminFetch(url, { master = false } = {}) {
+  const headers = { 'X-Admin-Key': apiKey };
+  if (master) headers['X-Master-Key'] = getMasterKey();
+  return fetch(url, { headers });
+}
+
 /* ── КУЛДАУН НА КНОПКИ ОБНОВЛЕНИЯ (не чаще раза в 10 сек) ── */
 const _cooldowns = {};
 function cooldownClick(btn, key, fn) {
@@ -869,7 +876,7 @@ async function login() {
     const res = await ghFetch(`/repos/${repo}`, token);
     if (!res.ok) throw new Error('Нет доступа к репозиторию. Проверь токен и права repo.');
 
-    const keyRes = await fetch(`${BOT_API}/admin/users?key=${encodeURIComponent(adminKey)}`);
+    const keyRes = await fetch(`${BOT_API}/admin/users`, { headers: { 'X-Admin-Key': adminKey } });
     if (keyRes.status === 403) throw new Error('Неверный ключ администратора');
     if (!keyRes.ok) throw new Error('Не удалось проверить ключ администратора (бэкенд недоступен)');
     const keyData = await keyRes.json();
@@ -1600,7 +1607,7 @@ async function loadUsers() {
   showStatus(status, '', '');
 
   try {
-    const res = await fetch(`${BOT_API}/admin/users?key=${encodeURIComponent(key)}`);
+    const res = await adminFetch(`${BOT_API}/admin/users`);
     if (res.status === 403) throw new Error('Неверный ключ');
     if (!res.ok) throw new Error('Ошибка сервера');
     const data = await res.json();
@@ -1678,7 +1685,7 @@ async function loadUnauthUsers() {
   showStatus(status, '', '');
 
   try {
-    const res = await fetch(`${BOT_API}/admin/unauthorized?key=${encodeURIComponent(key)}`);
+    const res = await adminFetch(`${BOT_API}/admin/unauthorized`);
     if (res.status === 403) throw new Error('Неверный ключ');
     if (!res.ok) throw new Error('Ошибка сервера');
     const data = await res.json();
@@ -1814,7 +1821,7 @@ async function banGuest(id) {
   const reason = prompt('Причина бана (можно пусто):', '') || '';
   const status = document.getElementById('unauthStatus');
   try {
-    const res = await fetch(`${BOT_API}/admin/ban-guest?key=${encodeURIComponent(apiKey)}&master_key=${encodeURIComponent(masterKey)}&id=${encodeURIComponent(id)}&reason=${encodeURIComponent(reason)}`);
+    const res = await adminFetch(`${BOT_API}/admin/ban-guest?id=${encodeURIComponent(id)}&reason=${encodeURIComponent(reason)}`, { master: true });
     if (res.status === 403) throw new Error('Неверный мастер-ключ');
     if (!res.ok) throw new Error('Не удалось забанить');
     showStatus(status, 'Гость забанен', 'ok');
@@ -1831,7 +1838,7 @@ async function unbanGuest(id) {
   if (!confirm('Снять бан с этого гостя?')) return;
   const status = document.getElementById('unauthStatus');
   try {
-    const res = await fetch(`${BOT_API}/admin/unban-guest?key=${encodeURIComponent(apiKey)}&master_key=${encodeURIComponent(masterKey)}&id=${encodeURIComponent(id)}`);
+    const res = await adminFetch(`${BOT_API}/admin/unban-guest?id=${encodeURIComponent(id)}`, { master: true });
     if (res.status === 403) throw new Error('Неверный мастер-ключ');
     if (!res.ok) throw new Error('Не удалось разбанить');
     showStatus(status, 'Бан снят', 'ok');
@@ -1848,7 +1855,7 @@ async function banUser(discordId) {
   const reason = prompt('Причина бана (можно пусто):', '') || '';
   const status = document.getElementById('usersStatus');
   try {
-    const res = await fetch(`${BOT_API}/admin/ban?key=${encodeURIComponent(apiKey)}&master_key=${encodeURIComponent(masterKey)}&discord_id=${encodeURIComponent(discordId)}&reason=${encodeURIComponent(reason)}`);
+    const res = await adminFetch(`${BOT_API}/admin/ban?discord_id=${encodeURIComponent(discordId)}&reason=${encodeURIComponent(reason)}`, { master: true });
     if (res.status === 403) throw new Error('Неверный мастер-ключ');
     if (!res.ok) throw new Error('Не удалось забанить');
     showStatus(status, 'Пользователь забанен', 'ok');
@@ -1865,7 +1872,7 @@ async function unbanUser(discordId) {
   if (!confirm('Снять бан с этого пользователя?')) return;
   const status = document.getElementById('usersStatus');
   try {
-    const res = await fetch(`${BOT_API}/admin/unban?key=${encodeURIComponent(apiKey)}&master_key=${encodeURIComponent(masterKey)}&discord_id=${encodeURIComponent(discordId)}`);
+    const res = await adminFetch(`${BOT_API}/admin/unban?discord_id=${encodeURIComponent(discordId)}`, { master: true });
     if (res.status === 403) throw new Error('Неверный мастер-ключ');
     if (!res.ok) throw new Error('Не удалось разбанить');
     showStatus(status, 'Бан снят', 'ok');
@@ -1890,7 +1897,7 @@ async function addToWatchlist() {
   if (!discordId) { showStatus(status, 'Впиши Discord ID', 'err'); return; }
 
   try {
-    const res = await fetch(`${BOT_API}/admin/watchlist/add?key=${encodeURIComponent(apiKey)}&master_key=${encodeURIComponent(masterKey)}&discord_id=${encodeURIComponent(discordId)}&reason=${encodeURIComponent(reason)}`);
+    const res = await adminFetch(`${BOT_API}/admin/watchlist/add?discord_id=${encodeURIComponent(discordId)}&reason=${encodeURIComponent(reason)}`, { master: true });
     if (res.status === 403) throw new Error('Неверный ключ или мастер-ключ');
     if (!res.ok) throw new Error('Не удалось добавить в стоп-лист');
     const data = await res.json();
@@ -1914,7 +1921,7 @@ async function loadWatchlist() {
   showStatus(status, '', '');
 
   try {
-    const res = await fetch(`${BOT_API}/admin/watchlist?key=${encodeURIComponent(apiKey)}`);
+    const res = await adminFetch(`${BOT_API}/admin/watchlist`);
     if (res.status === 403) throw new Error('Неверный ключ');
     if (!res.ok) throw new Error('Ошибка сервера');
     const data = await res.json();
@@ -1953,7 +1960,7 @@ async function removeFromWatchlist(discordId) {
   if (!masterKey) { showStatus(status, 'Введи мастер-ключ (не сохраняется)', 'err'); return; }
   if (!confirm('Убрать этот ID из стоп-листа? (текущий бан, если уже наложен, снят не будет)')) return;
   try {
-    const res = await fetch(`${BOT_API}/admin/watchlist/remove?key=${encodeURIComponent(apiKey)}&master_key=${encodeURIComponent(masterKey)}&discord_id=${encodeURIComponent(discordId)}`);
+    const res = await adminFetch(`${BOT_API}/admin/watchlist/remove?discord_id=${encodeURIComponent(discordId)}`, { master: true });
     if (res.status === 403) throw new Error('Неверный ключ или мастер-ключ');
     if (!res.ok) throw new Error('Не удалось убрать из стоп-листа');
     showStatus(status, 'Убрано из стоп-листа', 'ok');
@@ -1994,10 +2001,10 @@ async function saveMaintenance() {
   btn.disabled = true;
   showStatus(status, 'Сохраняю...', 'info');
   try {
-    const params = new URLSearchParams({ key: apiKey, on: String(on) });
+    const params = new URLSearchParams({ on: String(on) });
     if (title) params.set('title', title);
     if (msg)   params.set('msg', msg);
-    const res = await fetch(`${BOT_API}/set-maintenance?${params.toString()}`);
+    const res = await adminFetch(`${BOT_API}/set-maintenance?${params.toString()}`);
     if (res.status === 403) throw new Error('Неверный API-ключ');
     if (!res.ok) throw new Error('Не удалось сохранить');
     const data = await res.json();
