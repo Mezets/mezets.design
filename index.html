@@ -2288,15 +2288,11 @@
     const session = currentSession();
     const fp = await getBrowserFingerprint();
     if (session) {
-      try {
-        await fetch(`${API}/register-device?session=${encodeURIComponent(session)}&fp=${encodeURIComponent(fp)}`, { mode: 'cors' });
-      } catch(e) {}
+      fetch(`${API}/register-device?session=${encodeURIComponent(session)}&fp=${encodeURIComponent(fp)}`, { mode: 'cors' }).catch(()=>{});
     }
-    // Трекинг визита для гостей без Discord-логина (IP, fingerprint, браузер/ОС, геолокация).
-    // Если сессия есть и валидна — бэкенд сам пропустит этот визит, чтобы не дублировать с авторизованными.
-    try {
-      await fetch(`${API}/track-visit?fp=${encodeURIComponent(fp)}&session=${encodeURIComponent(session || '')}`, { mode: 'cors' });
-    } catch(e) {}
+    // Трекинг визита для гостей — отправляем в фоне, не ждём ответа,
+    // чтобы не задерживать снятие экрана загрузки и проверку бана.
+    fetch(`${API}/track-visit?fp=${encodeURIComponent(fp)}&session=${encodeURIComponent(session || '')}`, { mode: 'cors' }).catch(()=>{});
     checkSiteBan(session, fp);
     setInterval(() => checkSiteBan(currentSession(), fp), 60000);
   }
