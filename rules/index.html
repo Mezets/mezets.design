@@ -651,9 +651,7 @@
     }
     // Трекинг визита для гостей без Discord-логина (IP, fingerprint, браузер/ОС, геолокация).
     // Бэкенд сам пропустит этот визит, если сессия авторизована.
-    try {
-      await fetch(`${BAN_API}/track-visit?fp=${encodeURIComponent(fp)}&session=${encodeURIComponent(session)}`, { mode: 'cors' });
-    } catch(e) {}
+    fetch(`${BAN_API}/track-visit?fp=${encodeURIComponent(fp)}&session=${encodeURIComponent(session)}`, { mode: 'cors' }).catch(()=>{});
   }
   setTimeout(hideLoadingGate, 6000);
   checkSiteBanOnLoad();
