@@ -26,7 +26,6 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    /* ── КАСТОМНЫЙ СКРОЛЛБАР ── */
     html { scrollbar-width: thin; scrollbar-color: rgba(255,0,0,0.45) rgba(10,0,0,0.6); }
     ::-webkit-scrollbar { width: 10px; }
     ::-webkit-scrollbar-track { background: rgba(10,0,0,0.6); }
@@ -50,7 +49,6 @@
       transition: background .3s, color .3s;
     }
 
-    /* ── ПЕРЕМЕННЫЕ ТЕМЫ ── */
     :root {
       --bg-page: #050000;
       --bg-panel-95: rgba(10,0,0,0.95);
@@ -120,7 +118,6 @@
     .home-arrow svg { width: 18px; height: 18px; display: block; }
     .home-arrow:hover { transform: scale(1.1) translateX(-2px); border-color: rgba(255,0,0,0.5); box-shadow: 0 0 26px rgba(255,0,0,0.3); }
 
-    /* ── ПЕРЕКЛЮЧАТЕЛЬ ТЕМЫ (солнце/луна) ── */
     .theme-switch {
       position: fixed;
       top: 18px; right: 18px;
@@ -151,8 +148,6 @@
       box-shadow: 0 0 14px rgba(255,0,0,0.5);
     }
 
-    /* ── СВЕТЛАЯ ТЕМА: переопределения текста, который был
-       светло-розовым/белым и терялся на белом фоне ── */
     body.light-theme .page-sub { color: rgba(120,20,20,0.55); }
     body.light-theme .rule-text { color: rgba(60,10,10,0.9); }
     body.light-theme .rule-text .hi { color: #b00000; }
@@ -179,14 +174,12 @@
       line-height: 1.8;
     }
 
-    /* ── RULE GRID ── */
     .rules-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 8px;
     }
 
-    /* ── RULE CARD ── */
     .rules-grid { perspective: 1200px; }
     .rule {
       display: flex;
@@ -316,7 +309,6 @@
 </div>
 <style>@keyframes lgSpin { to { transform: rotate(360deg); } }</style>
 
-<!-- ТОСТ ТЕХ. НЕПОЛАДОК -->
 <div id="maintToast" style="position:fixed; bottom:20px; right:20px; z-index:99990; max-width:280px; background:rgba(10,0,0,0.95); border:1px solid rgba(255,40,40,0.3); border-radius:12px; padding:14px 16px; transform:translateY(140%); transition:transform .35s ease; font-family:'Press Start 2P',monospace;">
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
     <div style="width:8px;height:8px;border-radius:50%;background:#ff2a2a;flex-shrink:0;"></div>
@@ -508,181 +500,12 @@
 
 </div>
 
+<script src="/common.js"></script>
 <script>
-  /* ── ПРОВЕРКА БАНА (IP / Discord ID / fingerprint) ── */
-  const BAN_API = 'https://mez.up.railway.app';
-
-  async function getBrowserFingerprintForBan() {
-    try {
-      const cached = localStorage.getItem('mezets_fp');
-      if (cached) return cached;
-    } catch(e) {}
-
-    let canvasHash = '';
-    try {
-      const c = document.createElement('canvas');
-      const cx = c.getContext('2d');
-      cx.textBaseline = 'top';
-      cx.font = "14px 'Arial'";
-      cx.fillText('mezets-fp-🔥', 2, 2);
-      canvasHash = c.toDataURL();
-    } catch(e) {}
-
-    const raw = [
-      navigator.userAgent, navigator.language, navigator.hardwareConcurrency || '',
-      navigator.deviceMemory || '', screen.width + 'x' + screen.height + 'x' + screen.colorDepth,
-      (Intl.DateTimeFormat().resolvedOptions().timeZone) || '', canvasHash
-    ].join('###');
-
-    let hash = '';
-    try {
-      if (window.crypto && crypto.subtle && crypto.subtle.digest) {
-        const enc = new TextEncoder().encode(raw);
-        const digest = await crypto.subtle.digest('SHA-256', enc);
-        hash = Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2,'0')).join('');
-      }
-    } catch(e) {}
-
-    if (!hash) {
-      // Web Crypto недоступен (встроенные браузеры, приватные режимы и т.п.) —
-      // считаем синхронный запасной хэш (FNV-1a), чтобы fingerprint не был пустым
-      let h = 0x811c9dc5;
-      for (let i = 0; i < raw.length; i++) {
-        h ^= raw.charCodeAt(i);
-        h = Math.imul(h, 0x01000193);
-      }
-      hash = 'fnv' + (h >>> 0).toString(16);
-    }
-
-    try { localStorage.setItem('mezets_fp', hash); } catch(e) {}
-    return hash;
-  }
-
-  let banEnforced = false;
-  function enforceBanOverlay(reason) {
-    const overlay = document.getElementById('banOverlay');
-    const reasonLine = document.getElementById('banReasonLine');
-    overlay.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-    if (reason) {
-      reasonLine.textContent = 'Причина: ' + reason;
-      reasonLine.style.display = 'block';
-    }
-    if (!banEnforced) {
-      banEnforced = true;
-
-      // Полностью стираем страницу — остаётся только окно бана.
-      // Даже если кто-то уберёт оверлей через консоль, восстанавливать уже нечего.
-      Array.from(document.body.children).forEach(el => {
-        if (el.id !== 'banOverlay' && el.id !== 'banSound') el.remove();
-      });
-
-      const snd = document.getElementById('banSound');
-      if (snd) {
-        snd.currentTime = 0;
-        const playPromise = snd.play();
-        if (playPromise && playPromise.catch) {
-          playPromise.catch(() => {
-            // Браузер заблокировал автовоспроизведение без клика — играем при первом взаимодействии
-            const retry = () => { snd.currentTime = 0; snd.play().catch(()=>{}); };
-            document.addEventListener('click', retry, { once: true });
-            document.addEventListener('keydown', retry, { once: true });
-            document.addEventListener('touchstart', retry, { once: true });
-          });
-        }
-      }
-
-      document.addEventListener('keydown', e => {
-        if (e.key === 'F12') e.preventDefault();
-        if (e.ctrlKey && e.shiftKey && ['I','J','C','K'].includes(e.key.toUpperCase())) e.preventDefault();
-        if (e.ctrlKey && e.key.toUpperCase() === 'U') e.preventDefault();
-      }, true);
-      document.addEventListener('contextmenu', e => e.preventDefault(), true);
-
-      const mo = new MutationObserver(() => {
-        const ov = document.getElementById('banOverlay');
-        if (!ov || ov.style.display !== 'flex') {
-          location.reload();
-        }
-      });
-      mo.observe(overlay, { attributes: true, attributeFilter: ['style','class'] });
-      mo.observe(document.body, { childList: true });
-
-      setInterval(() => {
-        const ov = document.getElementById('banOverlay');
-        if (ov) { ov.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
-      }, 800);
-
-      // Грубая эвристика "открыты ли devtools" (по разнице размеров окна).
-      // Не панацея (можно обойти отстыкованным окном/другим браузером),
-      // но мешает спокойно пользоваться консолью пока активен бан.
-      let ddtWarned = false;
-      setInterval(() => {
-        const wDiff = window.outerWidth  - window.innerWidth;
-        const hDiff = window.outerHeight - window.innerHeight;
-        if (wDiff > 160 || hDiff > 160) {
-          if (!ddtWarned) { ddtWarned = true; }
-          location.reload();
-        } else {
-          ddtWarned = false;
-        }
-      }, 1000);
-    }
-  }
-
-  function hideLoadingGate() {
-    const gate = document.getElementById('loadingGate');
-    if (gate) gate.style.display = 'none';
-  }
-
-  async function checkSiteBanOnLoad() {
-    const session = localStorage.getItem('mezets_session') || '';
-    const fp = await getBrowserFingerprintForBan();
-    try {
-      const params = new URLSearchParams();
-      if (session) params.set('session', session);
-      if (fp) params.set('fp', fp);
-      const res  = await fetch(`${BAN_API}/check-ban?${params.toString()}`, { mode: 'cors' });
-      const data = await res.json();
-      if (data.banned) enforceBanOverlay(data.reason);
-      else hideLoadingGate();
-    } catch(e) {
-      hideLoadingGate(); // бэкенд недоступен — не блокируем сайт всем подряд
-    }
-    // Трекинг визита для гостей без Discord-логина (IP, fingerprint, браузер/ОС, геолокация).
-    // Бэкенд сам пропустит этот визит, если сессия авторизована.
-    fetch(`${BAN_API}/track-visit?fp=${encodeURIComponent(fp)}&session=${encodeURIComponent(session)}`, { mode: 'cors' }).catch(()=>{});
-  }
-  setTimeout(hideLoadingGate, 6000);
-  checkSiteBanOnLoad();
-  setInterval(checkSiteBanOnLoad, 60000);
-
-  /* ── ТОСТ ТЕХ. НЕПОЛАДОК ── */
-  async function checkMaintenance() {
-    try {
-      const res  = await fetch(`${BAN_API}/maintenance-status`, { mode: 'cors' });
-      const data = await res.json();
-      const toast = document.getElementById('maintToast');
-      if (data.on) {
-        document.getElementById('maintToastMsg').innerHTML = data.msg || '';
-        document.getElementById('maintToastTitle').textContent = data.title || 'Тех. неполадки';
-        toast.style.transform = 'translateY(0)';
-      } else {
-        toast.style.transform = 'translateY(140%)';
-      }
-    } catch(e) {}
-  }
-  checkMaintenance();
-  setInterval(checkMaintenance, 60000);
 
   function openDataPolicy() { document.getElementById('dataPolicyOverlay').style.display = 'flex'; }
   function closeDataPolicy() { document.getElementById('dataPolicyOverlay').style.display = 'none'; }
 
-  /* =========================================================
-     ПЕРЕКЛЮЧАТЕЛЬ ТЕМЫ
-     Приоритет: сохранённый выбор в куки → тема системы → тёмная.
-     Куки общие с главной страницей — тема синхронна по всему сайту.
-  ========================================================= */
   function getCookie(name) {
     const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
     return match ? decodeURIComponent(match[2]) : null;
@@ -743,7 +566,6 @@
   }
   if (!noMotion) animate();
 
-  // 3D tilt on rule cards
   if (!noMotion) {
     document.querySelectorAll('.rule').forEach(card => {
       card.addEventListener('mousemove', e => {
