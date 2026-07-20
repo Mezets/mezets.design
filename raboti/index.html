@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Скачать работу | Mezets</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="icon" type="image/png" href="/mezets.design/favicon.png">
+<link rel="icon" type="image/png" href="/favicon.png">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
 <style>
@@ -46,7 +46,6 @@
 
   canvas { position: fixed; inset: 0; z-index: 0; }
 
-  /* фоновое свечение, как на основном сайте */
   .fluff-wrap { position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
   .fluff {
     position: absolute;
@@ -79,7 +78,6 @@
     .fluff, .fluff2 { animation: none; }
   }
 
-  /* ── ШАРИКИ (только 4 июля) ── */
   .balloons-wrap { position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
   .balloon {
     position: absolute;
@@ -154,10 +152,8 @@
     .balloon-l7, .balloon-r7, .balloon-l9, .balloon-r9 { display: none; }
   }
 
-  /* ── САЛЮТЫ (только 4 июля) ── */
   #fireworks { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
 
-  /* ── ПЕРЕКЛЮЧАТЕЛЬ ТЕМЫ (солнце/луна) ── */
   .theme-switch {
     position: fixed;
     top: 18px; right: 18px;
@@ -278,14 +274,13 @@
   <div style="font-size:16px; color:#c99; max-width:420px;">Вам тут не рады. Доступ к сайту закрыт администратором.</div>
   <div id="banReasonLine" style="font-size:13px; color:#e88; max-width:420px; margin-top:14px; display:none;"></div>
 </div>
-<audio id="banSound" src="/mezets.design/ban.mp3" preload="auto"></audio>
+<audio id="banSound" src="/ban.mp3" preload="auto"></audio>
 
 <div id="loadingGate" style="position:fixed; inset:0; z-index:999995; background:#050000; display:flex; align-items:center; justify-content:center;">
   <div style="width:38px;height:38px;border:3px solid rgba(255,40,40,0.2);border-top-color:#ff3b3b;border-radius:50%;animation:lgSpin .8s linear infinite;"></div>
 </div>
 <style>@keyframes lgSpin { to { transform: rotate(360deg); } }</style>
 
-<!-- ТОСТ ТЕХ. НЕПОЛАДОК -->
 <div class="maint-toast" id="maintToast" style="position:fixed; bottom:20px; right:20px; z-index:99990; max-width:280px; background:rgba(10,0,0,0.95); border:1px solid rgba(255,40,40,0.3); border-radius:12px; padding:14px 16px; transform:translateY(140%); transition:transform .35s ease; font-family:'Press Start 2P',monospace;">
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
     <div style="width:8px;height:8px;border-radius:50%;background:#ff2a2a;flex-shrink:0;"></div>
@@ -346,7 +341,6 @@
 <canvas id="fireworks"></canvas>
 
 <div class="card" id="card">
-  <!-- контент подставляется скриптом -->
 </div>
 
 <a onclick="openDataPolicy()" style="position:fixed;left:14px;bottom:14px;z-index:500;font-size:7px;color:rgba(255,150,150,0.45);text-decoration:underline;cursor:pointer;font-family:'Press Start 2P',monospace;">Политика данных</a>
@@ -375,7 +369,6 @@
   function openDataPolicy() { document.getElementById('dataPolicyOverlay').style.display = 'flex'; }
   function closeDataPolicy() { document.getElementById('dataPolicyOverlay').style.display = 'none'; }
 
-  /* ── ПЕРЕКЛЮЧАТЕЛЬ ТЕМЫ ── */
   function getCookie(name) {
     const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
     return match ? decodeURIComponent(match[2]) : null;
@@ -437,7 +430,6 @@
   if (!noMotion) animateDots();
   else for (let d of dots) { ctx.beginPath(); ctx.arc(d.x,d.y,d.r,0,Math.PI*2); ctx.fillStyle='rgba(255,0,0,0.6)'; ctx.fill(); }
 
-  /* ── ПРАЗДНИК ТОЛЬКО 4 ИЮЛЯ ── */
   function isHolidayWindow() {
     const now = new Date();
     return now.getMonth() === 6 && now.getDate() === 4;
@@ -450,7 +442,6 @@
     if (fwCanvasEl) fwCanvasEl.style.display = 'none';
   }
 
-  /* ── САЛЮТЫ ── */
   (function fireworksInit() {
     const fwCanvas = document.getElementById('fireworks');
     if (!fwCanvas || noMotion || !holidayActive) return;
@@ -529,7 +520,6 @@
     fwTick();
   })();
 
-  /* ── 3D НАКЛОН КАРТОЧКИ ── */
   function tilt(card) {
     if (!card || noMotion) return;
     card.addEventListener('mousemove', e => {
@@ -557,7 +547,7 @@
       </div>
       <div class="title">Файл не указан</div>
       <div class="error">Ссылка неполная.<br>Попросите отправителя прислать её ещё раз.</div>
-      <a class="home-btn" href="/mezets.design/">
+      <a class="home-btn" href="/">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M3 11l9-8 9 8M5 10v10a1 1 0 001 1h4v-6h4v6h4a1 1 0 001-1V10"/>
         </svg>
@@ -565,7 +555,7 @@
       </a>
     `;
   } else {
-    const fileUrl = '/mezets.design/raboti/' + encodeURIComponent(file).replace(/%2F/g, '/');
+    const fileUrl = '/raboti/' + encodeURIComponent(file).replace(/%2F/g, '/');
     const displayName = title ? decodeURIComponent(title) : file;
 
     card.innerHTML = `
@@ -582,7 +572,7 @@
         </svg>
         Скачать
       </a>
-      <a class="home-btn" href="/mezets.design/">
+      <a class="home-btn" href="/">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M3 11l9-8 9 8M5 10v10a1 1 0 001 1h4v-6h4v6h4a1 1 0 001-1V10"/>
         </svg>
