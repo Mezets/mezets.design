@@ -46,7 +46,6 @@
       margin-bottom: 40px;
     }
 
-    /* ── КАРТОЧКА ── */
     .card {
       background: rgba(12,0,0,0.82);
       border: 1px solid rgba(255,0,0,0.22);
@@ -64,7 +63,6 @@
       margin-bottom: 20px;
     }
 
-    /* ── ПОЛЯ ── */
     label {
       display: block;
       font-size: 7px;
@@ -96,7 +94,6 @@
     }
     textarea { resize: vertical; min-height: 60px; }
 
-    /* ── WYSIWYG EDITOR ── */
     .rich-toolbar {
       display: flex; flex-wrap: wrap; gap: 4px;
       padding: 6px 8px;
@@ -137,7 +134,6 @@
       pointer-events: none;
     }
 
-    /* ── ЗАГРУЗКА ФАЙЛА ── */
     .file-drop {
       border: 2px dashed rgba(255,0,0,0.3);
       border-radius: 14px;
@@ -154,7 +150,6 @@
     .file-drop-label { font-size: 8px; color: rgba(255,200,200,0.5); line-height: 1.8; }
     .file-drop-name { font-size: 8px; color: #ff4444; margin-top: 8px; line-height: 1.6; word-break: break-all; }
 
-    /* ── ПРЕВЬЮ ── */
     .preview-wrap {
       margin-bottom: 18px;
       border-radius: 12px;
@@ -171,7 +166,6 @@
       margin: 0 auto;
     }
 
-    /* ── КНОПКИ ── */
     .btn {
       width: 100%;
       padding: 16px 12px;
@@ -198,7 +192,6 @@
     }
     .btn-sm:hover:not(:disabled) { background: rgba(255,0,0,0.1); box-shadow: none; transform: none; }
 
-    /* ── ПРОГРЕСС ── */
     .progress-wrap {
       display: none;
       margin-top: 14px;
@@ -226,7 +219,6 @@
       line-height: 1.8;
     }
 
-    /* ── СТАТУС ── */
     .status {
       font-size: 7px;
       line-height: 2;
@@ -240,7 +232,6 @@
     .status.err { color: rgba(255,120,120,0.9); background: rgba(255,0,0,0.06); border: 1px solid rgba(255,0,0,0.25); display: block; }
     .status.info { color: rgba(255,200,200,0.6); background: rgba(255,0,0,0.04); border: 1px solid rgba(255,0,0,0.15); display: block; }
 
-    /* ── ТОКЕН ── */
     .token-row {
       display: flex;
       gap: 10px;
@@ -249,7 +240,6 @@
     }
     .token-row input { margin-bottom: 0; flex: 1; }
 
-    /* ── СПИСОК РАБОТ ── */
     .works-list {
       display: flex;
       flex-direction: column;
@@ -278,13 +268,11 @@
     .work-type { font-size: 7px; color: #ff4444; line-height: 1.7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .work-file { font-size: 6px; color: rgba(255,200,200,0.35); line-height: 1.6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    /* ── Карточки юзеров/гостей: кликабельны, детали открываются в модалке ── */
     .clickable-item { cursor: pointer; transition: .15s; }
     .clickable-item:hover { background: rgba(255,0,0,0.09); border-color: rgba(255,0,0,0.3); transform: translateY(-1px); }
     .guest-item { border-left: 3px solid rgba(255,80,80,0.4); }
     .guest-item.banned { border-left-color: rgba(255,0,0,0.9); background: rgba(255,0,0,0.07); }
 
-    /* ── Модалка деталей ── */
     #userDetailOverlay {
       display: none; position: fixed; inset: 0; z-index: 99997;
       background: rgba(0,0,0,0.65); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
@@ -337,7 +325,6 @@
       vertical-align: middle;
     }
 
-    /* ── ЛОГИН ЭКРАН ── */
     #loginScreen { display: block; }
     #mainScreen { display: none; }
 
@@ -375,11 +362,6 @@
     .tab-panel { display: none; }
     .tab-panel.active { display: block; animation: tabFadeIn .4s cubic-bezier(.16,1,.3,1); }
 
-    /* ── ВКЛАДКА ЮЗЕРЫ: 3 колонки ── */
-    /* Раньше ширина/центрирование этой вкладки делались через transform: translateX(-50%),
-       а fade-in анимация (.tab-panel.active) тоже анимирует transform — один transform
-       перебивал другой, из-за чего окна дёргано прыгали влево, а потом скачком в центр.
-       Теперь расширяем сам .wrap через max-width (с transition), никакого transform-конфликта. */
     .wrap { transition: max-width .35s cubic-bezier(.4,0,.2,1); }
     .wrap.wrap-wide { max-width: 1180px; }
     .users-grid {
@@ -399,7 +381,6 @@
       .users-grid > .card { margin-bottom: 20px; }
     }
 
-    /* ── СЧЁТЧИК ── */
     .counter {
       font-size: 7px;
       color: rgba(255,200,200,0.35);
@@ -417,7 +398,6 @@
   <div class="logo" style="display:flex;align-items:center;gap:14px"><img src="https://mezets.github.io/mezets.design/favicon.png" alt="" style="width:48px;height:48px;image-rendering:pixelated;flex-shrink:0"><span style="font-size:22px;letter-spacing:3px">Mezets</span></div>
   <div class="logo-sub">ПАНЕЛЬ УПРАВЛЕНИЯ</div>
 
-  <!-- ──── ЭКРАН ВХОДА ──── -->
   <div id="loginScreen">
     <div class="card">
       <div class="card-title">🔑 ВХОД</div>
@@ -446,7 +426,6 @@
     </div>
   </div>
 
-  <!-- ──── ГЛАВНЫЙ ЭКРАН ──── -->
   <div id="mainScreen">
 
     <div class="tabs" id="tabsBar">
@@ -458,7 +437,6 @@
       <button class="tab" onclick="switchTab('maint')">🛠️ ТЕХРАБОТЫ</button>
     </div>
 
-    <!-- ── ВКЛАДКА: ЗАГРУЗИТЬ ── -->
     <div id="tabUpload" class="tab-panel active">
       <div class="card">
         <div class="card-title">📁 НОВАЯ РАБОТА</div>
@@ -495,7 +473,6 @@
       </div>
     </div>
 
-    <!-- ── ВКЛАДКА: РАБОТЫ ── -->
     <div id="tabManage" class="tab-panel">
       <div class="card">
         <div class="card-title">📋 ВСЕ РАБОТЫ <span class="badge" id="worksCount">0</span></div>
@@ -506,7 +483,6 @@
       </div>
     </div>
 
-    <!-- ВКЛАДКА: ЦЕНЫ -->
     <div id="tabPrices" class="tab-panel">
       <div class="card">
         <div class="card-title">РЕДАКТОР ЦЕН</div>
@@ -542,7 +518,6 @@
     </div>
 
 
-    <!-- ВКЛАДКА: ПРАВИЛА -->
     <div id="tabRules" class="tab-panel">
       <div class="card">
         <div class="card-title">РЕДАКТОР ПРАВИЛ</div>
@@ -583,10 +558,8 @@
       </div>
     </div>
 
-    <!-- ВКЛАДКА: ЮЗЕРЫ -->
     <div id="tabUsers" class="tab-panel">
 
-      <!-- ── ГЕЙТ: сначала ключи, потом окна ── -->
       <div class="card" id="usersGate" style="max-width:400px;margin-left:auto;margin-right:auto">
         <div class="card-title">🔒 ДОСТУП К ЮЗЕРАМ</div>
 <label>API-ключ бэкенда (ADMIN_TEST_KEY)</label>
@@ -603,7 +576,6 @@
         <div class="status" id="usersGateStatus"></div>
       </div>
 
-      <!-- ── ОКНА: скрыты, пока не пройден гейт ── -->
       <div class="users-grid" id="usersGridWrap" style="display:none">
       <div class="card">
         <div class="card-title">👤 АВТОРИЗОВАННЫЕ <span class="badge" id="usersCount">0</span></div>
@@ -648,7 +620,6 @@
       </div>
     </div>
 
-    <!-- Модалка деталей юзера/гостя -->
     <div id="userDetailOverlay" onclick="if(event.target===this) closeUserDetail()">
       <div class="card">
         <button id="userDetailClose" onclick="closeUserDetail()">✕</button>
@@ -656,7 +627,6 @@
       </div>
     </div>
 
-    <!-- ВКЛАДКА: ТЕХРАБОТЫ -->
     <div id="tabMaint" class="tab-panel">
       <div class="card">
         <div class="card-title">🛠️ ТОСТ ТЕХ. НЕПОЛАДОК <span class="badge" id="maintOnBadge">—</span></div>
@@ -697,7 +667,6 @@
 </div><!-- /wrap -->
 
 <script>
-/* ── ЗАЩИТА ОТ ПРОСМОТРА ЧЕРЕЗ DEVTOOLS ── */
 document.addEventListener('contextmenu', e => e.preventDefault(), true);
 document.addEventListener('keydown', e => {
   if (e.key === 'F12') e.preventDefault();
@@ -705,22 +674,18 @@ document.addEventListener('keydown', e => {
   if (e.ctrlKey && e.key.toUpperCase() === 'U') e.preventDefault();
 }, true);
 
-/* ── КОНФИГ ── */
 const GH_API = 'https://api.github.com';
 let TOKEN = '', REPO = '', BRANCH = '';
 
-/* ── КОНФИГ БЭКЕНДА (бан/юзеры) ── */
 const BOT_API = 'https://mez.up.railway.app';
 let apiKey = '';
 
-/* ── Обёртка над fetch: ключи уходят заголовками, а не в URL (не светятся в логах) ── */
 function adminFetch(url, { master = false } = {}) {
   const headers = { 'X-Admin-Key': apiKey };
   if (master) headers['X-Master-Key'] = getMasterKey();
   return fetch(url, { headers });
 }
 
-/* ── КУЛДАУН НА КНОПКИ ОБНОВЛЕНИЯ (не чаще раза в 10 сек) ── */
 const _cooldowns = {};
 function cooldownClick(btn, key, fn) {
   const now = Date.now();
@@ -746,7 +711,6 @@ function cooldownClick(btn, key, fn) {
 }
 let USERS = [];
 
-/* ── ЧАСТИЦЫ ── */
 const canvas = document.getElementById('bg');
 const ctx    = canvas.getContext('2d');
 function resize() { canvas.width = innerWidth; canvas.height = innerHeight; }
@@ -773,7 +737,6 @@ initDots(); addEventListener('resize', initDots);
   requestAnimationFrame(animate);
 })();
 
-/* ── DRAG & DROP ── */
 const fileDrop = document.getElementById('fileDrop');
 fileDrop.addEventListener('dragover', e => { e.preventDefault(); fileDrop.classList.add('drag'); });
 fileDrop.addEventListener('dragleave', () => fileDrop.classList.remove('drag'));
@@ -786,7 +749,6 @@ fileDrop.addEventListener('drop', e => {
   }
 });
 
-/* ── ПРЕВЬЮ ── */
 function onFileSelect(input) {
   const file = input.files[0];
   if (!file) return;
@@ -807,7 +769,6 @@ function onFileSelect(input) {
   }
 }
 
-/* ── ПОКАЗАТЬ/СКРЫТЬ ТОКЕН ── */
 function showToken() {
   const inp = document.getElementById('tokenInput');
   inp.type = inp.type === 'password' ? 'text' : 'password';
@@ -828,7 +789,6 @@ function showGateAdminKey() {
   inp.type = inp.type === 'password' ? 'text' : 'password';
 }
 
-/* ── ГЕЙТ ВКЛАДКИ ЮЗЕРЫ (сначала ключ — потом окна) ── */
 function enterUsersGate() {
   const key    = document.getElementById('apiKeyInput').value.trim();
   const status = document.getElementById('usersGateStatus');
@@ -844,7 +804,6 @@ function enterUsersGate() {
   loadWatchlist();
 }
 
-/* ── ВКЛАДКИ ── */
 function switchTab(tab) {
   const order = ['upload','manage','prices','rules','users','maint'];
   const tabButtons = document.querySelectorAll('.tab');
@@ -859,7 +818,6 @@ function switchTab(tab) {
   if (tab === 'maint' && apiKey) loadMaintenance();
 }
 
-/* ── ВХОД ── */
 async function login() {
   const token     = document.getElementById('tokenInput').value.trim();
   const repo      = document.getElementById('repoInput').value.trim();
@@ -888,7 +846,6 @@ async function login() {
     localStorage.setItem('mz_repo', repo);
     localStorage.setItem('mz_branch', BRANCH);
 
-    // Ключ администратора нигде не сохраняется — только в памяти текущей вкладки
     apiKey = adminKey;
     USERS  = keyData.users || [];
     document.getElementById('apiKeyInput').value = adminKey;
@@ -901,7 +858,6 @@ async function login() {
   }
 }
 
-/* ── АВТО-ЗАПОЛНЕНИЕ (git-токен персистентен, admin key — никогда) ── */
 window.addEventListener('DOMContentLoaded', () => {
   const t = localStorage.getItem('mz_token');
   const r = localStorage.getItem('mz_repo');
@@ -910,11 +866,9 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('tokenInput').value = t;
     document.getElementById('repoInput').value  = r;
     if (b) document.getElementById('branchInput').value = b;
-    // Контент НЕ открывается автоматически — нужно ввести admin key и нажать "Войти"
   }
 });
 
-/* ── GITHUB API ── */
 function ghFetch(path, token, opts) {
   return fetch(GH_API + path, Object.assign({
     headers: {
@@ -925,21 +879,18 @@ function ghFetch(path, token, opts) {
   }, opts));
 }
 
-/* ── ПОЛУЧИТЬ ФАЙЛ (SHA + КОНТЕНТ) ── */
 async function getFile(path) {
   const res = await ghFetch(`/repos/${REPO}/contents/${path}?ref=${BRANCH}`);
   if (!res.ok) return null;
   return res.json();
 }
 
-/* ── ПРОГРЕСС ── */
 function setProgress(pct, label) {
   document.getElementById('progressWrap').style.display = 'block';
   document.getElementById('progressBar').style.width = pct + '%';
   document.getElementById('progressLabel').textContent = label;
 }
 
-/* ── ЗАГРУЗКА РАБОТЫ ── */
 async function uploadWork() {
   const fileInput = document.getElementById('fileInput');
   const workType  = document.getElementById('workType').value.trim();
@@ -960,21 +911,17 @@ async function uploadWork() {
   showStatus(status, '', '');
 
   try {
-    /* 1. Читаем файл как base64 */
     setProgress(10, 'Читаю файл...');
     const b64 = await toBase64(file);
 
-    /* 2. Определяем папку */
     const isVideo = /\.(mp4|webm|mov)$/i.test(file.name);
     const folder  = isVideo ? 'portfolio/mp4' : 'portfolio/png';
     const fname   = sanitizeFilename(file.name);
     const ghPath  = `${folder}/${fname}`;
 
-    /* 3. Проверяем нет ли такого файла уже */
     setProgress(25, 'Проверяю репозиторий...');
     const existing = await getFile(ghPath);
 
-    /* 4. Коммитим файл */
     setProgress(45, 'Загружаю файл...');
     const fileBody = {
       message: `[admin] add portfolio: ${fname}`,
@@ -992,29 +939,24 @@ async function uploadWork() {
       throw new Error(err.message || 'Ошибка загрузки файла');
     }
 
-    /* 5. Читаем index.html */
     setProgress(65, 'Обновляю index.html...');
     const indexFile = await getFile('index.html');
     if (!indexFile) throw new Error('index.html не найден в репозитории');
 
     let html = decodeURIComponent(escape(atob(indexFile.content.replace(/\n/g, ''))));
 
-    /* 6. Строим новую запись */
     const imgRef = `${folder}/${fname}`;
     let newEntry;
     if (workGroup) {
-      // Ищем существующую группу с таким именем в комментарии
       const groupTag = `/* group:${workGroup} */`;
       const itemObj  = `      { img: "${imgRef}", type: "${workType}", time: "${workTime}" }`;
 
       if (html.includes(groupTag)) {
-        // Дописываем в конец группы перед закрывающей скобкой
         html = html.replace(
           new RegExp(`(/\\* group:${escapeRegex(workGroup)} \\*/[\\s\\S]*?)(\\s*\\]\\s*\\})`),
           (match, before, close) => `${before},\n${itemObj}${close}`
         );
       } else {
-        // Создаём новую группу
         newEntry = `{\n  ${groupTag}\n  group: [\n${itemObj},\n  ]\n},`;
         html = insertAfterLastItem(html, newEntry);
       }
@@ -1023,7 +965,6 @@ async function uploadWork() {
       html = insertAfterLastItem(html, newEntry);
     }
 
-    /* 7. Коммитим index.html */
     setProgress(85, 'Сохраняю index.html...');
     const htmlB64 = btoa(unescape(encodeURIComponent(html)));
     const htmlRes = await ghFetch(`/repos/${REPO}/contents/index.html`, TOKEN, {
@@ -1043,7 +984,6 @@ async function uploadWork() {
     setProgress(100, 'Готово!');
     showStatus(status, `✅ Работа загружена!\nФайл: ${ghPath}\nСайт обновится через ~30 секунд.`, 'ok');
 
-    /* Сброс формы */
     fileInput.value = '';
     document.getElementById('fileDropName').textContent = '';
     document.getElementById('previewWrap').style.display = 'none';
@@ -1061,19 +1001,15 @@ async function uploadWork() {
   }
 }
 
-/* ── ВСТАВКА НОВОЙ ЗАПИСИ В КОНЕЦ PORTFOLIO_ITEMS ── */
 function insertAfterLastItem(html, newEntry) {
-  // Ищем последний }; или }, перед закрытием массива '];'
   const marker = '  ];'; // конец PORTFOLIO_ITEMS
   const idx = html.lastIndexOf(marker);
   if (idx === -1) throw new Error('Не удалось найти PORTFOLIO_ITEMS в index.html');
-  // Вставляем перед закрывающей строкой
   return html.slice(0, idx) + newEntry + '\n' + html.slice(idx);
 }
 
 function escapeRegex(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 
-/* ── ЗАГРУЗКА СПИСКА РАБОТ ── */
 async function loadWorks() {
   const container = document.getElementById('worksList');
   container.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div>';
@@ -1116,14 +1052,12 @@ async function loadWorks() {
   }
 }
 
-/* ── ПАРСИНГ PORTFOLIO_ITEMS ── */
 function parsePortfolioItems(html) {
   const start = html.indexOf('const PORTFOLIO_ITEMS = [');
   const end   = html.indexOf('\n  ];', start);
   if (start === -1 || end === -1) return [];
   const block = html.slice(start, end);
   const items = [];
-  // Матч одиночных записей
   const single = /\{\s*img:\s*"([^"]+)",\s*type:\s*"([^"]+)",\s*time:\s*"([^"]+)"\s*\}/g;
   let m;
   while ((m = single.exec(block)) !== null) {
@@ -1132,7 +1066,6 @@ function parsePortfolioItems(html) {
   return items;
 }
 
-/* ── УДАЛИТЬ РАБОТУ ── */
 async function deleteWork(idx) {
   if (!confirm('Удалить запись из PORTFOLIO_ITEMS?\n(Файл в репозитории останется)')) return;
 
@@ -1155,7 +1088,6 @@ async function deleteWork(idx) {
     }
     if (!toRemove) throw new Error('Запись не найдена');
 
-    // Удаляем строку с этой записью (включая ведущие пробелы и запятую)
     const lineRx = new RegExp(`\\s*\\{\\s*img:\\s*"${escapeRegex(toRemove.match(/img:\s*"([^"]+)"/)[1])}"[^}]+\\},?`);
     html = html.replace(lineRx, '');
 
@@ -1176,7 +1108,6 @@ async function deleteWork(idx) {
   }
 }
 
-/* ── ХЕЛПЕРЫ ── */
 function toBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -1187,7 +1118,6 @@ function toBase64(file) {
 }
 
 function sanitizeFilename(name) {
-  // Оставляем только безопасные символы, пробелы→_
   return name.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9._\-()]/g, '');
 }
 
@@ -1197,9 +1127,7 @@ function showStatus(el, msg, type) {
   if (!type) el.style.display = 'none';
 }
 
-/* ── РЕДАКТОР ЦЕН ── */
 
-// Текущие данные цен в памяти
 let pricesData = []; // [{section, name, price}, ...]
 let pricesFileSha = '';
 
@@ -1220,9 +1148,7 @@ async function loadPrices() {
 }
 
 function parsePrices(rawHtml) {
-  // Парсим все section-label и item внутри каждой секции
   const items = [];
-  // Ищем блоки <div class="section">...</div>
   const sectionRx = /<div class="section">\s*<div class="section-label">([^<]+)<\/div>([\s\S]*?)<\/div>\s*<\/div>/g;
   const itemRx = /<div class="item-row"><span class="item-dot"><\/span><span class="item-name">([^<]+)<\/span><\/div><span class="item-price">([^<]+)<\/span>/g;
   let sm;
@@ -1242,7 +1168,6 @@ function renderPrices() {
   const container = document.getElementById('pricesSections');
   container.innerHTML = '';
 
-  // Группируем по секциям
   const sections = {};
   pricesData.forEach((item, idx) => {
     if (!sections[item.section]) sections[item.section] = [];
@@ -1320,15 +1245,12 @@ async function savePrices() {
     if (!f) throw new Error('prices/index.html не найден');
     let rawHtml = decodeURIComponent(escape(atob(f.content.replace(/\n/g, ''))));
 
-    // Перестраиваем все секции с ценами
     const sections = {};
     pricesData.forEach(item => {
       if (!sections[item.section]) sections[item.section] = [];
       sections[item.section].push(item);
     });
 
-    // Заменяем HTML каждой секции
-    // Ищем существующие section-label и заменяем их содержимое
     Object.entries(sections).forEach(([section, items], si) => {
       const itemsHtml = items.map((it, ii) => {
         const delay = (0.05 + (si * 3 + ii) * 0.05).toFixed(2);
@@ -1372,7 +1294,6 @@ function escHtml(s) {
 }
 
 
-/* ── РЕДАКТОР ПРАВИЛ ── */
 let rulesData = []; // [{title, text, important}, ...]
 
 async function loadRules() {
@@ -1392,7 +1313,6 @@ async function loadRules() {
 
 function parseRules(rawHtml) {
   const items = [];
-  // Матч: <div class="rule[important]" ...><div class="rule-num">NN</div><div class="rule-body">...<div class="rule-title">...</div><div class="rule-text">...</div>
   const ruleRx = /<div class="rule([^"]*)"[^>]*>\s*<div class="rule-num">[^<]*<\/div>\s*<div class="rule-body">\s*<div class="rule-title">([^<]*)<\/div>\s*<div class="rule-text">([\s\S]*?)<\/div>\s*<\/div>\s*<\/div>/g;
   let m;
   while ((m = ruleRx.exec(rawHtml)) !== null) {
@@ -1417,7 +1337,6 @@ function renderRules() {
     wrap.style.cssText = 'background:rgba(255,0,0,0.04);border:1px solid rgba(255,0,0,0.15);border-radius:12px;padding:14px;margin-bottom:10px';
     if (rule.important) wrap.style.borderColor = 'rgba(255,0,0,0.3)';
 
-    // Заголовок + удалить
     const row1 = document.createElement('div');
     row1.style.cssText = 'display:flex;gap:8px;align-items:center;margin-bottom:8px';
 
@@ -1449,7 +1368,6 @@ function renderRules() {
     row1.appendChild(impChk);
     row1.appendChild(del);
 
-    // WYSIWYG toolbar
     const edId = 'rte_' + idx;
     const toolbar = document.createElement('div');
     toolbar.className = 'rich-toolbar';
@@ -1463,7 +1381,6 @@ function renderRules() {
       <button onclick="rteInsert('${edId}','<br>')" title="Перенос строки">↵ br</button>
     `;
 
-    // Rich editor
     const editor = document.createElement('div');
     editor.id = edId;
     editor.className = 'rich-editor';
@@ -1511,7 +1428,6 @@ async function saveRules() {
     if (!f) throw new Error('rules/index.html не найден');
     let rawHtml = decodeURIComponent(escape(atob(f.content.replace(/\n/g, ''))));
 
-    // Строим новый HTML блок правил
     const newRulesHtml = rulesData.map((rule, idx) => {
       const num     = String(idx+1).padStart(2,'0');
       const delay   = (0.04 + idx * 0.05).toFixed(2);
@@ -1519,7 +1435,6 @@ async function saveRules() {
       return `  <div class="${cls}" style="animation-delay:${delay}s">\n    <div class="rule-num">${num}</div>\n    <div class="rule-body">\n      <div class="rule-title">${escHtml(rule.title)}</div>\n      <div class="rule-text">\n        ${rule.text}\n      </div>\n    </div>\n  </div>`;
     }).join('\n\n');
 
-    // Заменяем содержимое rules-grid
     rawHtml = rawHtml.replace(
       /(<div class="rules-grid">)[\s\S]*?(<\/div><!-- \/rules-grid -->)/,
       '$1\n\n' + newRulesHtml + '\n\n  $2'
@@ -1548,7 +1463,6 @@ async function saveRules() {
   }
 }
 
-/* ── WYSIWYG HELPERS ── */
 function rteCmd(edId, cmd) {
   const ed = document.getElementById(edId);
   if (!ed) return;
@@ -1566,7 +1480,6 @@ function rteHighlight(edId) {
   const span = document.createElement('span');
   span.className = 'hi';
   try { range.surroundContents(span); } catch(e) {
-    // fallback for partial selections
     const frag = range.extractContents();
     span.appendChild(frag);
     range.insertNode(span);
@@ -1582,7 +1495,6 @@ function rteRemoveHi(edId) {
     while (s.firstChild) parent.insertBefore(s.firstChild, s);
     parent.removeChild(s);
   });
-  // update rulesData
   const idx = edId.startsWith('rte_') ? parseInt(edId.slice(4)) : -1;
   if (idx >= 0 && rulesData[idx]) rulesData[idx].text = ed.innerHTML;
 }
@@ -1594,7 +1506,6 @@ function rteInsert(edId, html) {
   document.execCommand('insertHTML', false, html);
 }
 
-/* ── ЮЗЕРЫ / БАНЫ ── */
 async function loadUsers() {
   const status = document.getElementById('usersStatus');
   const list   = document.getElementById('usersList');
@@ -1659,7 +1570,6 @@ function renderUsers() {
   }).join('');
 }
 
-/* ── НЕАВТОРИЗОВАННЫЕ (гости без входа через Discord) ── */
 let UNAUTH_USERS = [];
 
 function flagImg(countryCode, w, h) {
@@ -1739,7 +1649,6 @@ function getMasterKey() {
   return document.getElementById('masterKeyInput').value.trim();
 }
 
-/* ── МОДАЛКА ДЕТАЛЕЙ (юзер / гость) ── */
 function closeUserDetail() {
   document.getElementById('userDetailOverlay').style.display = 'none';
 }
@@ -1883,7 +1792,6 @@ async function unbanUser(discordId) {
   }
 }
 
-/* ── СТОП-ЛИСТ (авто-бан по Discord ID) ── */
 let WATCHLIST = [];
 
 async function addToWatchlist() {
@@ -1970,7 +1878,6 @@ async function removeFromWatchlist(discordId) {
   }
 }
 
-/* ── ТЕХРАБОТЫ ── */
 async function loadMaintenance() {
   const status = document.getElementById('maintStatus');
   if (!apiKey) { showStatus(status, 'Введи API-ключ бэкенда на вкладке ЮЗЕРЫ', 'err'); return; }
