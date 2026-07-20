@@ -1,6 +1,5 @@
 const BAN_API = 'https://mez.up.railway.app';
 
-/* ── FINGERPRINT (псевдо-HWID) ── */
 async function getBrowserFingerprintForBan() {
   try {
     const cached = localStorage.getItem('mezets_fp');
@@ -33,8 +32,6 @@ async function getBrowserFingerprintForBan() {
   } catch(e) {}
 
   if (!hash) {
-    // Web Crypto недоступен (встроенные браузеры, приватные режимы и т.п.) —
-    // считаем синхронный запасной хэш (FNV-1a), чтобы fingerprint не был пустым
     let h = 0x811c9dc5;
     for (let i = 0; i < raw.length; i++) {
       h ^= raw.charCodeAt(i);
@@ -47,7 +44,6 @@ async function getBrowserFingerprintForBan() {
   return hash;
 }
 
-/* ── ОВЕРЛЕЙ БАНА ── */
 let banEnforced = false;
 function enforceBanOverlay(reason) {
   const overlay = document.getElementById('banOverlay');
@@ -62,8 +58,6 @@ function enforceBanOverlay(reason) {
   if (!banEnforced) {
     banEnforced = true;
 
-    // Полностью стираем страницу — остаётся только окно бана.
-    // Даже если кто-то уберёт оверлей через консоль, восстанавливать уже нечего.
     Array.from(document.body.children).forEach(el => {
       if (el.id !== 'banOverlay' && el.id !== 'banSound') el.remove();
     });
@@ -74,7 +68,6 @@ function enforceBanOverlay(reason) {
       const playPromise = snd.play();
       if (playPromise && playPromise.catch) {
         playPromise.catch(() => {
-          // Браузер заблокировал автовоспроизведение без клика — играем при первом взаимодействии
           const retry = () => { snd.currentTime = 0; snd.play().catch(()=>{}); };
           document.addEventListener('click', retry, { once: true });
           document.addEventListener('keydown', retry, { once: true });
@@ -104,9 +97,6 @@ function enforceBanOverlay(reason) {
       if (ov) { ov.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
     }, 800);
 
-    // Грубая эвристика "открыты ли devtools" (по разнице размеров окна).
-    // Не панацея (можно обойти отстыкованным окном/другим браузером),
-    // но мешает спокойно пользоваться консолью пока активен бан.
     let ddtWarned = false;
     setInterval(() => {
       const wDiff = window.outerWidth  - window.innerWidth;
@@ -126,7 +116,6 @@ function hideLoadingGate() {
   if (gate) gate.style.display = 'none';
 }
 
-/* ── ПРОВЕРКА БАНА + ТРЕКИНГ ВИЗИТА ── */
 async function checkSiteBanOnLoad() {
   const session = localStorage.getItem('mezets_session') || '';
   const fp = await getBrowserFingerprintForBan();
@@ -141,13 +130,9 @@ async function checkSiteBanOnLoad() {
   } catch(e) {
     hideLoadingGate(); // бэкенд недоступен — не блокируем сайт всем подряд
   }
-  // Трекинг визита для гостей без Discord-логина (IP, fingerprint, браузер/ОС, геолокация).
-  // Бэкенд сам пропустит этот визит, если сессия авторизована. Не ждём ответа —
-  // не должно задерживать загрузку страницы.
   fetch(`${BAN_API}/track-visit?fp=${encodeURIComponent(fp)}&session=${encodeURIComponent(session)}`, { mode: 'cors' }).catch(()=>{});
 }
 
-/* ── ТОСТ ТЕХ. НЕПОЛАДОК (не критично — просто не показываем, если блока нет на странице) ── */
 async function checkMaintenance() {
   const toast = document.getElementById('maintToast');
   if (!toast) return;
@@ -166,7 +151,6 @@ async function checkMaintenance() {
   } catch(e) {}
 }
 
-/* ── СТАРТ ── */
 setTimeout(hideLoadingGate, 6000);
 checkSiteBanOnLoad();
 setInterval(checkSiteBanOnLoad, 60000);
