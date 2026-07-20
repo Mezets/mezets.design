@@ -27,7 +27,6 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    /* ── КАСТОМНЫЙ СКРОЛЛБАР ── */
     html { scrollbar-width: thin; scrollbar-color: rgba(255,0,0,0.45) rgba(10,0,0,0.6); }
     ::-webkit-scrollbar { width: 10px; }
     ::-webkit-scrollbar-track { background: rgba(10,0,0,0.6); }
@@ -51,7 +50,6 @@
       transition: background .3s, color .3s;
     }
 
-    /* ── ПЕРЕМЕННЫЕ ТЕМЫ ── */
     :root {
       --bg-page: #050000;
       --bg-panel-95: rgba(10,0,0,0.95);
@@ -99,7 +97,6 @@
       100% { transform: translate(70vw, 70vh); }
     }
 
-    /* ── LAYOUT ── */
     .page {
       position: relative;
       z-index: 2;
@@ -108,7 +105,6 @@
       padding: 32px 36px 24px;
     }
 
-    /* ── BACK BTN ── */
     .home-arrow {
       position: fixed; top: 18px; left: 18px; z-index: 9999;
       width: 42px; height: 42px;
@@ -123,7 +119,6 @@
     .home-arrow svg { width: 18px; height: 18px; display: block; }
     .home-arrow:hover { transform: scale(1.1) translateX(-2px); border-color: rgba(255,0,0,0.5); box-shadow: 0 0 26px rgba(255,0,0,0.3); }
 
-    /* ── ПЕРЕКЛЮЧАТЕЛЬ ТЕМЫ (солнце/луна) ── */
     .theme-switch {
       position: fixed;
       top: 18px; right: 18px;
@@ -154,8 +149,6 @@
       box-shadow: 0 0 14px rgba(255,0,0,0.5);
     }
 
-    /* ── СВЕТЛАЯ ТЕМА: переопределения текста, который был
-       светло-розовым/белым и терялся на белом фоне ── */
     body.light-theme .page-sub { color: rgba(120,20,20,0.55); }
     body.light-theme .page-seo-text { color: rgba(90,10,10,0.65); }
     body.light-theme .section-label { color: rgba(180,20,20,0.75); }
@@ -164,7 +157,6 @@
     body.light-theme .commission-text { color: rgba(150,45,0,0.9); }
     body.light-theme .cta-label { color: rgba(120,20,20,0.5); }
 
-    /* ── HEADER ── */
     .page-header {
       text-align: center;
       margin-bottom: 18px;
@@ -191,7 +183,6 @@
       margin: 12px auto 0;
     }
 
-    /* ── SECTION ── */
     .section { margin-bottom: 14px; }
     .section-label {
       font-size: 10px;
@@ -202,7 +193,6 @@
       padding-left: 2px;
     }
 
-    /* ── GRID ── */
     .items-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -210,7 +200,6 @@
       perspective: 1200px;
     }
 
-    /* ── ITEM CARD ── */
     .item {
       display: flex;
       flex-direction: column;
@@ -262,14 +251,12 @@
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* ── DIVIDER ── */
     .divider {
       height: 1px;
       background: linear-gradient(90deg, transparent, rgba(255,0,0,0.18), transparent);
       margin: 12px 0;
     }
 
-    /* ── PAYMENT ── */
     .payment-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -306,7 +293,6 @@
       margin-top: 6px; flex-shrink: 0;
     }
 
-    /* ── COMMISSION WARNING ── */
     .commission {
       display: flex; align-items: center; gap: 12px;
       padding: 16px 20px;
@@ -323,7 +309,6 @@
       letter-spacing: .5px;
     }
 
-    /* ── ORDER BTN ── */
     .order-cta {
       margin-top: 18px;
       display: flex;
@@ -376,7 +361,6 @@
 </div>
 <style>@keyframes lgSpin { to { transform: rotate(360deg); } }</style>
 
-<!-- ТОСТ ТЕХ. НЕПОЛАДОК -->
 <div id="maintToast" style="position:fixed; bottom:20px; right:20px; z-index:99990; max-width:280px; background:rgba(10,0,0,0.95); border:1px solid rgba(255,40,40,0.3); border-radius:12px; padding:14px 16px; transform:translateY(140%); transition:transform .35s ease; font-family:'Press Start 2P',monospace;">
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
     <div style="width:8px;height:8px;border-radius:50%;background:#ff2a2a;flex-shrink:0;"></div>
@@ -450,7 +434,6 @@
     </p>
   </div>
 
-  <!-- БАЗОВЫЕ -->
   <div class="section">
     <div class="section-label">Базовое</div>
     <div class="items-grid">
@@ -466,7 +449,6 @@
     </div>
   </div>
 
-  <!-- DISCORD -->
   <div class="section">
     <div class="section-label">Discord</div>
     <div class="items-grid">
@@ -482,7 +464,6 @@
     </div>
   </div>
 
-  <!-- TWITCH -->
   <div class="section">
     <div class="section-label">Twitch</div>
     <div class="items-grid">
@@ -492,7 +473,6 @@
     </div>
   </div>
 
-  <!-- YOUTUBE -->
   <div class="section">
     <div class="section-label">YouTube</div>
     <div class="items-grid">
@@ -502,7 +482,6 @@
     </div>
   </div>
 
-  <!-- VK -->
   <div class="section">
     <div class="section-label">VK</div>
     <div class="items-grid">
@@ -512,7 +491,6 @@
     </div>
   </div>
 
-  <!-- ФОРУМЫ -->
   <div class="section">
     <div class="section-label">Форум</div>
     <div class="items-grid">
@@ -525,7 +503,6 @@
     </div>
   </div>
 
-  <!-- БОТЫ -->
   <div class="section">
     <div class="section-label">Боты</div>
     <div class="items-grid">
@@ -543,7 +520,6 @@
 
   <div class="divider"></div>
 
-  <!-- ОПЛАТА -->
   <div class="section">
     <div class="section-label">Способы оплаты</div>
     <div class="payment-grid">
@@ -564,7 +540,6 @@
     </div>
   </div>
 
-  <!-- CTA -->
   <div class="order-cta">
     <div class="cta-label">Готов заказать?</div>
     <a class="cta-btn" href="https://mezets.github.io/mezets.design/">
@@ -580,11 +555,6 @@
   function openDataPolicy() { document.getElementById('dataPolicyOverlay').style.display = 'flex'; }
   function closeDataPolicy() { document.getElementById('dataPolicyOverlay').style.display = 'none'; }
 
-  /* =========================================================
-     ПЕРЕКЛЮЧАТЕЛЬ ТЕМЫ
-     Приоритет: сохранённый выбор в куки → тема системы → тёмная.
-     Куки общие с главной страницей — тема синхронна по всему сайту.
-  ========================================================= */
   function getCookie(name) {
     const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
     return match ? decodeURIComponent(match[2]) : null;
@@ -617,7 +587,6 @@
     }
   })();
 
-  /* ЧАСТИЦЫ */
   const canvas = document.getElementById('bg');
   const ctx    = canvas.getContext('2d');
   function resize() { canvas.width = innerWidth; canvas.height = innerHeight; }
@@ -646,7 +615,6 @@
   }
   if (!noMotion) animate();
 
-  // 3D tilt on item and pay cards
   if (!noMotion) {
     document.querySelectorAll('.item, .pay-block').forEach(card => {
       card.addEventListener('mousemove', e => {
