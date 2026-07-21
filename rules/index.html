@@ -21,7 +21,7 @@
   <meta name="twitter:title" content="Правила оформления — Mezets">
   <meta name="twitter:description" content="Правила заказа оформления Discord, ВК, YouTube, Twitch и ботов.">
 
-  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="icon" type="image/png" href="/mezets.design/favicon.png">
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -500,7 +500,13 @@
 
 </div>
 
-<script src="/common.js"></script>
+<script>
+  setTimeout(function () {
+    var g = document.getElementById('loadingGate');
+    if (g) g.style.display = 'none';
+  }, 8000);
+</script>
+<script src="/mezets.design/common.js" onerror="var g=document.getElementById('loadingGate'); if(g) g.style.display='none';"></script>
 <script>
 
   function openDataPolicy() { document.getElementById('dataPolicyOverlay').style.display = 'flex'; }
