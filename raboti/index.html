@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Скачать работу | Mezets</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="icon" type="image/png" href="/mezets.design/favicon.png">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
 <style>
@@ -274,7 +274,7 @@
   <div style="font-size:16px; color:#c99; max-width:420px;">Вам тут не рады. Доступ к сайту закрыт администратором.</div>
   <div id="banReasonLine" style="font-size:13px; color:#e88; max-width:420px; margin-top:14px; display:none;"></div>
 </div>
-<audio id="banSound" src="/ban.mp3" preload="auto"></audio>
+<audio id="banSound" src="/mezets.design/ban.mp3" preload="auto"></audio>
 
 <div id="loadingGate" style="position:fixed; inset:0; z-index:999995; background:#050000; display:flex; align-items:center; justify-content:center;">
   <div style="width:38px;height:38px;border:3px solid rgba(255,40,40,0.2);border-top-color:#ff3b3b;border-radius:50%;animation:lgSpin .8s linear infinite;"></div>
@@ -363,7 +363,13 @@
   </div>
 </div>
 
-<script src="/common.js"></script>
+<script>
+  setTimeout(function () {
+    var g = document.getElementById('loadingGate');
+    if (g) g.style.display = 'none';
+  }, 8000);
+</script>
+<script src="/mezets.design/common.js" onerror="var g=document.getElementById('loadingGate'); if(g) g.style.display='none';"></script>
 <script>
 
   function openDataPolicy() { document.getElementById('dataPolicyOverlay').style.display = 'flex'; }
@@ -547,7 +553,7 @@
       </div>
       <div class="title">Файл не указан</div>
       <div class="error">Ссылка неполная.<br>Попросите отправителя прислать её ещё раз.</div>
-      <a class="home-btn" href="/">
+      <a class="home-btn" href="/mezets.design/">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M3 11l9-8 9 8M5 10v10a1 1 0 001 1h4v-6h4v6h4a1 1 0 001-1V10"/>
         </svg>
@@ -555,7 +561,7 @@
       </a>
     `;
   } else {
-    const fileUrl = '/raboti/' + encodeURIComponent(file).replace(/%2F/g, '/');
+    const fileUrl = '/mezets.design/raboti/' + encodeURIComponent(file).replace(/%2F/g, '/');
     const displayName = title ? decodeURIComponent(title) : file;
 
     card.innerHTML = `
@@ -572,7 +578,7 @@
         </svg>
         Скачать
       </a>
-      <a class="home-btn" href="/">
+      <a class="home-btn" href="/mezets.design/">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M3 11l9-8 9 8M5 10v10a1 1 0 001 1h4v-6h4v6h4a1 1 0 001-1V10"/>
         </svg>
