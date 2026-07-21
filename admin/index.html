@@ -273,6 +273,40 @@
     .guest-item { border-left: 3px solid rgba(255,80,80,0.4); }
     .guest-item.banned { border-left-color: rgba(255,0,0,0.9); background: rgba(255,0,0,0.07); }
 
+    /* ── ВКЛАДКА БД: редактируемая таблица ── */
+    .db-scroll { overflow-x: auto; max-width: 100%; }
+    .db-table { border-collapse: collapse; font-size: 9px; white-space: nowrap; }
+    .db-table th {
+      position: sticky; top: 0;
+      background: #1a0000; color: #ff6a6a;
+      padding: 8px 10px; text-align: left;
+      border: 1px solid rgba(255,0,0,0.25);
+      font-family: 'Press Start 2P', monospace; font-size: 8px;
+    }
+    .db-table td {
+      border: 1px solid rgba(255,0,0,0.12);
+      padding: 3px;
+    }
+    .db-table input {
+      width: 100%; min-width: 90px;
+      background: transparent; border: 1px solid transparent;
+      color: rgba(255,220,220,0.85);
+      font-family: 'Press Start 2P', monospace; font-size: 8px;
+      padding: 6px 8px; border-radius: 4px;
+    }
+    .db-table input:focus {
+      border-color: rgba(255,0,0,0.4); background: rgba(255,0,0,0.06); outline: none;
+    }
+    .db-table input.pk-field { color: rgba(255,150,150,0.5); }
+    .db-table tr:hover td { background: rgba(255,0,0,0.04); }
+    .db-row-actions { display: flex; gap: 4px; padding: 4px !important; }
+    .db-row-actions button {
+      font-size: 10px; padding: 6px 8px; border-radius: 6px; cursor: pointer;
+      border: 1px solid rgba(255,0,0,0.25); background: transparent; color: rgba(255,200,200,0.5);
+    }
+    .db-row-actions .save-btn { border-color: rgba(0,200,0,0.35); color: #55ff55; }
+    .db-row-actions .del-btn { border-color: rgba(255,0,0,0.4); color: #ff4444; }
+
     #userDetailOverlay {
       display: none; position: fixed; inset: 0; z-index: 99997;
       background: rgba(0,0,0,0.65); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
@@ -435,6 +469,7 @@
       <button class="tab" onclick="switchTab('rules')">📜 ПРАВИЛА</button>
       <button class="tab" onclick="switchTab('users')">👤 ЮЗЕРЫ</button>
       <button class="tab" onclick="switchTab('maint')">🛠️ ТЕХРАБОТЫ</button>
+      <button class="tab" onclick="switchTab('db')">🗄️ БД</button>
     </div>
 
     <div id="tabUpload" class="tab-panel active">
@@ -663,6 +698,30 @@
       </div>
     </div>
 
+    <!-- ВКЛАДКА: БД -->
+    <div id="tabDb" class="tab-panel">
+      <div class="card">
+        <div class="card-title">🗄️ БАЗА ДАННЫХ <span class="badge" id="dbRowCount">0</span></div>
+
+        <label>Таблица</label>
+        <select id="dbTableSelect" onchange="loadDbTable()" style="width:100%;padding:10px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,0,0,0.25);border-radius:8px;color:#fff;font-family:'Press Start 2P',monospace;font-size:9px">
+          <option value="">— выбери таблицу —</option>
+        </select>
+
+        <div style="display:flex;gap:8px;margin:14px 0">
+          <button class="btn btn-sm" onclick="cooldownClick(this,'dbtable',loadDbTable)" style="flex:1">🔄 Обновить</button>
+          <button class="btn btn-sm" onclick="toggleDbAddForm()" style="flex:1;border-color:rgba(0,200,0,0.35);color:#55ff55">➕ Добавить строку</button>
+        </div>
+
+        <div id="dbAddForm" style="display:none;background:rgba(0,180,0,0.05);border:1px solid rgba(0,200,0,0.25);border-radius:10px;padding:14px;margin-bottom:16px"></div>
+
+        <div class="status" id="dbStatus"></div>
+        <div id="dbTableWrap" class="db-scroll">
+          <div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Выбери таблицу выше</div>
+        </div>
+      </div>
+    </div>
+
   </div><!-- /mainScreen -->
 </div><!-- /wrap -->
 
@@ -680,10 +739,15 @@ let TOKEN = '', REPO = '', BRANCH = '';
 const BOT_API = 'https://mez.up.railway.app';
 let apiKey = '';
 
-function adminFetch(url, { master = false } = {}) {
+function adminFetch(url, { master = false, method = 'GET', body = null } = {}) {
   const headers = { 'X-Admin-Key': apiKey };
   if (master) headers['X-Master-Key'] = getMasterKey();
-  return fetch(url, { headers });
+  const opts = { headers, method };
+  if (body !== null) {
+    headers['Content-Type'] = 'application/json';
+    opts.body = JSON.stringify(body);
+  }
+  return fetch(url, opts);
 }
 
 const _cooldowns = {};
@@ -805,17 +869,18 @@ function enterUsersGate() {
 }
 
 function switchTab(tab) {
-  const order = ['upload','manage','prices','rules','users','maint'];
+  const order = ['upload','manage','prices','rules','users','maint','db'];
   const tabButtons = document.querySelectorAll('.tab');
   tabButtons.forEach((t,i) => t.classList.toggle('active', order[i]===tab));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
-  document.querySelector('.wrap').classList.toggle('wrap-wide', tab === 'users');
+  document.querySelector('.wrap').classList.toggle('wrap-wide', tab === 'users' || tab === 'db');
   if (tab === 'manage') loadWorks();
   if (tab === 'prices') loadPrices();
   if (tab === 'rules') loadRules();
   if (tab === 'users' && apiKey) { loadUsers(); loadUnauthUsers(); loadWatchlist(); }
   if (tab === 'maint' && apiKey) loadMaintenance();
+  if (tab === 'db' && apiKey) loadDbTablesList();
 }
 
 async function login() {
