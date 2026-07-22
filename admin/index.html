@@ -307,6 +307,40 @@
     .db-row-actions .save-btn { border-color: rgba(0,200,0,0.35); color: #55ff55; }
     .db-row-actions .del-btn { border-color: rgba(255,0,0,0.4); color: #ff4444; }
 
+    /* ── Кастомный дропдаун выбора таблицы (вместо нативного select) ── */
+    .db-dropdown { position: relative; }
+    .db-dropdown-btn {
+      width: 100%; display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 14px; background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,0,0,0.25); border-radius: 8px;
+      color: #fff; font-family: 'Press Start 2P', monospace; font-size: 9px;
+      cursor: pointer; transition: .15s; text-align: left;
+    }
+    .db-dropdown-btn:hover { border-color: rgba(255,0,0,0.5); background: rgba(255,0,0,0.06); }
+    .db-dropdown.open .db-dropdown-btn { border-color: rgba(255,0,0,0.6); }
+    .db-dropdown-arrow { color: #ff4444; transition: transform .2s; flex-shrink: 0; margin-left: 10px; }
+    .db-dropdown.open .db-dropdown-arrow { transform: rotate(180deg); }
+    .db-dropdown-list {
+      display: none; position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 50;
+      background: #150000; border: 1px solid rgba(255,0,0,0.35); border-radius: 10px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+      max-height: 280px; overflow-y: auto;
+      animation: dbDropIn .15s ease;
+    }
+    .db-dropdown.open .db-dropdown-list { display: block; }
+    @keyframes dbDropIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+    .db-dropdown-item {
+      display: flex; flex-direction: column; gap: 4px;
+      padding: 12px 14px; cursor: pointer; transition: .15s;
+      border-bottom: 1px solid rgba(255,0,0,0.1);
+      font-family: 'Press Start 2P', monospace;
+    }
+    .db-dropdown-item:last-child { border-bottom: none; }
+    .db-dropdown-item:hover { background: rgba(255,0,0,0.1); }
+    .db-dropdown-item.selected { background: rgba(255,0,0,0.15); }
+    .db-dropdown-item .name { font-size: 9px; color: #fff; }
+    .db-dropdown-item .meta { font-size: 7px; color: rgba(255,200,200,0.4); }
+
     #userDetailOverlay {
       display: none; position: fixed; inset: 0; z-index: 99997;
       background: rgba(0,0,0,0.65); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
@@ -704,9 +738,13 @@
         <div class="card-title">🗄️ БАЗА ДАННЫХ <span class="badge" id="dbRowCount">0</span></div>
 
         <label>Таблица</label>
-        <select id="dbTableSelect" onchange="loadDbTable()" style="width:100%;padding:10px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,0,0,0.25);border-radius:8px;color:#fff;font-family:'Press Start 2P',monospace;font-size:9px">
-          <option value="">— выбери таблицу —</option>
-        </select>
+        <div class="db-dropdown" id="dbDropdown">
+          <button type="button" class="db-dropdown-btn" onclick="toggleDbDropdown()">
+            <span id="dbDropdownLabel">— выбери таблицу —</span>
+            <span class="db-dropdown-arrow">▾</span>
+          </button>
+          <div class="db-dropdown-list" id="dbDropdownList"></div>
+        </div>
 
         <div style="display:flex;gap:8px;margin:14px 0">
           <button class="btn btn-sm" onclick="cooldownClick(this,'dbtable',loadDbTable)" style="flex:1">🔄 Обновить</button>
@@ -1993,31 +2031,64 @@ async function saveMaintenance() {
 let DB_CURRENT_TABLE = '';
 let DB_CURRENT_PK = '';
 let DB_CURRENT_COLUMNS = [];
+let DB_TABLES_INFO = [];
+
+const DB_TABLE_LABELS = {
+  ticket_counter:       'Счётчик тикетов',
+  order_ratings:        'Оценки заказов',
+  spun_users:           'Кто уже крутил рулетку',
+  last_winners:         'Победители рулетки',
+  authorized_users:     'Авторизованные',
+  watchlist:            'Стоп-лист',
+  unauthorized_visits:  'Гости',
+};
+
+function toggleDbDropdown(forceClose) {
+  const dd = document.getElementById('dbDropdown');
+  if (forceClose) { dd.classList.remove('open'); return; }
+  dd.classList.toggle('open');
+}
+document.addEventListener('click', (e) => {
+  const dd = document.getElementById('dbDropdown');
+  if (dd && !dd.contains(e.target)) dd.classList.remove('open');
+});
 
 async function loadDbTablesList() {
-  const select = document.getElementById('dbTableSelect');
   const status = document.getElementById('dbStatus');
+  const list = document.getElementById('dbDropdownList');
   try {
     const res = await adminFetch(`${BOT_API}/admin/db/tables`);
     if (res.status === 403) throw new Error('Неверный API-ключ');
     if (!res.ok) throw new Error('Не удалось получить список таблиц');
     const data = await res.json();
-    const prev = select.value;
-    select.innerHTML = '<option value="">— выбери таблицу —</option>' +
-      data.tables.map(t => `<option value="${escHtml(t.name)}">${escHtml(t.name)} (ключ: ${escHtml(t.pk)})</option>`).join('');
-    if (prev) select.value = prev;
+    DB_TABLES_INFO = data.tables;
+
+    list.innerHTML = data.tables.map(t => `
+      <div class="db-dropdown-item ${t.name === DB_CURRENT_TABLE ? 'selected' : ''}" onclick="selectDbTable('${escHtml(t.name)}')">
+        <span class="name">${escHtml(DB_TABLE_LABELS[t.name] || t.name)}</span>
+        <span class="meta">${escHtml(t.name)} · ключ: ${escHtml(t.pk)}</span>
+      </div>
+    `).join('');
   } catch(e) {
     showStatus(status, 'Ошибка: ' + e.message, 'err');
   }
+}
+
+function selectDbTable(table) {
+  document.getElementById('dbDropdownLabel').textContent = DB_TABLE_LABELS[table] || table;
+  document.querySelectorAll('.db-dropdown-item').forEach(el => {
+    el.classList.toggle('selected', el.getAttribute('onclick') === `selectDbTable('${table}')`);
+  });
+  toggleDbDropdown(true);
+  loadDbTable(table);
 }
 
 function dbInputValue(table, colType, value) {
   return value === null || value === undefined ? '' : String(value);
 }
 
-async function loadDbTable() {
-  const select = document.getElementById('dbTableSelect');
-  const table  = select.value;
+async function loadDbTable(tableArg) {
+  const table  = tableArg !== undefined ? tableArg : DB_CURRENT_TABLE;
   const wrap   = document.getElementById('dbTableWrap');
   const status = document.getElementById('dbStatus');
   document.getElementById('dbAddForm').style.display = 'none';
