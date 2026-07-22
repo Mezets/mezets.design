@@ -1989,6 +1989,181 @@ async function saveMaintenance() {
   }
 }
 
+/* ── ВКЛАДКА БД ── */
+let DB_CURRENT_TABLE = '';
+let DB_CURRENT_PK = '';
+let DB_CURRENT_COLUMNS = [];
+
+async function loadDbTablesList() {
+  const select = document.getElementById('dbTableSelect');
+  const status = document.getElementById('dbStatus');
+  try {
+    const res = await adminFetch(`${BOT_API}/admin/db/tables`);
+    if (res.status === 403) throw new Error('Неверный API-ключ');
+    if (!res.ok) throw new Error('Не удалось получить список таблиц');
+    const data = await res.json();
+    const prev = select.value;
+    select.innerHTML = '<option value="">— выбери таблицу —</option>' +
+      data.tables.map(t => `<option value="${escHtml(t.name)}">${escHtml(t.name)} (ключ: ${escHtml(t.pk)})</option>`).join('');
+    if (prev) select.value = prev;
+  } catch(e) {
+    showStatus(status, 'Ошибка: ' + e.message, 'err');
+  }
+}
+
+function dbInputValue(table, colType, value) {
+  return value === null || value === undefined ? '' : String(value);
+}
+
+async function loadDbTable() {
+  const select = document.getElementById('dbTableSelect');
+  const table  = select.value;
+  const wrap   = document.getElementById('dbTableWrap');
+  const status = document.getElementById('dbStatus');
+  document.getElementById('dbAddForm').style.display = 'none';
+
+  if (!table) {
+    wrap.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Выбери таблицу выше</div>';
+    document.getElementById('dbRowCount').textContent = '0';
+    return;
+  }
+  if (!apiKey) { showStatus(status, 'Введи API-ключ на вкладке ЮЗЕРЫ', 'err'); return; }
+
+  wrap.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div>';
+  showStatus(status, '', '');
+
+  try {
+    const res = await adminFetch(`${BOT_API}/admin/db/${encodeURIComponent(table)}`);
+    if (res.status === 403) throw new Error('Неверный API-ключ');
+    if (!res.ok) throw new Error('Не удалось загрузить таблицу');
+    const data = await res.json();
+
+    DB_CURRENT_TABLE   = data.table;
+    DB_CURRENT_PK      = data.pk;
+    DB_CURRENT_COLUMNS = data.columns;
+
+    document.getElementById('dbRowCount').textContent = data.rows.length;
+    renderDbTable(data.rows);
+  } catch(e) {
+    wrap.innerHTML = '';
+    showStatus(status, 'Ошибка: ' + e.message, 'err');
+  }
+}
+
+function renderDbTable(rows) {
+  const wrap = document.getElementById('dbTableWrap');
+  if (!rows.length) {
+    wrap.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Таблица пуста</div>';
+    return;
+  }
+  const cols = DB_CURRENT_COLUMNS;
+  const pk = DB_CURRENT_PK;
+
+  let html = '<table class="db-table"><thead><tr>';
+  cols.forEach(c => html += `<th>${escHtml(c)}${c === pk ? ' 🔑' : ''}</th>`);
+  html += '<th>Действия</th></tr></thead><tbody>';
+
+  rows.forEach((row, i) => {
+    html += `<tr data-row="${i}">`;
+    cols.forEach(c => {
+      const val = dbInputValue(DB_CURRENT_TABLE, c, row[c]);
+      const isPk = c === pk;
+      html += `<td><input class="${isPk ? 'pk-field' : ''}" data-col="${escHtml(c)}" value="${escHtml(val)}" ${isPk ? 'readonly' : ''}></td>`;
+    });
+    html += `<td class="db-row-actions">
+      <button class="save-btn" onclick="saveDbRow(${i})">💾</button>
+      <button class="del-btn" onclick="deleteDbRow(${i})">🗑️</button>
+    </td></tr>`;
+  });
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+
+  wrap._rowsData = rows;
+}
+
+async function saveDbRow(rowIndex) {
+  const status = document.getElementById('dbStatus');
+  const masterKey = getMasterKey();
+  if (!masterKey) { showStatus(status, 'Введи мастер-ключ (не сохраняется)', 'err'); return; }
+
+  const tr = document.querySelector(`tr[data-row="${rowIndex}"]`);
+  const inputs = tr.querySelectorAll('input');
+  const fields = {};
+  let pkValue = null;
+  inputs.forEach(inp => {
+    const col = inp.dataset.col;
+    if (col === DB_CURRENT_PK) { pkValue = inp.value; return; }
+    fields[col] = inp.value;
+  });
+
+  try {
+    const res = await adminFetch(`${BOT_API}/admin/db/${encodeURIComponent(DB_CURRENT_TABLE)}/update`, {
+      master: true, method: 'POST', body: { pk_value: pkValue, fields }
+    });
+    if (res.status === 403) throw new Error('Неверный мастер-ключ');
+    if (!res.ok) { const d = await res.json().catch(()=>({})); throw new Error(d.error || 'Не удалось сохранить'); }
+    showStatus(status, 'Строка сохранена', 'ok');
+  } catch(e) {
+    showStatus(status, 'Ошибка: ' + e.message, 'err');
+  }
+}
+
+async function deleteDbRow(rowIndex) {
+  const status = document.getElementById('dbStatus');
+  const masterKey = getMasterKey();
+  if (!masterKey) { showStatus(status, 'Введи мастер-ключ (не сохраняется)', 'err'); return; }
+  if (!confirm('Удалить эту строку из таблицы "' + DB_CURRENT_TABLE + '" безвозвратно?')) return;
+
+  const tr = document.querySelector(`tr[data-row="${rowIndex}"]`);
+  const pkInput = tr.querySelector(`input[data-col="${DB_CURRENT_PK}"]`);
+  const pkValue = pkInput.value;
+
+  try {
+    const res = await adminFetch(`${BOT_API}/admin/db/${encodeURIComponent(DB_CURRENT_TABLE)}/delete?pk_value=${encodeURIComponent(pkValue)}`, { master: true });
+    if (res.status === 403) throw new Error('Неверный мастер-ключ');
+    if (!res.ok) { const d = await res.json().catch(()=>({})); throw new Error(d.error || 'Не удалось удалить'); }
+    showStatus(status, 'Строка удалена', 'ok');
+    loadDbTable();
+  } catch(e) {
+    showStatus(status, 'Ошибка: ' + e.message, 'err');
+  }
+}
+
+function toggleDbAddForm() {
+  const form = document.getElementById('dbAddForm');
+  if (!DB_CURRENT_TABLE) { showStatus(document.getElementById('dbStatus'), 'Сначала выбери таблицу', 'err'); return; }
+  if (form.style.display === 'block') { form.style.display = 'none'; return; }
+
+  form.innerHTML = DB_CURRENT_COLUMNS.map(c => `
+    <label style="font-size:8px">${escHtml(c)}${c === DB_CURRENT_PK ? ' (можно оставить пустым для автономера)' : ''}</label>
+    <input type="text" data-newcol="${escHtml(c)}" placeholder="${escHtml(c)}">
+  `).join('') + `<button class="btn btn-sm" onclick="createDbRow()" style="margin-top:8px">Создать строку</button>`;
+  form.style.display = 'block';
+}
+
+async function createDbRow() {
+  const status = document.getElementById('dbStatus');
+  const masterKey = getMasterKey();
+  if (!masterKey) { showStatus(status, 'Введи мастер-ключ (не сохраняется)', 'err'); return; }
+
+  const inputs = document.querySelectorAll('#dbAddForm input[data-newcol]');
+  const fields = {};
+  inputs.forEach(inp => { fields[inp.dataset.newcol] = inp.value; });
+
+  try {
+    const res = await adminFetch(`${BOT_API}/admin/db/${encodeURIComponent(DB_CURRENT_TABLE)}/insert`, {
+      master: true, method: 'POST', body: { pk_value: '', fields }
+    });
+    if (res.status === 403) throw new Error('Неверный мастер-ключ');
+    if (!res.ok) { const d = await res.json().catch(()=>({})); throw new Error(d.error || 'Не удалось создать строку'); }
+    showStatus(status, 'Строка создана', 'ok');
+    document.getElementById('dbAddForm').style.display = 'none';
+    loadDbTable();
+  } catch(e) {
+    showStatus(status, 'Ошибка: ' + e.message, 'err');
+  }
+}
+
 </script>
 </body>
 </html>
