@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>404 — страница не найдена | Mezets</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/png" href="/mezets.design/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg-page: #050000;
+    --fg-text: rgba(255,200,200,0.6);
+    --fg-onblack: #fff;
+  }
+  body.light-theme {
+    --bg-page: #ffffff;
+    --fg-text: rgba(120,20,20,0.65);
+    --fg-onblack: #111;
+  }
+
+  html, body {
+    font-family: 'Press Start 2P', monospace;
+    background: var(--bg-page);
+    min-height: 100vh;
+    overflow-x: hidden;
+    transition: background .3s;
+  }
+
+  canvas#bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+  .fluff-wrap { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+  .fluff { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.25; }
+  .fluff-1 {
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(255,0,0,0.9), rgba(180,0,0,0.3), transparent 70%);
+    animation: moveFluff1 18s ease-in-out infinite;
+  }
+  .fluff-2 {
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(255,60,0,0.8), rgba(200,0,0,0.2), transparent 70%);
+    animation: moveFluff2 12s ease-in-out infinite;
+    opacity: 0.18;
+  }
+  @keyframes moveFluff1 {
+    0%   { transform: translate(5vw,  10vh); }
+    25%  { transform: translate(55vw, 20vh); }
+    50%  { transform: translate(60vw, 60vh); }
+    75%  { transform: translate(15vw, 65vh); }
+    100% { transform: translate(5vw,  10vh); }
+  }
+  @keyframes moveFluff2 {
+    0%   { transform: translate(70vw, 70vh); }
+    33%  { transform: translate(10vw, 50vh); }
+    66%  { transform: translate(50vw, 5vh);  }
+    100% { transform: translate(70vw, 70vh); }
+  }
+  @media (prefers-reduced-motion: reduce) { .fluff-1, .fluff-2 { animation: none; } }
+
+  .wrap {
+    position: relative; z-index: 1;
+    min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+    padding: 40px 20px;
+  }
+
+  .code {
+    font-size: clamp(60px, 18vw, 120px);
+    color: #ff2a2a;
+    text-shadow: 0 0 30px rgba(255,0,0,0.6), 0 0 70px rgba(255,0,0,0.3);
+    letter-spacing: 4px;
+    line-height: 1;
+    animation: flicker 3.5s infinite;
+  }
+  @keyframes flicker {
+    0%, 92%, 100% { opacity: 1; }
+    93% { opacity: 0.4; }
+    94% { opacity: 1; }
+    95% { opacity: 0.6; }
+    96% { opacity: 1; }
+  }
+
+  .title {
+    margin-top: 22px;
+    font-size: 13px;
+    color: var(--fg-onblack);
+    line-height: 1.8;
+  }
+
+  .subtitle {
+    margin-top: 14px;
+    font-size: 9px;
+    color: var(--fg-text);
+    line-height: 2;
+    max-width: 460px;
+  }
+
+  .home-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 14px 22px; margin-top: 32px; text-decoration: none;
+    font-family: 'Press Start 2P', monospace; font-size: 10px; line-height: 1.6;
+    color: #ff3b3b; border-radius: 12px;
+    background: rgba(255,0,0,0.05); border: 1px solid rgba(255,0,0,0.25);
+    box-shadow: 0 0 18px rgba(255,0,0,0.1);
+    transition: .2s; position: relative; overflow: hidden;
+  }
+  .home-btn::before {
+    content: ""; position: absolute; top: 0; left: -120%; width: 120%; height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255,0,0,0.35), transparent);
+    transition: .5s;
+  }
+  .home-btn:hover::before { left: 120%; }
+  .home-btn:hover { transform: scale(1.03); border-color: rgba(255,0,0,0.5); box-shadow: 0 0 30px rgba(255,0,0,0.25); }
+  .home-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<canvas id="bg"></canvas>
+
+<div class="fluff-wrap">
+  <div class="fluff fluff-1"></div>
+  <div class="fluff fluff-2"></div>
+</div>
+
+<div class="wrap">
+  <div class="code">404</div>
+  <div class="title">Такой страницы нет</div>
+  <div class="subtitle">
+    Похоже, ссылка битая или страницу уже перенесли.<br>
+    Зато рулетку со скидкой ещё никто не отменял.
+  </div>
+
+  <a class="home-btn" href="/mezets.design/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h4a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h4a1 1 0 001-1V10"/>
+    </svg>
+    На главную
+  </a>
+</div>
+
+<script>
+  function getCookie(name) {
+    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    return match ? decodeURIComponent(match[2]) : null;
+  }
+  (function initTheme() {
+    const saved = getCookie('theme');
+    if (saved === 'light') {
+      document.body.classList.add('light-theme');
+    } else if (saved !== 'dark') {
+      const systemPrefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+      if (systemPrefersLight) document.body.classList.add('light-theme');
+    }
+  })();
+
+  const canvas = document.getElementById('bg');
+  const ctx = canvas.getContext('2d');
+  let w, h, particles;
+
+  function resize() {
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  }
+  function initParticles() {
+    particles = Array.from({ length: 60 }, () => ({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      r: Math.random() * 1.6 + 0.4,
+      vy: Math.random() * 0.3 + 0.05,
+      o: Math.random() * 0.5 + 0.1,
+    }));
+  }
+  function tick() {
+    ctx.clearRect(0, 0, w, h);
+    const isLight = document.body.classList.contains('light-theme');
+    ctx.fillStyle = isLight ? 'rgba(180,0,0,ALPHA)' : 'rgba(255,60,60,ALPHA)';
+    particles.forEach(p => {
+      ctx.globalAlpha = p.o;
+      ctx.fillStyle = isLight ? 'rgba(180,0,0,1)' : 'rgba(255,60,60,1)';
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+      p.y -= p.vy;
+      if (p.y < -5) { p.y = h + 5; p.x = Math.random() * w; }
+    });
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(tick);
+  }
+  resize();
+  initParticles();
+  tick();
+  window.addEventListener('resize', () => { resize(); initParticles(); });
+</script>
+
+</body>
+</html>
