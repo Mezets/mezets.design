@@ -288,12 +288,14 @@
       padding: 3px;
     }
     .db-table input {
-      width: 100%; min-width: 90px;
+      width: 100%; min-width: 130px;
       background: transparent; border: 1px solid transparent;
       color: rgba(255,220,220,0.85);
       font-family: 'Press Start 2P', monospace; font-size: 8px;
       padding: 6px 8px; border-radius: 4px;
     }
+    .db-table input.wide-field { min-width: 240px; }
+    .db-table input.narrow-field { min-width: 60px; }
     .db-table input:focus {
       border-color: rgba(255,0,0,0.4); background: rgba(255,0,0,0.06); outline: none;
     }
@@ -1756,6 +1758,71 @@ function closeUserDetail() {
   document.getElementById('userDetailOverlay').style.display = 'none';
 }
 
+/* ── Редактор отзыва (правит само сообщение в Discord, не только БД) ── */
+async function showReviewEditor(messageId) {
+  const body = document.getElementById('userDetailBody');
+  body.innerHTML = '<div style="font-size:9px;color:rgba(255,200,200,0.4)">Загружаю отзыв из Discord...</div>';
+  document.getElementById('userDetailOverlay').style.display = 'flex';
+
+  try {
+    const res = await adminFetch(`${BOT_API}/admin/review/${encodeURIComponent(messageId)}`);
+    if (res.status === 403) throw new Error('Неверный API-ключ');
+    if (!res.ok) { const d = await res.json().catch(()=>({})); throw new Error(d.error || 'Не удалось загрузить отзыв'); }
+    const r = await res.json();
+
+    body.innerHTML = `
+      <div style="font-size:12px;color:#fff;font-weight:600;margin-bottom:14px">💬 Редактирование отзыва</div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+        <img id="reviewAvatarPreview" src="${escHtml(r.avatar || '')}" style="width:44px;height:44px;border-radius:50%" onerror="this.style.visibility='hidden'">
+        <input type="text" id="reviewAvatar" placeholder="URL аватара" value="${escHtml(r.avatar || '')}" oninput="document.getElementById('reviewAvatarPreview').src=this.value" style="flex:1">
+      </div>
+      <label style="font-size:8px">Имя автора</label>
+      <input type="text" id="reviewAuthor" value="${escHtml(r.author || '')}">
+      <label style="font-size:8px">Оценка (1-5)</label>
+      <input type="text" id="reviewRating" value="${escHtml(String(r.rating || ''))}">
+      <label style="font-size:8px">Заказ №</label>
+      <input type="text" id="reviewOrder" value="${escHtml(r.order || '')}">
+      <label style="font-size:8px">Вид оформления</label>
+      <input type="text" id="reviewOrderType" value="${escHtml(r.order_type || '')}">
+      <label style="font-size:8px">Способ оплаты</label>
+      <input type="text" id="reviewPayment" value="${escHtml(r.payment || '')}">
+      <label style="font-size:8px">Комментарий</label>
+      <textarea id="reviewComment" rows="4" style="width:100%;padding:10px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,0,0,0.25);border-radius:8px;color:#fff;font-family:'Press Start 2P',monospace;font-size:8px;resize:vertical">${escHtml(r.comment || '')}</textarea>
+      <button class="btn" style="margin-top:16px" onclick="saveReviewEdit('${escHtml(String(messageId))}')">💾 Сохранить в Discord</button>
+      <div class="detail-row" style="margin-top:8px;color:rgba(255,180,180,0.5)">Правка обновит само сообщение в канале отзывов — именно оттуда его тянет и сайт.</div>
+    `;
+  } catch(e) {
+    body.innerHTML = `<div style="font-size:9px;color:#ff6666">Ошибка: ${escHtml(e.message)}</div>`;
+  }
+}
+
+async function saveReviewEdit(messageId) {
+  const masterKey = getMasterKey();
+  if (!masterKey) { alert('Введи мастер-ключ (поле на вкладке ЮЗЕРЫ)'); return; }
+
+  const fields = {
+    avatar:     document.getElementById('reviewAvatar').value.trim(),
+    author:     document.getElementById('reviewAuthor').value.trim(),
+    rating:     document.getElementById('reviewRating').value.trim(),
+    order:      document.getElementById('reviewOrder').value.trim(),
+    order_type: document.getElementById('reviewOrderType').value.trim(),
+    payment:    document.getElementById('reviewPayment').value.trim(),
+    comment:    document.getElementById('reviewComment').value.trim(),
+  };
+
+  try {
+    const res = await adminFetch(`${BOT_API}/admin/review/${encodeURIComponent(messageId)}/update`, {
+      master: true, method: 'POST', body: { pk_value: '', fields }
+    });
+    if (res.status === 403) throw new Error('Неверный мастер-ключ');
+    if (!res.ok) { const d = await res.json().catch(()=>({})); throw new Error(d.error || 'Не удалось сохранить'); }
+    closeUserDetail();
+    loadDbTable();
+  } catch(e) {
+    alert('Ошибка: ' + e.message);
+  }
+}
+
 function showAuthDetail(discordId) {
   const u = USERS.find(x => String(x.discord_id) === String(discordId));
   if (!u) return;
@@ -2130,6 +2197,15 @@ function renderDbTable(rows) {
   const cols = DB_CURRENT_COLUMNS;
   const pk = DB_CURRENT_PK;
 
+  const WIDE_COLS = ['fingerprint','avatar','comment','user_agent','ua','username','discord_id','ip','country','city','region','browser','os','ban_reason','reason','payment_method','order_type'];
+  const NARROW_COLS = ['id','rating','discount','banned','visits'];
+  function dbFieldClass(colName) {
+    const lc = colName.toLowerCase();
+    if (NARROW_COLS.includes(lc)) return 'narrow-field';
+    if (WIDE_COLS.some(w => lc.includes(w))) return 'wide-field';
+    return '';
+  }
+
   let html = '<table class="db-table"><thead><tr>';
   cols.forEach(c => html += `<th>${escHtml(c)}${c === pk ? ' 🔑' : ''}</th>`);
   html += '<th>Действия</th></tr></thead><tbody>';
@@ -2139,9 +2215,14 @@ function renderDbTable(rows) {
     cols.forEach(c => {
       const val = dbInputValue(DB_CURRENT_TABLE, c, row[c]);
       const isPk = c === pk;
-      html += `<td><input class="${isPk ? 'pk-field' : ''}" data-col="${escHtml(c)}" value="${escHtml(val)}" ${isPk ? 'readonly' : ''}></td>`;
+      const cls = [isPk ? 'pk-field' : '', dbFieldClass(c)].filter(Boolean).join(' ');
+      html += `<td><input class="${cls}" data-col="${escHtml(c)}" value="${escHtml(val)}" ${isPk ? 'readonly' : ''}></td>`;
     });
+    const reviewBtn = (DB_CURRENT_TABLE === 'order_ratings' && row.message_id)
+      ? `<button class="save-btn" style="border-color:rgba(88,101,242,0.4);color:#8ea1ff" title="Редактировать отзыв в Discord" onclick="showReviewEditor('${escHtml(row.message_id)}')">💬</button>`
+      : '';
     html += `<td class="db-row-actions">
+      ${reviewBtn}
       <button class="save-btn" onclick="saveDbRow(${i})">💾</button>
       <button class="del-btn" onclick="deleteDbRow(${i})">🗑️</button>
     </td></tr>`;
