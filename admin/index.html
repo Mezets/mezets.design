@@ -498,6 +498,10 @@
 
   <div id="mainScreen">
 
+    <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+      <button class="btn btn-sm" onclick="logoutAdmin()" style="border-color:rgba(255,0,0,0.3);color:rgba(255,150,150,0.6)">🚪 Выйти</button>
+    </div>
+
     <div class="tabs" id="tabsBar">
       <button class="tab active" onclick="switchTab('upload')">📤 ЗАГРУЗИТЬ</button>
       <button class="tab" onclick="switchTab('manage')">📋 РАБОТЫ</button>
@@ -950,6 +954,8 @@ async function login() {
     localStorage.setItem('mz_token', token);
     localStorage.setItem('mz_repo', repo);
     localStorage.setItem('mz_branch', BRANCH);
+    localStorage.setItem('mz_admin_key', adminKey);
+    localStorage.setItem('mz_session_ts', String(Date.now()));
 
     apiKey = adminKey;
     USERS  = keyData.users || [];
@@ -963,14 +969,40 @@ async function login() {
   }
 }
 
+const MZ_SESSION_MAX_AGE = 7 * 24 * 60 * 60 * 1000; // неделя
+
+function logoutAdmin() {
+  if (!confirm('Выйти из админки? Придётся заново ввести токен и ключ.')) return;
+  localStorage.removeItem('mz_token');
+  localStorage.removeItem('mz_repo');
+  localStorage.removeItem('mz_branch');
+  localStorage.removeItem('mz_admin_key');
+  localStorage.removeItem('mz_session_ts');
+  location.reload();
+}
+
 window.addEventListener('DOMContentLoaded', () => {
-  const t = localStorage.getItem('mz_token');
-  const r = localStorage.getItem('mz_repo');
-  const b = localStorage.getItem('mz_branch');
-  if (t && r) {
-    document.getElementById('tokenInput').value = t;
-    document.getElementById('repoInput').value  = r;
-    if (b) document.getElementById('branchInput').value = b;
+  const t  = localStorage.getItem('mz_token');
+  const r  = localStorage.getItem('mz_repo');
+  const b  = localStorage.getItem('mz_branch');
+  const ak = localStorage.getItem('mz_admin_key');
+  const ts = Number(localStorage.getItem('mz_session_ts') || 0);
+  const sessionValid = ts && (Date.now() - ts) < MZ_SESSION_MAX_AGE;
+
+  if (t) document.getElementById('tokenInput').value = t;
+  if (r) document.getElementById('repoInput').value  = r;
+  if (b) document.getElementById('branchInput').value = b;
+
+  if (sessionValid && t && r && ak) {
+    // Сессия ещё не старше недели — не заставляем вводить всё заново,
+    // но всё равно реально проверяем токен/ключ через login() (вдруг их отозвали).
+    document.getElementById('gateAdminKeyInput').value = ak;
+    login();
+  } else if (ts) {
+    // Сессия истекла — чистим только чувствительное (admin key), логин/репо
+    // оставляем для удобства, но входить придётся заново вручную.
+    localStorage.removeItem('mz_admin_key');
+    localStorage.removeItem('mz_session_ts');
   }
 });
 
