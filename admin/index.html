@@ -1810,8 +1810,8 @@ async function showReviewEditor(messageId) {
       </div>
       <label style="font-size:8px">Имя автора</label>
       <input type="text" id="reviewAuthor" value="${escHtml(r.author || '')}">
-      <label style="font-size:8px">Оценка (1-5)</label>
-      <input type="text" id="reviewRating" value="${escHtml(String(r.rating || ''))}">
+      <label style="font-size:8px">Оценка (только 1-5, не количество)</label>
+      <input type="text" id="reviewRating" inputmode="numeric" maxlength="1" placeholder="1-5" value="${escHtml(String(r.rating || ''))}" oninput="this.value=this.value.replace(/[^1-5]/g,'').slice(0,1)">
       <label style="font-size:8px">Заказ №</label>
       <input type="text" id="reviewOrder" value="${escHtml(r.order || '')}">
       <label style="font-size:8px">Вид оформления</label>
