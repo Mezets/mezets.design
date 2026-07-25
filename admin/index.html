@@ -757,6 +757,19 @@
           <button class="btn btn-sm" onclick="toggleDbAddForm()" style="flex:1;border-color:rgba(0,200,0,0.35);color:#55ff55">➕ Добавить строку</button>
         </div>
 
+        <div style="background:rgba(88,101,242,0.05);border:1px solid rgba(88,101,242,0.25);border-radius:10px;padding:14px;margin-bottom:16px">
+          <div style="font-size:9px;color:#8ea1ff;margin-bottom:10px">🔎 Найти аватар в Discord (не привязано к конкретной строке)</div>
+          <div style="display:flex;gap:8px;align-items:flex-start">
+            <input type="text" id="avatarLookupQuery" placeholder="Ник или Discord ID" style="flex:1">
+            <button class="btn btn-sm" onclick="standaloneAvatarLookup()" style="border-color:rgba(88,101,242,0.4);color:#8ea1ff">Найти</button>
+          </div>
+          <div style="font-size:6.5px;color:rgba(200,210,255,0.4);line-height:1.7;margin-top:6px">Ищет по нику среди участников сервера, а если человек уже вышел — по последнему известному входу на сайт. Discord ID находит всегда, даже если человека нет ни там, ни там.</div>
+          <div id="avatarLookupResult" style="display:none;margin-top:12px;align-items:center;gap:12px">
+            <img id="avatarLookupImg" style="width:48px;height:48px;border-radius:50%">
+            <input type="text" id="avatarLookupUrl" readonly style="flex:1" onclick="this.select()">
+          </div>
+        </div>
+
         <div id="dbAddForm" style="display:none;background:rgba(0,180,0,0.05);border:1px solid rgba(0,200,0,0.25);border-radius:10px;padding:14px;margin-bottom:16px"></div>
 
         <div class="status" id="dbStatus"></div>
@@ -1826,6 +1839,25 @@ async function showReviewEditor(messageId) {
     `;
   } catch(e) {
     body.innerHTML = `<div style="font-size:9px;color:#ff6666">Ошибка: ${escHtml(e.message)}</div>`;
+  }
+}
+
+async function standaloneAvatarLookup() {
+  const q = document.getElementById('avatarLookupQuery').value.trim();
+  const resultBox = document.getElementById('avatarLookupResult');
+  if (!q) { alert('Впиши ник или Discord ID'); return; }
+
+  try {
+    const res = await adminFetch(`${BOT_API}/admin/review-lookup-avatar?name=${encodeURIComponent(q)}`);
+    if (res.status === 404) { alert('Не нашёл ни на сервере, ни в базе сайта'); resultBox.style.display = 'none'; return; }
+    if (res.status === 403) throw new Error('Неверный API-ключ');
+    if (!res.ok) throw new Error('Ошибка поиска');
+    const data = await res.json();
+    document.getElementById('avatarLookupImg').src = data.avatar;
+    document.getElementById('avatarLookupUrl').value = data.avatar;
+    resultBox.style.display = 'flex';
+  } catch(e) {
+    alert('Ошибка: ' + e.message);
   }
 }
 
