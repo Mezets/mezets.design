@@ -1807,6 +1807,7 @@ async function showReviewEditor(messageId) {
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
         <img id="reviewAvatarPreview" src="${escHtml(r.avatar || '')}" style="width:44px;height:44px;border-radius:50%" onerror="this.style.visibility='hidden'">
         <input type="text" id="reviewAvatar" placeholder="URL аватара" value="${escHtml(r.avatar || '')}" oninput="document.getElementById('reviewAvatarPreview').src=this.value" style="flex:1">
+        <button type="button" class="btn btn-sm" onclick="lookupReviewAvatar()" title="Найти аватар по имени автора на сервере">🔎</button>
       </div>
       <label style="font-size:8px">Имя автора</label>
       <input type="text" id="reviewAuthor" value="${escHtml(r.author || '')}">
@@ -1825,6 +1826,26 @@ async function showReviewEditor(messageId) {
     `;
   } catch(e) {
     body.innerHTML = `<div style="font-size:9px;color:#ff6666">Ошибка: ${escHtml(e.message)}</div>`;
+  }
+}
+
+async function lookupReviewAvatar() {
+  const nameInput = document.getElementById('reviewAuthor');
+  const avatarInput = document.getElementById('reviewAvatar');
+  const preview = document.getElementById('reviewAvatarPreview');
+  const name = nameInput.value.trim();
+  if (!name) { alert('Сначала впиши имя автора'); return; }
+
+  try {
+    const res = await adminFetch(`${BOT_API}/admin/review-lookup-avatar?name=${encodeURIComponent(name)}`);
+    if (res.status === 404) { alert('Не нашёл такого на сервере'); return; }
+    if (res.status === 403) throw new Error('Неверный API-ключ');
+    if (!res.ok) throw new Error('Ошибка поиска');
+    const data = await res.json();
+    avatarInput.value = data.avatar;
+    preview.src = data.avatar;
+  } catch(e) {
+    alert('Ошибка: ' + e.message);
   }
 }
 
@@ -2138,7 +2159,8 @@ const DB_TABLE_LABELS = {
   spun_users:           'Кто уже крутил рулетку',
   last_winners:         'Победители рулетки',
   authorized_users:     'Авторизованные',
-  watchlist:            'Стоп-лист',
+  watchlist:            'Стоп-лист (по Discord ID)',
+  banned_ips:           'Стоп-лист по IP',
   unauthorized_visits:  'Гости',
 };
 
