@@ -758,15 +758,20 @@
         </div>
 
         <div style="background:rgba(88,101,242,0.05);border:1px solid rgba(88,101,242,0.25);border-radius:10px;padding:14px;margin-bottom:16px">
-          <div style="font-size:9px;color:#8ea1ff;margin-bottom:10px">🔎 Найти аватар в Discord (не привязано к конкретной строке)</div>
-          <div style="display:flex;gap:8px;align-items:flex-start">
-            <input type="text" id="avatarLookupQuery" placeholder="Ник или Discord ID" style="flex:1">
-            <button class="btn btn-sm" onclick="standaloneAvatarLookup()" style="border-color:rgba(88,101,242,0.4);color:#8ea1ff">Найти</button>
+          <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="toggleAvatarLookupBox()">
+            <span style="font-size:9px;color:#8ea1ff">🔎 Найти аватар в Discord (не привязано к конкретной строке)</span>
+            <span id="avatarLookupCollapseArrow" style="color:#8ea1ff;transition:transform .2s">▾</span>
           </div>
-          <div style="font-size:6.5px;color:rgba(200,210,255,0.4);line-height:1.7;margin-top:6px">Ищет по нику среди участников сервера, а если человек уже вышел — по последнему известному входу на сайт. Discord ID находит всегда, даже если человека нет ни там, ни там.</div>
-          <div id="avatarLookupResult" style="display:none;margin-top:12px;align-items:center;gap:12px">
-            <img id="avatarLookupImg" style="width:48px;height:48px;border-radius:50%">
-            <input type="text" id="avatarLookupUrl" readonly style="flex:1" onclick="this.select()">
+          <div id="avatarLookupBody" style="margin-top:10px">
+            <div style="display:flex;gap:8px;align-items:flex-start">
+              <input type="text" id="avatarLookupQuery" placeholder="Ник или Discord ID" style="flex:1">
+              <button class="btn btn-sm" onclick="standaloneAvatarLookup()" style="border-color:rgba(88,101,242,0.4);color:#8ea1ff">Найти</button>
+            </div>
+            <div style="font-size:6.5px;color:rgba(200,210,255,0.4);line-height:1.7;margin-top:6px">Ищет по нику среди участников сервера, а если человек уже вышел — по последнему известному входу на сайт. Discord ID находит всегда, даже если человека нет ни там, ни там.</div>
+            <div id="avatarLookupResult" style="display:none;margin-top:12px;align-items:center;gap:12px">
+              <img id="avatarLookupImg" style="width:48px;height:48px;border-radius:50%">
+              <input type="text" id="avatarLookupUrl" readonly style="flex:1" onclick="this.select()">
+            </div>
           </div>
         </div>
 
@@ -1842,6 +1847,14 @@ async function showReviewEditor(messageId) {
   }
 }
 
+function toggleAvatarLookupBox() {
+  const body = document.getElementById('avatarLookupBody');
+  const arrow = document.getElementById('avatarLookupCollapseArrow');
+  const collapsed = body.style.display === 'none';
+  body.style.display = collapsed ? 'block' : 'none';
+  arrow.style.transform = collapsed ? 'rotate(0deg)' : 'rotate(-90deg)';
+}
+
 async function standaloneAvatarLookup() {
   const q = document.getElementById('avatarLookupQuery').value.trim();
   const resultBox = document.getElementById('avatarLookupResult');
@@ -2283,7 +2296,7 @@ function renderDbTable(rows) {
   const cols = DB_CURRENT_COLUMNS;
   const pk = DB_CURRENT_PK;
 
-  const WIDE_COLS = ['fingerprint','avatar','comment','user_agent','ua','username','discord_id','ip','country','city','region','browser','os','ban_reason','reason','payment_method','order_type'];
+  const WIDE_COLS = ['fingerprint','avatar','comment','user_agent','ua','username','discord_id','ip','country','city','region','browser','os','ban_reason','reason','payment_method','order_type','message_id'];
   const NARROW_COLS = ['id','rating','discount','banned','visits'];
   function dbFieldClass(colName) {
     const lc = colName.toLowerCase();
@@ -2302,7 +2315,9 @@ function renderDbTable(rows) {
       const val = dbInputValue(DB_CURRENT_TABLE, c, row[c]);
       const isPk = c === pk;
       const cls = [isPk ? 'pk-field' : '', dbFieldClass(c)].filter(Boolean).join(' ');
-      html += `<td><input class="${cls}" data-col="${escHtml(c)}" value="${escHtml(val)}" ${isPk ? 'readonly' : ''}></td>`;
+      const isEmptyMsgId = (c === 'message_id' && DB_CURRENT_TABLE === 'order_ratings' && !val);
+      const ph = isEmptyMsgId ? 'В Discord: режим разработчика → ПКМ на сообщении → Copy Message ID' : '';
+      html += `<td><input class="${cls}" data-col="${escHtml(c)}" value="${escHtml(val)}" placeholder="${escHtml(ph)}" ${isPk ? 'readonly' : ''}></td>`;
     });
     const reviewBtn = (DB_CURRENT_TABLE === 'order_ratings' && row.message_id)
       ? `<button class="save-btn" style="border-color:rgba(88,101,242,0.4);color:#8ea1ff" title="Редактировать отзыв в Discord" onclick="showReviewEditor('${escHtml(row.message_id)}')">💬</button>`
