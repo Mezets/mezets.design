@@ -1315,6 +1315,14 @@
       background: rgba(255,0,0,0.07);
     }
     .order-item-cb input { accent-color: #ff2a2a; margin: 0; width: 10px; height: 10px; }
+    .order-items-section-label {
+      font-size: 6px; color: rgba(255,200,200,0.3);
+      margin: 6px 0 4px; letter-spacing: 1px; text-transform: uppercase;
+    }
+    .order-items-section-label:first-child { margin-top: 0; }
+    .order-items-grid {
+      display: flex; flex-wrap: wrap; gap: 4px;
+    }
 
     .order-submit {
       display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -2031,7 +2039,7 @@
       <div class="order-modal-title">Оформить заказ</div>
       <div class="order-field">
         <div class="order-label">Категория</div>
-        <select class="order-select" id="orderCategory" onchange="updateOrderPrice()">
+        <select class="order-select" id="orderCategory" onchange="updateOrderPrice();renderPriceItems()">
           <option value="design">🎨 Дизайн</option>
           <option value="discord_bot">🤖 Discord бот</option>
           <option value="telegram_bot">📱 Telegram бот</option>
@@ -2043,24 +2051,31 @@
         <div class="order-label">Что нужно сделать?</div>
         <textarea class="order-textarea" id="orderDesc" rows="4" placeholder="Опиши задачу..." oninput="updateOrderPrice()"></textarea>
       </div>
+      <div class="order-field" id="orderItemsSection">
+        <div class="order-label">Выбери услуги</div>
+        <div id="priceItemsContainer" style="margin-bottom:6px"></div>
+        <div style="font-size:7px;color:rgba(255,200,200,0.4);text-align:right;margin-top:2px">
+          Итого: <span id="orderItemsTotal">0</span> ₽
+        </div>
+      </div>
       <div class="order-field">
         <div class="order-label">Способ оплаты</div>
         <div class="order-payment-group">
           <label class="order-payment-option">
             <input type="radio" name="payment" value="sbp" checked>
-            <span>💳 СБП</span>
+            <span>СБП</span>
           </label>
           <label class="order-payment-option">
             <input type="radio" name="payment" value="card">
-            <span>💳 Карта</span>
+            <span>Карта</span>
           </label>
           <label class="order-payment-option">
             <input type="radio" name="payment" value="steam_gift">
-            <span>🎮 Подарок Steam</span>
+            <span>Подарок Steam</span>
           </label>
           <label class="order-payment-option">
             <input type="radio" name="payment" value="steam_topup">
-            <span>🎮 Пополнение Steam</span>
+            <span>Пополнение Steam</span>
           </label>
         </div>
       </div>
@@ -3013,6 +3028,57 @@
     document.getElementById('orderNotLogged').style.display = 'none';
     document.getElementById('orderPriceEst').style.display = 'block';
     updateOrderPrice();
+    renderPriceItems();
+  }
+
+  var cachedPriceItems = null;
+  async function renderPriceItems() {
+    var container = document.getElementById('priceItemsContainer');
+    if (!container) return;
+    var cat = document.getElementById('orderCategory').value;
+    if (cat === 'discord_bot' || cat === 'telegram_bot') {
+      container.innerHTML = '';
+      document.getElementById('orderItemsSection').style.display = 'none';
+      updateOrderPrice();
+      return;
+    }
+    document.getElementById('orderItemsSection').style.display = '';
+    if (cachedPriceItems) {
+      renderPriceItemsHTML(container, cachedPriceItems);
+      updateOrderPrice();
+      return;
+    }
+    try {
+      var r = await fetch(API + '/api/prices');
+      var d = await r.json();
+      cachedPriceItems = d.sections || [];
+      renderPriceItemsHTML(container, cachedPriceItems);
+      updateOrderPrice();
+    } catch(e) {
+      container.innerHTML = '<div style="font-size:6px;color:rgba(255,150,150,0.5)">Не удалось загрузить услуги</div>';
+    }
+  }
+  function renderPriceItemsHTML(container, sections) {
+    if (!sections || sections.length === 0) {
+      container.innerHTML = '<div style="font-size:6px;color:rgba(255,200,200,0.3)">Нет доступных услуг</div>';
+      return;
+    }
+    var html = '';
+    for (var si = 0; si < sections.length; si++) {
+      var sec = sections[si];
+      html += '<div class="order-items-section-label">' + sec.label + '</div>';
+      html += '<div class="order-items-grid">';
+      for (var ii = 0; ii < sec.items.length; ii++) {
+        var item = sec.items[ii];
+        var safe = item.name.replace(/[^a-zA-Zа-яА-Я0-9 ]/g, '').trim();
+        html += '<label class="order-item-cb">' +
+          '<input type="checkbox" value="' + item.name.replace(/"/g,'&quot;') + '" data-price="' + item.price + '" onchange="updateOrderPrice()"> ' +
+          item.name + ' <span style="opacity:0.5">' + item.price + '</span>' +
+        '</label>';
+      }
+      html += '</div>';
+    }
+    container.innerHTML = html;
   }
 
   function updateOrderPrice() {
@@ -3021,8 +3087,17 @@
     var bases = { design: 200, discord_bot: 1000, telegram_bot: 1000, website: 2000, other: 500 };
     var base = bases[cat] || 500;
     var bonus = Math.min(Math.floor(desc.length / 50) * 50, base);
-    var est = base + bonus;
+    // sum selected items
+    var itemsTotal = 0;
+    var cbs = document.querySelectorAll('#priceItemsContainer input[type=checkbox]:checked');
+    for (var i = 0; i < cbs.length; i++) {
+      var p = cbs[i].getAttribute('data-price') || '';
+      var num = parseInt(p);
+      if (!isNaN(num)) itemsTotal += num;
+    }
+    var est = base + bonus + itemsTotal;
     document.getElementById('orderPriceDisplay').textContent = est + ' ₽';
+    document.getElementById('orderItemsTotal').textContent = itemsTotal;
   }
 
   async function submitOrder() {
@@ -3033,6 +3108,9 @@
     const category = document.getElementById('orderCategory').value;
     const paymentEl = document.querySelector('input[name="payment"]:checked');
     const payment_method = paymentEl ? paymentEl.value : null;
+    const items = [];
+    const cbs = document.querySelectorAll('#priceItemsContainer input[type=checkbox]:checked');
+    for (var i = 0; i < cbs.length; i++) items.push(cbs[i].value);
 
     if (!session) {
       window.location.href = API + '/discord-login-url';
@@ -3054,7 +3132,7 @@
       const res = await fetch(API + '/api/order?session=' + encodeURIComponent(session), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ category: category, description: desc, payment_method: payment_method }),
+        body: JSON.stringify({ category: category, description: desc, payment_method: payment_method, items: items }),
       });
       const data = await res.json();
       if (data.status === 'ok') {
