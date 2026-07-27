@@ -1968,6 +1968,23 @@
         Используя сайт и входя через Discord, вы соглашаетесь с
         <span onclick="openDataPolicy()" style="text-decoration:underline;cursor:pointer;color:#ff8888">условиями обработки данных</span>
       </div>
+    </div>        <div class="order-card" id="orderCard">
+      <div class="order-title">📦 Оформить заказ</div>
+      <div class="order-field">
+        <div class="order-label">Что нужно сделать?</div>
+        <textarea class="order-textarea" id="orderDesc" rows="4" placeholder="Опиши задачу..."></textarea>
+      </div>
+      <div style="font-size:6px;color:rgba(255,200,200,0.35);text-align:center;margin-bottom:8px;" id="orderLoginHint">
+        <span id="orderNotLogged">Войди через Discord, чтобы оформить заказ</span>
+        <span id="orderPriceEst" style="display:none;">Примерная цена: <span id="orderPriceDisplay">—</span></span>
+      </div>
+      <div class="order-status" id="orderStatus"></div>
+      <button class="order-submit" id="orderSubmit" onclick="submitOrder()">
+        Отправить заявку
+      </button>
+      <div style="font-size:6px;color:rgba(255,200,200,0.3);text-align:center;margin-top:6px;">
+        Или <a href="/mezets.design/order/" style="color:#ff6666">подробная форма заказа</a>
+      </div>
     </div>
 
     <script>
@@ -2765,13 +2782,18 @@
   if (orderCard) tilt(orderCard);
 
   async function submitOrder() {
-    const discord = document.getElementById('orderDiscord').value.trim();
-    const wishes  = document.getElementById('orderWishes').value.trim();
-    const status  = document.getElementById('orderStatus');
-    const btn     = document.getElementById('orderSubmit');
+    const desc = document.getElementById('orderDesc').value.trim();
+    const status = document.getElementById('orderStatus');
+    const btn = document.getElementById('orderSubmit');
+    const session = (function() { var s; try { s = localStorage.getItem('mezets_session') || ''; } catch(e) { s = ''; } return s; })();
 
-    if (!discord) {
-      status.textContent = 'Укажи Discord ник';
+    if (!session) {
+      window.location.href = API + '/discord-login-url';
+      return;
+    }
+
+    if (!desc) {
+      status.textContent = 'Опиши что нужно сделать';
       status.className = 'order-status err';
       return;
     }
@@ -2782,23 +2804,22 @@
     status.className = 'order-status';
 
     try {
-      const res = await fetch(`${API}/api/order`, {
+      const res = await fetch(API + '/api/order?session=' + encodeURIComponent(session), {
         method: 'POST',
-        mode: 'cors',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ discord, wishes }),
+        body: JSON.stringify({ category: 'design', description: desc, payment_method: null }),
       });
       const data = await res.json();
       if (data.status === 'ok') {
-        status.textContent = 'Заявка отправлена! Ожидай ответа в Discord';
+        const oid = data.order.id;
+        status.innerHTML = 'Заказ #' + oid + ' создан! Перейти в <a href="/mezets.design/order/chat.html?id=' + oid + '" style="color:#ff5555">чат</a>';
         status.className = 'order-status ok';
-        document.getElementById('orderDiscord').value = '';
-        document.getElementById('orderWishes').value  = '';
+        document.getElementById('orderDesc').value = '';
         btn.textContent = 'Отправлено ✓';
-        setTimeout(() => {
+        setTimeout(function() {
           btn.disabled = false;
           btn.textContent = 'Отправить заявку';
-        }, 4000);
+        }, 5000);
       } else {
         throw new Error(data.error || 'Ошибка');
       }
@@ -2810,8 +2831,7 @@
     }
   }
 
-
-  const DISCOUNT_EMOJI = {10:'🎟️',25:'🎫',42:'🐄',50:'🎯',67:'🔥',75:'💎',100:'👑'};
+  constconst DISCOUNT_EMOJI = {10:'🎟️',25:'🎫',42:'🐄',50:'🎯',67:'🔥',75:'💎',100:'👑'};
   const WEIGHTS = {10:130,25:46,42:22,50:18,67:7,75:5,100:1};
   const WEIGHTS_TOTAL = Object.values(WEIGHTS).reduce((a,b)=>a+b,0);
   function getChance(discount) { return (WEIGHTS[discount]/WEIGHTS_TOTAL*100).toFixed(2)+'%'; }
