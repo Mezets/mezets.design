@@ -2831,7 +2831,7 @@
     }
   }
 
-  constconst DISCOUNT_EMOJI = {10:'🎟️',25:'🎫',42:'🐄',50:'🎯',67:'🔥',75:'💎',100:'👑'};
+  const DISCOUNT_EMOJI = {10:'🎟️',25:'🎫',42:'🐄',50:'🎯',67:'🔥',75:'💎',100:'👑'};
   const WEIGHTS = {10:130,25:46,42:22,50:18,67:7,75:5,100:1};
   const WEIGHTS_TOTAL = Object.values(WEIGHTS).reduce((a,b)=>a+b,0);
   function getChance(discount) { return (WEIGHTS[discount]/WEIGHTS_TOTAL*100).toFixed(2)+'%'; }
