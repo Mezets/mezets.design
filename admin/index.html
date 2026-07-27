@@ -543,6 +543,7 @@
       <button class="tab" onclick="switchTab('orders')">📦 ЗАКАЗЫ</button>
       <button class="tab" onclick="switchTab('maint')">🛠️ ТЕХРАБОТЫ</button>
       <button class="tab" onclick="switchTab('db')">🗄️ БД</button>
+      <button class="tab" onclick="switchTab('payments')">💳 ОПЛАТА</button>
     </div>
 
     <div id="tabUpload" class="tab-panel active">
@@ -768,8 +769,6 @@
         </div>
         <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
           <input type="text" id="catEmojiInput" placeholder="🎨" style="width:60px;font-size:7px;text-align:center">
-          <input type="number" id="catPriceInput" placeholder="Базовая цена (₽)" style="width:120px;font-size:7px">
-          <span style="font-size:6px;color:rgba(255,200,200,0.3)">для расчёта цены</span>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="btn btn-sm" onclick="addCategory()" style="flex:1;border-color:rgba(0,200,0,0.35);color:#55ff55">➕ Добавить</button>
@@ -892,6 +891,21 @@
         <div id="dbTableWrap" class="db-scroll">
           <div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Выбери таблицу выше</div>
         </div>
+      </div>
+    <div id="tabPayments" class="tab-panel">
+      <div class="card">
+        <div class="card-title">💳 СПОСОБЫ ОПЛАТЫ</div>
+        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+          <input type="text" id="pmKeyInput" placeholder="Ключ (sbp)" style="flex:1;font-size:7px;min-width:80px">
+          <input type="text" id="pmLabelInput" placeholder="Название (СБП)" style="flex:1;font-size:7px;min-width:100px">
+        </div>
+        <button class="btn btn-sm" onclick="addPaymentMethod()" style="margin-bottom:14px;border-color:rgba(0,200,0,0.35);color:#55ff55">➕ Добавить</button>
+        <div class="works-list" id="paymentMethodsList"><div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div></div>
+        <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+          <button class="btn btn-sm" onclick="loadPaymentMethods()">🔄 Загрузить</button>
+          <button class="btn btn-sm" onclick="savePaymentMethods()" style="background:rgba(0,180,0,0.08);border-color:rgba(0,200,0,0.3);color:#55ff55">💾 Сохранить на GitHub</button>
+        </div>
+        <div class="status" id="pmStatus"></div>
       </div>
     </div>
 
@@ -1055,7 +1069,7 @@ function enterUsersGate() {
 }
 
 function switchTab(tab) {
-  const order = ['upload','manage','prices','rules','users','orders','maint','db'];
+  const order = ['upload','manage','prices','rules','users','orders','maint','db','payments'];
   const tabButtons = document.querySelectorAll('.tab');
   tabButtons.forEach((t,i) => t.classList.toggle('active', order[i]===tab));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
@@ -1068,6 +1082,7 @@ function switchTab(tab) {
   if (tab === 'orders' && getAdminKey()) { loadOrders(); loadCategories(); }
   if (tab === 'maint' && getAdminKey()) loadMaintenance();
   if (tab === 'db' && getAdminKey()) loadDbTablesList();
+  if (tab === 'payments' && TOKEN) loadPaymentMethods();
 }
 
 async function login() {
@@ -1571,6 +1586,86 @@ async function savePrices() {
 
 function escHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+var paymentMethodsData = [];
+async function loadPaymentMethods() {
+  const status = document.getElementById('pmStatus');
+  const list = document.getElementById('paymentMethodsList');
+  list.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div>';
+  showStatus(status, '', '');
+  try {
+    const f = await getFile('common.js');
+    if (!f) { paymentMethodsData = []; throw new Error('common.js не найден'); }
+    const content = decodeURIComponent(escape(atob(f.content)));
+    const match = content.match(/\/\/ --- PAYMENT_METHODS_START ---\nconst PAYMENT_METHODS = ([\s\S]*?)\/\/ --- PAYMENT_METHODS_END ---/);
+    if (!match) throw new Error('PAYMENT_METHODS не найден в common.js');
+    paymentMethodsData = JSON.parse(match[1].trim().replace(/;\s*$/, ''));
+    renderPaymentMethods();
+    showStatus(status, 'Загружено (' + paymentMethodsData.length + ' способов)', 'ok');
+  } catch(e) {
+    list.innerHTML = '<div style="font-size:7px;color:rgba(255,150,150,0.5);line-height:2">' + escHtml(e.message) + '</div>';
+  }
+}
+function renderPaymentMethods() {
+  const list = document.getElementById('paymentMethodsList');
+  if (!paymentMethodsData.length) {
+    list.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2;padding:20px;text-align:center">Нет способов оплаты</div>';
+    return;
+  }
+  list.innerHTML = paymentMethodsData.map(function(m, i) {
+    return '<div class="work-item" style="align-items:center">' +
+      '<div style="flex:1;min-width:0">' +
+        '<div class="work-type">' + escHtml(m.label || m.key) + '</div>' +
+        '<div class="work-file">' + escHtml(m.key) + '</div>' +
+      '</div>' +
+      '<input type="text" id="pmEdit_' + i + '" value="' + escHtml(m.label) + '" style="width:120px;font-size:7px;padding:6px 8px;border-radius:6px;background:rgba(255,0,0,0.04);border:1px solid rgba(255,0,0,0.13);color:rgba(255,220,220,0.8);font-family:inherit">' +
+      '<button class="btn btn-sm" onclick="deletePaymentMethod(' + i + ')" style="width:auto;border-color:rgba(255,0,0,0.4);color:#ff5555">✕</button>' +
+    '</div>';
+  }).join('');
+}
+async function addPaymentMethod() {
+  const status = document.getElementById('pmStatus');
+  const key = document.getElementById('pmKeyInput').value.trim();
+  const label = document.getElementById('pmLabelInput').value.trim();
+  if (!key || !label) { showStatus(status, 'Заполни ключ и название', 'err'); return; }
+  paymentMethodsData.push({ key: key, label: label });
+  document.getElementById('pmKeyInput').value = '';
+  document.getElementById('pmLabelInput').value = '';
+  renderPaymentMethods();
+  showStatus(status, 'Добавлено. Нажми Сохранить на GitHub', 'ok');
+}
+function deletePaymentMethod(i) {
+  if (!confirm('Удалить этот способ оплаты?')) return;
+  paymentMethodsData.splice(i, 1);
+  renderPaymentMethods();
+  showStatus(document.getElementById('pmStatus'), 'Удалено. Нажми Сохранить на GitHub', 'ok');
+}
+async function savePaymentMethods() {
+  const status = document.getElementById('pmStatus');
+  paymentMethodsData.forEach(function(m, i) {
+    var inp = document.getElementById('pmEdit_' + i);
+    if (inp && inp.value.trim()) m.label = inp.value.trim();
+  });
+  showStatus(status, 'Сохраняю...', 'info');
+  try {
+    const json = JSON.stringify(paymentMethodsData, null, 2);
+    const f = await getFile('common.js');
+    if (!f) throw new Error('common.js не найден');
+    const content = decodeURIComponent(escape(atob(f.content)));
+    const replacement = '// --- PAYMENT_METHODS_START ---\nconst PAYMENT_METHODS = ' + json + ';\n// --- PAYMENT_METHODS_END ---';
+    const newContent = content.replace(/\/\/ --- PAYMENT_METHODS_START ---[\s\S]*?\/\/ --- PAYMENT_METHODS_END ---/g, replacement);
+    const b64 = btoa(unescape(encodeURIComponent(newContent)));
+    const body = { message: 'update PAYMENT_METHODS in common.js', content: b64, branch: BRANCH };
+    if (f.sha) body.sha = f.sha;
+    const res = await ghFetch('/repos/' + REPO + '/contents/common.js', TOKEN, {
+      method: 'PUT', body: JSON.stringify(body),
+    });
+    if (!res.ok) { const err = await res.json(); throw new Error(err.message || 'GitHub API error'); }
+    showStatus(status, 'Сохранено! Сайт обновится через ~30 сек.', 'ok');
+  } catch(e) {
+    showStatus(status, 'Ошибка: ' + e.message, 'err');
+  }
 }
 
 
@@ -2669,7 +2764,6 @@ async function loadCategories() {
       <div class="work-item" style="${c.is_active ? '' : 'opacity:0.5'}">
         <div style="flex:1;min-width:0">
           <div class="work-type">${c.emoji || ''} ${escHtml(c.label)} <span style="color:rgba(255,200,200,0.3)">(${escHtml(c.name)})</span></div>
-          <div class="work-file">Базовая цена: ${c.base_price} ₽</div>
         </div>
         <button class="btn btn-sm" onclick="toggleCategory(${c.id}, ${c.is_active ? 0 : 1})" style="width:auto;border-color:rgba(255,200,0,0.3);color:#ffcc00">${c.is_active ? 'Выкл' : 'Вкл'}</button>
         <button class="btn btn-sm" onclick="deleteCategory(${c.id})" style="width:auto;border-color:rgba(255,0,0,0.4);color:#ff5555">✕</button>
@@ -2688,11 +2782,10 @@ async function addCategory() {
   const name = document.getElementById('catNameInput').value.trim();
   const label = document.getElementById('catLabelInput').value.trim();
   const emoji = document.getElementById('catEmojiInput').value.trim();
-  const base_price = parseInt(document.getElementById('catPriceInput').value) || 0;
   if (!name || !label) { showStatus(status, 'Заполни name и название', 'err'); return; }
   try {
     const res = await adminFetch(BOT_API + '/admin/categories/add', {
-      master: true, method: 'POST', body: { name, label, emoji, base_price }
+      master: true, method: 'POST', body: { name, label, emoji }
     });
     if (res.status === 403) throw new Error('Неверный мастер-ключ');
     if (!res.ok) { const d = await res.json().catch(()=>({})); throw new Error(d.error || 'Ошибка'); }
