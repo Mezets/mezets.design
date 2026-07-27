@@ -1,2732 +1,429 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mezets — Админка</title>
-  <link rel="icon" type="image/png" href="/mezets.design/favicon.png">
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mezets — Чат заказа</title>
+<link rel="icon" type="image/png" href="/mezets.design/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scrollbar-width: thin; scrollbar-color: rgba(255,0,0,0.45) rgba(10,0,0,0.6); }
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: rgba(10,0,0,0.6); }
+::-webkit-scrollbar-thumb { background: rgba(255,0,0,0.45); border-radius: 6px; }
+html, body {
+  font-family: 'Press Start 2P', monospace;
+  background: #050000; min-height: 100vh;
+  color: rgba(255,200,200,0.85); overflow-x: hidden;
+}
+.canvas-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+.wrap {
+  position: relative; z-index: 1;
+  max-width: 680px; margin: 0 auto; padding: 48px 20px 100px;
+}
+.header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
+}
+.logo {
+  font-size: 13px;
+  color: #ff2a2a;
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+  text-shadow: 0 0 18px rgba(255,0,0,0.55);
+}
+.logo-sub {
+  font-size: 7px;
+  color: rgba(255,200,200,0.35);
+  letter-spacing: 1px;
+  margin-bottom: 40px;
+}
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 10px 16px; font-family: 'Press Start 2P', monospace;
+  font-size: 8px; line-height: 1.6; cursor: pointer; text-decoration: none;
+  color: #ff3b3b; border-radius: 10px;
+  background: rgba(255,0,0,0.05); border: 1px solid rgba(255,0,0,0.25);
+  transition: .2s; letter-spacing: .5px;
+}
+.btn:hover { transform: scale(1.04); border-color: rgba(255,0,0,0.5); box-shadow: 0 0 24px rgba(255,0,0,0.2); }
+.btn-sm { padding: 8px 12px; font-size: 7px; }
+.btn-danger { background: rgba(255,0,0,0.15); border-color: rgba(255,0,0,0.4); }
 
-    html { scrollbar-width: thin; scrollbar-color: rgba(255,0,0,0.45) rgba(10,0,0,0.6); }
-    ::-webkit-scrollbar { width: 8px; }
-    ::-webkit-scrollbar-track { background: rgba(10,0,0,0.6); }
-    ::-webkit-scrollbar-thumb { background: rgba(255,0,0,0.45); border-radius: 6px; }
+.card {
+  background: rgba(12,0,0,0.82);
+  border: 1px solid rgba(255,0,0,0.2);
+  border-radius: 18px; padding: 20px; margin-bottom: 16px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 40px rgba(255,0,0,0.06);
+}
 
-    html, body {
-      font-family: 'Press Start 2P', monospace;
-      background: #050000;
-      min-height: 100vh;
-      color: rgba(255,200,200,0.85);
-      overflow-x: hidden;
-    }
+.order-info {
+  display: flex; flex-wrap: wrap; gap: 12px;
+  justify-content: space-between; align-items: center;
+}
+.order-info-left { display: flex; flex-direction: column; gap: 6px; }
+.order-id { font-size: 11px; color: #ff2a2a; letter-spacing: 1px; }
+.order-meta { font-size: 7px; color: rgba(255,200,200,0.5); }
+.order-price { font-size: 13px; color: #ff5555; }
+.status-new { color: #59bfff; }
+.status-in_progress { color: #ffcc00; }
+.status-completed { color: #66ff99; }
+.status-cancelled { color: #ff6666; }
+.order-status-badge {
+  font-size: 8px; padding: 6px 12px; border-radius: 8px;
+  border: 1px solid currentColor;
+}
+.order-desc-box {
+  margin-top: 12px; padding: 12px; border-radius: 10px;
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,0,0,0.1);
+  font-size: 7px; color: rgba(255,200,200,0.6); line-height: 1.8;
+  word-break: break-word;
+}
 
-    canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+.chat-box {
+  display: flex; flex-direction: column;
+  height: 400px; overflow-y: auto; gap: 10px;
+  padding-right: 4px; margin-bottom: 12px;
+}
+.msg {
+  padding: 12px 14px; border-radius: 12px;
+  max-width: 85%; word-break: break-word; animation: msgIn .2s ease;
+}
+@keyframes msgIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.msg-user {
+  align-self: flex-end;
+  background: rgba(255,0,0,0.08); border: 1px solid rgba(255,0,0,0.18);
+}
+.msg-discord {
+  align-self: flex-start;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+}
+.msg-author { font-size: 6px; color: rgba(255,200,200,0.4); margin-bottom: 5px; }
+.msg-text { font-size: 7px; color: rgba(255,220,220,0.9); line-height: 1.6; font-family: sans-serif; }
+.msg-time { font-size: 5px; color: rgba(255,150,150,0.3); margin-top: 4px; text-align: right; font-family: monospace; }
+.msg-attachments { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.msg-attachment {
+  font-size: 6px; padding: 4px 8px; border-radius: 6px;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(200,200,255,0.7); text-decoration: none;
+  transition: .2s;
+}
+.msg-attachment:hover { border-color: rgba(255,60,60,0.3); }
 
-    .wrap {
-      position: relative;
-      z-index: 1;
-      max-width: 560px;
-      margin: 0 auto;
-      padding: 48px 20px 80px;
-    }
+.chat-input-row {
+  display: flex; gap: 8px;
+}
+.chat-input {
+  flex: 1; padding: 12px 14px; border-radius: 10px;
+  background: rgba(255,0,0,0.05); border: 1px solid rgba(255,0,0,0.2);
+  color: rgba(255,220,220,0.9);
+  font-family: 'Press Start 2P', monospace; font-size: 7px; line-height: 1.6;
+  outline: none; transition: .2s;
+}
+.chat-input:focus { border-color: rgba(255,0,0,0.45); box-shadow: 0 0 14px rgba(255,0,0,0.1); }
+.chat-send { padding: 10px 14px; font-size: 9px; }
+.chat-file-btn { padding: 10px 12px; font-size: 9px; }
 
-    .logo {
-      font-size: 13px;
-      color: #ff2a2a;
-      letter-spacing: 2px;
-      margin-bottom: 6px;
-      text-shadow: 0 0 18px rgba(255,0,0,0.55);
-    }
-    .logo-sub {
-      font-size: 7px;
-      color: rgba(255,200,200,0.35);
-      letter-spacing: 1px;
-      margin-bottom: 40px;
-    }
+.loader {
+  width: 28px; height: 28px; border: 3px solid rgba(255,40,40,0.2);
+  border-top-color: #ff3b3b; border-radius: 50%;
+  animation: lgSpin .8s linear infinite; margin: 60px auto;
+}
+@keyframes lgSpin { to { transform: rotate(360deg); } }
 
-    .card {
-      background: rgba(12,0,0,0.82);
-      border: 1px solid rgba(255,0,0,0.22);
-      border-radius: 18px;
-      padding: 28px 24px;
-      margin-bottom: 20px;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 0 40px rgba(255,0,0,0.06);
-    }
+.fluff-wrap { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.fluff { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.2; }
+.fluff-1 {
+  width: 500px; height: 500px; background: radial-gradient(circle, rgba(255,0,0,0.8), transparent 70%);
+  animation: moveFluff1 18s ease-in-out infinite;
+}
+.fluff-2 {
+  width: 300px; height: 300px; background: radial-gradient(circle, rgba(255,60,0,0.6), transparent 70%);
+  animation: moveFluff2 12s ease-in-out infinite; opacity: 0.12;
+}
+@keyframes moveFluff1 { 0% { transform: translate(5vw, 10vh); } 50% { transform: translate(55vw, 50vh); } 100% { transform: translate(5vw, 10vh); } }
+@keyframes moveFluff2 { 0% { transform: translate(70vw, 70vh); } 50% { transform: translate(10vw, 40vh); } 100% { transform: translate(70vw, 70vh); } }
 
-    .card-title {
-      font-size: 9px;
-      color: #ff2a2a;
-      letter-spacing: 1px;
-      margin-bottom: 20px;
-    }
-
-    label {
-      display: block;
-      font-size: 7px;
-      color: rgba(255,200,200,0.45);
-      letter-spacing: 1px;
-      margin-bottom: 7px;
-    }
-
-    input[type="text"],
-    input[type="password"],
-    textarea,
-    select {
-      width: 100%;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,0,0,0.22);
-      border-radius: 10px;
-      padding: 12px 14px;
-      font-family: 'Press Start 2P', monospace;
-      font-size: 8px;
-      color: rgba(255,200,200,0.9);
-      outline: none;
-      transition: border-color .2s, box-shadow .2s;
-      margin-bottom: 18px;
-      line-height: 1.7;
-    }
-    input:focus, textarea:focus, select:focus {
-      border-color: rgba(255,0,0,0.55);
-      box-shadow: 0 0 14px rgba(255,0,0,0.12);
-    }
-    textarea { resize: vertical; min-height: 60px; }
-
-    .rich-toolbar {
-      display: flex; flex-wrap: wrap; gap: 4px;
-      padding: 6px 8px;
-      background: rgba(255,0,0,0.06);
-      border: 1px solid rgba(255,0,0,0.2);
-      border-bottom: none;
-      border-radius: 10px 10px 0 0;
-    }
-    .rich-toolbar button {
-      font-family: monospace; font-size: 11px; font-weight: bold;
-      padding: 4px 9px; border-radius: 5px; border: 1px solid rgba(255,0,0,0.2);
-      background: rgba(255,0,0,0.04); color: rgba(255,180,180,0.9);
-      cursor: pointer; transition: background .15s, border-color .15s;
-      line-height: 1;
-    }
-    .rich-toolbar button:hover { background: rgba(255,0,0,0.15); border-color: rgba(255,0,0,0.4); }
-    .rich-toolbar button.active { background: rgba(255,0,0,0.2); border-color: rgba(255,0,0,0.5); }
-    .rich-toolbar .tb-sep { width: 1px; background: rgba(255,0,0,0.15); margin: 2px 2px; }
-    .rich-editor {
-      width: 100%; min-height: 80px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,0,0,0.22);
-      border-top: none;
-      border-radius: 0 0 10px 10px;
-      padding: 10px 12px;
-      font-family: 'Press Start 2P', monospace;
-      font-size: 8px; color: rgba(255,200,200,0.9);
-      line-height: 1.9;
-      outline: none;
-      margin-bottom: 18px;
-    }
-    .rich-editor:focus { border-color: rgba(255,0,0,0.55); box-shadow: 0 0 14px rgba(255,0,0,0.1); }
-    .rich-editor .hi { color: #ffaaaa; }
-    .rich-editor-wrap { margin-bottom: 0; }
-    .rich-editor:empty:before {
-      content: attr(placeholder);
-      color: rgba(255,200,200,0.25);
-      pointer-events: none;
-    }
-
-    .file-drop {
-      border: 2px dashed rgba(255,0,0,0.3);
-      border-radius: 14px;
-      padding: 28px 16px;
-      text-align: center;
-      cursor: pointer;
-      transition: .2s;
-      margin-bottom: 18px;
-      position: relative;
-    }
-    .file-drop:hover, .file-drop.drag { border-color: rgba(255,0,0,0.7); background: rgba(255,0,0,0.04); }
-    .file-drop input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-    .file-drop-icon { font-size: 22px; margin-bottom: 10px; }
-    .file-drop-label { font-size: 8px; color: rgba(255,200,200,0.5); line-height: 1.8; }
-    .file-drop-name { font-size: 8px; color: #ff4444; margin-top: 8px; line-height: 1.6; word-break: break-all; }
-
-    .preview-wrap {
-      margin-bottom: 18px;
-      border-radius: 12px;
-      overflow: hidden;
-      border: 1px solid rgba(255,0,0,0.18);
-      display: none;
-      background: rgba(0,0,0,0.4);
-      text-align: center;
-    }
-    .preview-wrap img, .preview-wrap video {
-      max-width: 100%;
-      max-height: 260px;
-      display: block;
-      margin: 0 auto;
-    }
-
-    .btn {
-      width: 100%;
-      padding: 16px 12px;
-      font-family: 'Press Start 2P', monospace;
-      font-size: 9px;
-      line-height: 1.6;
-      background: linear-gradient(135deg, rgba(255,0,0,0.18), rgba(180,0,0,0.1));
-      border: 1px solid rgba(255,0,0,0.5);
-      border-radius: 12px;
-      color: #ff3b3b;
-      cursor: pointer;
-      transition: .2s;
-      letter-spacing: 1px;
-    }
-    .btn:hover:not(:disabled) { background: rgba(255,0,0,0.22); box-shadow: 0 0 22px rgba(255,0,0,0.3); transform: translateY(-1px); }
-    .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-
-    .btn-sm {
-      width: auto;
-      padding: 8px 14px;
-      font-size: 7px;
-      background: transparent;
-      border-color: rgba(255,0,0,0.3);
-    }
-    .btn-sm:hover:not(:disabled) { background: rgba(255,0,0,0.1); box-shadow: none; transform: none; }
-
-    .progress-wrap {
-      display: none;
-      margin-top: 14px;
-    }
-    .progress-bar-bg {
-      height: 6px;
-      background: rgba(255,0,0,0.1);
-      border-radius: 10px;
-      overflow: hidden;
-      margin-bottom: 8px;
-      border: 1px solid rgba(255,0,0,0.2);
-    }
-    .progress-bar {
-      height: 100%;
-      background: linear-gradient(90deg, #ff2a2a, #ff6b6b);
-      border-radius: 10px;
-      width: 0%;
-      transition: width .3s ease;
-      box-shadow: 0 0 10px rgba(255,0,0,0.4);
-    }
-    .progress-label {
-      font-size: 7px;
-      color: rgba(255,200,200,0.55);
-      letter-spacing: 1px;
-      line-height: 1.8;
-    }
-
-    .status {
-      font-size: 7px;
-      line-height: 2;
-      letter-spacing: 0.5px;
-      margin-top: 14px;
-      padding: 12px 14px;
-      border-radius: 10px;
-      display: none;
-    }
-    .status.ok { color: rgba(100,255,100,0.85); background: rgba(0,255,0,0.06); border: 1px solid rgba(0,255,0,0.2); display: block; }
-    .status.err { color: rgba(255,120,120,0.9); background: rgba(255,0,0,0.06); border: 1px solid rgba(255,0,0,0.25); display: block; }
-    .status.info { color: rgba(255,200,200,0.6); background: rgba(255,0,0,0.04); border: 1px solid rgba(255,0,0,0.15); display: block; }
-
-    .token-row {
-      display: flex;
-      gap: 10px;
-      align-items: flex-start;
-      margin-bottom: 6px;
-    }
-    .token-row input { margin-bottom: 0; flex: 1; }
-
-    .works-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-top: 16px;
-    }
-    .work-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      background: rgba(255,0,0,0.04);
-      border: 1px solid rgba(255,0,0,0.14);
-      border-radius: 12px;
-      padding: 10px 14px;
-    }
-    .work-thumb {
-      width: 52px;
-      height: 36px;
-      object-fit: cover;
-      border-radius: 8px;
-      border: 1px solid rgba(255,0,0,0.2);
-      background: rgba(0,0,0,0.4);
-      flex-shrink: 0;
-    }
-    .work-info { flex: 1; min-width: 0; }
-    .work-type { font-size: 7px; color: #ff4444; line-height: 1.7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .work-file { font-size: 6px; color: rgba(255,200,200,0.35); line-height: 1.6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-    .clickable-item { cursor: pointer; transition: .15s; }
-    .clickable-item:hover { background: rgba(255,0,0,0.09); border-color: rgba(255,0,0,0.3); transform: translateY(-1px); }
-    .guest-item { border-left: 3px solid rgba(255,80,80,0.4); }
-    .guest-item.banned { border-left-color: rgba(255,0,0,0.9); background: rgba(255,0,0,0.07); }
-
-    /* ── ВКЛАДКА БД: редактируемая таблица ── */
-    .db-scroll { overflow-x: auto; max-width: 100%; }
-    .db-table { border-collapse: collapse; font-size: 9px; white-space: nowrap; }
-    .db-table th {
-      position: sticky; top: 0;
-      background: #1a0000; color: #ff6a6a;
-      padding: 8px 10px; text-align: left;
-      border: 1px solid rgba(255,0,0,0.25);
-      font-family: 'Press Start 2P', monospace; font-size: 8px;
-    }
-    .db-table td {
-      border: 1px solid rgba(255,0,0,0.12);
-      padding: 3px;
-    }
-    .db-table input {
-      width: 100%; min-width: 130px;
-      background: transparent; border: 1px solid transparent;
-      color: rgba(255,220,220,0.85);
-      font-family: 'Press Start 2P', monospace; font-size: 8px;
-      padding: 6px 8px; border-radius: 4px;
-    }
-    .db-table input.wide-field { min-width: 240px; }
-    .db-table input.narrow-field { min-width: 60px; }
-    .db-table input:focus {
-      border-color: rgba(255,0,0,0.4); background: rgba(255,0,0,0.06); outline: none;
-    }
-    .db-table input.pk-field { color: rgba(255,150,150,0.5); }
-    .db-table tr:hover td { background: rgba(255,0,0,0.04); }
-    .db-row-actions { display: flex; gap: 4px; padding: 4px !important; }
-    .db-row-actions button {
-      font-size: 10px; padding: 6px 8px; border-radius: 6px; cursor: pointer;
-      border: 1px solid rgba(255,0,0,0.25); background: transparent; color: rgba(255,200,200,0.5);
-    }
-    .db-row-actions .save-btn { border-color: rgba(0,200,0,0.35); color: #55ff55; }
-    .db-row-actions .del-btn { border-color: rgba(255,0,0,0.4); color: #ff4444; }
-
-    /* ── Кастомный дропдаун выбора таблицы (вместо нативного select) ── */
-    .db-dropdown { position: relative; }
-    .db-dropdown-btn {
-      width: 100%; display: flex; align-items: center; justify-content: space-between;
-      padding: 12px 14px; background: rgba(0,0,0,0.3);
-      border: 1px solid rgba(255,0,0,0.25); border-radius: 8px;
-      color: #fff; font-family: 'Press Start 2P', monospace; font-size: 9px;
-      cursor: pointer; transition: .15s; text-align: left;
-    }
-    .db-dropdown-btn:hover { border-color: rgba(255,0,0,0.5); background: rgba(255,0,0,0.06); }
-    .db-dropdown.open .db-dropdown-btn { border-color: rgba(255,0,0,0.6); }
-    .db-dropdown-arrow { color: #ff4444; transition: transform .2s; flex-shrink: 0; margin-left: 10px; }
-    .db-dropdown.open .db-dropdown-arrow { transform: rotate(180deg); }
-    .db-dropdown-list {
-      display: none; position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 50;
-      background: #150000; border: 1px solid rgba(255,0,0,0.35); border-radius: 10px;
-      box-shadow: 0 12px 30px rgba(0,0,0,0.6);
-      max-height: 280px; overflow-y: auto;
-      animation: dbDropIn .15s ease;
-    }
-    .db-dropdown.open .db-dropdown-list { display: block; }
-    @keyframes dbDropIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
-    .db-dropdown-item {
-      display: flex; flex-direction: column; gap: 4px;
-      padding: 12px 14px; cursor: pointer; transition: .15s;
-      border-bottom: 1px solid rgba(255,0,0,0.1);
-      font-family: 'Press Start 2P', monospace;
-    }
-    .db-dropdown-item:last-child { border-bottom: none; }
-    .db-dropdown-item:hover { background: rgba(255,0,0,0.1); }
-    .db-dropdown-item.selected { background: rgba(255,0,0,0.15); }
-    .db-dropdown-item .name { font-size: 9px; color: #fff; }
-    .db-dropdown-item .meta { font-size: 7px; color: rgba(255,200,200,0.4); }
-
-    #userDetailOverlay {
-      display: none; position: fixed; inset: 0; z-index: 99997;
-      background: rgba(0,0,0,0.65); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-      align-items: center; justify-content: center; padding: 20px;
-    }
-    #userDetailOverlay .card { max-width: 420px; width: 100%; max-height: 82vh; overflow: auto; position: relative; }
-    #userDetailClose {
-      position: absolute; top: 14px; right: 14px; background: none; border: none;
-      color: rgba(255,200,200,0.5); font-size: 16px; cursor: pointer; line-height: 1;
-    }
-    #userDetailClose:hover { color: #ff4444; }
-    .detail-row { font-size: 10px; color: rgba(255,210,210,0.65); line-height: 2; word-break: break-all; }
-    .detail-row b { color: rgba(255,230,230,0.9); font-weight: 600; }
-    .work-del {
-      font-size: 10px;
-      color: rgba(255,0,0,0.4);
-      cursor: pointer;
-      transition: .2s;
-      flex-shrink: 0;
-      padding: 4px 8px;
-      border-radius: 8px;
-    }
-    .work-del:hover { color: #ff2a2a; background: rgba(255,0,0,0.1); }
-
-    .divider {
-      height: 1px;
-      background: rgba(255,0,0,0.1);
-      margin: 6px 0 18px;
-    }
-
-    .hint {
-      font-size: 6px;
-      color: rgba(255,200,200,0.3);
-      line-height: 2;
-      letter-spacing: 0.5px;
-      margin-top: -12px;
-      margin-bottom: 18px;
-    }
-
-    .badge {
-      display: inline-block;
-      font-size: 6px;
-      padding: 3px 8px;
-      border-radius: 6px;
-      background: rgba(255,0,0,0.12);
-      border: 1px solid rgba(255,0,0,0.25);
-      color: #ff4444;
-      letter-spacing: 1px;
-      margin-left: 8px;
-      vertical-align: middle;
-    }
-
-    #loginScreen { display: block; }
-    #mainScreen { display: none; }
-
-    .tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 22px;
-    }
-    .tab {
-      flex: 1;
-      padding: 10px 6px;
-      font-family: 'Press Start 2P', monospace;
-      font-size: 7px;
-      line-height: 1.6;
-      border-radius: 10px;
-      border: 1px solid rgba(255,0,0,0.2);
-      background: transparent;
-      color: rgba(255,200,200,0.45);
-      cursor: pointer;
-      transition: color .2s, border-color .2s, background .2s, transform .15s;
-      letter-spacing: 0.5px;
-    }
-    .tab:hover { color: rgba(255,200,200,0.75); border-color: rgba(255,0,0,0.35); }
-    .tab:active { transform: scale(.94); }
-    .tab.active {
-      border-color: rgba(255,0,0,0.55);
-      color: #ff3b3b;
-      background: rgba(255,0,0,0.08);
-    }
-
-    @keyframes tabFadeIn {
-      from { opacity: 0; transform: translateY(10px) scale(.99); }
-      to   { opacity: 1; transform: translateY(0) scale(1); }
-    }
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; animation: tabFadeIn .4s cubic-bezier(.16,1,.3,1); }
-
-    .ban-tabs { display: flex; gap: 6px; margin-bottom: 16px; }
-    .ban-tab {
-      flex: 1; padding: 8px 6px; font-family: 'Press Start 2P', monospace;
-      font-size: 8px; cursor: pointer; border: 1px solid rgba(255,0,0,0.15);
-      background: rgba(255,0,0,0.03); color: rgba(255,200,200,0.5);
-      border-radius: 10px; transition: all .3s cubic-bezier(.16,1,.3,1);
-    }
-    .ban-tab:hover { color: rgba(255,200,200,0.75); border-color: rgba(255,0,0,0.35); }
-    .ban-tab:active { transform: scale(.94); }
-    .ban-tab.active { border-color: rgba(255,0,0,0.55); color: #ff3b3b; background: rgba(255,0,0,0.08); }
-
-    .wrap { transition: max-width .35s cubic-bezier(.4,0,.2,1); }
-    .wrap.wrap-wide { max-width: 1180px; }
-    .users-grid {
-      display: flex;
-      gap: 20px;
-      align-items: flex-start;
-      flex-wrap: wrap;
-    }
-    .users-grid > .card {
-      flex: 1 1 320px;
-      min-width: 280px;
-      margin-bottom: 0;
-    }
-    @media (max-width: 900px) {
-      .wrap.wrap-wide { max-width: 560px; }
-      .users-grid { display: block; }
-      .users-grid > .card { margin-bottom: 20px; }
-    }
-
-    .counter {
-      font-size: 7px;
-      color: rgba(255,200,200,0.35);
-      letter-spacing: 1px;
-      margin-bottom: 16px;
-    }
-    .counter span { color: #ff4444; }
-
-    .fluff-wrap { position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
-    .fluff { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.2; }
-    .fluff-1 {
-      width: 500px; height: 500px; background: radial-gradient(circle, rgba(255,0,0,0.8), transparent 70%);
-      animation: moveFluff1 18s ease-in-out infinite;
-    }
-    .fluff-2 {
-      width: 300px; height: 300px; background: radial-gradient(circle, rgba(255,60,0,0.6), transparent 70%);
-      animation: moveFluff2 12s ease-in-out infinite; opacity: 0.12;
-    }
-    @keyframes moveFluff1 { 0% { transform: translate(5vw, 10vh); } 50% { transform: translate(55vw, 50vh); } 100% { transform: translate(5vw, 10vh); } }
-    @keyframes moveFluff2 { 0% { transform: translate(70vw, 70vh); } 50% { transform: translate(10vw, 40vh); } 100% { transform: translate(70vw, 70vh); } }
-  </style>
+.empty-chat { font-size: 8px; color: rgba(255,200,200,0.3); text-align: center; padding: 60px 20px; }
+</style>
 </head>
 <body>
+<div id="banOverlay" style="display:none;position:fixed;inset:0;z-index:999999;background:radial-gradient(ellipse at center,#2a0000 0%,#050000 75%);color:#fff;align-items:center;justify-content:center;text-align:center;flex-direction:column;padding:24px;">
+  <div style="font-size:64px;line-height:1;margin-bottom:18px;">🚫</div>
+  <div style="font-size:28px;font-weight:800;margin-bottom:10px;">Вы забанены</div>
+  <div style="font-size:16px;color:#c99;max-width:420px;">Вам тут не рады. Доступ закрыт.</div>
+  <div id="banReasonLine" style="font-size:13px;color:#e88;max-width:420px;margin-top:14px;display:none;"></div>
+</div>
+<audio id="banSound" src="../ban.mp3" preload="auto"></audio>
 
-<canvas id="bg"></canvas>
+<div id="loadingGate" style="position:fixed;inset:0;z-index:999995;background:#050000;display:flex;align-items:center;justify-content:center;">
+  <div style="width:38px;height:38px;border:3px solid rgba(255,40,40,0.2);border-top-color:#ff3b3b;border-radius:50%;animation:lgSpin .8s linear infinite;"></div>
+</div>
+
+<div id="maintToast" style="position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(140%);z-index:99999;background:#0d0202;border:1px solid rgba(255,40,40,0.3);border-radius:14px;padding:16px 22px;max-width:440px;width:90%;backdrop-filter:blur(12px);transition:transform .4s ease;box-shadow:0 0 40px rgba(255,0,0,0.15);">
+  <div id="maintToastTitle" style="font-size:10px;color:#ff2a2a;margin-bottom:6px;letter-spacing:1px;">Тех. неполадки</div>
+  <div id="maintToastMsg" style="font-size:7px;color:rgba(255,200,200,0.6);line-height:1.6;"></div>
+</div>
+
 <div class="fluff-wrap">
   <div class="fluff fluff-1"></div>
   <div class="fluff fluff-2"></div>
 </div>
+<canvas class="canvas-bg" id="matrixCanvas"></canvas>
 
-<div class="wrap">
-  <div class="logo" style="display:flex;align-items:center;gap:14px"><img src="https://mezets.github.io/mezets.design/favicon.png" alt="" style="width:48px;height:48px;image-rendering:pixelated;flex-shrink:0"><span style="font-size:22px;letter-spacing:3px">Mezets</span></div>
-  <div class="logo-sub">ПАНЕЛЬ УПРАВЛЕНИЯ</div>
+<div class="wrap" id="app">
+  <div style="position:relative">
+    <div class="logo" style="display:flex;align-items:center;gap:14px"><img src="https://mezets.github.io/mezets.design/favicon.png" alt="" style="width:48px;height:48px;image-rendering:pixelated;flex-shrink:0"><span style="font-size:22px;letter-spacing:3px">Mezets</span></div>
+    <div class="logo-sub">ЧАТ</div>
+    <a href="/mezets.design/order/" class="btn btn-sm" style="position:absolute;top:6px;right:0">← Заказы</a>
+  </div>
 
-  <div id="loginScreen">
-    <div class="card">
-      <div class="card-title">🔑 ВХОД</div>
+  <div id="loadingState">
+    <div class="loader"></div>
+  </div>
 
-      <label>GitHub Personal Access Token</label>
-      <div class="token-row">
-        <input type="password" id="tokenInput" placeholder="ghp_xxxxxxxxxxxx">
-        <button class="btn btn-sm" onclick="showToken()">👁</button>
-      </div>
-
-      <label>Репозиторий (owner/repo)</label>
-      <input type="text" id="repoInput" placeholder="Mezets/mezets.design" value="Mezets/mezets.design">
-
-      <label>Ветка</label>
-      <input type="text" id="branchInput" placeholder="main" value="main">
-
-      <div style="height:1px;background:rgba(255,0,0,0.1);margin:18px 0"></div>
-
-      <label>Ключ администратора (ADMIN_TEST_KEY)</label>
-      <div class="token-row">
-        <input type="password" id="gateAdminKeyInput" placeholder="admin key">
-        <button class="btn btn-sm" onclick="showGateAdminKey()">👁</button>
-      </div>
-<button class="btn" onclick="login()">Войти</button>
-      <div class="status" id="loginStatus"></div>
+  <div id="notFound" style="display:none">
+    <div class="card" style="text-align:center;padding:40px;">
+      <div style="font-size:9px;color:rgba(255,200,200,0.4);">Заказ не найден</div>
+      <a href="/mezets.design/order/" class="btn" style="margin-top:16px;">К заказам</a>
     </div>
   </div>
 
-  <div id="mainScreen">
-
-    <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
-      <button class="btn btn-sm" onclick="logoutAdmin()" style="border-color:rgba(255,0,0,0.3);color:rgba(255,150,150,0.6)">🚪 Выйти</button>
+  <div id="chatContent" style="display:none">
+    <div class="card">
+      <div class="order-info">
+        <div class="order-info-left">
+          <div class="order-id" id="orderIdDisplay">Заказ #—</div>
+          <div class="order-meta" id="orderMeta"></div>
+        </div>
+        <div style="text-align:right">
+          <div class="order-price" id="orderPrice"></div>
+          <div class="order-status-badge" id="orderStatusBadge"></div>
+        </div>
+      </div>
+      <div class="order-desc-box" id="orderDescBox"></div>
     </div>
 
-    <div class="tabs" id="tabsBar">
-      <button class="tab active" onclick="switchTab('upload')">📤 ЗАГРУЗИТЬ</button>
-      <button class="tab" onclick="switchTab('manage')">📋 РАБОТЫ</button>
-      <button class="tab" onclick="switchTab('prices')">💰 ЦЕНЫ</button>
-      <button class="tab" onclick="switchTab('rules')">📜 ПРАВИЛА</button>
-      <button class="tab" onclick="switchTab('users')">👤 ЮЗЕРЫ</button>
-      <button class="tab" onclick="switchTab('maint')">🛠️ ТЕХРАБОТЫ</button>
-      <button class="tab" onclick="switchTab('db')">🗄️ БД</button>
-    </div>
-
-    <div id="tabUpload" class="tab-panel active">
-      <div class="card">
-        <div class="card-title">📁 НОВАЯ РАБОТА</div>
-
-        <label>Файл (PNG / JPG / GIF / MP4 до 50 MB)</label>
-        <div class="file-drop" id="fileDrop">
-          <input type="file" id="fileInput" accept=".png,.jpg,.jpeg,.gif,.mp4,.webm" onchange="onFileSelect(this)">
-          <div class="file-drop-icon">🎨</div>
-          <div class="file-drop-label">Перетащи файл или нажми</div>
-          <div class="file-drop-name" id="fileDropName"></div>
-        </div>
-
-        <div class="preview-wrap" id="previewWrap">
-          <img id="previewImg" style="display:none">
-          <video id="previewVid" muted loop playsinline style="display:none"></video>
-        </div>
-
-        <label>Тип работы</label>
-        <input type="text" id="workType" placeholder="Анимированное оформление форумного аккаунта">
-
-        <label>Срок выполнения</label>
-        <input type="text" id="workTime" placeholder="1 день">
-
-        <label>Группа (необязательно)</label>
-        <input type="text" id="workGroup" placeholder="Оставь пустым, если одиночная работа">
-<button class="btn" id="uploadBtn" onclick="uploadWork()">Загрузить работу</button>
-
-        <div class="progress-wrap" id="progressWrap">
-          <div class="progress-bar-bg"><div class="progress-bar" id="progressBar"></div></div>
-          <div class="progress-label" id="progressLabel">Подготовка...</div>
-        </div>
-
-        <div class="status" id="uploadStatus"></div>
+    <div class="card">
+      <div class="chat-box" id="chatBox"></div>
+      <div class="chat-input-row">
+        <button class="btn btn-sm chat-file-btn" onclick="uploadFile()" title="Прикрепить файл">📎</button>
+        <input class="chat-input" id="msgInput" placeholder="Сообщение..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}">
+        <button class="btn chat-send" onclick="sendMsg()">→</button>
       </div>
     </div>
+  </div>
+</div>
 
-    <div id="tabManage" class="tab-panel">
-      <div class="card">
-        <div class="card-title">📋 ВСЕ РАБОТЫ <span class="badge" id="worksCount">0</span></div>
-<button class="btn btn-sm" onclick="cooldownClick(this,'works',loadWorks)" style="margin-bottom:16px">🔄 Обновить список</button>
-        <div id="worksList" class="works-list">
-          <div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div>
-        </div>
-      </div>
-    </div>
-
-    <div id="tabPrices" class="tab-panel">
-      <div class="card">
-        <div class="card-title">РЕДАКТОР ЦЕН</div>
-<button class="btn btn-sm" onclick="cooldownClick(this,'prices',loadPrices)" style="margin-bottom:16px">Загрузить актуальные цены</button>
-        <div id="pricesSections"></div>
-
-        <div style="height:1px;background:rgba(255,0,0,0.1);margin:20px 0"></div>
-
-        <div class="card-title" style="font-size:8px;margin-bottom:14px">ДОБАВИТЬ ПОЗИЦИЮ</div>
-        <label>Раздел</label>
-        <select id="newItemSection">
-          <option value="Базовое">Базовое</option>
-          <option value="Discord">Discord</option>
-          <option value="Twitch">Twitch</option>
-          <option value="YouTube">YouTube</option>
-          <option value="VK">VK</option>
-          <option value="Форум">Форум</option>
-          <option value="Боты">Боты</option>
-        </select>
-        <label>Название</label>
-        <input type="text" id="newItemName" placeholder="Аватарка для сервера">
-        <label>Цена</label>
-        <input type="text" id="newItemPrice" placeholder="300 или по договоренности">
-        <button class="btn" style="margin-bottom:20px" onclick="addPriceItem()">Добавить позицию</button>
-
-        <div style="height:1px;background:rgba(255,0,0,0.1);margin-bottom:20px"></div>
-
-        <button class="btn" id="savePricesBtn" onclick="savePrices()" style="background:rgba(0,180,0,0.08);border-color:rgba(0,200,0,0.3);color:#55ff55">
-          СОХРАНИТЬ ВСЕ ИЗМЕНЕНИЯ
-        </button>
-        <div class="status" id="pricesStatus"></div>
-      </div>
-    </div>
-
-
-    <div id="tabRules" class="tab-panel">
-      <div class="card">
-        <div class="card-title">РЕДАКТОР ПРАВИЛ</div>
-<button class="btn btn-sm" onclick="cooldownClick(this,'rules',loadRules)" style="margin-bottom:16px">Загрузить актуальные правила</button>
-
-        <div id="rulesList"></div>
-
-        <div style="height:1px;background:rgba(255,0,0,0.1);margin:20px 0"></div>
-
-        <div class="card-title" style="font-size:8px;margin-bottom:14px">ДОБАВИТЬ ПРАВИЛО</div>
-        <label>Заголовок</label>
-        <input type="text" id="newRuleTitle" placeholder="Название правила">
-        <label>Текст (выдели текст и нажми кнопку для подсветки)</label>
-        <div class="rich-editor-wrap">
-          <div class="rich-toolbar" id="newRuleToolbar">
-            <button onclick="rteCmd('newRuleEditor','bold')" title="Жирный"><b>B</b></button>
-            <button onclick="rteCmd('newRuleEditor','italic')" title="Курсив"><i>I</i></button>
-            <div class="tb-sep"></div>
-            <button onclick="rteHighlight('newRuleEditor')" title="Подсветить (hi)" style="color:#ffaaaa">★ hi</button>
-            <button onclick="rteRemoveHi('newRuleEditor')" title="Убрать подсветку">✕ hi</button>
-            <div class="tb-sep"></div>
-            <button onclick="rteInsert('newRuleEditor','<br>')" title="Перенос строки">↵ br</button>
-          </div>
-          <div class="rich-editor" id="newRuleEditor" contenteditable="true" placeholder="Текст правила..."></div>
-        </div>
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:18px">
-          <input type="checkbox" id="newRuleImportant" style="width:auto;margin:0;accent-color:#ff2a2a">
-          <span>Важное правило (красная рамка)</span>
-        </label>
-        <button class="btn" style="margin-bottom:20px" onclick="addRule()">Добавить правило</button>
-
-        <div style="height:1px;background:rgba(255,0,0,0.1);margin-bottom:20px"></div>
-
-        <button class="btn" id="saveRulesBtn" onclick="saveRules()" style="background:rgba(0,180,0,0.08);border-color:rgba(0,200,0,0.3);color:#55ff55">
-          СОХРАНИТЬ ВСЕ ИЗМЕНЕНИЯ
-        </button>
-        <div class="status" id="rulesStatus"></div>
-      </div>
-    </div>
-
-    <div id="tabUsers" class="tab-panel">
-
-      <div class="card" id="usersGate" style="max-width:400px;margin-left:auto;margin-right:auto">
-        <div class="card-title">🔒 ДОСТУП К ЮЗЕРАМ</div>
-<label>API-ключ бэкенда (ADMIN_TEST_KEY)</label>
-        <div class="token-row">
-          <input type="password" id="apiKeyInput" placeholder="admin key" onkeydown="if(event.key==='Enter')enterUsersGate()">
-          <button class="btn btn-sm" onclick="showApiKey()">👁</button>
-        </div>
-<label>Мастер-ключ для бана (не сохраняется, вводить каждый раз)</label>
-        <div class="token-row">
-          <input type="password" id="masterKeyInput" placeholder="master key" onkeydown="if(event.key==='Enter')enterUsersGate()">
-          <button class="btn btn-sm" onclick="showMasterKey()">👁</button>
-        </div>
-<button class="btn" onclick="enterUsersGate()">Войти</button>
-        <div class="status" id="usersGateStatus"></div>
-      </div>
-
-      <div class="users-grid" id="usersGridWrap" style="display:none">
-      <div class="card">
-        <div class="card-title">👤 АВТОРИЗОВАННЫЕ <span class="badge" id="usersCount">0</span></div>
-<input type="text" id="usersSearch" placeholder="Поиск: ник / Discord ID / IP / fingerprint" oninput="renderUsers()">
-
-        <button class="btn btn-sm" onclick="cooldownClick(this,'users',loadUsers)" style="margin-bottom:16px">🔄 Обновить список</button>
-
-        <div id="usersList" class="works-list">
-          <div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div>
-        </div>
-        <div class="status" id="usersStatus"></div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">🌐 НЕАВТОРИЗОВАННЫЕ <span class="badge" id="unauthCount">0</span></div>
-<input type="text" id="unauthSearch" placeholder="Поиск: IP / страна / город" oninput="renderUnauthUsers()">
-
-        <button class="btn btn-sm" onclick="cooldownClick(this,'unauth',loadUnauthUsers)" style="margin-bottom:16px">🔄 Обновить список</button>
-
-        <div id="unauthList" class="works-list">
-          <div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div>
-        </div>
-        <div class="status" id="unauthStatus"></div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">🛡️ БАН</div>
-
-        <div class="ban-tabs">
-          <button class="ban-tab active" data-ban="ip" onclick="switchBanTab('ip')">🌐 Бан по IP</button>
-          <button class="ban-tab" data-ban="discord" onclick="switchBanTab('discord')">🎯 Бан по Discord ID</button>
-        </div>
-
-        <div id="banIpContent">
-          <label>IP-адрес</label>
-          <input type="text" id="banIpInput" placeholder="например 192.168.1.1">
-          <label>Причина</label>
-          <input type="text" id="banIpReason" placeholder="Причина (необязательно)">
-          <button class="btn" onclick="banIp()">Забанить IP</button>
-
-          <div style="height:1px;background:rgba(255,0,0,0.1);margin:18px 0"></div>
-
-          <button class="btn btn-sm" onclick="cooldownClick(this,'bannedips',loadBannedIps)" style="margin-bottom:16px">🔄 Обновить список</button>
-          <div id="bannedIpsList" class="works-list">
-            <div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Список пуст или не загружен</div>
-          </div>
-          <div class="status" id="bannedIpsStatus"></div>
-        </div>
-
-        <div id="banDiscordContent" style="display:none">
-          <label>Discord ID</label>
-          <input type="text" id="watchDiscordId" placeholder="например 582219322236338205">
-          <label>Причина</label>
-          <input type="text" id="watchReason" placeholder="Причина (необязательно)">
-          <button class="btn" onclick="addToWatchlist()">Добавить в стоп-лист</button>
-
-          <div style="height:1px;background:rgba(255,0,0,0.1);margin:18px 0"></div>
-
-          <button class="btn btn-sm" onclick="cooldownClick(this,'watchlist',loadWatchlist)" style="margin-bottom:16px">🔄 Обновить стоп-лист</button>
-          <div id="watchlistList" class="works-list">
-            <div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Список пуст или не загружен</div>
-          </div>
-          <div class="status" id="watchlistStatus"></div>
-        </div>
-      </div>
-      </div>
-    </div>
-
-    <div id="userDetailOverlay" onclick="if(event.target===this) closeUserDetail()">
-      <div class="card">
-        <button id="userDetailClose" onclick="closeUserDetail()">✕</button>
-        <div id="userDetailBody"></div>
-      </div>
-    </div>
-
-	    <div id="tabUsers" class="tab-panel" style="display:block">
-	    <div class="card" id="categoriesCard">
-	      <div class="card-title">КАТЕГОРИИ ЗАКАЗОВ</div>
-
-	      <div style="display:flex;gap:8px;margin-bottom:14px">
-	        <input type="text" id="catNameInput" placeholder="name (key)" style="flex:1;font-size:7px">
-	        <input type="text" id="catLabelInput" placeholder="Название" style="flex:1;font-size:7px">
-	      </div>
-	      <div style="display:flex;gap:8px;margin-bottom:14px">
-	        <input type="text" id="catEmojiInput" placeholder="emoji" style="width:60px;font-size:7px;text-align:center">
-	        <input type="number" id="catPriceInput" placeholder="500" style="width:80px;font-size:7px">
-	        <button class="btn btn-sm" onclick="addCategory()" style="flex:1;border-color:rgba(0,200,0,0.35);color:#55ff55">Добавить</button>
-	      </div>
-
-	      <button class="btn btn-sm" onclick="loadCategories()">Обновить список</button>
-	      <div id="categoriesList" class="works-list" style="margin-top:14px">
-	        <div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div>
-	      </div>
-	      <div class="status" id="catStatus"></div>
-	    </div>
-
-	    <div class="card" id="ordersSearchCard">
-	      <div class="card-title">ПОИСК ЗАКАЗОВ</div>
-	      <input type="text" id="orderSearchInput" placeholder="Ник, Discord ID или IP пользователя">
-	      <button class="btn btn-sm" onclick="searchOrders()">Найти</button>
-	      <div id="ordersSearchList" class="works-list" style="margin-top:14px">
-	        <div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Введи данные пользователя для поиска</div>
-	      </div>
-	      <div class="status" id="ordersSearchStatus"></div>
-	    </div>
-	    </div>
-    <div id="tabMaint" class="tab-panel">
-      <div class="card">
-        <div class="card-title">🛠️ ТОСТ ТЕХ. НЕПОЛАДОК <span class="badge" id="maintOnBadge">—</span></div>
-<label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:18px">
-          <input type="checkbox" id="maintOnChk" style="width:auto;margin:0;accent-color:#ff2a2a">
-          <span>Показывать тост техработ на сайте</span>
-        </label>
-
-        <label>Заголовок</label>
-        <input type="text" id="maintTitleInput" placeholder="Тех. неполадки">
-
-        <label>Текст (выдели текст и нажми кнопку для подсветки)</label>
-        <div class="rich-editor-wrap">
-          <div class="rich-toolbar">
-            <button onclick="rteCmd('maintMsgEditor','bold')" title="Жирный"><b>B</b></button>
-            <button onclick="rteCmd('maintMsgEditor','italic')" title="Курсив"><i>I</i></button>
-            <div class="tb-sep"></div>
-            <button onclick="rteHighlight('maintMsgEditor')" title="Подсветить (hi)" style="color:#ffaaaa">★ hi</button>
-            <button onclick="rteRemoveHi('maintMsgEditor')" title="Убрать подсветку">✕ hi</button>
-            <div class="tb-sep"></div>
-            <button onclick="rteInsert('maintMsgEditor','<br>')" title="Перенос строки">↵ br</button>
-          </div>
-          <div class="rich-editor" id="maintMsgEditor" contenteditable="true" placeholder="Текст тоста..."></div>
-        </div>
-
-        <button class="btn btn-sm" onclick="cooldownClick(this,'maint',loadMaintenance)" style="margin-bottom:16px">🔄 Загрузить текущий текст</button>
-
-        <div style="height:1px;background:rgba(255,0,0,0.1);margin-bottom:20px"></div>
-
-        <button class="btn" id="saveMaintBtn" onclick="saveMaintenance()" style="background:rgba(0,180,0,0.08);border-color:rgba(0,200,0,0.3);color:#55ff55">
-          СОХРАНИТЬ И ПРИМЕНИТЬ
-        </button>
-        <div class="status" id="maintStatus"></div>
-      </div>
-    </div>
-
-    <!-- ВКЛАДКА: БД -->
-    <div id="tabDb" class="tab-panel">
-      <div class="card">
-        <div class="card-title">🗄️ БАЗА ДАННЫХ <span class="badge" id="dbRowCount">0</span></div>
-
-        <label>Таблица</label>
-        <div class="db-dropdown" id="dbDropdown">
-          <button type="button" class="db-dropdown-btn" onclick="toggleDbDropdown()">
-            <span id="dbDropdownLabel">— выбери таблицу —</span>
-            <span class="db-dropdown-arrow">▾</span>
-          </button>
-          <div class="db-dropdown-list" id="dbDropdownList"></div>
-        </div>
-
-        <div style="display:flex;gap:8px;margin:14px 0">
-          <button class="btn btn-sm" onclick="cooldownClick(this,'dbtable',loadDbTable)" style="flex:1">🔄 Обновить</button>
-          <button class="btn btn-sm" onclick="toggleDbAddForm()" style="flex:1;border-color:rgba(0,200,0,0.35);color:#55ff55">➕ Добавить строку</button>
-        </div>
-
-        <div style="background:rgba(88,101,242,0.05);border:1px solid rgba(88,101,242,0.25);border-radius:10px;padding:14px;margin-bottom:16px">
-          <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="toggleAvatarLookupBox()">
-            <span style="font-size:9px;color:#8ea1ff">🔎 Найти аватар в Discord (не привязано к конкретной строке)</span>
-            <span id="avatarLookupCollapseArrow" style="color:#8ea1ff;transition:transform .2s">▾</span>
-          </div>
-          <div id="avatarLookupBody" style="margin-top:10px">
-            <div style="display:flex;gap:8px;align-items:flex-start">
-              <input type="text" id="avatarLookupQuery" placeholder="Ник или Discord ID" style="flex:1">
-              <button class="btn btn-sm" onclick="standaloneAvatarLookup()" style="border-color:rgba(88,101,242,0.4);color:#8ea1ff">Найти</button>
-            </div>
-            <div style="font-size:6.5px;color:rgba(200,210,255,0.4);line-height:1.7;margin-top:6px">Ищет по нику среди участников сервера, а если человек уже вышел — по последнему известному входу на сайт. Discord ID находит всегда, даже если человека нет ни там, ни там.</div>
-            <div id="avatarLookupResult" style="display:none;margin-top:12px;align-items:center;gap:12px">
-              <img id="avatarLookupImg" style="width:48px;height:48px;border-radius:50%">
-              <input type="text" id="avatarLookupUrl" readonly style="flex:1" onclick="this.select()">
-            </div>
-          </div>
-        </div>
-
-        <div id="dbAddForm" style="display:none;background:rgba(0,180,0,0.05);border:1px solid rgba(0,200,0,0.25);border-radius:10px;padding:14px;margin-bottom:16px"></div>
-
-        <div class="status" id="dbStatus"></div>
-        <div id="dbTableWrap" class="db-scroll">
-          <div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Выбери таблицу выше</div>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- /mainScreen -->
-</div><!-- /wrap -->
-
+<script src="../common.js"></script>
 <script>
-document.addEventListener('contextmenu', e => e.preventDefault(), true);
-document.addEventListener('keydown', e => {
-  if (e.key === 'F12') e.preventDefault();
-  if (e.ctrlKey && e.shiftKey && ['I','J','C','K'].includes(e.key.toUpperCase())) e.preventDefault();
-  if (e.ctrlKey && e.key.toUpperCase() === 'U') e.preventDefault();
-}, true);
+checkSiteBanOnLoad();
+checkMaintenance();
 
-const GH_API = 'https://api.github.com';
-let TOKEN = '', REPO = '', BRANCH = '';
+const API = BAN_API; // из common.js
+let orderId = null;
+let currentUser = null;
+let pollTimer = null;
 
-const BOT_API = 'https://mez.up.railway.app';
-let apiKey = '';
-
-function adminFetch(url, { master = false, method = 'GET', body = null } = {}) {
-  const headers = { 'X-Admin-Key': apiKey };
-  if (master) headers['X-Master-Key'] = getMasterKey();
-  const opts = { headers, method };
-  if (body !== null) {
-    headers['Content-Type'] = 'application/json';
-    opts.body = JSON.stringify(body);
-  }
-  return fetch(url, opts);
+function getSession() {
+  try { return localStorage.getItem('mezets_session') || ''; } catch(e) { return ''; }
 }
 
-const _cooldowns = {};
-function cooldownClick(btn, key, fn) {
-  const now = Date.now();
-  const last = _cooldowns[key] || 0;
-  if (now - last < 10000) return; // кнопка и так задизейблена, но на всякий случай
-  _cooldowns[key] = now;
-  fn();
+function g(name) { return document.getElementById(name); }
 
-  const originalText = btn.textContent;
-  btn.disabled = true;
-  let remain = 10;
-  btn.textContent = `⏳ ${remain}с`;
-  const interval = setInterval(() => {
-    remain--;
-    if (remain <= 0) {
-      clearInterval(interval);
-      btn.disabled = false;
-      btn.textContent = originalText;
-    } else {
-      btn.textContent = `⏳ ${remain}с`;
-    }
-  }, 1000);
-}
-let USERS = [];
+async function init() {
+  const params = new URLSearchParams(window.location.search);
+  orderId = params.get('id');
+  if (!orderId) { showNotFound(); return; }
 
-const canvas = document.getElementById('bg');
-const ctx    = canvas.getContext('2d');
-function resize() { canvas.width = innerWidth; canvas.height = innerHeight; }
-resize(); addEventListener('resize', resize);
-let dots = [];
-function initDots() {
-  dots = [];
-  const n = Math.round((innerWidth * innerHeight) / 12000);
-  for (let i = 0; i < n; i++) dots.push({
-    x: Math.random()*canvas.width, y: Math.random()*canvas.height,
-    r: Math.random()*1.2+0.3, dx:(Math.random()-.5)*.12, dy:(Math.random()-.5)*.12
-  });
-}
-initDots(); addEventListener('resize', initDots);
-(function animate() {
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  for (let d of dots) {
-    ctx.beginPath(); ctx.arc(d.x,d.y,d.r,0,Math.PI*2);
-    ctx.fillStyle='rgba(255,0,0,0.5)'; ctx.fill();
-    d.x+=d.dx; d.y+=d.dy;
-    if(d.x<0)d.x=canvas.width; if(d.x>canvas.width)d.x=0;
-    if(d.y<0)d.y=canvas.height; if(d.y>canvas.height)d.y=0;
-  }
-  requestAnimationFrame(animate);
-})();
-
-const fileDrop = document.getElementById('fileDrop');
-fileDrop.addEventListener('dragover', e => { e.preventDefault(); fileDrop.classList.add('drag'); });
-fileDrop.addEventListener('dragleave', () => fileDrop.classList.remove('drag'));
-fileDrop.addEventListener('drop', e => {
-  e.preventDefault();
-  fileDrop.classList.remove('drag');
-  if (e.dataTransfer.files[0]) {
-    document.getElementById('fileInput').files = e.dataTransfer.files;
-    onFileSelect(document.getElementById('fileInput'));
-  }
-});
-
-function onFileSelect(input) {
-  const file = input.files[0];
-  if (!file) return;
-  document.getElementById('fileDropName').textContent = file.name + ' (' + (file.size/1024/1024).toFixed(2) + ' MB)';
-  const pw = document.getElementById('previewWrap');
-  const pi = document.getElementById('previewImg');
-  const pv = document.getElementById('previewVid');
-  pw.style.display = 'block';
-  if (file.type.startsWith('video/')) {
-    pi.style.display = 'none';
-    pv.style.display = 'block';
-    pv.src = URL.createObjectURL(file);
-    pv.play().catch(()=>{});
-  } else {
-    pv.style.display = 'none';
-    pi.style.display = 'block';
-    pi.src = URL.createObjectURL(file);
-  }
-}
-
-function showToken() {
-  const inp = document.getElementById('tokenInput');
-  inp.type = inp.type === 'password' ? 'text' : 'password';
-}
-
-function showApiKey() {
-  const inp = document.getElementById('apiKeyInput');
-  inp.type = inp.type === 'password' ? 'text' : 'password';
-}
-
-function showMasterKey() {
-  const inp = document.getElementById('masterKeyInput');
-  inp.type = inp.type === 'password' ? 'text' : 'password';
-}
-
-function showGateAdminKey() {
-  const inp = document.getElementById('gateAdminKeyInput');
-  inp.type = inp.type === 'password' ? 'text' : 'password';
-}
-
-function enterUsersGate() {
-  const key    = document.getElementById('apiKeyInput').value.trim();
-  const status = document.getElementById('usersGateStatus');
-  if (!key) { showStatus(status, 'Введи API-ключ бэкенда', 'err'); return; }
-  apiKey = key;
-  showStatus(status, '', '');
-
-  document.getElementById('usersGate').style.display = 'none';
-  document.getElementById('usersGridWrap').style.display = 'flex';
-
-  loadUsers();
-  loadUnauthUsers();
-  loadWatchlist();
-  loadBannedIps();
-}
-
-function switchTab(tab) {
-  const order = ['upload','manage','prices','rules','users','maint','db'];
-  const tabButtons = document.querySelectorAll('.tab');
-  tabButtons.forEach((t,i) => t.classList.toggle('active', order[i]===tab));
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
-  document.querySelector('.wrap').classList.toggle('wrap-wide', tab === 'users' || tab === 'db');
-  if (tab === 'manage') loadWorks();
-  if (tab === 'prices') loadPrices();
-  if (tab === 'rules') loadRules();
-  if (tab === 'users' && apiKey) { loadUsers(); loadUnauthUsers(); loadWatchlist(); loadBannedIps(); }
-  if (tab === 'maint' && apiKey) loadMaintenance();
-  if (tab === 'db' && apiKey) loadDbTablesList();
-}
-
-async function login() {
-  const token     = document.getElementById('tokenInput').value.trim();
-  const repo      = document.getElementById('repoInput').value.trim();
-  const branch    = document.getElementById('branchInput').value.trim();
-  const adminKey  = document.getElementById('gateAdminKeyInput').value.trim();
-  const status    = document.getElementById('loginStatus');
-
-  if (!token || !repo) { showStatus(status, 'Заполни токен и репозиторий', 'err'); return; }
-  if (!adminKey)        { showStatus(status, 'Введи ключ администратора', 'err'); return; }
-
-  showStatus(status, 'Проверяю доступ...', 'info');
+  const session = getSession();
+  if (!session) { window.location.href = '/mezets.design/order/'; return; }
 
   try {
-    const res = await ghFetch(`/repos/${repo}`, token);
-    if (!res.ok) throw new Error('Нет доступа к репозиторию. Проверь токен и права repo.');
+    const rMe = await fetch(`${API}/api/me?session=${encodeURIComponent(session)}`);
+    if (!rMe.ok) { window.location.href = '/mezets.design/order/'; return; }
+    const dMe = await rMe.json();
+    currentUser = dMe.user;
+  } catch(e) { window.location.href = '/mezets.design/order/'; return; }
 
-    const keyRes = await fetch(`${BOT_API}/admin/users`, { headers: { 'X-Admin-Key': adminKey } });
-    if (keyRes.status === 403) throw new Error('Неверный ключ администратора');
-    if (!keyRes.ok) throw new Error('Не удалось проверить ключ администратора (бэкенд недоступен)');
-    const keyData = await keyRes.json();
+  await loadOrder();
 
-    TOKEN  = token;
-    REPO   = repo;
-    BRANCH = branch || 'main';
-    localStorage.setItem('mz_token', token);
-    localStorage.setItem('mz_repo', repo);
-    localStorage.setItem('mz_branch', BRANCH);
-    localStorage.setItem('mz_admin_key', adminKey);
-    localStorage.setItem('mz_session_ts', String(Date.now()));
-
-    apiKey = adminKey;
-    USERS  = keyData.users || [];
-    document.getElementById('apiKeyInput').value = adminKey;
-
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('mainScreen').style.display = 'block';
-    showStatus(status, '', '');
-  } catch(e) {
-    showStatus(status, e.message, 'err');
-  }
-}
-
-const MZ_SESSION_MAX_AGE = 7 * 24 * 60 * 60 * 1000; // неделя
-
-function logoutAdmin() {
-  if (!confirm('Выйти из админки? Придётся заново ввести токен и ключ.')) return;
-  localStorage.removeItem('mz_token');
-  localStorage.removeItem('mz_repo');
-  localStorage.removeItem('mz_branch');
-  localStorage.removeItem('mz_admin_key');
-  localStorage.removeItem('mz_session_ts');
-  location.reload();
-}
-
-window.addEventListener('DOMContentLoaded', () => {
-  const t  = localStorage.getItem('mz_token');
-  const r  = localStorage.getItem('mz_repo');
-  const b  = localStorage.getItem('mz_branch');
-  const ak = localStorage.getItem('mz_admin_key');
-  const ts = Number(localStorage.getItem('mz_session_ts') || 0);
-  const sessionValid = ts && (Date.now() - ts) < MZ_SESSION_MAX_AGE;
-
-  if (t) document.getElementById('tokenInput').value = t;
-  if (r) document.getElementById('repoInput').value  = r;
-  if (b) document.getElementById('branchInput').value = b;
-
-  if (sessionValid && t && r && ak) {
-    // Сессия ещё не старше недели — не заставляем вводить всё заново,
-    // но всё равно реально проверяем токен/ключ через login() (вдруг их отозвали).
-    document.getElementById('gateAdminKeyInput').value = ak;
-    login();
-  } else if (ts) {
-    // Сессия истекла — чистим только чувствительное (admin key), логин/репо
-    // оставляем для удобства, но входить придётся заново вручную.
-    localStorage.removeItem('mz_admin_key');
-    localStorage.removeItem('mz_session_ts');
-  }
-});
-
-function ghFetch(path, token, opts) {
-  return fetch(GH_API + path, Object.assign({
-    headers: {
-      'Authorization': 'token ' + (token || TOKEN),
-      'Accept': 'application/vnd.github.v3+json',
-      'Content-Type': 'application/json',
-    }
-  }, opts));
-}
-
-async function getFile(path) {
-  const res = await ghFetch(`/repos/${REPO}/contents/${path}?ref=${BRANCH}`);
-  if (!res.ok) return null;
-  return res.json();
-}
-
-function setProgress(pct, label) {
-  document.getElementById('progressWrap').style.display = 'block';
-  document.getElementById('progressBar').style.width = pct + '%';
-  document.getElementById('progressLabel').textContent = label;
-}
-
-async function uploadWork() {
-  const fileInput = document.getElementById('fileInput');
-  const workType  = document.getElementById('workType').value.trim();
-  const workTime  = document.getElementById('workTime').value.trim();
-  const workGroup = document.getElementById('workGroup').value.trim();
-  const status    = document.getElementById('uploadStatus');
-  const btn       = document.getElementById('uploadBtn');
-
-  if (!fileInput.files[0]) { showStatus(status, 'Выбери файл!', 'err'); return; }
-  if (!workType)            { showStatus(status, 'Укажи тип работы!', 'err'); return; }
-  if (!workTime)            { showStatus(status, 'Укажи срок выполнения!', 'err'); return; }
-
-  const file = fileInput.files[0];
-  const maxMB = 50;
-  if (file.size > maxMB * 1024 * 1024) { showStatus(status, `Файл больше ${maxMB} MB!`, 'err'); return; }
-
-  btn.disabled = true;
-  showStatus(status, '', '');
-
-  try {
-    setProgress(10, 'Читаю файл...');
-    const b64 = await toBase64(file);
-
-    const isVideo = /\.(mp4|webm|mov)$/i.test(file.name);
-    const folder  = isVideo ? 'portfolio/mp4' : 'portfolio/png';
-    const fname   = sanitizeFilename(file.name);
-    const ghPath  = `${folder}/${fname}`;
-
-    setProgress(25, 'Проверяю репозиторий...');
-    const existing = await getFile(ghPath);
-
-    setProgress(45, 'Загружаю файл...');
-    const fileBody = {
-      message: `[admin] add portfolio: ${fname}`,
-      content: b64,
-      branch: BRANCH,
-    };
-    if (existing) fileBody.sha = existing.sha;
-
-    const uploadRes = await ghFetch(`/repos/${REPO}/contents/${ghPath}`, TOKEN, {
-      method: 'PUT',
-      body: JSON.stringify(fileBody),
+  // Точки как в админке
+  const dotCanvas = g('matrixCanvas');
+  const dotCtx = dotCanvas.getContext('2d');
+  function resizeDots() { dotCanvas.width = innerWidth; dotCanvas.height = innerHeight; }
+  resizeDots();
+  let dots = [];
+  function initDots() {
+    dots = [];
+    const n = Math.round((innerWidth * innerHeight) / 12000);
+    for (let i = 0; i < n; i++) dots.push({
+      x: Math.random()*dotCanvas.width, y: Math.random()*dotCanvas.height,
+      r: Math.random()*1.2+0.3, dx:(Math.random()-.5)*.12, dy:(Math.random()-.5)*.12
     });
-    if (!uploadRes.ok) {
-      const err = await uploadRes.json();
-      throw new Error(err.message || 'Ошибка загрузки файла');
+  }
+  initDots();
+  window.addEventListener('resize', () => { resizeDots(); initDots(); });
+  (function animateDots() {
+    dotCtx.clearRect(0,0,dotCanvas.width,dotCanvas.height);
+    for (let d of dots) {
+      dotCtx.beginPath(); dotCtx.arc(d.x,d.y,d.r,0,Math.PI*2);
+      dotCtx.fillStyle='rgba(255,0,0,0.5)'; dotCtx.fill();
+      d.x+=d.dx; d.y+=d.dy;
+      if(d.x<0)d.x=dotCanvas.width; if(d.x>dotCanvas.width)d.x=0;
+      if(d.y<0)d.y=dotCanvas.height; if(d.y>dotCanvas.height)d.y=0;
     }
+    requestAnimationFrame(animateDots);
+  })();
+}
 
-    setProgress(65, 'Обновляю index.html...');
-    const indexFile = await getFile('index.html');
-    if (!indexFile) throw new Error('index.html не найден в репозитории');
+async function loadOrder() {
+  const session = getSession();
+  try {
+    const r = await fetch(`${API}/api/order/${orderId}?session=${encodeURIComponent(session)}`);
+    if (!r.ok) { showNotFound(); return; }
+    const d = await r.json();
+    renderOrder(d.order, d.messages || [], d.attachments || []);
+    startPolling();
+  } catch(e) { showNotFound(); }
+}
 
-    let html = decodeURIComponent(escape(atob(indexFile.content.replace(/\n/g, ''))));
+function showNotFound() {
+  g('loadingState').style.display = 'none';
+  g('notFound').style.display = 'block';
+}
 
-    const imgRef = `${folder}/${fname}`;
-    let newEntry;
-    if (workGroup) {
-      const groupTag = `/* group:${workGroup} */`;
-      const itemObj  = `      { img: "${imgRef}", type: "${workType}", time: "${workTime}" }`;
+function renderOrder(order, messages, attachments) {
+  g('loadingState').style.display = 'none';
+  g('chatContent').style.display = 'block';
 
-      if (html.includes(groupTag)) {
-        html = html.replace(
-          new RegExp(`(/\\* group:${escapeRegex(workGroup)} \\*/[\\s\\S]*?)(\\s*\\]\\s*\\})`),
-          (match, before, close) => `${before},\n${itemObj}${close}`
-        );
-      } else {
-        newEntry = `{\n  ${groupTag}\n  group: [\n${itemObj},\n  ]\n},`;
-        html = insertAfterLastItem(html, newEntry);
+  const statusLabels = { 'new': 'Новый', 'in_progress': 'В работе', 'completed': 'Выполнен', 'cancelled': 'Отменён' };
+  g('orderIdDisplay').textContent = `Заказ #${order.id}`;
+  document.title = `Mezets - Чат заказа #${order.id}`;
+  g('orderMeta').textContent = `${order.category || ''} · ${order.created_at ? order.created_at.slice(0, 10) : ''}`;
+  g('orderPrice').textContent = order.estimated_price ? `${order.estimated_price} ₽` : '';
+  const badge = g('orderStatusBadge');
+  badge.textContent = statusLabels[order.status] || order.status;
+  badge.className = 'order-status-badge status-' + order.status;
+  g('orderDescBox').textContent = order.description || '';
+
+  renderMessages(messages, attachments);
+}
+
+function renderMessages(messages, attachments) {
+  const box = g('chatBox');
+  if (!messages.length) {
+    box.innerHTML = '<div class="empty-chat">Сообщений пока нет. Напиши что-нибудь!</div>';
+    return;
+  }
+  const attMap = {};
+  if (attachments) attachments.forEach(a => {
+    if (a.message_id) {
+      if (!attMap[a.message_id]) attMap[a.message_id] = [];
+      attMap[a.message_id].push(a);
+    }
+  });
+
+  box.innerHTML = messages.map(m => {
+    const isUser = !m.from_discord;
+    const atts = attMap[m.id] || [];
+    const attHtml = atts.length ? '<div class="msg-attachments">' + atts.map(a =>
+      `<a href="${a.discord_url}" target="_blank" class="msg-attachment">${a.filename || 'файл'} ↓</a>`
+    ).join('') + '</div>' : '';
+    const author = isUser ? 'Вы' : m.author;
+    return `<div class="msg msg-${isUser ? 'user' : 'discord'}">
+      <div class="msg-author">${isUser ? 'Вы' : m.author}</div>
+      <div class="msg-text">${escapeHtml(m.content || '')}</div>
+      ${attHtml}
+      <div class="msg-time">${m.created_at ? m.created_at.slice(11, 19) : ''}</div>
+    </div>`;
+  }).join('');
+  box.scrollTop = box.scrollHeight;
+}
+
+function escapeHtml(t) {
+  const d = document.createElement('div');
+  d.textContent = t;
+  return d.innerHTML;
+}
+
+function startPolling() {
+  pollTimer = setInterval(async () => {
+    const session = getSession();
+    try {
+      const r = await fetch(`${API}/api/order/${orderId}/messages?session=${encodeURIComponent(session)}`);
+      if (!r.ok) return;
+      const d = await r.json();
+      const box = g('chatBox');
+      const oldCount = box.querySelectorAll('.msg').length;
+      if (d.messages && d.messages.length !== oldCount) {
+        const r2 = await fetch(`${API}/api/order/${orderId}?session=${encodeURIComponent(session)}`);
+        if (r2.ok) {
+          const d2 = await r2.json();
+          renderMessages(d2.messages || [], d2.attachments || []);
+        }
       }
-    } else {
-      newEntry = `    { img: "${imgRef}", type: "${workType}", time: "${workTime}" },`;
-      html = insertAfterLastItem(html, newEntry);
-    }
-
-    setProgress(85, 'Сохраняю index.html...');
-    const htmlB64 = btoa(unescape(encodeURIComponent(html)));
-    const htmlRes = await ghFetch(`/repos/${REPO}/contents/index.html`, TOKEN, {
-      method: 'PUT',
-      body: JSON.stringify({
-        message: `[admin] portfolio: add ${fname}`,
-        content: htmlB64,
-        sha: indexFile.sha,
-        branch: BRANCH,
-      }),
-    });
-    if (!htmlRes.ok) {
-      const err = await htmlRes.json();
-      throw new Error('Файл загружен, но index.html не обновился: ' + (err.message || ''));
-    }
-
-    setProgress(100, 'Готово!');
-    showStatus(status, `✅ Работа загружена!\nФайл: ${ghPath}\nСайт обновится через ~30 секунд.`, 'ok');
-
-    fileInput.value = '';
-    document.getElementById('fileDropName').textContent = '';
-    document.getElementById('previewWrap').style.display = 'none';
-    document.getElementById('workType').value  = '';
-    document.getElementById('workTime').value  = '';
-    document.getElementById('workGroup').value = '';
-
-    setTimeout(() => { document.getElementById('progressWrap').style.display = 'none'; }, 3000);
-
-  } catch(e) {
-    showStatus(status, '❌ ' + e.message, 'err');
-    document.getElementById('progressWrap').style.display = 'none';
-  } finally {
-    btn.disabled = false;
-  }
+    } catch(e) {}
+  }, 3000);
 }
 
-function insertAfterLastItem(html, newEntry) {
-  const marker = '  ];'; // конец PORTFOLIO_ITEMS
-  const idx = html.lastIndexOf(marker);
-  if (idx === -1) throw new Error('Не удалось найти PORTFOLIO_ITEMS в index.html');
-  return html.slice(0, idx) + newEntry + '\n' + html.slice(idx);
-}
+async function sendMsg() {
+  const input = g('msgInput');
+  const content = input.value.trim();
+  if (!content) return;
 
-function escapeRegex(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
-
-async function loadWorks() {
-  const container = document.getElementById('worksList');
-  container.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div>';
+  const session = getSession();
+  input.disabled = true;
 
   try {
-    const indexFile = await getFile('index.html');
-    if (!indexFile) throw new Error('index.html не найден');
-    const html = decodeURIComponent(escape(atob(indexFile.content.replace(/\n/g, ''))));
-
-    const items = parsePortfolioItems(html);
-    document.getElementById('worksCount').textContent = items.length;
-
-    if (!items.length) { container.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Работ пока нет</div>'; return; }
-
-    container.innerHTML = '';
-    const baseUrl = `https://raw.githubusercontent.com/${REPO}/${BRANCH}/`;
-
-    items.slice().reverse().forEach((item, revIdx) => {
-      const realIdx = items.length - 1 - revIdx;
-      const el = document.createElement('div');
-      el.className = 'work-item';
-
-      const isVideo = /\.(mp4|webm)$/i.test(item.img);
-      const thumbHtml = isVideo
-        ? `<video class="work-thumb" src="${baseUrl}${item.img}" muted playsinline preload="metadata"></video>`
-        : `<img class="work-thumb" src="${baseUrl}${item.img}" alt="">`;
-
-      el.innerHTML = `
-        ${thumbHtml}
-        <div class="work-info">
-          <div class="work-type">${item.type}</div>
-          <div class="work-file">${item.img}</div>
-        </div>
-        <div class="work-del" title="Удалить из index.html" onclick="deleteWork(${realIdx})">✕</div>
-      `;
-      container.appendChild(el);
+    const r = await fetch(`${API}/api/order/${orderId}/message?session=${encodeURIComponent(session)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content }),
     });
-  } catch(e) {
-    container.innerHTML = `<div style="font-size:7px;color:rgba(255,100,100,0.7);line-height:2">Ошибка: ${e.message}</div>`;
-  }
-}
-
-function parsePortfolioItems(html) {
-  const start = html.indexOf('const PORTFOLIO_ITEMS = [');
-  const end   = html.indexOf('\n  ];', start);
-  if (start === -1 || end === -1) return [];
-  const block = html.slice(start, end);
-  const items = [];
-  const single = /\{\s*img:\s*"([^"]+)",\s*type:\s*"([^"]+)",\s*time:\s*"([^"]+)"\s*\}/g;
-  let m;
-  while ((m = single.exec(block)) !== null) {
-    items.push({ img: m[1], type: m[2], time: m[3] });
-  }
-  return items;
-}
-
-async function deleteWork(idx) {
-  if (!confirm('Удалить запись из PORTFOLIO_ITEMS?\n(Файл в репозитории останется)')) return;
-
-  const container = document.getElementById('worksList');
-  try {
-    const indexFile = await getFile('index.html');
-    if (!indexFile) throw new Error('index.html не найден');
-    let html = decodeURIComponent(escape(atob(indexFile.content.replace(/\n/g, ''))));
-
-    const start = html.indexOf('const PORTFOLIO_ITEMS = [');
-    const end   = html.indexOf('\n  ];', start);
-    if (start === -1 || end === -1) throw new Error('Не найден PORTFOLIO_ITEMS');
-
-    const block  = html.slice(start, end);
-    const single = /\{\s*img:\s*"([^"]+)",\s*type:\s*"([^"]+)",\s*time:\s*"([^"]+)"\s*\}/g;
-    let i = 0, m, toRemove = null, toRemoveFull = null;
-    while ((m = single.exec(block)) !== null) {
-      if (i === idx) { toRemove = m[0]; toRemoveFull = m[0]; break; }
-      i++;
+    if (!r.ok) throw new Error('send failed');
+    input.value = '';
+    // Reload immediately
+    const r2 = await fetch(`${API}/api/order/${orderId}?session=${encodeURIComponent(session)}`);
+    if (r2.ok) {
+      const d = await r2.json();
+      renderMessages(d.messages || [], d.attachments || []);
     }
-    if (!toRemove) throw new Error('Запись не найдена');
-
-    const lineRx = new RegExp(`\\s*\\{\\s*img:\\s*"${escapeRegex(toRemove.match(/img:\s*"([^"]+)"/)[1])}"[^}]+\\},?`);
-    html = html.replace(lineRx, '');
-
-    const htmlB64 = btoa(unescape(encodeURIComponent(html)));
-    const res = await ghFetch(`/repos/${REPO}/contents/index.html`, TOKEN, {
-      method: 'PUT',
-      body: JSON.stringify({
-        message: '[admin] portfolio: remove item',
-        content: htmlB64,
-        sha: indexFile.sha,
-        branch: BRANCH,
-      }),
-    });
-    if (!res.ok) throw new Error('Не удалось обновить index.html');
-    await loadWorks();
   } catch(e) {
-    alert('Ошибка: ' + e.message);
+    console.error('send error:', e);
   }
+  input.disabled = false;
+  input.focus();
 }
 
-function toBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload  = () => resolve(reader.result.split(',')[1]);
-    reader.onerror = () => reject(new Error('Не удалось прочитать файл'));
-    reader.readAsDataURL(file);
-  });
-}
-
-function sanitizeFilename(name) {
-  return name.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9._\-()]/g, '');
-}
-
-function showStatus(el, msg, type) {
-  el.textContent = msg;
-  el.className   = 'status' + (type ? ' ' + type : '');
-  if (!type) el.style.display = 'none';
-}
-
-
-let pricesData = []; // [{section, name, price}, ...]
-let pricesFileSha = '';
-
-async function loadPrices() {
-  const container = document.getElementById('pricesSections');
-  container.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div>';
-  showStatus(document.getElementById('pricesStatus'), '', '');
-  try {
-    const f = await getFile('prices/index.html');
-    if (!f) throw new Error('prices/index.html не найден');
-    pricesFileSha = f.sha;
-    const rawHtml = decodeURIComponent(escape(atob(f.content.replace(/\n/g, ''))));
-    pricesData = parsePrices(rawHtml);
-    renderPrices();
-  } catch(e) {
-    container.innerHTML = '<div style="font-size:7px;color:rgba(255,100,100,0.7);line-height:2">Ошибка: ' + e.message + '</div>';
-  }
-}
-
-function parsePrices(rawHtml) {
-  const items = [];
-  const sectionRx = /<div class="section">\s*<div class="section-label">([^<]+)<\/div>([\s\S]*?)<\/div>\s*<\/div>/g;
-  const itemRx = /<div class="item-row"><span class="item-dot"><\/span><span class="item-name">([^<]+)<\/span><\/div><span class="item-price">([^<]+)<\/span>/g;
-  let sm;
-  while ((sm = sectionRx.exec(rawHtml)) !== null) {
-    const section = sm[1].trim();
-    const block   = sm[2];
-    let im;
-    itemRx.lastIndex = 0;
-    while ((im = itemRx.exec(block)) !== null) {
-      items.push({ section, name: im[1].trim(), price: im[2].trim() });
-    }
-  }
-  return items;
-}
-
-function renderPrices() {
-  const container = document.getElementById('pricesSections');
-  container.innerHTML = '';
-
-  const sections = {};
-  pricesData.forEach((item, idx) => {
-    if (!sections[item.section]) sections[item.section] = [];
-    sections[item.section].push({ ...item, idx });
-  });
-
-  Object.entries(sections).forEach(([section, items]) => {
-    const secEl = document.createElement('div');
-    secEl.style.cssText = 'margin-bottom:20px';
-
-    const secLabel = document.createElement('div');
-    secLabel.style.cssText = 'font-size:8px;color:#ff2a2a;letter-spacing:1px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(255,0,0,0.15)';
-    secLabel.textContent = section;
-    secEl.appendChild(secLabel);
-
-    items.forEach(({ name, price, idx }) => {
-      const row = document.createElement('div');
-      row.style.cssText = 'display:flex;gap:8px;align-items:center;margin-bottom:8px';
-
-      const nameInp = document.createElement('input');
-      nameInp.type = 'text';
-      nameInp.value = name;
-      nameInp.style.cssText = 'flex:2;margin-bottom:0;font-size:7px;padding:8px 10px';
-      nameInp.oninput = () => { pricesData[idx].name = nameInp.value; };
-
-      const priceInp = document.createElement('input');
-      priceInp.type = 'text';
-      priceInp.value = price;
-      priceInp.style.cssText = 'flex:1;margin-bottom:0;font-size:7px;padding:8px 10px';
-      priceInp.oninput = () => { pricesData[idx].price = priceInp.value; };
-
-      const del = document.createElement('div');
-      del.className = 'work-del';
-      del.textContent = '✕';
-      del.title = 'Удалить позицию';
-      del.onclick = () => { pricesData.splice(idx, 1); renderPrices(); };
-
-      row.appendChild(nameInp);
-      row.appendChild(priceInp);
-      row.appendChild(del);
-      secEl.appendChild(row);
-    });
-
-    container.appendChild(secEl);
-  });
-
-  if (!pricesData.length) {
-    container.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Нажми "Загрузить актуальные цены"</div>';
-  }
-}
-
-function addPriceItem() {
-  const section = document.getElementById('newItemSection').value;
-  const name    = document.getElementById('newItemName').value.trim();
-  const price   = document.getElementById('newItemPrice').value.trim();
-  if (!name || !price) {
-    showStatus(document.getElementById('pricesStatus'), 'Заполни название и цену', 'err');
-    return;
-  }
-  pricesData.push({ section, name, price });
-  document.getElementById('newItemName').value  = '';
-  document.getElementById('newItemPrice').value = '';
-  renderPrices();
-  showStatus(document.getElementById('pricesStatus'), 'Позиция добавлена — не забудь сохранить!', 'info');
-}
-
-async function savePrices() {
-  const status = document.getElementById('pricesStatus');
-  const btn    = document.getElementById('savePricesBtn');
-  btn.disabled = true;
-  showStatus(status, 'Читаю prices/index.html...', 'info');
-
-  try {
-    const f = await getFile('prices/index.html');
-    if (!f) throw new Error('prices/index.html не найден');
-    let rawHtml = decodeURIComponent(escape(atob(f.content.replace(/\n/g, ''))));
-
-    const sections = {};
-    pricesData.forEach(item => {
-      if (!sections[item.section]) sections[item.section] = [];
-      sections[item.section].push(item);
-    });
-
-    Object.entries(sections).forEach(([section, items], si) => {
-      const itemsHtml = items.map((it, ii) => {
-        const delay = (0.05 + (si * 3 + ii) * 0.05).toFixed(2);
-        return `      <div class="item" style="animation-delay:${delay}s">\n        <div class="item-row"><span class="item-dot"></span><span class="item-name">${escHtml(it.name)}</span></div><span class="item-price">${escHtml(it.price)}</span>\n      </div>`;
-      }).join('\n');
-
-      const sectionRx = new RegExp(
-        '(<div class="section">\\s*<div class="section-label">' + escapeRegex(section) + '<\\/div>\\s*<div class="items-grid">)([\\s\\S]*?)(<\\/div>\\s*<\\/div>)',
-        'g'
-      );
-      rawHtml = rawHtml.replace(sectionRx, (m, before, _old, after) => {
-        return before + '\n' + itemsHtml + '\n    ' + after;
+function uploadFile() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.onchange = async () => {
+    const file = input.files[0];
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) { alert('Файл слишком большой (макс 10MB)'); return; }
+    const session = getSession();
+    const formData = new FormData();
+    formData.append('order_id', orderId);
+    formData.append('file', file);
+    try {
+      await fetch(`${API}/api/order/upload?session=${encodeURIComponent(session)}`, {
+        method: 'POST', body: formData,
       });
-    });
-
-    showStatus(status, 'Сохраняю...', 'info');
-    const b64 = btoa(unescape(encodeURIComponent(rawHtml)));
-    const res = await ghFetch('/repos/' + REPO + '/contents/prices/index.html', TOKEN, {
-      method: 'PUT',
-      body: JSON.stringify({
-        message: '[admin] update prices',
-        content: b64,
-        sha: f.sha,
-        branch: BRANCH,
-      }),
-    });
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.message || 'GitHub API error');
-    }
-    showStatus(status, 'Цены сохранены! Сайт обновится через ~30 сек.', 'ok');
-  } catch(e) {
-    showStatus(status, 'Ошибка: ' + e.message, 'err');
-  } finally {
-    btn.disabled = false;
-  }
-}
-
-function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-
-let rulesData = []; // [{title, text, important}, ...]
-
-async function loadRules() {
-  const container = document.getElementById('rulesList');
-  container.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div>';
-  showStatus(document.getElementById('rulesStatus'), '', '');
-  try {
-    const f = await getFile('rules/index.html');
-    if (!f) throw new Error('rules/index.html не найден');
-    const rawHtml = decodeURIComponent(escape(atob(f.content.replace(/\n/g, ''))));
-    rulesData = parseRules(rawHtml);
-    renderRules();
-  } catch(e) {
-    container.innerHTML = '<div style="font-size:7px;color:rgba(255,100,100,0.7);line-height:2">Ошибка: ' + e.message + '</div>';
-  }
-}
-
-function parseRules(rawHtml) {
-  const items = [];
-  const ruleRx = /<div class="rule([^"]*)"[^>]*>\s*<div class="rule-num">[^<]*<\/div>\s*<div class="rule-body">\s*<div class="rule-title">([^<]*)<\/div>\s*<div class="rule-text">([\s\S]*?)<\/div>\s*<\/div>\s*<\/div>/g;
-  let m;
-  while ((m = ruleRx.exec(rawHtml)) !== null) {
-    items.push({
-      important: m[1].includes('important'),
-      title: m[2].trim(),
-      text: m[3].trim()
-    });
-  }
-  return items;
-}
-
-function renderRules() {
-  const container = document.getElementById('rulesList');
-  container.innerHTML = '';
-  if (!rulesData.length) {
-    container.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Нажми "Загрузить актуальные правила"</div>';
-    return;
-  }
-  rulesData.forEach((rule, idx) => {
-    const wrap = document.createElement('div');
-    wrap.style.cssText = 'background:rgba(255,0,0,0.04);border:1px solid rgba(255,0,0,0.15);border-radius:12px;padding:14px;margin-bottom:10px';
-    if (rule.important) wrap.style.borderColor = 'rgba(255,0,0,0.3)';
-
-    const row1 = document.createElement('div');
-    row1.style.cssText = 'display:flex;gap:8px;align-items:center;margin-bottom:8px';
-
-    const numBadge = document.createElement('div');
-    numBadge.style.cssText = 'font-size:7px;color:rgba(255,80,80,0.5);flex-shrink:0;min-width:22px';
-    numBadge.textContent = String(idx+1).padStart(2,'0');
-
-    const titleInp = document.createElement('input');
-    titleInp.type = 'text';
-    titleInp.value = rule.title;
-    titleInp.style.cssText = 'flex:1;margin-bottom:0;font-size:7px;padding:7px 10px';
-    titleInp.oninput = () => { rulesData[idx].title = titleInp.value; };
-
-    const impChk = document.createElement('input');
-    impChk.type = 'checkbox';
-    impChk.checked = rule.important;
-    impChk.title = 'Важное';
-    impChk.style.cssText = 'width:14px;height:14px;flex-shrink:0;accent-color:#ff2a2a;cursor:pointer';
-    impChk.onchange = () => { rulesData[idx].important = impChk.checked; wrap.style.borderColor = impChk.checked ? 'rgba(255,0,0,0.3)' : 'rgba(255,0,0,0.15)'; };
-
-    const del = document.createElement('div');
-    del.className = 'work-del';
-    del.textContent = '✕';
-    del.title = 'Удалить правило';
-    del.onclick = () => { rulesData.splice(idx, 1); renderRules(); };
-
-    row1.appendChild(numBadge);
-    row1.appendChild(titleInp);
-    row1.appendChild(impChk);
-    row1.appendChild(del);
-
-    const edId = 'rte_' + idx;
-    const toolbar = document.createElement('div');
-    toolbar.className = 'rich-toolbar';
-    toolbar.innerHTML = `
-      <button onclick="rteCmd('${edId}','bold')" title="Жирный"><b>B</b></button>
-      <button onclick="rteCmd('${edId}','italic')" title="Курсив"><i>I</i></button>
-      <div class="tb-sep"></div>
-      <button onclick="rteHighlight('${edId}')" title="Подсветить (hi)" style="color:#ffaaaa">★ hi</button>
-      <button onclick="rteRemoveHi('${edId}')" title="Убрать подсветку">✕ hi</button>
-      <div class="tb-sep"></div>
-      <button onclick="rteInsert('${edId}','<br>')" title="Перенос строки">↵ br</button>
-    `;
-
-    const editor = document.createElement('div');
-    editor.id = edId;
-    editor.className = 'rich-editor';
-    editor.contentEditable = 'true';
-    editor.innerHTML = rule.text;
-    editor.oninput = () => { rulesData[idx].text = editor.innerHTML; };
-
-    const hint = document.createElement('div');
-    hint.style.cssText = 'font-size:6px;color:rgba(255,200,200,0.25);line-height:1.8;margin-top:4px';
-    hint.textContent = 'Выдели текст → нажми ★ hi для подсветки красным';
-
-    wrap.appendChild(row1);
-    wrap.appendChild(toolbar);
-    wrap.appendChild(editor);
-    wrap.appendChild(hint);
-    container.appendChild(wrap);
-  });
-}
-
-function addRule() {
-  const title     = document.getElementById('newRuleTitle').value.trim();
-  const editor    = document.getElementById('newRuleEditor');
-  const text      = editor ? editor.innerHTML.trim() : '';
-  const important = document.getElementById('newRuleImportant').checked;
-  if (!title || !text || text === '<br>') {
-    showStatus(document.getElementById('rulesStatus'), 'Заполни заголовок и текст', 'err');
-    return;
-  }
-  rulesData.push({ title, text, important });
-  document.getElementById('newRuleTitle').value = '';
-  if (editor) editor.innerHTML = '';
-  document.getElementById('newRuleImportant').checked = false;
-  renderRules();
-  showStatus(document.getElementById('rulesStatus'), 'Правило добавлено — не забудь сохранить!', 'info');
-}
-
-async function saveRules() {
-  const status = document.getElementById('rulesStatus');
-  const btn    = document.getElementById('saveRulesBtn');
-  btn.disabled = true;
-  showStatus(status, 'Читаю rules/index.html...', 'info');
-
-  try {
-    const f = await getFile('rules/index.html');
-    if (!f) throw new Error('rules/index.html не найден');
-    let rawHtml = decodeURIComponent(escape(atob(f.content.replace(/\n/g, ''))));
-
-    const newRulesHtml = rulesData.map((rule, idx) => {
-      const num     = String(idx+1).padStart(2,'0');
-      const delay   = (0.04 + idx * 0.05).toFixed(2);
-      const cls     = rule.important ? 'rule important' : 'rule';
-      return `  <div class="${cls}" style="animation-delay:${delay}s">\n    <div class="rule-num">${num}</div>\n    <div class="rule-body">\n      <div class="rule-title">${escHtml(rule.title)}</div>\n      <div class="rule-text">\n        ${rule.text}\n      </div>\n    </div>\n  </div>`;
-    }).join('\n\n');
-
-    rawHtml = rawHtml.replace(
-      /(<div class="rules-grid">)[\s\S]*?(<\/div><!-- \/rules-grid -->)/,
-      '$1\n\n' + newRulesHtml + '\n\n  $2'
-    );
-
-    showStatus(status, 'Сохраняю...', 'info');
-    const b64 = btoa(unescape(encodeURIComponent(rawHtml)));
-    const res = await ghFetch('/repos/' + REPO + '/contents/rules/index.html', TOKEN, {
-      method: 'PUT',
-      body: JSON.stringify({
-        message: '[admin] update rules',
-        content: b64,
-        sha: f.sha,
-        branch: BRANCH,
-      }),
-    });
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.message || 'GitHub API error');
-    }
-    showStatus(status, 'Правила сохранены! Сайт обновится через ~30 сек.', 'ok');
-  } catch(e) {
-    showStatus(status, 'Ошибка: ' + e.message, 'err');
-  } finally {
-    btn.disabled = false;
-  }
-}
-
-function rteCmd(edId, cmd) {
-  const ed = document.getElementById(edId);
-  if (!ed) return;
-  ed.focus();
-  document.execCommand(cmd, false, null);
-}
-
-function rteHighlight(edId) {
-  const ed = document.getElementById(edId);
-  if (!ed) return;
-  ed.focus();
-  const sel = window.getSelection();
-  if (!sel || sel.isCollapsed) return;
-  const range = sel.getRangeAt(0);
-  const span = document.createElement('span');
-  span.className = 'hi';
-  try { range.surroundContents(span); } catch(e) {
-    const frag = range.extractContents();
-    span.appendChild(frag);
-    range.insertNode(span);
-  }
-  sel.removeAllRanges();
-}
-
-function rteRemoveHi(edId) {
-  const ed = document.getElementById(edId);
-  if (!ed) return;
-  ed.querySelectorAll('span.hi').forEach(s => {
-    const parent = s.parentNode;
-    while (s.firstChild) parent.insertBefore(s.firstChild, s);
-    parent.removeChild(s);
-  });
-  const idx = edId.startsWith('rte_') ? parseInt(edId.slice(4)) : -1;
-  if (idx >= 0 && rulesData[idx]) rulesData[idx].text = ed.innerHTML;
-}
-
-function rteInsert(edId, html) {
-  const ed = document.getElementById(edId);
-  if (!ed) return;
-  ed.focus();
-  document.execCommand('insertHTML', false, html);
-}
-
-async function loadUsers() {
-  const status = document.getElementById('usersStatus');
-  const list   = document.getElementById('usersList');
-  const key    = document.getElementById('apiKeyInput').value.trim();
-
-  if (!key) { showStatus(status, 'Введи API-ключ бэкенда', 'err'); return; }
-  apiKey = key;
-
-  list.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div>';
-  showStatus(status, '', '');
-
-  try {
-    const res = await adminFetch(`${BOT_API}/admin/users`);
-    if (res.status === 403) throw new Error('Неверный ключ');
-    if (!res.ok) throw new Error('Ошибка сервера');
-    const data = await res.json();
-    USERS = data.users || [];
-    renderUsers();
-  } catch(e) {
-    list.innerHTML = '';
-    showStatus(status, 'Ошибка: ' + e.message, 'err');
-  }
-}
-
-function renderUsers() {
-  const q    = document.getElementById('usersSearch').value.trim().toLowerCase();
-  const list = document.getElementById('usersList');
-
-  const filtered = USERS.filter(u => {
-    if (!q) return true;
-    return [u.username, u.discord_id, u.ip, u.fingerprint]
-      .some(v => (v || '').toLowerCase().includes(q));
-  });
-
-  document.getElementById('usersCount').textContent = USERS.length;
-
-  if (!filtered.length) {
-    list.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Нет данных</div>';
-    return;
-  }
-
-  list.innerHTML = filtered.map(u => {
-    const bannedBadge = u.banned
-      ? '<span class="badge" style="background:rgba(255,0,0,0.22);border-color:rgba(255,0,0,0.5)">БАН</span>'
-      : '';
-    const locationLine = [u.country, u.region, u.city].filter(Boolean).join(', ') || '—';
-
-    return `
-      <div class="work-item clickable-item" onclick="showAuthDetail('${escHtml(String(u.discord_id))}')">
-        <div style="position:relative;width:36px;flex-shrink:0">
-          <img class="work-thumb" style="width:36px;height:36px;border-radius:50%" src="${escHtml(u.avatar || '')}" onerror="this.style.visibility='hidden'">
-          <div style="position:absolute;bottom:-3px;right:-4px;line-height:0">${flagImg(u.country_code, 15, 11)}</div>
-        </div>
-        <div class="work-info">
-          <div class="work-type">${escHtml(u.username || 'неизвестно')} ${bannedBadge}</div>
-          <div class="work-file">ID: ${escHtml(u.discord_id)} · IP: ${escHtml(u.ip || '—')}</div>
-          <div class="work-file">📍 ${escHtml(locationLine)}</div>
-          <div class="work-file">Вход: ${escHtml(u.last_seen || '—')}</div>
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-
-let UNAUTH_USERS = [];
-
-function flagImg(countryCode, w, h) {
-  w = w || 26; h = h || 19;
-  if (!countryCode) {
-    return `<div style="width:${w}px;height:${h}px;border-radius:3px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,0,0,0.2)"></div>`;
-  }
-  const cc = countryCode.toLowerCase();
-  return `<img src="https://flagcdn.com/w40/${cc}.png" alt="${escHtml(countryCode.toUpperCase())}"
-            style="width:${w}px;height:${h}px;object-fit:cover;border-radius:3px;border:1px solid rgba(255,0,0,0.25);vertical-align:middle"
-            onerror="this.style.visibility='hidden'">`;
-}
-
-async function loadUnauthUsers() {
-  const status = document.getElementById('unauthStatus');
-  const list   = document.getElementById('unauthList');
-  const key    = document.getElementById('apiKeyInput').value.trim();
-
-  if (!key) { showStatus(status, 'Введи API-ключ бэкенда', 'err'); return; }
-  apiKey = key;
-
-  list.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div>';
-  showStatus(status, '', '');
-
-  try {
-    const res = await adminFetch(`${BOT_API}/admin/unauthorized`);
-    if (res.status === 403) throw new Error('Неверный ключ');
-    if (!res.ok) throw new Error('Ошибка сервера');
-    const data = await res.json();
-    UNAUTH_USERS = data.unauthorized || data.users || [];
-    renderUnauthUsers();
-  } catch(e) {
-    list.innerHTML = '';
-    UNAUTH_USERS = [];
-    showStatus(status, 'Ошибка: ' + e.message, 'err');
-  }
-}
-
-function renderUnauthUsers() {
-  const q    = document.getElementById('unauthSearch').value.trim().toLowerCase();
-  const list = document.getElementById('unauthList');
-
-  const filtered = UNAUTH_USERS.filter(u => {
-    if (!q) return true;
-    return [u.ip, u.country, u.region, u.city, u.fingerprint]
-      .some(v => (v || '').toLowerCase().includes(q));
-  });
-
-  document.getElementById('unauthCount').textContent = UNAUTH_USERS.length;
-
-  if (!filtered.length) {
-    list.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Нет данных</div>';
-    return;
-  }
-
-  list.innerHTML = filtered.map(u => {
-    const locationLine = [u.country, u.region, u.city].filter(Boolean).join(', ') || '—';
-    const bannedClass = u.banned ? ' banned' : '';
-    const bannedBadge = u.banned
-      ? '<span class="badge" style="background:rgba(255,0,0,0.22);border-color:rgba(255,0,0,0.5)">БАН</span>'
-      : '';
-
-    return `
-      <div class="work-item clickable-item guest-item${bannedClass}" onclick="showGuestDetail(${u.id})">
-        <div style="width:36px;text-align:center;padding-top:2px">${flagImg(u.country_code)}</div>
-        <div class="work-info">
-          <div class="work-type">${escHtml(locationLine)} ${bannedBadge}</div>
-          <div class="work-file">IP: ${escHtml(u.ip || '—')} · визитов: ${escHtml(String(u.visits ?? 1))}</div>
-          <div class="work-file">Вход: ${escHtml(u.last_seen || '—')}</div>
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-
-function getMasterKey() {
-  return document.getElementById('masterKeyInput').value.trim();
-}
-
-function closeUserDetail() {
-  document.getElementById('userDetailOverlay').style.display = 'none';
-}
-
-/* ── Редактор отзыва (правит само сообщение в Discord, не только БД) ── */
-async function showReviewEditor(messageId) {
-  const body = document.getElementById('userDetailBody');
-  body.innerHTML = '<div style="font-size:9px;color:rgba(255,200,200,0.4)">Загружаю отзыв из Discord...</div>';
-  document.getElementById('userDetailOverlay').style.display = 'flex';
-
-  try {
-    const res = await adminFetch(`${BOT_API}/admin/review/${encodeURIComponent(messageId)}`);
-    if (res.status === 403) throw new Error('Неверный API-ключ');
-    if (!res.ok) { const d = await res.json().catch(()=>({})); throw new Error(d.error || 'Не удалось загрузить отзыв'); }
-    const r = await res.json();
-
-    body.innerHTML = `
-      <div style="font-size:12px;color:#fff;font-weight:600;margin-bottom:14px">💬 Редактирование отзыва</div>
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
-        <img id="reviewAvatarPreview" src="${escHtml(r.avatar || '')}" style="width:44px;height:44px;border-radius:50%" onerror="this.style.visibility='hidden'">
-        <input type="text" id="reviewAvatar" placeholder="URL аватара" value="${escHtml(r.avatar || '')}" oninput="document.getElementById('reviewAvatarPreview').src=this.value" style="flex:1">
-        <button type="button" class="btn btn-sm" onclick="lookupReviewAvatar()" title="Найти аватар по имени автора на сервере">🔎</button>
-      </div>
-      <label style="font-size:8px">Имя автора</label>
-      <input type="text" id="reviewAuthor" value="${escHtml(r.author || '')}">
-      <label style="font-size:8px">Оценка (только 1-5, не количество)</label>
-      <input type="text" id="reviewRating" inputmode="numeric" maxlength="1" placeholder="1-5" value="${escHtml(String(r.rating || ''))}" oninput="this.value=this.value.replace(/[^1-5]/g,'').slice(0,1)">
-      <label style="font-size:8px">Заказ №</label>
-      <input type="text" id="reviewOrder" value="${escHtml(r.order || '')}">
-      <label style="font-size:8px">Вид оформления</label>
-      <input type="text" id="reviewOrderType" value="${escHtml(r.order_type || '')}">
-      <label style="font-size:8px">Способ оплаты</label>
-      <input type="text" id="reviewPayment" value="${escHtml(r.payment || '')}">
-      <label style="font-size:8px">Комментарий</label>
-      <textarea id="reviewComment" rows="4" style="width:100%;padding:10px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,0,0,0.25);border-radius:8px;color:#fff;font-family:'Press Start 2P',monospace;font-size:8px;resize:vertical">${escHtml(r.comment || '')}</textarea>
-      <button class="btn" style="margin-top:16px" onclick="saveReviewEdit('${escHtml(String(messageId))}')">💾 Сохранить в Discord</button>
-      <div class="detail-row" style="margin-top:8px;color:rgba(255,180,180,0.5)">Правка обновит само сообщение в канале отзывов — именно оттуда его тянет и сайт.</div>
-    `;
-  } catch(e) {
-    body.innerHTML = `<div style="font-size:9px;color:#ff6666">Ошибка: ${escHtml(e.message)}</div>`;
-  }
-}
-
-function toggleAvatarLookupBox() {
-  const body = document.getElementById('avatarLookupBody');
-  const arrow = document.getElementById('avatarLookupCollapseArrow');
-  const collapsed = body.style.display === 'none';
-  body.style.display = collapsed ? 'block' : 'none';
-  arrow.style.transform = collapsed ? 'rotate(0deg)' : 'rotate(-90deg)';
-}
-
-async function standaloneAvatarLookup() {
-  const q = document.getElementById('avatarLookupQuery').value.trim();
-  const resultBox = document.getElementById('avatarLookupResult');
-  if (!q) { alert('Впиши ник или Discord ID'); return; }
-
-  try {
-    const res = await adminFetch(`${BOT_API}/admin/review-lookup-avatar?name=${encodeURIComponent(q)}`);
-    if (res.status === 404) { alert('Не нашёл ни на сервере, ни в базе сайта'); resultBox.style.display = 'none'; return; }
-    if (res.status === 403) throw new Error('Неверный API-ключ');
-    if (!res.ok) throw new Error('Ошибка поиска');
-    const data = await res.json();
-    document.getElementById('avatarLookupImg').src = data.avatar;
-    document.getElementById('avatarLookupUrl').value = data.avatar;
-    resultBox.style.display = 'flex';
-  } catch(e) {
-    alert('Ошибка: ' + e.message);
-  }
-}
-
-async function lookupReviewAvatar() {
-  const nameInput = document.getElementById('reviewAuthor');
-  const avatarInput = document.getElementById('reviewAvatar');
-  const preview = document.getElementById('reviewAvatarPreview');
-  const name = nameInput.value.trim();
-  if (!name) { alert('Сначала впиши имя автора'); return; }
-
-  try {
-    const res = await adminFetch(`${BOT_API}/admin/review-lookup-avatar?name=${encodeURIComponent(name)}`);
-    if (res.status === 404) { alert('Не нашёл такого на сервере'); return; }
-    if (res.status === 403) throw new Error('Неверный API-ключ');
-    if (!res.ok) throw new Error('Ошибка поиска');
-    const data = await res.json();
-    avatarInput.value = data.avatar;
-    preview.src = data.avatar;
-  } catch(e) {
-    alert('Ошибка: ' + e.message);
-  }
-}
-
-async function saveReviewEdit(messageId) {
-  const masterKey = getMasterKey();
-  if (!masterKey) { alert('Введи мастер-ключ (поле на вкладке ЮЗЕРЫ)'); return; }
-
-  const fields = {
-    avatar:     document.getElementById('reviewAvatar').value.trim(),
-    author:     document.getElementById('reviewAuthor').value.trim(),
-    rating:     document.getElementById('reviewRating').value.trim(),
-    order:      document.getElementById('reviewOrder').value.trim(),
-    order_type: document.getElementById('reviewOrderType').value.trim(),
-    payment:    document.getElementById('reviewPayment').value.trim(),
-    comment:    document.getElementById('reviewComment').value.trim(),
+      const r = await fetch(`${API}/api/order/${orderId}?session=${encodeURIComponent(session)}`);
+      if (r.ok) {
+        const d = await r.json();
+        renderMessages(d.messages || [], d.attachments || []);
+      }
+    } catch(e) { console.error('upload error:', e); }
   };
-
-  try {
-    const res = await adminFetch(`${BOT_API}/admin/review/${encodeURIComponent(messageId)}/update`, {
-      master: true, method: 'POST', body: { pk_value: '', fields }
-    });
-    if (res.status === 403) throw new Error('Неверный мастер-ключ');
-    if (!res.ok) { const d = await res.json().catch(()=>({})); throw new Error(d.error || 'Не удалось сохранить'); }
-    closeUserDetail();
-    loadDbTable();
-  } catch(e) {
-    alert('Ошибка: ' + e.message);
-  }
+  input.click();
 }
 
-function showAuthDetail(discordId) {
-  const u = USERS.find(x => String(x.discord_id) === String(discordId));
-  if (!u) return;
-  const fpFull = u.fingerprint || '—';
-  const locationLine = [u.country, u.region, u.city].filter(Boolean).join(', ') || '—';
-  const bannedBadge = u.banned
-    ? '<span class="badge" style="background:rgba(255,0,0,0.22);border-color:rgba(255,0,0,0.5)">БАН</span>'
-    : '';
-  const reasonLine = (u.banned && u.ban_reason)
-    ? `<div class="detail-row" style="color:rgba(255,120,120,0.75)"><b>Причина бана:</b> ${escHtml(u.ban_reason)}</div>`
-    : '';
-  const actionBtn = u.banned
-    ? `<button class="btn" style="border-color:rgba(0,200,0,0.35);color:#55ff55;margin-top:16px" onclick="unbanUser('${escHtml(u.discord_id)}')">Разбан</button>`
-    : `<button class="btn" style="border-color:rgba(255,0,0,0.4);color:#ff4444;margin-top:16px" onclick="banUser('${escHtml(u.discord_id)}')">Бан</button>`;
-
-  document.getElementById('userDetailBody').innerHTML = `
-    <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px">
-      <div style="position:relative;width:52px;flex-shrink:0">
-        <img src="${escHtml(u.avatar || '')}" style="width:52px;height:52px;border-radius:50%" onerror="this.style.visibility='hidden'">
-        <div style="position:absolute;bottom:-3px;right:-5px;line-height:0">${flagImg(u.country_code, 20, 14)}</div>
-      </div>
-      <div>
-        <div style="font-size:12px;color:#fff;font-weight:600;margin-bottom:6px">${escHtml(u.username || 'неизвестно')}</div>
-        ${bannedBadge}
-      </div>
-    </div>
-    <div class="detail-row"><b>Discord ID:</b> ${escHtml(u.discord_id)}</div>
-    <div class="detail-row"><b>IP:</b> ${escHtml(u.ip || '—')}</div>
-    <div class="detail-row"><b>Местоположение:</b> ${escHtml(locationLine)}</div>
-    <div class="detail-row"><b>Устройство:</b> ${escHtml([u.browser, u.os].filter(Boolean).join(' · ') || '—')}</div>
-    <div class="detail-row"><b>Fingerprint:</b> ${escHtml(fpFull)}</div>
-    <div class="detail-row"><b>Первый вход:</b> ${escHtml(u.first_seen || '—')}</div>
-    <div class="detail-row"><b>Последний вход:</b> ${escHtml(u.last_seen || '—')}</div>
-    ${reasonLine}
-    ${actionBtn}
-  `;
-  document.getElementById('userDetailOverlay').style.display = 'flex';
-}
-
-function showGuestDetail(id) {
-  const u = UNAUTH_USERS.find(x => Number(x.id) === Number(id));
-  if (!u) return;
-  const locationLine = [u.country, u.region, u.city].filter(Boolean).join(', ') || '—';
-  const bannedBadge = u.banned
-    ? '<span class="badge" style="background:rgba(255,0,0,0.22);border-color:rgba(255,0,0,0.5)">БАН</span>'
-    : '';
-  const reasonLine = (u.banned && u.ban_reason)
-    ? `<div class="detail-row" style="color:rgba(255,120,120,0.75)"><b>Причина бана:</b> ${escHtml(u.ban_reason)}</div>`
-    : '';
-  const actionBtn = u.banned
-    ? `<button class="btn" style="border-color:rgba(0,200,0,0.35);color:#55ff55;margin-top:16px" onclick="unbanGuest(${u.id})">Разбан</button>`
-    : `<button class="btn" style="border-color:rgba(255,0,0,0.4);color:#ff4444;margin-top:16px" onclick="banGuest(${u.id})">Бан</button>`;
-
-  document.getElementById('userDetailBody').innerHTML = `
-    <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px">
-      ${flagImg(u.country_code)}
-      <div style="font-size:12px;color:#fff;font-weight:600">${escHtml(locationLine)}</div>
-      ${bannedBadge}
-    </div>
-    <div class="detail-row"><b>IP:</b> ${escHtml(u.ip || '—')}</div>
-    <div class="detail-row"><b>Устройство:</b> ${escHtml(u.device || '—')}</div>
-    <div class="detail-row"><b>Fingerprint:</b> ${escHtml(u.fingerprint || '—')}</div>
-    <div class="detail-row"><b>Визитов:</b> ${escHtml(String(u.visits ?? 1))}</div>
-    <div class="detail-row"><b>Первый визит:</b> ${escHtml(u.first_seen || '—')}</div>
-    <div class="detail-row"><b>Последний визит:</b> ${escHtml(u.last_seen || '—')}</div>
-    ${reasonLine}
-    ${actionBtn}
-  `;
-  document.getElementById('userDetailOverlay').style.display = 'flex';
-}
-
-async function banGuest(id) {
-  const masterKey = getMasterKey();
-  if (!masterKey) { showStatus(document.getElementById('unauthStatus'), 'Введи мастер-ключ (не сохраняется)', 'err'); return; }
-  const reason = prompt('Причина бана (можно пусто):', '') || '';
-  const status = document.getElementById('unauthStatus');
-  try {
-    const res = await adminFetch(`${BOT_API}/admin/ban-guest?id=${encodeURIComponent(id)}&reason=${encodeURIComponent(reason)}`, { master: true });
-    if (res.status === 403) throw new Error('Неверный мастер-ключ');
-    if (!res.ok) throw new Error('Не удалось забанить');
-    showStatus(status, 'Гость забанен', 'ok');
-    closeUserDetail();
-    loadUnauthUsers();
-  } catch(e) {
-    showStatus(status, 'Ошибка: ' + e.message, 'err');
-  }
-}
-
-async function unbanGuest(id) {
-  const masterKey = getMasterKey();
-  if (!masterKey) { showStatus(document.getElementById('unauthStatus'), 'Введи мастер-ключ (не сохраняется)', 'err'); return; }
-  if (!confirm('Снять бан с этого гостя?')) return;
-  const status = document.getElementById('unauthStatus');
-  try {
-    const res = await adminFetch(`${BOT_API}/admin/unban-guest?id=${encodeURIComponent(id)}`, { master: true });
-    if (res.status === 403) throw new Error('Неверный мастер-ключ');
-    if (!res.ok) throw new Error('Не удалось разбанить');
-    showStatus(status, 'Бан снят', 'ok');
-    closeUserDetail();
-    loadUnauthUsers();
-  } catch(e) {
-    showStatus(status, 'Ошибка: ' + e.message, 'err');
-  }
-}
-
-async function banUser(discordId) {
-  const masterKey = getMasterKey();
-  if (!masterKey) { showStatus(document.getElementById('usersStatus'), 'Введи мастер-ключ (не сохраняется)', 'err'); return; }
-  const reason = prompt('Причина бана (можно пусто):', '') || '';
-  const status = document.getElementById('usersStatus');
-  try {
-    const res = await adminFetch(`${BOT_API}/admin/ban?discord_id=${encodeURIComponent(discordId)}&reason=${encodeURIComponent(reason)}`, { master: true });
-    if (res.status === 403) throw new Error('Неверный мастер-ключ');
-    if (!res.ok) throw new Error('Не удалось забанить');
-    showStatus(status, 'Пользователь забанен', 'ok');
-    closeUserDetail();
-    loadUsers();
-  } catch(e) {
-    showStatus(status, 'Ошибка: ' + e.message, 'err');
-  }
-}
-
-async function unbanUser(discordId) {
-  const masterKey = getMasterKey();
-  if (!masterKey) { showStatus(document.getElementById('usersStatus'), 'Введи мастер-ключ (не сохраняется)', 'err'); return; }
-  if (!confirm('Снять бан с этого пользователя?')) return;
-  const status = document.getElementById('usersStatus');
-  try {
-    const res = await adminFetch(`${BOT_API}/admin/unban?discord_id=${encodeURIComponent(discordId)}`, { master: true });
-    if (res.status === 403) throw new Error('Неверный мастер-ключ');
-    if (!res.ok) throw new Error('Не удалось разбанить');
-    showStatus(status, 'Бан снят', 'ok');
-    closeUserDetail();
-    loadUsers();
-  } catch(e) {
-    showStatus(status, 'Ошибка: ' + e.message, 'err');
-  }
-}
-
-let WATCHLIST = [];
-
-async function addToWatchlist() {
-  const masterKey  = getMasterKey();
-  const status     = document.getElementById('watchlistStatus');
-  if (!masterKey) { showStatus(status, 'Введи мастер-ключ (не сохраняется)', 'err'); return; }
-  if (!apiKey)     { showStatus(status, 'Введи API-ключ бэкенда выше', 'err'); return; }
-
-  const discordId = document.getElementById('watchDiscordId').value.trim();
-  const reason    = document.getElementById('watchReason').value.trim();
-  if (!discordId) { showStatus(status, 'Впиши Discord ID', 'err'); return; }
-
-  try {
-    const res = await adminFetch(`${BOT_API}/admin/watchlist/add?discord_id=${encodeURIComponent(discordId)}&reason=${encodeURIComponent(reason)}`, { master: true });
-    if (res.status === 403) throw new Error('Неверный ключ или мастер-ключ');
-    if (!res.ok) throw new Error('Не удалось добавить в стоп-лист');
-    const data = await res.json();
-    document.getElementById('watchDiscordId').value = '';
-    document.getElementById('watchReason').value = '';
-    showStatus(status, data.auto_banned_now
-      ? 'Добавлено — этот ID уже авторизовывался, забанен прямо сейчас'
-      : 'Добавлено в стоп-лист — забанится при следующей авторизации', 'ok');
-    loadWatchlist();
-  } catch(e) {
-    showStatus(status, 'Ошибка: ' + e.message, 'err');
-  }
-}
-
-async function loadWatchlist() {
-  const status = document.getElementById('watchlistStatus');
-  const list   = document.getElementById('watchlistList');
-  if (!apiKey) { showStatus(status, 'Введи API-ключ бэкенда выше', 'err'); return; }
-
-  list.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div>';
-  showStatus(status, '', '');
-
-  try {
-    const res = await adminFetch(`${BOT_API}/admin/watchlist`);
-    if (res.status === 403) throw new Error('Неверный ключ');
-    if (!res.ok) throw new Error('Ошибка сервера');
-    const data = await res.json();
-    WATCHLIST = data.watchlist || [];
-    renderWatchlist();
-  } catch(e) {
-    list.innerHTML = '';
-    showStatus(status, 'Ошибка: ' + e.message, 'err');
-  }
-}
-
-function renderWatchlist() {
-  const list = document.getElementById('watchlistList');
-  document.getElementById('watchlistCount').textContent = WATCHLIST.length;
-
-  if (!WATCHLIST.length) {
-    list.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Стоп-лист пуст</div>';
-    return;
-  }
-
-  list.innerHTML = WATCHLIST.map(w => `
-    <div class="work-item">
-      <div class="work-info">
-        <div class="work-type">ID: ${escHtml(w.discord_id)}</div>
-        <div class="work-file">Причина: ${escHtml(w.reason || '—')}</div>
-        <div class="work-file">Добавлен: ${escHtml(w.added_at || '—')}</div>
-      </div>
-      <div class="work-del" onclick="removeFromWatchlist('${escHtml(w.discord_id)}')" title="Убрать из стоп-листа">✕</div>
-    </div>
-  `).join('');
-}
-
-async function removeFromWatchlist(discordId) {
-  const masterKey = getMasterKey();
-  const status = document.getElementById('watchlistStatus');
-  if (!masterKey) { showStatus(status, 'Введи мастер-ключ (не сохраняется)', 'err'); return; }
-  if (!confirm('Убрать этот ID из стоп-листа? (текущий бан, если уже наложен, снят не будет)')) return;
-  try {
-    const res = await adminFetch(`${BOT_API}/admin/watchlist/remove?discord_id=${encodeURIComponent(discordId)}`, { master: true });
-    if (res.status === 403) throw new Error('Неверный ключ или мастер-ключ');
-    if (!res.ok) throw new Error('Не удалось убрать из стоп-листа');
-    showStatus(status, 'Убрано из стоп-листа', 'ok');
-    loadWatchlist();
-  } catch(e) {
-    showStatus(status, 'Ошибка: ' + e.message, 'err');
-  }
-}
-
-/* ── ПЕРЕКЛЮЧЕНИЕ БАН ТАБОВ ── */
-function switchBanTab(tab) {
-  document.querySelectorAll('.ban-tab').forEach(t => t.classList.toggle('active', t.dataset.ban === tab));
-  document.getElementById('banIpContent').style.display = tab === 'ip' ? 'block' : 'none';
-  document.getElementById('banDiscordContent').style.display = tab === 'discord' ? 'block' : 'none';
-}
-
-/* ── БАН ПО IP ── */
-let BANNED_IPS = [];
-
-async function loadBannedIps() {
-  const status = document.getElementById('bannedIpsStatus');
-  const list   = document.getElementById('bannedIpsList');
-  if (!apiKey) { showStatus(status, 'Введи API-ключ бэкенда', 'err'); return; }
-
-  list.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div>';
-  showStatus(status, '', '');
-
-  try {
-    const res = await adminFetch(`${BOT_API}/admin/banned-ips`);
-    if (res.status === 403) throw new Error('Неверный ключ');
-    if (!res.ok) throw new Error('Ошибка сервера');
-    const data = await res.json();
-    BANNED_IPS = data.banned_ips || [];
-    renderBannedIps();
-  } catch(e) {
-    list.innerHTML = '';
-    showStatus(status, 'Ошибка: ' + e.message, 'err');
-  }
-}
-
-function renderBannedIps() {
-  const list = document.getElementById('bannedIpsList');
-  document.getElementById('bannedIpsCount').textContent = BANNED_IPS.length;
-
-  if (!BANNED_IPS.length) {
-    list.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Бан-лист пуст</div>';
-    return;
-  }
-
-  list.innerHTML = BANNED_IPS.map(b => `
-    <div class="work-item">
-      <div class="work-info">
-        <div class="work-type">IP: ${escHtml(b.ip)}</div>
-        <div class="work-file">Причина: ${escHtml(b.reason || '—')}</div>
-        <div class="work-file">Добавлен: ${escHtml(b.added_at || '—')}</div>
-      </div>
-      <div class="work-del" onclick="unbanIp('${escHtml(b.ip)}')" title="Разбанить IP">✕</div>
-    </div>
-  `).join('');
-}
-
-async function banIp() {
-  const masterKey = getMasterKey();
-  const status    = document.getElementById('bannedIpsStatus');
-  if (!masterKey) { showStatus(status, 'Введи мастер-ключ (не сохраняется)', 'err'); return; }
-  if (!apiKey)    { showStatus(status, 'Введи API-ключ бэкенда', 'err'); return; }
-
-  const ip     = document.getElementById('banIpInput').value.trim();
-  const reason = document.getElementById('banIpReason').value.trim();
-  if (!ip) { showStatus(status, 'Впиши IP-адрес', 'err'); return; }
-
-  try {
-    const res = await adminFetch(`${BOT_API}/admin/ban-ip?ip=${encodeURIComponent(ip)}&reason=${encodeURIComponent(reason)}`, { master: true });
-    if (res.status === 403) throw new Error('Неверный ключ или мастер-ключ');
-    if (!res.ok) throw new Error('Не удалось забанить IP');
-    document.getElementById('banIpInput').value = '';
-    document.getElementById('banIpReason').value = '';
-    showStatus(status, 'IP забанен', 'ok');
-    loadBannedIps();
-  } catch(e) {
-    showStatus(status, 'Ошибка: ' + e.message, 'err');
-  }
-}
-
-async function unbanIp(ip) {
-  const masterKey = getMasterKey();
-  const status    = document.getElementById('bannedIpsStatus');
-  if (!masterKey) { showStatus(status, 'Введи мастер-ключ (не сохраняется)', 'err'); return; }
-  if (!confirm(`Разбанить IP ${ip}?`)) return;
-  try {
-    const res = await adminFetch(`${BOT_API}/admin/unban-ip?ip=${encodeURIComponent(ip)}`, { master: true });
-    if (res.status === 403) throw new Error('Неверный ключ или мастер-ключ');
-    if (!res.ok) throw new Error('Не удалось разбанить');
-    showStatus(status, 'IP разбанен', 'ok');
-    loadBannedIps();
-  } catch(e) {
-    showStatus(status, 'Ошибка: ' + e.message, 'err');
-  }
-}
-
-async function loadMaintenance() {
-  const status = document.getElementById('maintStatus');
-  if (!apiKey) { showStatus(status, 'Введи API-ключ бэкенда на вкладке ЮЗЕРЫ', 'err'); return; }
-  showStatus(status, 'Загрузка...', 'info');
-  try {
-    const res = await fetch(`${BOT_API}/maintenance-status`);
-    if (!res.ok) throw new Error('Ошибка сервера');
-    const data = await res.json();
-    document.getElementById('maintOnChk').checked = !!data.on;
-    document.getElementById('maintOnBadge').textContent = data.on ? 'ВКЛ' : 'ВЫКЛ';
-    document.getElementById('maintTitleInput').value = data.title || '';
-    document.getElementById('maintMsgEditor').innerHTML = data.msg || '';
-    showStatus(status, '', '');
-  } catch(e) {
-    showStatus(status, 'Ошибка: ' + e.message, 'err');
-  }
-}
-
-async function saveMaintenance() {
-  const status = document.getElementById('maintStatus');
-  const btn    = document.getElementById('saveMaintBtn');
-  if (!apiKey) { showStatus(status, 'Введи API-ключ бэкенда на вкладке ЮЗЕРЫ', 'err'); return; }
-
-  const on    = document.getElementById('maintOnChk').checked ? 1 : 0;
-  const title = document.getElementById('maintTitleInput').value.trim();
-  const msg   = document.getElementById('maintMsgEditor').innerHTML.trim();
-
-  btn.disabled = true;
-  showStatus(status, 'Сохраняю...', 'info');
-  try {
-    const params = new URLSearchParams({ on: String(on) });
-    if (title) params.set('title', title);
-    if (msg)   params.set('msg', msg);
-    const res = await adminFetch(`${BOT_API}/set-maintenance?${params.toString()}`);
-    if (res.status === 403) throw new Error('Неверный API-ключ');
-    if (!res.ok) throw new Error('Не удалось сохранить');
-    const data = await res.json();
-    document.getElementById('maintOnBadge').textContent = data.on ? 'ВКЛ' : 'ВЫКЛ';
-    showStatus(status, 'Сохранено и применено на сайте!', 'ok');
-  } catch(e) {
-    showStatus(status, 'Ошибка: ' + e.message, 'err');
-  } finally {
-    btn.disabled = false;
-  }
-}
-
-/* ── ВКЛАДКА БД ── */
-let DB_CURRENT_TABLE = '';
-let DB_CURRENT_PK = '';
-let DB_CURRENT_COLUMNS = [];
-let DB_TABLES_INFO = [];
-
-const DB_TABLE_LABELS = {
-  ticket_counter:       'Счётчик тикетов',
-  order_ratings:        'Оценки заказов',
-  spun_users:           'Кто уже крутил рулетку',
-  last_winners:         'Победители рулетки',
-  authorized_users:     'Авторизованные',
-  watchlist:            'Стоп-лист (по Discord ID)',
-  banned_ips:           'Стоп-лист по IP',
-  unauthorized_visits:  'Гости',
-};
-
-function toggleDbDropdown(forceClose) {
-  const dd = document.getElementById('dbDropdown');
-  if (forceClose) { dd.classList.remove('open'); return; }
-  dd.classList.toggle('open');
-}
-document.addEventListener('click', (e) => {
-  const dd = document.getElementById('dbDropdown');
-  if (dd && !dd.contains(e.target)) dd.classList.remove('open');
-});
-
-async function loadDbTablesList() {
-  const status = document.getElementById('dbStatus');
-  const list = document.getElementById('dbDropdownList');
-  try {
-    const res = await adminFetch(`${BOT_API}/admin/db/tables`);
-    if (res.status === 403) throw new Error('Неверный API-ключ');
-    if (!res.ok) throw new Error('Не удалось получить список таблиц');
-    const data = await res.json();
-    DB_TABLES_INFO = data.tables;
-
-    list.innerHTML = data.tables.map(t => `
-      <div class="db-dropdown-item ${t.name === DB_CURRENT_TABLE ? 'selected' : ''}" onclick="selectDbTable('${escHtml(t.name)}')">
-        <span class="name">${escHtml(DB_TABLE_LABELS[t.name] || t.name)}</span>
-        <span class="meta">${escHtml(t.name)} · ключ: ${escHtml(t.pk)}</span>
-      </div>
-    `).join('');
-  } catch(e) {
-    showStatus(status, 'Ошибка: ' + e.message, 'err');
-  }
-}
-
-function selectDbTable(table) {
-  document.getElementById('dbDropdownLabel').textContent = DB_TABLE_LABELS[table] || table;
-  document.querySelectorAll('.db-dropdown-item').forEach(el => {
-    el.classList.toggle('selected', el.getAttribute('onclick') === `selectDbTable('${table}')`);
-  });
-  toggleDbDropdown(true);
-  loadDbTable(table);
-}
-
-function dbInputValue(table, colType, value) {
-  return value === null || value === undefined ? '' : String(value);
-}
-
-async function loadDbTable(tableArg) {
-  const table  = tableArg !== undefined ? tableArg : DB_CURRENT_TABLE;
-  const wrap   = document.getElementById('dbTableWrap');
-  const status = document.getElementById('dbStatus');
-  document.getElementById('dbAddForm').style.display = 'none';
-
-  if (!table) {
-    wrap.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Выбери таблицу выше</div>';
-    document.getElementById('dbRowCount').textContent = '0';
-    return;
-  }
-  if (!apiKey) { showStatus(status, 'Введи API-ключ на вкладке ЮЗЕРЫ', 'err'); return; }
-
-  wrap.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div>';
-  showStatus(status, '', '');
-
-  try {
-    const res = await adminFetch(`${BOT_API}/admin/db/${encodeURIComponent(table)}`);
-    if (res.status === 403) throw new Error('Неверный API-ключ');
-    if (!res.ok) throw new Error('Не удалось загрузить таблицу');
-    const data = await res.json();
-
-    DB_CURRENT_TABLE   = data.table;
-    DB_CURRENT_PK      = data.pk;
-    DB_CURRENT_COLUMNS = data.columns;
-
-    document.getElementById('dbRowCount').textContent = data.rows.length;
-    renderDbTable(data.rows);
-  } catch(e) {
-    wrap.innerHTML = '';
-    showStatus(status, 'Ошибка: ' + e.message, 'err');
-  }
-}
-
-function renderDbTable(rows) {
-  const wrap = document.getElementById('dbTableWrap');
-  if (!rows.length) {
-    wrap.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Таблица пуста</div>';
-    return;
-  }
-  const cols = DB_CURRENT_COLUMNS;
-  const pk = DB_CURRENT_PK;
-
-  const WIDE_COLS = ['fingerprint','avatar','comment','user_agent','ua','username','discord_id','ip','country','city','region','browser','os','ban_reason','reason','payment_method','order_type','message_id'];
-  const NARROW_COLS = ['id','rating','discount','banned','visits'];
-  function dbFieldClass(colName) {
-    const lc = colName.toLowerCase();
-    if (NARROW_COLS.includes(lc)) return 'narrow-field';
-    if (WIDE_COLS.some(w => lc.includes(w))) return 'wide-field';
-    return '';
-  }
-
-  let html = '<table class="db-table"><thead><tr>';
-  cols.forEach(c => html += `<th>${escHtml(c)}${c === pk ? ' 🔑' : ''}</th>`);
-  html += '<th>Действия</th></tr></thead><tbody>';
-
-  rows.forEach((row, i) => {
-    html += `<tr data-row="${i}">`;
-    cols.forEach(c => {
-      const val = dbInputValue(DB_CURRENT_TABLE, c, row[c]);
-      const isPk = c === pk;
-      const cls = [isPk ? 'pk-field' : '', dbFieldClass(c)].filter(Boolean).join(' ');
-      const isEmptyMsgId = (c === 'message_id' && DB_CURRENT_TABLE === 'order_ratings' && !val);
-      const ph = isEmptyMsgId ? 'В Discord: режим разработчика → ПКМ на сообщении → Copy Message ID' : '';
-      html += `<td><input class="${cls}" data-col="${escHtml(c)}" value="${escHtml(val)}" placeholder="${escHtml(ph)}" ${isPk ? 'readonly' : ''}></td>`;
-    });
-    const reviewBtn = (DB_CURRENT_TABLE === 'order_ratings' && row.message_id)
-      ? `<button class="save-btn" style="border-color:rgba(88,101,242,0.4);color:#8ea1ff" title="Редактировать отзыв в Discord" onclick="showReviewEditor('${escHtml(row.message_id)}')">💬</button>`
-      : '';
-    html += `<td class="db-row-actions">
-      ${reviewBtn}
-      <button class="save-btn" onclick="saveDbRow(${i})">💾</button>
-      <button class="del-btn" onclick="deleteDbRow(${i})">🗑️</button>
-    </td></tr>`;
-  });
-  html += '</tbody></table>';
-  wrap.innerHTML = html;
-
-  wrap._rowsData = rows;
-}
-
-async function saveDbRow(rowIndex) {
-  const status = document.getElementById('dbStatus');
-  const masterKey = getMasterKey();
-  if (!masterKey) { showStatus(status, 'Введи мастер-ключ (не сохраняется)', 'err'); return; }
-
-  const tr = document.querySelector(`tr[data-row="${rowIndex}"]`);
-  const inputs = tr.querySelectorAll('input');
-  const fields = {};
-  let pkValue = null;
-  inputs.forEach(inp => {
-    const col = inp.dataset.col;
-    if (col === DB_CURRENT_PK) { pkValue = inp.value; return; }
-    fields[col] = inp.value;
-  });
-
-  try {
-    const res = await adminFetch(`${BOT_API}/admin/db/${encodeURIComponent(DB_CURRENT_TABLE)}/update`, {
-      master: true, method: 'POST', body: { pk_value: pkValue, fields }
-    });
-    if (res.status === 403) throw new Error('Неверный мастер-ключ');
-    if (!res.ok) { const d = await res.json().catch(()=>({})); throw new Error(d.error || 'Не удалось сохранить'); }
-    showStatus(status, 'Строка сохранена', 'ok');
-  } catch(e) {
-    showStatus(status, 'Ошибка: ' + e.message, 'err');
-  }
-}
-
-async function deleteDbRow(rowIndex) {
-  const status = document.getElementById('dbStatus');
-  const masterKey = getMasterKey();
-  if (!masterKey) { showStatus(status, 'Введи мастер-ключ (не сохраняется)', 'err'); return; }
-  if (!confirm('Удалить эту строку из таблицы "' + DB_CURRENT_TABLE + '" безвозвратно?')) return;
-
-  const tr = document.querySelector(`tr[data-row="${rowIndex}"]`);
-  const pkInput = tr.querySelector(`input[data-col="${DB_CURRENT_PK}"]`);
-  const pkValue = pkInput.value;
-
-  try {
-    const res = await adminFetch(`${BOT_API}/admin/db/${encodeURIComponent(DB_CURRENT_TABLE)}/delete?pk_value=${encodeURIComponent(pkValue)}`, { master: true });
-    if (res.status === 403) throw new Error('Неверный мастер-ключ');
-    if (!res.ok) { const d = await res.json().catch(()=>({})); throw new Error(d.error || 'Не удалось удалить'); }
-    showStatus(status, 'Строка удалена', 'ok');
-    loadDbTable();
-  } catch(e) {
-    showStatus(status, 'Ошибка: ' + e.message, 'err');
-  }
-}
-
-function toggleDbAddForm() {
-  const form = document.getElementById('dbAddForm');
-  if (!DB_CURRENT_TABLE) { showStatus(document.getElementById('dbStatus'), 'Сначала выбери таблицу', 'err'); return; }
-  if (form.style.display === 'block') { form.style.display = 'none'; return; }
-
-  form.innerHTML = DB_CURRENT_COLUMNS.map(c => `
-    <label style="font-size:8px">${escHtml(c)}${c === DB_CURRENT_PK ? ' (можно оставить пустым для автономера)' : ''}</label>
-    <input type="text" data-newcol="${escHtml(c)}" placeholder="${escHtml(c)}">
-  `).join('') + `<button class="btn btn-sm" onclick="createDbRow()" style="margin-top:8px">Создать строку</button>`;
-  form.style.display = 'block';
-}
-
-async function createDbRow() {
-  const status = document.getElementById('dbStatus');
-  const masterKey = getMasterKey();
-  if (!masterKey) { showStatus(status, 'Введи мастер-ключ (не сохраняется)', 'err'); return; }
-
-  const inputs = document.querySelectorAll('#dbAddForm input[data-newcol]');
-  const fields = {};
-  inputs.forEach(inp => { fields[inp.dataset.newcol] = inp.value; });
-
-  try {
-    const res = await adminFetch(`${BOT_API}/admin/db/${encodeURIComponent(DB_CURRENT_TABLE)}/insert`, {
-      master: true, method: 'POST', body: { pk_value: '', fields }
-    });
-    if (res.status === 403) throw new Error('Неверный мастер-ключ');
-    if (!res.ok) { const d = await res.json().catch(()=>({})); throw new Error(d.error || 'Не удалось создать строку'); }
-    showStatus(status, 'Строка создана', 'ok');
-    document.getElementById('dbAddForm').style.display = 'none';
-    loadDbTable();
-  } catch(e) {
-    showStatus(status, 'Ошибка: ' + e.message, 'err');
-  }
-}
-
-
-async function loadCategories() {
-  const status = document.getElementById('catStatus');
-  try {
-    const res = await adminFetch(BOT_API + '/admin/categories');
-    if (!res.ok) throw new Error('Не удалось загрузить');
-    const data = await res.json();
-    const list = document.getElementById('categoriesList');
-    if (!data.categories || data.categories.length === 0) {
-      list.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Нет категорий</div>';
-      return;
-    }
-    list.innerHTML = data.categories.map(c => `
-      <div class="work-item" style="${c.is_active ? '' : 'opacity:0.5'}">
-        <div style="flex:1;min-width:0">
-          <div class="work-type">${c.emoji || ''} ${escHtml(c.label)} <span style="color:rgba(255,200,200,0.3)">(${escHtml(c.name)})</span></div>
-          <div class="work-file">Базовая цена: ${c.base_price} ₽</div>
-        </div>
-        <button class="btn btn-sm" onclick="toggleCategory(${c.id}, ${c.is_active ? 0 : 1})" style="width:auto;border-color:rgba(255,200,0,0.3);color:#ffcc00">${c.is_active ? 'Выкл' : 'Вкл'}</button>
-        <button class="btn btn-sm" onclick="deleteCategory(${c.id})" style="width:auto;border-color:rgba(255,0,0,0.4);color:#ff5555">✕</button>
-      </div>
-    `).join('');
-    showStatus(status, 'Загружено', 'ok');
-  } catch(e) {
-    showStatus(status, 'Ошибка: ' + e.message, 'err');
-  }
-}
-
-async function addCategory() {
-  const status = document.getElementById('catStatus');
-  const masterKey = getMasterKey();
-  if (!masterKey) { showStatus(status, 'Введи мастер-ключ', 'err'); return; }
-  const name = document.getElementById('catNameInput').value.trim();
-  const label = document.getElementById('catLabelInput').value.trim();
-  const emoji = document.getElementById('catEmojiInput').value.trim();
-  const base_price = parseInt(document.getElementById('catPriceInput').value) || 0;
-  if (!name || !label) { showStatus(status, 'Заполни name и название', 'err'); return; }
-  try {
-    const res = await adminFetch(BOT_API + '/admin/categories/add', {
-      master: true, method: 'POST', body: { name, label, emoji, base_price }
-    });
-    if (res.status === 403) throw new Error('Неверный мастер-ключ');
-    if (!res.ok) { const d = await res.json().catch(()=>({})); throw new Error(d.error || 'Ошибка'); }
-    document.getElementById('catNameInput').value = '';
-    document.getElementById('catLabelInput').value = '';
-    document.getElementById('catEmojiInput').value = '';
-    document.getElementById('catPriceInput').value = '';
-    showStatus(status, 'Категория добавлена', 'ok');
-    loadCategories();
-  } catch(e) {
-    showStatus(status, 'Ошибка: ' + e.message, 'err');
-  }
-}
-
-async function toggleCategory(catId, isActive) {
-  const status = document.getElementById('catStatus');
-  const masterKey = getMasterKey();
-  if (!masterKey) { showStatus(status, 'Введи мастер-ключ', 'err'); return; }
-  try {
-    const res = await adminFetch(BOT_API + '/admin/categories/toggle?cat_id=' + catId + '&is_active=' + isActive, { master: true });
-    if (res.status === 403) throw new Error('Неверный мастер-ключ');
-    if (!res.ok) throw new Error('Ошибка');
-    loadCategories();
-  } catch(e) {
-    showStatus(status, 'Ошибка: ' + e.message, 'err');
-  }
-}
-
-async function deleteCategory(catId) {
-  const status = document.getElementById('catStatus');
-  const masterKey = getMasterKey();
-  if (!masterKey) { showStatus(status, 'Введи мастер-ключ', 'err'); return; }
-  try {
-    const res = await adminFetch(BOT_API + '/admin/categories/delete?cat_id=' + catId, { master: true });
-    if (res.status === 403) throw new Error('Неверный мастер-ключ');
-    if (!res.ok) throw new Error('Ошибка');
-    loadCategories();
-  } catch(e) {
-    showStatus(status, 'Ошибка: ' + e.message, 'err');
-  }
-}
-
-async function searchOrders() {
-  const status = document.getElementById('ordersSearchStatus');
-  const query = document.getElementById('orderSearchInput').value.trim();
-  if (!query) { showStatus(status, 'Введи данные для поиска', 'err'); return; }
-  try {
-    const res = await adminFetch(BOT_API + '/admin/order-search?q=' + encodeURIComponent(query));
-    if (!res.ok) throw new Error('Ошибка поиска');
-    const data = await res.json();
-    const list = document.getElementById('ordersSearchList');
-    if (!data.users || data.users.length === 0) {
-      list.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Ничего не найдено</div>';
-      showStatus(status, 'Не найдено', 'info');
-      return;
-    }
-    list.innerHTML = data.users.flatMap(function(u) {
-      return (u.orders || []).map(function(o) {
-        return '<div class="work-item">' +
-          '<div style="flex:1;min-width:0">' +
-            '<div class="work-type">Заказ #' + o.id + ' · ' + (o.category || '—') + '</div>' +
-            '<div class="work-file">' + (o.status || '—') + ' · ' + (o.created_at || '—') + ' · ' + (o.estimated_price || '?') + '₽</div>' +
-          '</div>' +
-          '<a class="btn btn-sm" href="/mezets.design/order/?id=' + o.id + '" target="_blank" style="width:auto;border-color:rgba(88,101,242,0.4);color:#8ea1ff">Чат</a>' +
-        '</div>';
-      });
-    }).join('');
-    showStatus(status, 'Найдено пользователей: ' + data.users.length, 'ok');
-  } catch(e) {
-    showStatus(status, 'Ошибка: ' + e.message, 'err');
-  }
-}
-
-function getMasterKey() {
-  var stored = sessionStorage.getItem('mezets_admin_master_key');
-  if (stored) return stored;
-  var key = prompt('Введите мастер-ключ:');
-  if (key) sessionStorage.setItem('mezets_admin_master_key', key);
-  return key;
-}
-
-function adminFetch(url, opts) {
-  opts = opts || {};
-  var adminKey = getAdminKey();
-  var headers = { 'X-Admin-Key': adminKey };
-  if (opts.master) {
-    var mk = getMasterKey();
-    if (mk) headers['X-Master-Key'] = mk;
-  }
-  if (opts.method === 'POST') {
-    headers['Content-Type'] = 'application/json';
-    return fetch(url, { method: 'POST', headers: headers, body: JSON.stringify(opts.body) });
-  }
-  return fetch(url, { headers: headers });
-}
+document.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>
