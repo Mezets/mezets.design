@@ -158,7 +158,7 @@ checkMaintenance();
 setInterval(checkMaintenance, 60000);
 
 // --- PAYMENT_METHODS_START ---
-const PAYMENT_METHODS = [
+var PAYMENT_METHODS = [
   {"key": "sbp", "label": "СБП"},
   {"key": "card", "label": "Карта"},
   {"key": "steam_gift", "label": "Подарок Steam"},
