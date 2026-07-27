@@ -1255,7 +1255,66 @@
       border-color: rgba(255,0,0,0.45);
       box-shadow: 0 0 14px rgba(255,0,0,0.1);
     }
-    .order-textarea { height: 80px; }
+    .order-textarea { height: 80px; }    .order-select {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: rgba(255,0,0,0.05);
+      border: 1px solid rgba(255,0,0,0.2);
+      color: rgba(255,220,220,0.9);
+      font-family: 'Press Start 2P', monospace;
+      font-size: 8px;
+      line-height: 1.6;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+      cursor: pointer;
+    }
+    .order-select option { background: #1a0505; color: rgba(255,220,220,0.9); }
+    .order-payment-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .order-payment-option {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,0,0,0.18);
+      background: rgba(255,0,0,0.04);
+      cursor: pointer;
+      font-size: 7px;
+      color: rgba(255,220,220,0.8);
+      transition: border-color .2s, background .2s;
+      flex: 1;
+      min-width: 100px;
+      line-height: 1.6;
+    }
+    .order-payment-option:hover {
+      border-color: rgba(255,0,0,0.4);
+      background: rgba(255,0,0,0.08);
+    }
+    .order-payment-option input { accent-color: #ff2a2a; margin: 0; }
+    .order-item-cb {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,0,0,0.13);
+      background: rgba(255,0,0,0.03);
+      cursor: pointer;
+      font-size: 6px;
+      color: rgba(255,220,220,0.75);
+      transition: border-color .2s, background .2s;
+      line-height: 1.6;
+    }
+    .order-item-cb:hover {
+      border-color: rgba(255,0,0,0.35);
+      background: rgba(255,0,0,0.07);
+    }
+    .order-item-cb input { accent-color: #ff2a2a; margin: 0; width: 10px; height: 10px; }
 
     .order-submit {
       display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -2920,6 +2979,8 @@
     }
     document.getElementById('orderChoiceStep').style.display = 'none';
     document.getElementById('orderFormStep').style.display = 'block';
+    document.getElementById('orderNotLogged').style.display = 'none';
+    document.getElementById('orderPriceEst').style.display = 'block';
   }
   function backToOrderChoice() {
     document.getElementById('orderChoiceStep').style.display = 'block';
@@ -2957,7 +3018,7 @@
       const data = await res.json();
       if (data.status === 'ok') {
         const oid = data.order.id;
-        status.innerHTML = 'Заказ #' + oid + ' создан! Перейти в <a href="/mezets.design/order/chat.html?id=' + oid + '" style="color:#ff5555">чат</a>';
+        status.innerHTML = 'Заказ #' + oid + ' создан! Перейти в <a href="/mezets.design/order/?id=' + oid + '" style="color:#ff5555">чат</a>';
         status.className = 'order-status ok';
         document.getElementById('orderDesc').value = '';
         btn.textContent = 'Отправлено ✓';
