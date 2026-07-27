@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
@@ -482,7 +482,11 @@
     }
     @keyframes moveFluff1 { 0% { transform: translate(5vw, 10vh); } 50% { transform: translate(55vw, 50vh); } 100% { transform: translate(5vw, 10vh); } }
     @keyframes moveFluff2 { 0% { transform: translate(70vw, 70vh); } 50% { transform: translate(10vw, 40vh); } 100% { transform: translate(70vw, 70vh); } }
-  </style>
+      @keyframes msgIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+</style>
 </head>
 <body>
 
@@ -536,6 +540,7 @@
       <button class="tab" onclick="switchTab('prices')">💰 ЦЕНЫ</button>
       <button class="tab" onclick="switchTab('rules')">📜 ПРАВИЛА</button>
       <button class="tab" onclick="switchTab('users')">👤 ЮЗЕРЫ</button>
+      <button class="tab" onclick="switchTab('orders')">📦 ЗАКАЗЫ</button>
       <button class="tab" onclick="switchTab('maint')">🛠️ ТЕХРАБОТЫ</button>
       <button class="tab" onclick="switchTab('db')">🗄️ БД</button>
     </div>
@@ -753,38 +758,58 @@
         <div id="userDetailBody"></div>
       </div>
     </div>
+<div id="tabOrders" class="tab-panel">
 
-	    <div id="tabUsers" class="tab-panel" style="display:block">
-	    <div class="card" id="categoriesCard">
-	      <div class="card-title">КАТЕГОРИИ ЗАКАЗОВ</div>
+      <div class="card">
+        <div class="card-title">📦 КАТЕГОРИИ ЗАКАЗОВ</div>
+        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+          <input type="text" id="catNameInput" placeholder="name (key)" style="flex:1;font-size:7px;min-width:80px">
+          <input type="text" id="catLabelInput" placeholder="Название" style="flex:1;font-size:7px;min-width:80px">
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+          <input type="text" id="catEmojiInput" placeholder="emoji" style="width:60px;font-size:7px;text-align:center">
+          <input type="number" id="catPriceInput" placeholder="500" style="width:80px;font-size:7px">
+          <button class="btn btn-sm" onclick="addCategory()" style="flex:1;min-width:80px;border-color:rgba(0,200,0,0.35);color:#55ff55">Добавить</button>
+        </div>
+        <button class="btn btn-sm" onclick="loadCategories()">Обновить список</button>
+        <div id="categoriesList" class="works-list" style="margin-top:14px">
+          <div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div>
+        </div>
+        <div class="status" id="catStatus"></div>
+      </div>
 
-	      <div style="display:flex;gap:8px;margin-bottom:14px">
-	        <input type="text" id="catNameInput" placeholder="name (key)" style="flex:1;font-size:7px">
-	        <input type="text" id="catLabelInput" placeholder="Название" style="flex:1;font-size:7px">
-	      </div>
-	      <div style="display:flex;gap:8px;margin-bottom:14px">
-	        <input type="text" id="catEmojiInput" placeholder="emoji" style="width:60px;font-size:7px;text-align:center">
-	        <input type="number" id="catPriceInput" placeholder="500" style="width:80px;font-size:7px">
-	        <button class="btn btn-sm" onclick="addCategory()" style="flex:1;border-color:rgba(0,200,0,0.35);color:#55ff55">Добавить</button>
-	      </div>
+      <div class="card">
+        <div class="card-title">📋 ВСЕ ЗАКАЗЫ <span class="badge" id="ordersCount">0</span></div>
+        <div style="display:flex;gap:8px;margin-bottom:14px">
+          <input type="text" id="orderSearchInput" placeholder="Ник, Discord ID или IP" style="flex:1;font-size:7px">
+          <button class="btn btn-sm" onclick="searchOrders()" style="width:auto">Найти</button>
+          <button class="btn btn-sm" onclick="loadOrders()" style="width:auto">Все</button>
+        </div>
+        <div id="ordersList" class="works-list" style="max-height:400px;overflow-y:auto">
+          <div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2;text-align:center;padding:20px">Загрузка...</div>
+        </div>
+        <div class="status" id="ordersSearchStatus"></div>
+<!-- Order chat modal -->
+      <div id="orderChatOverlay" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(5,0,0,0.88);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px">
+        <div style="background:rgba(12,0,0,0.95);border:1px solid rgba(255,0,0,0.25);border-radius:18px;max-width:640px;width:100%;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 0 60px rgba(255,0,0,0.15)">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px 12px;border-bottom:1px solid rgba(255,0,0,0.12)">
+            <div>
+              <div style="font-size:11px;color:#ff2a2a;letter-spacing:1px" id="chatOrderTitle">Заказ #—</div>
+              <div style="font-size:7px;color:rgba(255,200,200,0.4);margin-top:4px" id="chatOrderMeta"></div>
+            </div>
+            <button class="btn btn-sm" onclick="closeOrderChat()" style="width:auto;font-size:9px">✕</button>
+          </div>
+          <div id="chatMessages" style="flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:8px;min-height:200px;max-height:50vh"></div>
+          <div style="display:flex;gap:8px;padding:12px 20px 18px;border-top:1px solid rgba(255,0,0,0.12)">
+            <input type="text" id="chatMsgInput" placeholder="Ответить..." style="flex:1;background:rgba(255,0,0,0.05);border:1px solid rgba(255,0,0,0.2);border-radius:10px;padding:12px 14px;font-family:'Press Start 2P',monospace;font-size:7px;color:rgba(255,220,220,0.9);outline:none;line-height:1.6" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();adminSendMsg()}">
+            <button class="btn btn-sm" onclick="adminSendMsg()" style="width:auto;font-size:9px">→</button>
+          </div>
+        </div>
+      </div>
 
-	      <button class="btn btn-sm" onclick="loadCategories()">Обновить список</button>
-	      <div id="categoriesList" class="works-list" style="margin-top:14px">
-	        <div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div>
-	      </div>
-	      <div class="status" id="catStatus"></div>
-	    </div>
+    </div>
+  </div>
 
-	    <div class="card" id="ordersSearchCard">
-	      <div class="card-title">ПОИСК ЗАКАЗОВ</div>
-	      <input type="text" id="orderSearchInput" placeholder="Ник, Discord ID или IP пользователя">
-	      <button class="btn btn-sm" onclick="searchOrders()">Найти</button>
-	      <div id="ordersSearchList" class="works-list" style="margin-top:14px">
-	        <div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Введи данные пользователя для поиска</div>
-	      </div>
-	      <div class="status" id="ordersSearchStatus"></div>
-	    </div>
-	    </div>
     <div id="tabMaint" class="tab-panel">
       <div class="card">
         <div class="card-title">🛠️ ТОСТ ТЕХ. НЕПОЛАДОК <span class="badge" id="maintOnBadge">—</span></div>
@@ -1015,16 +1040,17 @@ function enterUsersGate() {
 }
 
 function switchTab(tab) {
-  const order = ['upload','manage','prices','rules','users','maint','db'];
+  const order = ['upload','manage','prices','rules','users','orders','maint','db'];
   const tabButtons = document.querySelectorAll('.tab');
   tabButtons.forEach((t,i) => t.classList.toggle('active', order[i]===tab));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
-  document.querySelector('.wrap').classList.toggle('wrap-wide', tab === 'users' || tab === 'db');
+  document.querySelector('.wrap').classList.toggle('wrap-wide', tab === 'users' || tab === 'orders' || tab === 'db');
   if (tab === 'manage') loadWorks();
   if (tab === 'prices') loadPrices();
   if (tab === 'rules') loadRules();
   if (tab === 'users' && apiKey) { loadUsers(); loadUnauthUsers(); loadWatchlist(); loadBannedIps(); }
+  if (tab === 'orders' && apiKey) { loadOrders(); loadCategories(); }
   if (tab === 'maint' && apiKey) loadMaintenance();
   if (tab === 'db' && apiKey) loadDbTablesList();
 }
@@ -1883,7 +1909,6 @@ function renderUnauthUsers() {
     `;
   }).join('');
 }
-
 function getMasterKey() {
   return document.getElementById('masterKeyInput').value.trim();
 }
@@ -2682,7 +2707,7 @@ async function searchOrders() {
     const res = await adminFetch(BOT_API + '/admin/order-search?q=' + encodeURIComponent(query));
     if (!res.ok) throw new Error('Ошибка поиска');
     const data = await res.json();
-    const list = document.getElementById('ordersSearchList');
+    const list = document.getElementById('ordersList');
     if (!data.users || data.users.length === 0) {
       list.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Ничего не найдено</div>';
       showStatus(status, 'Не найдено', 'info');
@@ -2704,6 +2729,131 @@ async function searchOrders() {
     showStatus(status, 'Ошибка: ' + e.message, 'err');
   }
 }
+let ACTIVE_CHAT_ORDER_ID = null;
+let CHAT_POLL_TIMER = null;
+
+async function loadOrders() {
+  const container = document.getElementById('ordersList');
+  const badge = document.getElementById('ordersCount');
+  try {
+    const res = await adminFetch(BOT_API + '/admin/orders?limit=100');
+    if (!res.ok) { container.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);text-align:center;padding:20px">Ошибка загрузки</div>'; return; }
+    const data = await res.json();
+    if (!data.orders || !data.orders.length) {
+      container.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);text-align:center;padding:20px">Нет заказов</div>';
+      if (badge) badge.textContent = '0';
+      return;
+    }
+    if (badge) badge.textContent = data.orders.length;
+    const statusLabels = { 'new': 'Новый', 'in_progress': 'В работе', 'completed': 'Выполнен', 'cancelled': 'Отменён' };
+    container.innerHTML = data.orders.map(function(o) {
+      var statusClass = 'status-' + (o.status || 'new');
+      var label = statusLabels[o.status] || o.status;
+      return '<div class="work-item" style="cursor:pointer" onclick="openOrderChat(' + o.id + ')">' +
+        '<div style="flex:1;min-width:0">' +
+          '<div class="work-type">#' + o.id + ' · ' + escHtml(o.category || '—') + '</div>' +
+          '<div class="work-file">' + escHtml(o.username || '—') + ' · <span class="' + statusClass + '">' + label + '</span> · ' + (o.created_at || '').slice(0,10) + ' · ' + (o.estimated_price || '?') + '₽</div>' +
+        '</div>' +
+        '<span style="color:rgba(255,150,150,0.4);font-size:9px">→</span>' +
+      '</div>';
+    }).join('');
+  } catch(e) {
+    container.innerHTML = '<div style="font-size:7px;color:rgba(255,100,100,0.5);text-align:center;padding:20px">Ошибка: ' + e.message + '</div>';
+  }
+}
+
+async function openOrderChat(orderId) {
+  ACTIVE_CHAT_ORDER_ID = orderId;
+  var overlay = document.getElementById('orderChatOverlay');
+  overlay.style.display = 'flex';
+  document.getElementById('chatMsgInput').value = '';
+
+  try {
+    var res = await adminFetch(BOT_API + '/admin/order/' + orderId);
+    if (!res.ok) throw new Error('not found');
+    var data = await res.json();
+    var o = data.order || {};
+    document.getElementById('chatOrderTitle').textContent = 'Заказ #' + o.id;
+    var statusLabels = { 'new': 'Новый', 'in_progress': 'В работе', 'completed': 'Выполнен', 'cancelled': 'Отменён' };
+    var meta = (o.category || '—') + ' · ' + (statusLabels[o.status] || o.status) + ' · ' + (o.estimated_price || '?') + '₽ · ' + (o.created_at || '').slice(0,10);
+    document.getElementById('chatOrderMeta').textContent = meta;
+    renderChatMessages(data.messages || [], data.attachments || []);
+  } catch(e) {
+    document.getElementById('chatMessages').innerHTML = '<div style="font-size:8px;color:rgba(255,100,100,0.5);text-align:center;padding:40px">Не удалось загрузить чат</div>';
+  }
+
+  // Start polling
+  if (CHAT_POLL_TIMER) clearInterval(CHAT_POLL_TIMER);
+  CHAT_POLL_TIMER = setInterval(pollChatMessages, 3000);
+}
+
+function closeOrderChat() {
+  ACTIVE_CHAT_ORDER_ID = null;
+  document.getElementById('orderChatOverlay').style.display = 'none';
+  if (CHAT_POLL_TIMER) { clearInterval(CHAT_POLL_TIMER); CHAT_POLL_TIMER = null; }
+}
+
+async function pollChatMessages() {
+  if (!ACTIVE_CHAT_ORDER_ID) return;
+  try {
+    var res = await adminFetch(BOT_API + '/admin/order/' + ACTIVE_CHAT_ORDER_ID);
+    if (!res.ok) return;
+    var data = await res.json();
+    renderChatMessages(data.messages || [], data.attachments || []);
+  } catch(e) {}
+}
+
+function renderChatMessages(messages, attachments) {
+  var box = document.getElementById('chatMessages');
+  if (!messages || !messages.length) {
+    box.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);text-align:center;padding:30px">Сообщений пока нет</div>';
+    return;
+  }
+  var attMap = {};
+  if (attachments) attachments.forEach(function(a) {
+    if (a.message_id) {
+      if (!attMap[a.message_id]) attMap[a.message_id] = [];
+      attMap[a.message_id].push(a);
+    }
+  });
+  box.innerHTML = messages.map(function(m) {
+    var isAdmin = m.author_id === 'admin';
+    var isUser = !m.from_discord && !isAdmin;
+    var atts = attMap[m.id] || [];
+    var attHtml = atts.length ? '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">' + atts.map(function(a) {
+      return '<a href="' + a.discord_url + '" target="_blank" style="font-size:6px;padding:3px 7px;border-radius:5px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(200,200,255,0.7);text-decoration:none">' + (a.filename || 'файл') + ' ↓</a>';
+    }).join('') + '</div>' : '';
+    var align = isAdmin ? 'flex-end' : 'flex-start';
+    var bg = isAdmin ? 'rgba(88,101,242,0.12)' : isUser ? 'rgba(255,0,0,0.08)' : 'rgba(255,255,255,0.04)';
+    var border = isAdmin ? 'rgba(88,101,242,0.2)' : isUser ? 'rgba(255,0,0,0.18)' : 'rgba(255,255,255,0.08)';
+    var author = isAdmin ? '👑 Администратор' : isUser ? '👤 ' + (m.author || 'Пользователь') : '🤖 ' + (m.author || 'Discord');
+    var time = m.created_at ? m.created_at.slice(11, 19) : '';
+    return '<div style="align-self:' + align + ';max-width:80%;padding:10px 14px;border-radius:12px;background:' + bg + ';border:1px solid ' + border + ';animation:msgIn .2s ease">' +
+      '<div style="font-size:6px;color:rgba(255,200,200,0.4);margin-bottom:4px">' + author + '</div>' +
+      '<div style="font-size:7px;color:rgba(255,220,220,0.9);line-height:1.6;font-family:sans-serif;word-break:break-word">' + escHtml(m.content || '') + '</div>' +
+      attHtml +
+      '<div style="font-size:5px;color:rgba(255,150,150,0.3);margin-top:4px;text-align:right;font-family:monospace">' + time + '</div>' +
+    '</div>';
+  }).join('');
+  box.scrollTop = box.scrollHeight;
+}
+
+async function adminSendMsg() {
+  var input = document.getElementById('chatMsgInput');
+  var content = input.value.trim();
+  if (!content || !ACTIVE_CHAT_ORDER_ID) return;
+  input.disabled = true;
+  try {
+    await adminFetch(BOT_API + '/admin/order/' + ACTIVE_CHAT_ORDER_ID + '/message', {
+      method: 'POST', body: { content: content }
+    });
+    input.value = '';
+    await pollChatMessages();
+  } catch(e) {}
+  input.disabled = false;
+  input.focus();
+}
+
 
 function getMasterKey() {
   var stored = sessionStorage.getItem('mezets_admin_master_key');
