@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
@@ -754,6 +754,37 @@
       </div>
     </div>
 
+	    <div id="tabUsers" class="tab-panel" style="display:block">
+	    <div class="card" id="categoriesCard">
+	      <div class="card-title">КАТЕГОРИИ ЗАКАЗОВ</div>
+
+	      <div style="display:flex;gap:8px;margin-bottom:14px">
+	        <input type="text" id="catNameInput" placeholder="name (key)" style="flex:1;font-size:7px">
+	        <input type="text" id="catLabelInput" placeholder="Название" style="flex:1;font-size:7px">
+	      </div>
+	      <div style="display:flex;gap:8px;margin-bottom:14px">
+	        <input type="text" id="catEmojiInput" placeholder="emoji" style="width:60px;font-size:7px;text-align:center">
+	        <input type="number" id="catPriceInput" placeholder="500" style="width:80px;font-size:7px">
+	        <button class="btn btn-sm" onclick="addCategory()" style="flex:1;border-color:rgba(0,200,0,0.35);color:#55ff55">Добавить</button>
+	      </div>
+
+	      <button class="btn btn-sm" onclick="loadCategories()">Обновить список</button>
+	      <div id="categoriesList" class="works-list" style="margin-top:14px">
+	        <div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div>
+	      </div>
+	      <div class="status" id="catStatus"></div>
+	    </div>
+
+	    <div class="card" id="ordersSearchCard">
+	      <div class="card-title">ПОИСК ЗАКАЗОВ</div>
+	      <input type="text" id="orderSearchInput" placeholder="Ник, Discord ID или IP пользователя">
+	      <button class="btn btn-sm" onclick="searchOrders()">Найти</button>
+	      <div id="ordersSearchList" class="works-list" style="margin-top:14px">
+	        <div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Введи данные пользователя для поиска</div>
+	      </div>
+	      <div class="status" id="ordersSearchStatus"></div>
+	    </div>
+	    </div>
     <div id="tabMaint" class="tab-panel">
       <div class="card">
         <div class="card-title">🛠️ ТОСТ ТЕХ. НЕПОЛАДОК <span class="badge" id="maintOnBadge">—</span></div>
@@ -2561,6 +2592,141 @@ async function createDbRow() {
   }
 }
 
+
+async function loadCategories() {
+  const status = document.getElementById('catStatus');
+  try {
+    const res = await adminFetch(BOT_API + '/admin/categories');
+    if (!res.ok) throw new Error('Не удалось загрузить');
+    const data = await res.json();
+    const list = document.getElementById('categoriesList');
+    if (!data.categories || data.categories.length === 0) {
+      list.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Нет категорий</div>';
+      return;
+    }
+    list.innerHTML = data.categories.map(c => `
+      <div class="work-item" style="${c.is_active ? '' : 'opacity:0.5'}">
+        <div style="flex:1;min-width:0">
+          <div class="work-type">${c.emoji || ''} ${escHtml(c.label)} <span style="color:rgba(255,200,200,0.3)">(${escHtml(c.name)})</span></div>
+          <div class="work-file">Базовая цена: ${c.base_price} ₽</div>
+        </div>
+        <button class="btn btn-sm" onclick="toggleCategory(${c.id}, ${c.is_active ? 0 : 1})" style="width:auto;border-color:rgba(255,200,0,0.3);color:#ffcc00">${c.is_active ? 'Выкл' : 'Вкл'}</button>
+        <button class="btn btn-sm" onclick="deleteCategory(${c.id})" style="width:auto;border-color:rgba(255,0,0,0.4);color:#ff5555">✕</button>
+      </div>
+    `).join('');
+    showStatus(status, 'Загружено', 'ok');
+  } catch(e) {
+    showStatus(status, 'Ошибка: ' + e.message, 'err');
+  }
+}
+
+async function addCategory() {
+  const status = document.getElementById('catStatus');
+  const masterKey = getMasterKey();
+  if (!masterKey) { showStatus(status, 'Введи мастер-ключ', 'err'); return; }
+  const name = document.getElementById('catNameInput').value.trim();
+  const label = document.getElementById('catLabelInput').value.trim();
+  const emoji = document.getElementById('catEmojiInput').value.trim();
+  const base_price = parseInt(document.getElementById('catPriceInput').value) || 0;
+  if (!name || !label) { showStatus(status, 'Заполни name и название', 'err'); return; }
+  try {
+    const res = await adminFetch(BOT_API + '/admin/categories/add', {
+      master: true, method: 'POST', body: { name, label, emoji, base_price }
+    });
+    if (res.status === 403) throw new Error('Неверный мастер-ключ');
+    if (!res.ok) { const d = await res.json().catch(()=>({})); throw new Error(d.error || 'Ошибка'); }
+    document.getElementById('catNameInput').value = '';
+    document.getElementById('catLabelInput').value = '';
+    document.getElementById('catEmojiInput').value = '';
+    document.getElementById('catPriceInput').value = '';
+    showStatus(status, 'Категория добавлена', 'ok');
+    loadCategories();
+  } catch(e) {
+    showStatus(status, 'Ошибка: ' + e.message, 'err');
+  }
+}
+
+async function toggleCategory(catId, isActive) {
+  const status = document.getElementById('catStatus');
+  const masterKey = getMasterKey();
+  if (!masterKey) { showStatus(status, 'Введи мастер-ключ', 'err'); return; }
+  try {
+    const res = await adminFetch(BOT_API + '/admin/categories/toggle?cat_id=' + catId + '&is_active=' + isActive, { master: true });
+    if (res.status === 403) throw new Error('Неверный мастер-ключ');
+    if (!res.ok) throw new Error('Ошибка');
+    loadCategories();
+  } catch(e) {
+    showStatus(status, 'Ошибка: ' + e.message, 'err');
+  }
+}
+
+async function deleteCategory(catId) {
+  const status = document.getElementById('catStatus');
+  const masterKey = getMasterKey();
+  if (!masterKey) { showStatus(status, 'Введи мастер-ключ', 'err'); return; }
+  try {
+    const res = await adminFetch(BOT_API + '/admin/categories/delete?cat_id=' + catId, { master: true });
+    if (res.status === 403) throw new Error('Неверный мастер-ключ');
+    if (!res.ok) throw new Error('Ошибка');
+    loadCategories();
+  } catch(e) {
+    showStatus(status, 'Ошибка: ' + e.message, 'err');
+  }
+}
+
+async function searchOrders() {
+  const status = document.getElementById('ordersSearchStatus');
+  const query = document.getElementById('orderSearchInput').value.trim();
+  if (!query) { showStatus(status, 'Введи данные для поиска', 'err'); return; }
+  try {
+    const res = await adminFetch(BOT_API + '/admin/order-search?q=' + encodeURIComponent(query));
+    if (!res.ok) throw new Error('Ошибка поиска');
+    const data = await res.json();
+    const list = document.getElementById('ordersSearchList');
+    if (!data.users || data.users.length === 0) {
+      list.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Ничего не найдено</div>';
+      showStatus(status, 'Не найдено', 'info');
+      return;
+    }
+    list.innerHTML = data.users.flatMap(function(u) {
+      return (u.orders || []).map(function(o) {
+        return '<div class="work-item">' +
+          '<div style="flex:1;min-width:0">' +
+            '<div class="work-type">Заказ #' + o.id + ' · ' + (o.category || '—') + '</div>' +
+            '<div class="work-file">' + (o.status || '—') + ' · ' + (o.created_at || '—') + ' · ' + (o.estimated_price || '?') + '₽</div>' +
+          '</div>' +
+          '<a class="btn btn-sm" href="/mezets.design/order/?id=' + o.id + '" target="_blank" style="width:auto;border-color:rgba(88,101,242,0.4);color:#8ea1ff">Чат</a>' +
+        '</div>';
+      });
+    }).join('');
+    showStatus(status, 'Найдено пользователей: ' + data.users.length, 'ok');
+  } catch(e) {
+    showStatus(status, 'Ошибка: ' + e.message, 'err');
+  }
+}
+
+function getMasterKey() {
+  var stored = sessionStorage.getItem('mezets_admin_master_key');
+  if (stored) return stored;
+  var key = prompt('Введите мастер-ключ:');
+  if (key) sessionStorage.setItem('mezets_admin_master_key', key);
+  return key;
+}
+
+function adminFetch(url, opts) {
+  opts = opts || {};
+  var adminKey = getAdminKey();
+  var headers = { 'X-Admin-Key': adminKey };
+  if (opts.master) {
+    var mk = getMasterKey();
+    if (mk) headers['X-Master-Key'] = mk;
+  }
+  if (opts.method === 'POST') {
+    headers['Content-Type'] = 'application/json';
+    return fetch(url, { method: 'POST', headers: headers, body: JSON.stringify(opts.body) });
+  }
+  return fetch(url, { headers: headers });
+}
 </script>
 </body>
 </html>
