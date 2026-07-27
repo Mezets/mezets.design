@@ -432,6 +432,17 @@
     .tab-panel { display: none; }
     .tab-panel.active { display: block; animation: tabFadeIn .4s cubic-bezier(.16,1,.3,1); }
 
+    .ban-tabs { display: flex; gap: 6px; margin-bottom: 16px; }
+    .ban-tab {
+      flex: 1; padding: 8px 6px; font-family: 'Press Start 2P', monospace;
+      font-size: 8px; cursor: pointer; border: 1px solid rgba(255,0,0,0.15);
+      background: rgba(255,0,0,0.03); color: rgba(255,200,200,0.5);
+      border-radius: 10px; transition: all .3s cubic-bezier(.16,1,.3,1);
+    }
+    .ban-tab:hover { color: rgba(255,200,200,0.75); border-color: rgba(255,0,0,0.35); }
+    .ban-tab:active { transform: scale(.94); }
+    .ban-tab.active { border-color: rgba(255,0,0,0.55); color: #ff3b3b; background: rgba(255,0,0,0.08); }
+
     .wrap { transition: max-width .35s cubic-bezier(.4,0,.2,1); }
     .wrap.wrap-wide { max-width: 1180px; }
     .users-grid {
@@ -694,37 +705,44 @@
       </div>
 
       <div class="card">
-        <div class="card-title">🎯 СТОП-ЛИСТ (авто-бан по ID) <span class="badge" id="watchlistCount">0</span></div>
-<label>Discord ID</label>
-        <input type="text" id="watchDiscordId" placeholder="например 582219322236338205">
-        <label>Причина</label>
-        <input type="text" id="watchReason" placeholder="Причина (необязательно)">
-        <button class="btn" onclick="addToWatchlist()">Добавить в стоп-лист</button>
+        <div class="card-title">🛡️ БАН</div>
 
-        <div style="height:1px;background:rgba(255,0,0,0.1);margin:18px 0"></div>
-
-        <button class="btn btn-sm" onclick="cooldownClick(this,'watchlist',loadWatchlist)" style="margin-bottom:16px">🔄 Обновить стоп-лист</button>
-        <div id="watchlistList" class="works-list">
-          <div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Список пуст или не загружен</div>
+        <div class="ban-tabs">
+          <button class="ban-tab active" data-ban="ip" onclick="switchBanTab('ip')">🌐 Бан по IP</button>
+          <button class="ban-tab" data-ban="discord" onclick="switchBanTab('discord')">🎯 Бан по Discord ID</button>
         </div>
-        <div class="status" id="watchlistStatus"></div>
-      </div>
 
-      <div class="card">
-        <div class="card-title">🛡️ БАН ПО IP <span class="badge" id="bannedIpsCount">0</span></div>
-<label>IP-адрес</label>
-        <input type="text" id="banIpInput" placeholder="например 192.168.1.1">
-        <label>Причина</label>
-        <input type="text" id="banIpReason" placeholder="Причина (необязательно)">
-        <button class="btn" onclick="banIp()">Забанить IP</button>
+        <div id="banIpContent">
+          <label>IP-адрес</label>
+          <input type="text" id="banIpInput" placeholder="например 192.168.1.1">
+          <label>Причина</label>
+          <input type="text" id="banIpReason" placeholder="Причина (необязательно)">
+          <button class="btn" onclick="banIp()">Забанить IP</button>
 
-        <div style="height:1px;background:rgba(255,0,0,0.1);margin:18px 0"></div>
+          <div style="height:1px;background:rgba(255,0,0,0.1);margin:18px 0"></div>
 
-        <button class="btn btn-sm" onclick="cooldownClick(this,'bannedips',loadBannedIps)" style="margin-bottom:16px">🔄 Обновить список</button>
-        <div id="bannedIpsList" class="works-list">
-          <div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Список пуст или не загружен</div>
+          <button class="btn btn-sm" onclick="cooldownClick(this,'bannedips',loadBannedIps)" style="margin-bottom:16px">🔄 Обновить список</button>
+          <div id="bannedIpsList" class="works-list">
+            <div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Список пуст или не загружен</div>
+          </div>
+          <div class="status" id="bannedIpsStatus"></div>
         </div>
-        <div class="status" id="bannedIpsStatus"></div>
+
+        <div id="banDiscordContent" style="display:none">
+          <label>Discord ID</label>
+          <input type="text" id="watchDiscordId" placeholder="например 582219322236338205">
+          <label>Причина</label>
+          <input type="text" id="watchReason" placeholder="Причина (необязательно)">
+          <button class="btn" onclick="addToWatchlist()">Добавить в стоп-лист</button>
+
+          <div style="height:1px;background:rgba(255,0,0,0.1);margin:18px 0"></div>
+
+          <button class="btn btn-sm" onclick="cooldownClick(this,'watchlist',loadWatchlist)" style="margin-bottom:16px">🔄 Обновить стоп-лист</button>
+          <div id="watchlistList" class="works-list">
+            <div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Список пуст или не загружен</div>
+          </div>
+          <div class="status" id="watchlistStatus"></div>
+        </div>
       </div>
       </div>
     </div>
@@ -2179,6 +2197,13 @@ async function removeFromWatchlist(discordId) {
   } catch(e) {
     showStatus(status, 'Ошибка: ' + e.message, 'err');
   }
+}
+
+/* ── ПЕРЕКЛЮЧЕНИЕ БАН ТАБОВ ── */
+function switchBanTab(tab) {
+  document.querySelectorAll('.ban-tab').forEach(t => t.classList.toggle('active', t.dataset.ban === tab));
+  document.getElementById('banIpContent').style.display = tab === 'ip' ? 'block' : 'none';
+  document.getElementById('banDiscordContent').style.display = tab === 'discord' ? 'block' : 'none';
 }
 
 /* ── БАН ПО IP ── */
