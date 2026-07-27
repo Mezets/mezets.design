@@ -156,3 +156,12 @@ checkSiteBanOnLoad();
 setInterval(checkSiteBanOnLoad, 60000);
 checkMaintenance();
 setInterval(checkMaintenance, 60000);
+
+// --- PAYMENT_METHODS_START ---
+const PAYMENT_METHODS = [
+  {"key": "sbp", "label": "СБП"},
+  {"key": "card", "label": "Карта"},
+  {"key": "steam_gift", "label": "Подарок Steam"},
+  {"key": "steam_topup", "label": "Пополнение Steam"}
+];
+// --- PAYMENT_METHODS_END ---
