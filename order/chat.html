@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MeZets Design — Чат заказа</title>
+<link rel="icon" type="image/png" href="/mezets.design/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scrollbar-width: thin; scrollbar-color: rgba(255,0,0,0.45) rgba(10,0,0,0.6); }
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: rgba(10,0,0,0.6); }
+::-webkit-scrollbar-thumb { background: rgba(255,0,0,0.45); border-radius: 6px; }
+html, body {
+  font-family: 'Press Start 2P', monospace;
+  background: #050000; min-height: 100vh;
+  color: rgba(255,200,200,0.85); overflow-x: hidden;
+}
+.canvas-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+.wrap {
+  position: relative; z-index: 1;
+  max-width: 680px; margin: 0 auto; padding: 48px 20px 100px;
+}
+.header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
+}
+.logo {
+  font-size: 13px;
+  color: #ff2a2a;
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+  text-shadow: 0 0 18px rgba(255,0,0,0.55);
+}
+.logo-sub {
+  font-size: 7px;
+  color: rgba(255,200,200,0.35);
+  letter-spacing: 1px;
+  margin-bottom: 40px;
+}
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 10px 16px; font-family: 'Press Start 2P', monospace;
+  font-size: 8px; line-height: 1.6; cursor: pointer; text-decoration: none;
+  color: #ff3b3b; border-radius: 10px;
+  background: rgba(255,0,0,0.05); border: 1px solid rgba(255,0,0,0.25);
+  transition: .2s; letter-spacing: .5px;
+}
+.btn:hover { transform: scale(1.04); border-color: rgba(255,0,0,0.5); box-shadow: 0 0 24px rgba(255,0,0,0.2); }
+.btn-sm { padding: 8px 12px; font-size: 7px; }
+.btn-danger { background: rgba(255,0,0,0.15); border-color: rgba(255,0,0,0.4); }
+
+.card {
+  background: rgba(12,0,0,0.82);
+  border: 1px solid rgba(255,0,0,0.2);
+  border-radius: 18px; padding: 20px; margin-bottom: 16px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 40px rgba(255,0,0,0.06);
+}
+
+.order-info {
+  display: flex; flex-wrap: wrap; gap: 12px;
+  justify-content: space-between; align-items: center;
+}
+.order-info-left { display: flex; flex-direction: column; gap: 6px; }
+.order-id { font-size: 11px; color: #ff2a2a; letter-spacing: 1px; }
+.order-meta { font-size: 7px; color: rgba(255,200,200,0.5); }
+.order-price { font-size: 13px; color: #ff5555; }
+.status-new { color: #59bfff; }
+.status-in_progress { color: #ffcc00; }
+.status-completed { color: #66ff99; }
+.status-cancelled { color: #ff6666; }
+.order-status-badge {
+  font-size: 8px; padding: 6px 12px; border-radius: 8px;
+  border: 1px solid currentColor;
+}
+.order-desc-box {
+  margin-top: 12px; padding: 12px; border-radius: 10px;
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,0,0,0.1);
+  font-size: 7px; color: rgba(255,200,200,0.6); line-height: 1.8;
+  word-break: break-word;
+}
+
+.chat-box {
+  display: flex; flex-direction: column;
+  height: 400px; overflow-y: auto; gap: 10px;
+  padding-right: 4px; margin-bottom: 12px;
+}
+.msg {
+  padding: 12px 14px; border-radius: 12px;
+  max-width: 85%; word-break: break-word; animation: msgIn .2s ease;
+}
+@keyframes msgIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.msg-user {
+  align-self: flex-end;
+  background: rgba(255,0,0,0.08); border: 1px solid rgba(255,0,0,0.18);
+}
+.msg-discord {
+  align-self: flex-start;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+}
+.msg-author { font-size: 6px; color: rgba(255,200,200,0.4); margin-bottom: 5px; }
+.msg-text { font-size: 7px; color: rgba(255,220,220,0.9); line-height: 1.6; font-family: sans-serif; }
+.msg-time { font-size: 5px; color: rgba(255,150,150,0.3); margin-top: 4px; text-align: right; font-family: monospace; }
+.msg-attachments { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.msg-attachment {
+  font-size: 6px; padding: 4px 8px; border-radius: 6px;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(200,200,255,0.7); text-decoration: none;
+  transition: .2s;
+}
+.msg-attachment:hover { border-color: rgba(255,60,60,0.3); }
+
+.chat-input-row {
+  display: flex; gap: 8px;
+}
+.chat-input {
+  flex: 1; padding: 12px 14px; border-radius: 10px;
+  background: rgba(255,0,0,0.05); border: 1px solid rgba(255,0,0,0.2);
+  color: rgba(255,220,220,0.9);
+  font-family: 'Press Start 2P', monospace; font-size: 7px; line-height: 1.6;
+  outline: none; transition: .2s;
+}
+.chat-input:focus { border-color: rgba(255,0,0,0.45); box-shadow: 0 0 14px rgba(255,0,0,0.1); }
+.chat-send { padding: 10px 14px; font-size: 9px; }
+.chat-file-btn { padding: 10px 12px; font-size: 9px; }
+
+.loader {
+  width: 28px; height: 28px; border: 3px solid rgba(255,40,40,0.2);
+  border-top-color: #ff3b3b; border-radius: 50%;
+  animation: lgSpin .8s linear infinite; margin: 60px auto;
+}
+@keyframes lgSpin { to { transform: rotate(360deg); } }
+
+.fluff-wrap { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.fluff { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.2; }
+.fluff-1 {
+  width: 500px; height: 500px; background: radial-gradient(circle, rgba(255,0,0,0.8), transparent 70%);
+  animation: moveFluff1 18s ease-in-out infinite;
+}
+.fluff-2 {
+  width: 300px; height: 300px; background: radial-gradient(circle, rgba(255,60,0,0.6), transparent 70%);
+  animation: moveFluff2 12s ease-in-out infinite; opacity: 0.12;
+}
+@keyframes moveFluff1 { 0% { transform: translate(5vw, 10vh); } 50% { transform: translate(55vw, 50vh); } 100% { transform: translate(5vw, 10vh); } }
+@keyframes moveFluff2 { 0% { transform: translate(70vw, 70vh); } 50% { transform: translate(10vw, 40vh); } 100% { transform: translate(70vw, 70vh); } }
+
+.empty-chat { font-size: 8px; color: rgba(255,200,200,0.3); text-align: center; padding: 60px 20px; }
+</style>
+</head>
+<body>
+<div id="banOverlay" style="display:none;position:fixed;inset:0;z-index:999999;background:radial-gradient(ellipse at center,#2a0000 0%,#050000 75%);color:#fff;align-items:center;justify-content:center;text-align:center;flex-direction:column;padding:24px;">
+  <div style="font-size:64px;line-height:1;margin-bottom:18px;">🚫</div>
+  <div style="font-size:28px;font-weight:800;margin-bottom:10px;">Вы забанены</div>
+  <div style="font-size:16px;color:#c99;max-width:420px;">Вам тут не рады. Доступ закрыт.</div>
+  <div id="banReasonLine" style="font-size:13px;color:#e88;max-width:420px;margin-top:14px;display:none;"></div>
+</div>
+<audio id="banSound" src="../ban.mp3" preload="auto"></audio>
+
+<div id="loadingGate" style="position:fixed;inset:0;z-index:999995;background:#050000;display:flex;align-items:center;justify-content:center;">
+  <div style="width:38px;height:38px;border:3px solid rgba(255,40,40,0.2);border-top-color:#ff3b3b;border-radius:50%;animation:lgSpin .8s linear infinite;"></div>
+</div>
+
+<div id="maintToast" style="position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(140%);z-index:99999;background:#0d0202;border:1px solid rgba(255,40,40,0.3);border-radius:14px;padding:16px 22px;max-width:440px;width:90%;backdrop-filter:blur(12px);transition:transform .4s ease;box-shadow:0 0 40px rgba(255,0,0,0.15);">
+  <div id="maintToastTitle" style="font-size:10px;color:#ff2a2a;margin-bottom:6px;letter-spacing:1px;">Тех. неполадки</div>
+  <div id="maintToastMsg" style="font-size:7px;color:rgba(255,200,200,0.6);line-height:1.6;"></div>
+</div>
+
+<div class="fluff-wrap">
+  <div class="fluff fluff-1"></div>
+  <div class="fluff fluff-2"></div>
+</div>
+<canvas class="canvas-bg" id="matrixCanvas"></canvas>
+
+<div class="wrap" id="app">
+  <div style="position:relative">
+    <div class="logo" style="display:flex;align-items:center;gap:14px"><img src="https://mezets.github.io/mezets.design/favicon.png" alt="" style="width:48px;height:48px;image-rendering:pixelated;flex-shrink:0"><span style="font-size:22px;letter-spacing:3px">Mezets</span></div>
+    <div class="logo-sub">ЧАТ</div>
+    <a href="/mezets.design/order/" class="btn btn-sm" style="position:absolute;top:6px;right:0">← Заказы</a>
+  </div>
+
+  <div id="loadingState">
+    <div class="loader"></div>
+  </div>
+
+  <div id="notFound" style="display:none">
+    <div class="card" style="text-align:center;padding:40px;">
+      <div style="font-size:9px;color:rgba(255,200,200,0.4);">Заказ не найден</div>
+      <a href="/mezets.design/order/" class="btn" style="margin-top:16px;">К заказам</a>
+    </div>
+  </div>
+
+  <div id="chatContent" style="display:none">
+    <div class="card">
+      <div class="order-info">
+        <div class="order-info-left">
+          <div class="order-id" id="orderIdDisplay">Заказ #—</div>
+          <div class="order-meta" id="orderMeta"></div>
+        </div>
+        <div style="text-align:right">
+          <div class="order-price" id="orderPrice"></div>
+          <div class="order-status-badge" id="orderStatusBadge"></div>
+        </div>
+      </div>
+      <div class="order-desc-box" id="orderDescBox"></div>
+    </div>
+
+    <div class="card">
+      <div class="chat-box" id="chatBox"></div>
+      <div class="chat-input-row">
+        <button class="btn btn-sm chat-file-btn" onclick="uploadFile()" title="Прикрепить файл">📎</button>
+        <input class="chat-input" id="msgInput" placeholder="Сообщение..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}">
+        <button class="btn chat-send" onclick="sendMsg()">→</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../common.js"></script>
+<script>
+checkSiteBanOnLoad();
+checkMaintenance();
+
+const API = BAN_API; // из common.js
+let orderId = null;
+let currentUser = null;
+let pollTimer = null;
+
+function getSession() {
+  try { return localStorage.getItem('mezets_session') || ''; } catch(e) { return ''; }
+}
+
+function g(name) { return document.getElementById(name); }
+
+async function init() {
+  const params = new URLSearchParams(window.location.search);
+  orderId = params.get('id');
+  if (!orderId) { showNotFound(); return; }
+
+  const session = getSession();
+  if (!session) { window.location.href = '/mezets.design/order/'; return; }
+
+  try {
+    const rMe = await fetch(`${API}/api/me?session=${encodeURIComponent(session)}`);
+    if (!rMe.ok) { window.location.href = '/mezets.design/order/'; return; }
+    const dMe = await rMe.json();
+    currentUser = dMe.user;
+  } catch(e) { window.location.href = '/mezets.design/order/'; return; }
+
+  await loadOrder();
+
+  // Точки как в админке
+  const dotCanvas = g('matrixCanvas');
+  const dotCtx = dotCanvas.getContext('2d');
+  function resizeDots() { dotCanvas.width = innerWidth; dotCanvas.height = innerHeight; }
+  resizeDots();
+  let dots = [];
+  function initDots() {
+    dots = [];
+    const n = Math.round((innerWidth * innerHeight) / 12000);
+    for (let i = 0; i < n; i++) dots.push({
+      x: Math.random()*dotCanvas.width, y: Math.random()*dotCanvas.height,
+      r: Math.random()*1.2+0.3, dx:(Math.random()-.5)*.12, dy:(Math.random()-.5)*.12
+    });
+  }
+  initDots();
+  window.addEventListener('resize', () => { resizeDots(); initDots(); });
+  (function animateDots() {
+    dotCtx.clearRect(0,0,dotCanvas.width,dotCanvas.height);
+    for (let d of dots) {
+      dotCtx.beginPath(); dotCtx.arc(d.x,d.y,d.r,0,Math.PI*2);
+      dotCtx.fillStyle='rgba(255,0,0,0.5)'; dotCtx.fill();
+      d.x+=d.dx; d.y+=d.dy;
+      if(d.x<0)d.x=dotCanvas.width; if(d.x>dotCanvas.width)d.x=0;
+      if(d.y<0)d.y=dotCanvas.height; if(d.y>dotCanvas.height)d.y=0;
+    }
+    requestAnimationFrame(animateDots);
+  })();
+}
+
+async function loadOrder() {
+  const session = getSession();
+  try {
+    const r = await fetch(`${API}/api/order/${orderId}?session=${encodeURIComponent(session)}`);
+    if (!r.ok) { showNotFound(); return; }
+    const d = await r.json();
+    renderOrder(d.order, d.messages || [], d.attachments || []);
+    startPolling();
+  } catch(e) { showNotFound(); }
+}
+
+function showNotFound() {
+  g('loadingState').style.display = 'none';
+  g('notFound').style.display = 'block';
+}
+
+function renderOrder(order, messages, attachments) {
+  g('loadingState').style.display = 'none';
+  g('chatContent').style.display = 'block';
+
+  const statusLabels = { 'new': 'Новый', 'in_progress': 'В работе', 'completed': 'Выполнен', 'cancelled': 'Отменён' };
+  g('orderIdDisplay').textContent = `Заказ #${order.id}`;
+  g('orderMeta').textContent = `${order.category || ''} · ${order.created_at ? order.created_at.slice(0, 10) : ''}`;
+  g('orderPrice').textContent = order.estimated_price ? `${order.estimated_price} ₽` : '';
+  const badge = g('orderStatusBadge');
+  badge.textContent = statusLabels[order.status] || order.status;
+  badge.className = 'order-status-badge status-' + order.status;
+  g('orderDescBox').textContent = order.description || '';
+
+  renderMessages(messages, attachments);
+}
+
+function renderMessages(messages, attachments) {
+  const box = g('chatBox');
+  if (!messages.length) {
+    box.innerHTML = '<div class="empty-chat">Сообщений пока нет. Напиши что-нибудь!</div>';
+    return;
+  }
+  const attMap = {};
+  if (attachments) attachments.forEach(a => {
+    if (a.message_id) {
+      if (!attMap[a.message_id]) attMap[a.message_id] = [];
+      attMap[a.message_id].push(a);
+    }
+  });
+
+  box.innerHTML = messages.map(m => {
+    const isUser = !m.from_discord;
+    const atts = attMap[m.id] || [];
+    const attHtml = atts.length ? '<div class="msg-attachments">' + atts.map(a =>
+      `<a href="${a.discord_url}" target="_blank" class="msg-attachment">${a.filename || 'файл'} ↓</a>`
+    ).join('') + '</div>' : '';
+    const author = isUser ? 'Вы' : m.author;
+    return `<div class="msg msg-${isUser ? 'user' : 'discord'}">
+      <div class="msg-author">${isUser ? 'Вы' : m.author}</div>
+      <div class="msg-text">${escapeHtml(m.content || '')}</div>
+      ${attHtml}
+      <div class="msg-time">${m.created_at ? m.created_at.slice(11, 19) : ''}</div>
+    </div>`;
+  }).join('');
+  box.scrollTop = box.scrollHeight;
+}
+
+function escapeHtml(t) {
+  const d = document.createElement('div');
+  d.textContent = t;
+  return d.innerHTML;
+}
+
+function startPolling() {
+  pollTimer = setInterval(async () => {
+    const session = getSession();
+    try {
+      const r = await fetch(`${API}/api/order/${orderId}/messages?session=${encodeURIComponent(session)}`);
+      if (!r.ok) return;
+      const d = await r.json();
+      const box = g('chatBox');
+      const oldCount = box.querySelectorAll('.msg').length;
+      if (d.messages && d.messages.length !== oldCount) {
+        const r2 = await fetch(`${API}/api/order/${orderId}?session=${encodeURIComponent(session)}`);
+        if (r2.ok) {
+          const d2 = await r2.json();
+          renderMessages(d2.messages || [], d2.attachments || []);
+        }
+      }
+    } catch(e) {}
+  }, 3000);
+}
+
+async function sendMsg() {
+  const input = g('msgInput');
+  const content = input.value.trim();
+  if (!content) return;
+
+  const session = getSession();
+  input.disabled = true;
+
+  try {
+    const r = await fetch(`${API}/api/order/${orderId}/message?session=${encodeURIComponent(session)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content }),
+    });
+    if (!r.ok) throw new Error('send failed');
+    input.value = '';
+    // Reload immediately
+    const r2 = await fetch(`${API}/api/order/${orderId}?session=${encodeURIComponent(session)}`);
+    if (r2.ok) {
+      const d = await r2.json();
+      renderMessages(d.messages || [], d.attachments || []);
+    }
+  } catch(e) {
+    console.error('send error:', e);
+  }
+  input.disabled = false;
+  input.focus();
+}
+
+function uploadFile() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.onchange = async () => {
+    const file = input.files[0];
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) { alert('Файл слишком большой (макс 10MB)'); return; }
+    const session = getSession();
+    const formData = new FormData();
+    formData.append('order_id', orderId);
+    formData.append('file', file);
+    try {
+      await fetch(`${API}/api/order/upload?session=${encodeURIComponent(session)}`, {
+        method: 'POST', body: formData,
+      });
+      const r = await fetch(`${API}/api/order/${orderId}?session=${encodeURIComponent(session)}`);
+      if (r.ok) {
+        const d = await r.json();
+        renderMessages(d.messages || [], d.attachments || []);
+      }
+    } catch(e) { console.error('upload error:', e); }
+  };
+  input.click();
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
