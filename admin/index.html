@@ -2855,6 +2855,14 @@ async function adminSendMsg() {
 }
 
 
+function getAdminKey() {
+  var stored = localStorage.getItem('mz_admin_key');
+  if (stored) return stored;
+  var key = prompt('Введите ключ администратора:');
+  if (key) localStorage.setItem('mz_admin_key', key);
+  return key;
+}
+
 function getMasterKey() {
   var stored = sessionStorage.getItem('mezets_admin_master_key');
   if (stored) return stored;
