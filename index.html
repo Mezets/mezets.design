@@ -2030,8 +2030,39 @@
       <button class="order-modal-back" onclick="backToOrderChoice()">← Назад</button>
       <div class="order-modal-title">Оформить заказ</div>
       <div class="order-field">
+        <div class="order-label">Категория</div>
+        <select class="order-select" id="orderCategory" onchange="updateOrderPrice()">
+          <option value="design">🎨 Дизайн</option>
+          <option value="discord_bot">🤖 Discord бот</option>
+          <option value="telegram_bot">📱 Telegram бот</option>
+          <option value="website">🌐 Сайт</option>
+          <option value="other">📦 Другое</option>
+        </select>
+      </div>
+      <div class="order-field">
         <div class="order-label">Что нужно сделать?</div>
-        <textarea class="order-textarea" id="orderDesc" rows="4" placeholder="Опиши задачу..."></textarea>
+        <textarea class="order-textarea" id="orderDesc" rows="4" placeholder="Опиши задачу..." oninput="updateOrderPrice()"></textarea>
+      </div>
+      <div class="order-field">
+        <div class="order-label">Способ оплаты</div>
+        <div class="order-payment-group">
+          <label class="order-payment-option">
+            <input type="radio" name="payment" value="sbp" checked>
+            <span>💳 СБП</span>
+          </label>
+          <label class="order-payment-option">
+            <input type="radio" name="payment" value="card">
+            <span>💳 Карта</span>
+          </label>
+          <label class="order-payment-option">
+            <input type="radio" name="payment" value="steam_gift">
+            <span>🎮 Подарок Steam</span>
+          </label>
+          <label class="order-payment-option">
+            <input type="radio" name="payment" value="steam_topup">
+            <span>🎮 Пополнение Steam</span>
+          </label>
+        </div>
       </div>
       <div style="font-size:6px;color:rgba(255,200,200,0.35);text-align:center;margin-bottom:8px;">
         <span id="orderNotLogged">Войди через Discord, чтобы оформить заказ</span>
@@ -2981,10 +3012,19 @@
     document.getElementById('orderFormStep').style.display = 'block';
     document.getElementById('orderNotLogged').style.display = 'none';
     document.getElementById('orderPriceEst').style.display = 'block';
-  }
-  function backToOrderChoice() {
+    updateOrderPrice();
     document.getElementById('orderChoiceStep').style.display = 'block';
     document.getElementById('orderFormStep').style.display = 'none';
+  }
+
+  function updateOrderPrice() {
+    var cat = document.getElementById('orderCategory').value;
+    var desc = document.getElementById('orderDesc').value;
+    var bases = { design: 200, discord_bot: 1000, telegram_bot: 1000, website: 2000, other: 500 };
+    var base = bases[cat] || 500;
+    var bonus = Math.min(Math.floor(desc.length / 50) * 50, base);
+    var est = base + bonus;
+    document.getElementById('orderPriceDisplay').textContent = est + ' ₽';
   }
 
   async function submitOrder() {
@@ -2992,6 +3032,9 @@
     const status = document.getElementById('orderStatus');
     const btn = document.getElementById('orderSubmit');
     const session = (function() { var s; try { s = localStorage.getItem('mezets_session') || ''; } catch(e) { s = ''; } return s; })();
+    const category = document.getElementById('orderCategory').value;
+    const paymentEl = document.querySelector('input[name="payment"]:checked');
+    const payment_method = paymentEl ? paymentEl.value : null;
 
     if (!session) {
       window.location.href = API + '/discord-login-url';
@@ -3013,7 +3056,7 @@
       const res = await fetch(API + '/api/order?session=' + encodeURIComponent(session), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ category: 'design', description: desc, payment_method: null }),
+        body: JSON.stringify({ category: category, description: desc, payment_method: payment_method }),
       });
       const data = await res.json();
       if (data.status === 'ok') {
