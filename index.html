@@ -1315,27 +1315,6 @@
       background: rgba(255,0,0,0.07);
     }
     .order-item-cb input { accent-color: #ff2a2a; margin: 0; width: 10px; height: 10px; }
-    .order-items-section-label {
-      font-size: 6px; color: rgba(255,200,200,0.3);
-      margin: 6px 0 4px; letter-spacing: 1px; text-transform: uppercase;
-    }
-    .order-items-section-label:first-child { margin-top: 0; }
-    .order-items-grid {
-      display: flex; flex-wrap: wrap; gap: 4px;
-    }
-    #priceItemsContainer { min-height: 30px; }
-    #paymentMethodsContainer { min-height: 50px; }
-    .item-qty {
-      width: 26px; height: 18px; padding: 0 2px; box-sizing: border-box;
-      font-family: 'Press Start 2P', monospace; font-size: 6px; line-height: 18px;
-      text-align: center; background: rgba(255,0,0,0.05);
-      border: 1px solid rgba(255,0,0,0.15); border-radius: 4px;
-      color: rgba(255,220,220,0.85); outline: none;
-      -moz-appearance: textfield;
-    }
-    .item-qty::-webkit-outer-spin-button,
-    .item-qty::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-    .item-qty:focus { border-color: rgba(255,0,0,0.4); box-shadow: 0 0 10px rgba(255,0,0,0.08); }
 
     .order-submit {
       display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -2051,42 +2030,12 @@
       <button class="order-modal-back" onclick="backToOrderChoice()">← Назад</button>
       <div class="order-modal-title">Оформить заказ</div>
       <div class="order-field">
-        <div class="order-label">Категория</div>
-        <select class="order-select" id="orderCategory" onchange="renderPriceItems()">
-          <option value="">Загрузка...</option>
-        </select>
-      </div>
-      <div class="order-field">
         <div class="order-label">Что нужно сделать?</div>
         <textarea class="order-textarea" id="orderDesc" rows="4" placeholder="Опиши задачу..."></textarea>
       </div>
-      <div class="order-field" id="orderItemsSection">
-        <div class="order-label" style="font-size:8px">Выбери услуги</div>
-        <div id="priceItemsContainer" style="margin-bottom:6px"></div>
-      </div>
-      <div class="order-field">
-        <div class="order-label">Способ оплаты</div>
-        <div class="order-payment-group" id="paymentMethodsContainer">
-          <label class="order-payment-option">
-            <input type="radio" name="payment" value="sbp" checked>
-            <span>СБП</span>
-          </label>
-          <label class="order-payment-option">
-            <input type="radio" name="payment" value="card">
-            <span>Карта</span>
-          </label>
-          <label class="order-payment-option">
-            <input type="radio" name="payment" value="steam_gift">
-            <span>Подарок Steam</span>
-          </label>
-          <label class="order-payment-option">
-            <input type="radio" name="payment" value="steam_topup">
-            <span>Пополнение Steam</span>
-          </label>
-        </div>
-      </div>
       <div style="font-size:6px;color:rgba(255,200,200,0.35);text-align:center;margin-bottom:8px;">
         <span id="orderNotLogged">Войди через Discord, чтобы оформить заказ</span>
+        <span id="orderPriceEst" style="display:none;">Примерная цена: <span id="orderPriceDisplay">—</span></span>
       </div>
       <div class="order-status" id="orderStatus" style="margin-bottom:8px"></div>
       <button class="order-submit" id="orderSubmit" onclick="submitOrder()">
@@ -2248,7 +2197,6 @@
 <img src="cow.png" alt="cow" class="flying-cow" id="flyingCow" title="Жми на корову!">
 <audio id="cowSound" src="cow.mp3" preload="auto"></audio>
 
-<script src="common.js"></script>
 
 <script>
 
@@ -3020,10 +2968,6 @@
   function closeOrderModal() {
     document.getElementById('orderModalOverlay').style.display = 'none';
   }
-  function backToOrderChoice() {
-    document.getElementById('orderFormStep').style.display = 'none';
-    document.getElementById('orderChoiceStep').style.display = 'block';
-  }
   function orderViaDiscord() {
     window.open('https://discord.gg/aBJBmzS49e', '_blank');
   }
@@ -3036,99 +2980,11 @@
     document.getElementById('orderChoiceStep').style.display = 'none';
     document.getElementById('orderFormStep').style.display = 'block';
     document.getElementById('orderNotLogged').style.display = 'none';
-    renderCategories();
-    renderPriceItems();
-    renderPaymentMethods();
+    document.getElementById('orderPriceEst').style.display = 'block';
   }
-
-  var cachedCategories = null;
-  var cachedPriceItems = null;
-  async function renderCategories() {
-    var sel = document.getElementById('orderCategory');
-    if (!sel) return;
-    if (cachedCategories) {
-      populateCategories(sel, cachedCategories);
-      return;
-    }
-    try {
-      var r = await fetch(API + '/api/categories');
-      var d = await r.json();
-      cachedCategories = d.categories || [];
-      populateCategories(sel, cachedCategories);
-    } catch(e) {
-      // fallback
-      sel.innerHTML = '<option value="design">🎨 Дизайн</option><option value="discord_bot">🤖 Discord бот</option><option value="telegram_bot">📱 Telegram бот</option><option value="website">🌐 Сайт</option><option value="other">📦 Другое</option>';
-    }
-  }
-  function populateCategories(sel, cats) {
-    if (!cats || !cats.length) {
-      sel.innerHTML = '<option value="other">📦 Другое</option>';
-      return;
-    }
-    sel.innerHTML = cats.map(function(c) {
-      var lbl = (c.label || c.name || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-      return '<option value="' + c.name.replace(/"/g,'&quot;') + '">' + (c.emoji || '') + ' ' + lbl + '</option>';
-    }).join('');
-  }
-  async function renderPriceItems() {
-    var container = document.getElementById('priceItemsContainer');
-    if (!container) return;
-    var cat = document.getElementById('orderCategory').value;
-    if (cat === 'discord_bot' || cat === 'telegram_bot') {
-      container.innerHTML = '';
-      document.getElementById('orderItemsSection').style.display = 'none';
-      return;
-    }
-    document.getElementById('orderItemsSection').style.display = '';
-    if (cachedPriceItems) {
-      renderPriceItemsHTML(container, cachedPriceItems);
-      return;
-    }
-    try {
-      var r = await fetch(API + '/api/prices');
-      var d = await r.json();
-      cachedPriceItems = d.sections || [];
-      renderPriceItemsHTML(container, cachedPriceItems);
-    } catch(e) {
-      container.innerHTML = '<div style="font-size:6px;color:rgba(255,150,150,0.5)">Не удалось загрузить услуги</div>';
-    }
-  }
-  function renderPriceItemsHTML(container, sections) {
-    if (!sections || sections.length === 0) {
-      container.innerHTML = '<div style="font-size:6px;color:rgba(255,200,200,0.3)">Нет доступных услуг</div>';
-      return;
-    }
-    var html = '';
-    for (var si = 0; si < sections.length; si++) {
-      var sec = sections[si];
-      html += '<div class="order-items-section-label">' + sec.label + '</div>';
-      html += '<div class="order-items-grid">';
-      for (var ii = 0; ii < sec.items.length; ii++) {
-        var item = sec.items[ii];
-        html += '<label class="order-item-cb" style="display:inline-flex;align-items:center;gap:4px;padding:5px 8px;font-size:6px">' +
-          '<span style="flex:1;min-width:0">' + item.name + ' <span style="opacity:0.5">' + item.price + '</span></span>' +
-          '<input type="number" class="item-qty" min="0" max="99" value="0" data-price="' + item.price + '" data-name="' + item.name.replace(/"/g,'&quot;') + '">' +
-        '</label>';
-      }
-      html += '</div>';
-    }
-    container.innerHTML = html;
-  }
-
-  function renderPaymentMethods() {
-    var container = document.getElementById('paymentMethodsContainer');
-    if (!container) return;
-    var methods = window.PAYMENT_METHODS || [];
-    var html = '';
-    for (var i = 0; i < methods.length; i++) {
-      var m = methods[i];
-      var checked = i === 0 ? ' checked' : '';
-      html += '<label class="order-payment-option">' +
-        '<input type="radio" name="payment" value="' + m.key.replace(/"/g,'&quot;') + '"' + checked + '>' +
-        ' <span>' + (m.label || m.key) + '</span>' +
-      '</label>';
-    }
-    if (html) container.innerHTML = html;
+  function backToOrderChoice() {
+    document.getElementById('orderChoiceStep').style.display = 'block';
+    document.getElementById('orderFormStep').style.display = 'none';
   }
 
   async function submitOrder() {
@@ -3136,18 +2992,6 @@
     const status = document.getElementById('orderStatus');
     const btn = document.getElementById('orderSubmit');
     const session = (function() { var s; try { s = localStorage.getItem('mezets_session') || ''; } catch(e) { s = ''; } return s; })();
-    const category = document.getElementById('orderCategory').value;
-    const paymentEl = document.querySelector('input[name="payment"]:checked');
-    const payment_method = paymentEl ? paymentEl.value : null;
-    const items = [];
-    const qtyInputs = document.querySelectorAll('#priceItemsContainer .item-qty');
-    for (var i = 0; i < qtyInputs.length; i++) {
-      var qty = parseInt(qtyInputs[i].value) || 0;
-      if (qty > 0) {
-        var name = qtyInputs[i].getAttribute('data-name') || '';
-        items.push(qty > 1 ? name + ' × ' + qty : name);
-      }
-    }
 
     if (!session) {
       window.location.href = API + '/discord-login-url';
@@ -3169,7 +3013,7 @@
       const res = await fetch(API + '/api/order?session=' + encodeURIComponent(session), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ category: category, description: desc, payment_method: payment_method, items: items }),
+        body: JSON.stringify({ category: 'design', description: desc, payment_method: null }),
       });
       const data = await res.json();
       if (data.status === 'ok') {
