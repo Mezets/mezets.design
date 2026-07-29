@@ -2347,7 +2347,6 @@ async function loadWatchlist() {
 
 function renderWatchlist() {
   const list = document.getElementById('watchlistList');
-  document.getElementById('watchlistCount').textContent = WATCHLIST.length;
 
   if (!WATCHLIST.length) {
     list.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Стоп-лист пуст</div>';
@@ -2415,7 +2414,6 @@ async function loadBannedIps() {
 
 function renderBannedIps() {
   const list = document.getElementById('bannedIpsList');
-  document.getElementById('bannedIpsCount').textContent = BANNED_IPS.length;
 
   if (!BANNED_IPS.length) {
     list.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Бан-лист пуст</div>';
@@ -2792,7 +2790,6 @@ async function addCategory() {
     document.getElementById('catNameInput').value = '';
     document.getElementById('catLabelInput').value = '';
     document.getElementById('catEmojiInput').value = '';
-    document.getElementById('catPriceInput').value = '';
     showStatus(status, 'Категория добавлена', 'ok');
     loadCategories();
   } catch(e) {
