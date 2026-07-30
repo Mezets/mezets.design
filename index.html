@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Mezets — оформление Discord, VK, YouTube, Twitch для RP-серверов | Province RP, GPA 5 RP, Majestic, Arizona</title>
-  <meta name="description" content="Mezets — оформление Discord-серверов, групп ВК, превью YouTube, Twitch и форумных аккаунтов. Работаю с игроками Province RP, GPA 5 RP, Majestic, Arizona. Также делаю ботов для Discord, Telegram и VK. Быстро, качественно, под ключ.">
-  <meta name="keywords" content="оформление discord, оформление вк, youtube оформление, province rp оформление, gpa 5 rp, Majestic оформление, arizona rp, дискорд сервер, бот discord, бот telegram, бот vk, оформление группы вк, twitch оформление, оформление форума, форумный аккаунт">
+  <title>Mezets — оформление Discord, VK, YouTube, Twitch для RP-серверов | Province RP, GPA 5 RP, Majestik, Arizona</title>
+  <meta name="description" content="Mezets — оформление Discord-серверов, групп ВК, превью YouTube, Twitch и форумных аккаунтов. Работаю с игроками Province RP, GPA 5 RP, Majestik, Arizona. Также делаю ботов для Discord, Telegram и VK. Быстро, качественно, под ключ.">
+  <meta name="keywords" content="оформление discord, оформление вк, youtube оформление, province rp оформление, gpa 5 rp, majestik оформление, arizona rp, дискорд сервер, бот discord, бот telegram, бот vk, оформление группы вк, twitch оформление, оформление форума, форумный аккаунт">
   <meta name="author" content="Mezets">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://mezets.github.io/mezets.design/">
@@ -14,14 +14,14 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://mezets.github.io/mezets.design/">
   <meta property="og:title" content="Mezets — оформление Discord, VK, YouTube, Twitch для RP-серверов">
-  <meta property="og:description" content="Оформление Discord, ВК, YouTube, Twitch и форумных аккаунтов для RP-проектов: Province RP, GPA 5 RP, Majestic, Arizona. Делаю ботов для Discord, Telegram, VK.">
+  <meta property="og:description" content="Оформление Discord, ВК, YouTube, Twitch и форумных аккаунтов для RP-проектов: Province RP, GPA 5 RP, Majestik, Arizona. Делаю ботов для Discord, Telegram, VK.">
   <meta property="og:image" content="https://mezets.github.io/mezets.design/avatar_server.png">
   <meta property="og:locale" content="ru_RU">
   <meta property="og:site_name" content="Mezets">
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Mezets — оформление Discord, VK, YouTube, Twitch для RP-серверов">
-  <meta name="twitter:description" content="Оформление Discord, ВК, YouTube, Twitch и форумных аккаунтов для RP-проектов: Province RP, GPA 5 RP, Majestic, Arizona. Делаю ботов для Discord, Telegram, VK.">
+  <meta name="twitter:description" content="Оформление Discord, ВК, YouTube, Twitch и форумных аккаунтов для RP-проектов: Province RP, GPA 5 RP, Majestik, Arizona. Делаю ботов для Discord, Telegram, VK.">
   <meta name="twitter:image" content="https://mezets.github.io/mezets.design/avatar_server.png">
 
   <link rel="icon" type="image/png" href="/mezets.design/favicon.png">
@@ -46,7 +46,7 @@
     "areaServed": "RU",
     "audience": {
       "@type": "Audience",
-      "audienceType": "RP-сервера: Province RP, GPA 5 RP, , Arizona RP"
+      "audienceType": "RP-сервера: Province RP, GPA 5 RP, Majestik, Arizona RP"
     },
     "description": "Оформление Discord-серверов, групп ВК, превью YouTube, оформление Twitch и форумных аккаунтов/разделов, а также создание ботов для Discord, Telegram и VK для RP-проектов.",
     "offers": {
@@ -1253,6 +1253,23 @@
     }
 
     .order-field { display: flex; flex-direction: column; gap: 7px; }
+    .order-total-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px; margin: 4px 0 2px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,0,0,0.25);
+      background: rgba(255,0,0,0.06);
+      font-size: 9px; color: rgba(255,225,225,0.9);
+      letter-spacing: 0.5px;
+      transition: box-shadow .2s ease;
+    }
+    .order-total-row span:last-child {
+      color: #ff4444;
+      font-size: 11px;
+      text-shadow: 0 0 10px rgba(255,40,40,0.5);
+      transition: transform .15s ease;
+    }
+    .order-total-row.bump span:last-child { transform: scale(1.15); }
     .order-label {
       font-size: 8px;
       color: rgba(255,200,200,0.5);
@@ -2115,7 +2132,7 @@
       <div class="order-modal-title">Оформить заказ</div>
       <div class="order-field">
         <div class="order-label">Категория</div>
-        <select class="order-select" id="orderCategory" onchange="renderPriceItems()">
+        <select class="order-select" id="orderCategory" onchange="renderPriceItems(); updateOrderTotal();">
           <option value="">Загрузка...</option>
         </select>
       </div>
@@ -2126,6 +2143,10 @@
       <div class="order-field" id="orderItemsSection">
         <div class="order-label" style="font-size:8px">Выбери услуги</div>
         <div id="priceItemsContainer" style="margin-bottom:6px"></div>
+      </div>
+      <div class="order-total-row" id="orderTotalRow">
+        <span>Итого</span>
+        <span id="orderTotalPrice">0 ₽</span>
       </div>
       <div class="order-field">
         <div class="order-label">Способ оплаты</div>
@@ -2213,7 +2234,7 @@
   <p>
     Я занимаюсь <strong>оформлением Discord-серверов</strong>, групп ВК, превью для YouTube,
     оформлением Twitch и форумных аккаунтов/разделов. Основная аудитория — игроки и администрация
-    RP-проектов: <strong>Province RP</strong>, <strong>GPA 5 RP</strong>, <strong></strong> и
+    RP-проектов: <strong>Province RP</strong>, <strong>GPA 5 RP</strong>, <strong>Majestik</strong> и
     <strong>Arizona RP</strong>. Делаю аватарки, баннеры, фоны приглашений и анимированное
     оформление под стиль конкретного сервера.
   </p>
@@ -2229,7 +2250,7 @@
     <li>Оформление Twitch-профилей</li>
     <li>Оформление форумных аккаунтов и разделов</li>
     <li>Боты для Discord, Telegram, VK</li>
-    <li>Оформление под RP-сервера: Province RP, GPA 5 RP, , Arizona RP</li>
+    <li>Оформление под RP-сервера: Province RP, GPA 5 RP, Majestik, Arizona RP</li>
   </ul>
 </section>
 
@@ -3050,7 +3071,7 @@
     document.getElementById('orderChoiceStep').style.display = 'none';
     document.getElementById('orderFormStep').style.display = 'block';
     document.getElementById('orderNotLogged').style.display = 'none';
-    renderCategories();
+    await renderCategories();
     renderPriceItems();
     renderPaymentMethods();
   }
@@ -3091,11 +3112,13 @@
     if (cat === 'discord_bot' || cat === 'telegram_bot') {
       container.innerHTML = '';
       document.getElementById('orderItemsSection').style.display = 'none';
+      updateOrderTotal();
       return;
     }
     document.getElementById('orderItemsSection').style.display = '';
     if (cachedPriceItems) {
       renderPriceItemsHTML(container, cachedPriceItems);
+      updateOrderTotal();
       return;
     }
     try {
@@ -3103,6 +3126,7 @@
       var d = await r.json();
       cachedPriceItems = d.sections || [];
       renderPriceItemsHTML(container, cachedPriceItems);
+      updateOrderTotal();
     } catch(e) {
       container.innerHTML = '<div style="font-size:6px;color:rgba(255,150,150,0.5)">Не удалось загрузить услуги</div>';
     }
@@ -3133,6 +3157,37 @@
     container.innerHTML = html;
   }
 
+  function parsePriceNumber(str) {
+    if (!str) return 0;
+    var digits = String(str).replace(/[^\d]/g, '');
+    return digits ? parseInt(digits, 10) : 0;
+  }
+
+  function updateOrderTotal() {
+    var row = document.getElementById('orderTotalRow');
+    var out = document.getElementById('orderTotalPrice');
+    if (!row || !out) return;
+
+    var catSelect = document.getElementById('orderCategory');
+    var catName = catSelect ? catSelect.value : '';
+    var base = 0;
+    if (cachedCategories) {
+      var found = cachedCategories.find(function(c) { return c.name === catName; });
+      if (found && found.base_price) base = parseInt(found.base_price, 10) || 0;
+    }
+
+    var total = base;
+    document.querySelectorAll('#priceItemsContainer .item-qty').forEach(function(inp) {
+      var qty = parseInt(inp.value, 10) || 0;
+      var price = parsePriceNumber(inp.getAttribute('data-price'));
+      total += qty * price;
+    });
+
+    out.textContent = total.toLocaleString('ru-RU') + ' ₽';
+    row.classList.add('bump');
+    setTimeout(function() { row.classList.remove('bump'); }, 150);
+  }
+
   function stepItemQty(btn, delta) {
     var stepper = btn.parentElement;
     var input = stepper.querySelector('.item-qty');
@@ -3140,6 +3195,7 @@
     if (val < 0) val = 0;
     if (val > 99) val = 99;
     input.value = val;
+    updateOrderTotal();
   }
 
   function renderPaymentMethods() {
