@@ -1323,14 +1323,13 @@
     }
     .order-payment-option input { accent-color: #ff2a2a; margin: 0; }
     .order-item-cb {
-      display: inline-flex;
+      display: flex;
       align-items: center;
-      gap: 4px;
-      padding: 6px 10px;
+      gap: 6px;
+      padding: 6px 8px;
       border-radius: 6px;
       border: 1px solid rgba(255,0,0,0.13);
       background: rgba(255,0,0,0.03);
-      cursor: pointer;
       font-size: 6px;
       color: rgba(255,220,220,0.75);
       transition: border-color .2s, background .2s;
@@ -1340,28 +1339,37 @@
       border-color: rgba(255,0,0,0.35);
       background: rgba(255,0,0,0.07);
     }
-    .order-item-cb input { accent-color: #ff2a2a; margin: 0; width: 10px; height: 10px; }
     .order-items-section-label {
       font-size: 6px; color: rgba(255,200,200,0.3);
       margin: 6px 0 4px; letter-spacing: 1px; text-transform: uppercase;
     }
     .order-items-section-label:first-child { margin-top: 0; }
     .order-items-grid {
-      display: flex; flex-wrap: wrap; gap: 4px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
     }
     #priceItemsContainer { min-height: 30px; }
     #paymentMethodsContainer { min-height: 50px; }
-    .item-qty {
-      width: 26px; height: 18px; padding: 0 2px; box-sizing: border-box;
-      font-family: 'Press Start 2P', monospace; font-size: 6px; line-height: 18px;
-      text-align: center; background: rgba(255,0,0,0.05);
-      border: 1px solid rgba(255,0,0,0.15); border-radius: 4px;
-      color: rgba(255,220,220,0.85); outline: none;
-      -moz-appearance: textfield;
+    .item-stepper {
+      display: flex; align-items: center; gap: 3px; flex-shrink: 0;
     }
-    .item-qty::-webkit-outer-spin-button,
-    .item-qty::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-    .item-qty:focus { border-color: rgba(255,0,0,0.4); box-shadow: 0 0 10px rgba(255,0,0,0.08); }
+    .item-stepper-btn {
+      width: 16px; height: 16px; padding: 0; box-sizing: border-box;
+      font-family: 'Press Start 2P', monospace; font-size: 8px; line-height: 1;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(255,0,0,0.1); border: 1px solid rgba(255,0,0,0.25);
+      border-radius: 4px; color: rgba(255,220,220,0.9); cursor: pointer;
+      transition: background .15s, border-color .15s;
+    }
+    .item-stepper-btn:hover { background: rgba(255,0,0,0.22); border-color: rgba(255,0,0,0.5); }
+    .item-stepper-btn:active { transform: scale(0.92); }
+    .item-qty {
+      width: 20px; height: 16px; padding: 0; box-sizing: border-box;
+      font-family: 'Press Start 2P', monospace; font-size: 6px; line-height: 16px;
+      text-align: center; background: transparent;
+      border: none;
+      color: rgba(255,220,220,0.9); outline: none;
+      pointer-events: none;
+    }
 
     .order-submit {
       display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -1416,7 +1424,7 @@
       -webkit-backdrop-filter: blur(4px);
     }
     .order-modal {
-      width: 420px; max-width: 95vw; padding: 32px 28px;
+      width: 560px; max-width: 95vw; padding: 32px 34px;
       border-radius: 22px;
       background: var(--bg-panel-92);
       border: 1px solid rgba(255,0,0,0.3);
@@ -1427,9 +1435,15 @@
       will-change: transform;
       transition: border-color .25s, box-shadow .25s, transform .1s ease-out;
       cursor: default;
-      max-height: 90vh; overflow-y: auto; overflow-x: hidden;
+      max-height: 96vh; overflow-y: auto; overflow-x: hidden;
       animation: modalIn .35s cubic-bezier(.16,1,.3,1);
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,0,0,0.3) transparent;
     }
+    .order-modal::-webkit-scrollbar { width: 6px; }
+    .order-modal::-webkit-scrollbar-track { background: transparent; }
+    .order-modal::-webkit-scrollbar-thumb { background: rgba(255,0,0,0.3); border-radius: 6px; }
+    .order-modal::-webkit-scrollbar-thumb:hover { background: rgba(255,30,30,0.5); }
     .order-modal:hover { border-color: rgba(255,0,0,0.5); box-shadow: 0 0 60px rgba(255,0,0,0.24); }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes modalIn {
@@ -3105,14 +3119,27 @@
       html += '<div class="order-items-grid">';
       for (var ii = 0; ii < sec.items.length; ii++) {
         var item = sec.items[ii];
-        html += '<label class="order-item-cb" style="display:inline-flex;align-items:center;gap:4px;padding:5px 8px;font-size:6px">' +
-          '<span style="flex:1;min-width:0">' + item.name + ' <span style="opacity:0.5">' + item.price + '</span></span>' +
-          '<input type="number" class="item-qty" min="0" max="99" value="0" data-price="' + item.price + '" data-name="' + item.name.replace(/"/g,'&quot;') + '">' +
-        '</label>';
+        html += '<div class="order-item-cb">' +
+          '<span style="flex:1;min-width:0;text-align:left">' + item.name + ' <span style="opacity:0.5">' + item.price + '</span></span>' +
+          '<div class="item-stepper">' +
+            '<button type="button" class="item-stepper-btn" onclick="stepItemQty(this,-1)">−</button>' +
+            '<input type="text" class="item-qty" readonly value="0" data-price="' + item.price + '" data-name="' + item.name.replace(/"/g,'&quot;') + '">' +
+            '<button type="button" class="item-stepper-btn" onclick="stepItemQty(this,1)">+</button>' +
+          '</div>' +
+        '</div>';
       }
       html += '</div>';
     }
     container.innerHTML = html;
+  }
+
+  function stepItemQty(btn, delta) {
+    var stepper = btn.parentElement;
+    var input = stepper.querySelector('.item-qty');
+    var val = (parseInt(input.value) || 0) + delta;
+    if (val < 0) val = 0;
+    if (val > 99) val = 99;
+    input.value = val;
   }
 
   function renderPaymentMethods() {
