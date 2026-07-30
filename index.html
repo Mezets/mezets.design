@@ -368,6 +368,20 @@
     .discord-order-btn:hover { transform: scale(1.03); box-shadow: 0 0 24px rgba(88,101,242,0.5); }
     .discord-order-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
 
+    .order-choice-btns-main {
+      display: flex; gap: 10px; margin-top: 16px;
+    }
+    .discord-order-btn-half {
+      flex: 1; margin-top: 0; padding: 16px 8px; font-size: 9px;
+    }
+    .discord-order-btn-half.site {
+      background: rgba(255,0,0,0.08); border: 1px solid rgba(255,0,0,0.3); color: #ff8888;
+    }
+    .discord-order-btn-half.site:hover { box-shadow: 0 0 24px rgba(255,0,0,0.3); }
+    @media (max-width: 400px) {
+      .order-choice-btns-main { flex-direction: column; }
+    }
+
     .stats { text-align: center; display: flex; flex-direction: column; flex: 1; }
     .stats-body { flex: 1; position: relative; z-index: 2; }
     .stat-block { margin: 18px 0; }
@@ -1060,6 +1074,18 @@
       font-size: 8px; color: rgba(150,255,150,0.7);
       margin-bottom: 14px; line-height: 1.6;
     }
+    .my-profile-widget {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 14px;
+    }
+    .my-profile-widget img {
+      width: 32px; height: 32px; border-radius: 50%;
+      border: 1px solid rgba(150,255,150,0.4);
+      flex-shrink: 0;
+    }
+    .my-profile-widget-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+    .my-profile-name { font-size: 8px; color: rgba(180,255,180,0.9); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .my-profile-date { font-size: 6px; color: rgba(150,255,150,0.5); }
 
     body.light-theme .roulette-winners-title,
     body.light-theme .roulette-winners-empty,
@@ -1298,8 +1324,11 @@
     .order-select option { background: #1a0505; color: rgba(255,220,220,0.9); }
     .order-payment-group {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
       gap: 8px;
+    }
+    @media (max-width: 600px) {
+      .order-payment-group { grid-template-columns: 1fr 1fr; }
     }
     .order-payment-option {
       display: flex;
@@ -1346,7 +1375,10 @@
     }
     .order-items-section-label:first-child { margin-top: 0; }
     .order-items-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px;
+    }
+    @media (max-width: 600px) {
+      .order-items-grid { grid-template-columns: 1fr 1fr; }
     }
     #priceItemsContainer { min-height: 30px; }
     #paymentMethodsContainer { min-height: 50px; }
@@ -1425,7 +1457,7 @@
       -webkit-backdrop-filter: blur(4px);
     }
     .order-modal {
-      width: 560px; max-width: 95vw; padding: 32px 34px;
+      width: 720px; max-width: 95vw; padding: 32px 34px;
       border-radius: 22px;
       background: var(--bg-panel-92);
       border: 1px solid rgba(255,0,0,0.3);
@@ -2062,10 +2094,15 @@
     </div>
     </div>
 
-    <button class="discord-order-btn" onclick="openOrderModal()">
-      <svg viewBox="0 0 127.14 96.36" fill="currentColor"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2A75.57,75.57,0,0,0,95.9,78.05c.87.65,1.76,1.33,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.9,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53.06s5-12.64,11.43-12.64S54,46.13,53.89,53.06,48.84,65.69,42.45,65.69Zm42.24,0c-6.27,0-11.44-5.69-11.44-12.63s5-12.64,11.44-12.64S96.23,46.13,96.12,53.06,91.08,65.69,84.69,65.69Z"/></svg>
-      Заказать оформление
-    </button>
+    <div class="order-choice-btns-main">
+      <button class="discord-order-btn discord-order-btn-half" onclick="orderViaDiscord()">
+        <svg viewBox="0 0 127.14 96.36" fill="currentColor"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2A75.57,75.57,0,0,0,95.9,78.05c.87.65,1.76,1.33,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.9,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53.06s5-12.64,11.43-12.64S54,46.13,53.89,53.06,48.84,65.69,42.45,65.69Zm42.24,0c-6.27,0-11.44-5.69-11.44-12.63s5-12.64,11.44-12.64S96.23,46.13,96.12,53.06,91.08,65.69,84.69,65.69Z"/></svg>
+        Discord сервер
+      </button>
+      <button class="discord-order-btn discord-order-btn-half site" onclick="openOrderModal()">
+        Через сайт
+      </button>
+    </div>
   </div>
 
   <div class="reviews-card">
@@ -2082,22 +2119,7 @@
   <div class="order-modal" id="orderModalBox">
     <div class="order-modal-close" onclick="closeOrderModal()">✕</div>
 
-    <div id="orderChoiceStep">
-      <div class="order-modal-title">Оформить заказ</div>
-      <div class="order-modal-subtitle">Выбери способ оформления</div>
-      <div class="order-choice-btns">
-        <button class="order-choice-btn discord" onclick="orderViaDiscord()">
-          <svg viewBox="0 0 127.14 96.36" fill="currentColor"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2A75.57,75.57,0,0,0,95.9,78.05c.87.65,1.76,1.33,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.9,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53.06s5-12.64,11.43-12.64S54,46.13,53.89,53.06,48.84,65.69,42.45,65.69Zm42.24,0c-6.27,0-11.44-5.69-11.44-12.63s5-12.64,11.44-12.64S96.23,46.13,96.12,53.06,91.08,65.69,84.69,65.69Z"/></svg>
-          <span>Discord сервер</span>
-        </button>
-        <button class="order-choice-btn site" onclick="orderViaSite()">
-          <span>Через сайт</span>
-        </button>
-      </div>
-    </div>
-
-    <div id="orderFormStep" style="display:none">
-      <button class="order-modal-back" onclick="backToOrderChoice()">← Назад</button>
+    <div id="orderFormStep">
       <div class="order-modal-title">Оформить заказ</div>
       <div class="order-field">
         <div class="order-label">Категория</div>
@@ -2559,6 +2581,29 @@
   }
   setTimeout(hideLoadingGate, 6000);
 
+  async function loadMyProfile(session) {
+    const el = document.getElementById('loggedAs');
+    if (!el) return;
+    try {
+      const res = await fetch(`${API}/api/me?session=${encodeURIComponent(session)}`, { mode: 'cors' });
+      const data = await res.json();
+      if (!data.user) return;
+      const u = data.user;
+      const dateStr = u.login_at ? u.login_at.split(' ')[0].split('-').reverse().join('.') : '';
+      el.innerHTML = `
+        <div class="my-profile-widget">
+          ${u.avatar ? `<img src="${u.avatar}" alt="">` : ''}
+          <div class="my-profile-widget-text">
+            <div class="my-profile-name">${(u.username || 'Discord').replace(/</g,'&lt;')}</div>
+            ${dateStr ? `<div class="my-profile-date">Вход: ${dateStr}</div>` : ''}
+          </div>
+        </div>
+      `;
+    } catch(e) {
+      // тихо оставляем текстовую заглушку "Вы вошли через Discord"
+    }
+  }
+
   async function setupLoginButton() {
     try {
       const res  = await fetch(`${API}/discord-login-url`, { mode: 'cors' });
@@ -2629,6 +2674,7 @@
       }
 
       document.getElementById('loggedAs').textContent = 'Вы вошли через Discord';
+      loadMyProfile(session);
 
       if (!data.can_spin) {
         btn.textContent   = 'Уже крутил';
@@ -3014,33 +3060,24 @@
   }
 
   /* ── МОДАЛКА ЗАКАЗА ── */
-  function openOrderModal() {
-    document.getElementById('orderModalOverlay').style.display = 'flex';
-    document.getElementById('orderChoiceStep').style.display = 'block';
-    document.getElementById('orderFormStep').style.display = 'none';
-  }
-  function closeOrderModal() {
-    document.getElementById('orderModalOverlay').style.display = 'none';
-  }
-  function backToOrderChoice() {
-    document.getElementById('orderFormStep').style.display = 'none';
-    document.getElementById('orderChoiceStep').style.display = 'block';
-  }
-  function orderViaDiscord() {
-    window.open('https://discord.gg/aBJBmzS49e', '_blank');
-  }
-  async function orderViaSite() {
+  async function openOrderModal() {
     var s; try { s = localStorage.getItem('mezets_session') || ''; } catch(e) { s = ''; }
     if (!s) {
       try { var r = await fetch(API + '/discord-login-url'); var d = await r.json(); window.location.href = d.url; } catch(e) { window.location.href = API + '/discord-login-url'; }
       return;
     }
-    document.getElementById('orderChoiceStep').style.display = 'none';
+    document.getElementById('orderModalOverlay').style.display = 'flex';
     document.getElementById('orderFormStep').style.display = 'block';
     document.getElementById('orderNotLogged').style.display = 'none';
     await renderCategories();
     renderPriceItems();
     renderPaymentMethods();
+  }
+  function closeOrderModal() {
+    document.getElementById('orderModalOverlay').style.display = 'none';
+  }
+  function orderViaDiscord() {
+    window.open('https://discord.gg/aBJBmzS49e', '_blank');
   }
 
   var cachedCategories = null;
