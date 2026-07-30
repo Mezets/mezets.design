@@ -1430,6 +1430,23 @@
       max-height: 90vh; overflow-y: auto; overflow-x: hidden;
       animation: modalIn .35s cubic-bezier(.16,1,.3,1);
     }
+    .order-modal::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      z-index: 0;
+      border-radius: 22px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .25s ease;
+      background: radial-gradient(
+        260px circle at var(--glow-x, 50%) var(--glow-y, 50%),
+        rgba(255,90,90,0.16),
+        transparent 60%
+      );
+    }
+    .order-modal:hover::before { opacity: 1; }
+    .order-modal > * { position: relative; z-index: 1; }
     .order-modal:hover { border-color: rgba(255,0,0,0.5); box-shadow: 0 0 60px rgba(255,0,0,0.24); }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes modalIn {
@@ -2974,6 +2991,9 @@
 
   const reviewsCard = document.querySelector('.reviews-card');
   if (reviewsCard) tilt(reviewsCard);
+
+  const orderModalBoxEl = document.getElementById('orderModalBox');
+  if (orderModalBoxEl) tilt(orderModalBoxEl);
 
   const rouletteOverlayEl = document.getElementById('rouletteOverlay');
   const rouletteBoxEl     = document.getElementById('rouletteBox');
