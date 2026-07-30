@@ -2320,6 +2320,7 @@
     { img: "portfolio/png/9ef13f1bfc538763.png", type: "Оформление форумного аккаунта", time: "1 день" },
     { img: "portfolio/png/prev.png", type: "Превью для YouTube", time: "2 дня" },
     { img: "portfolio/mp4/5abbc31fb75cc879.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
+    { img: "portfolio/png/2.png", type: "Оформление форумного аккаунта", time: "1 день" },
     { img: "portfolio/mp4/9aea3cf2d065ca86.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
     { img: "portfolio/png/a3e33aad31bfabfe.png", type: "Оформление форумного аккаунта", time: "1 день" },
     { img: "portfolio/mp4/b48e6dd5bea5da15.mp4", type: "Анимированное оформление форумного аккаунта", time: "2 дня" },
@@ -2489,7 +2490,76 @@
   }
   registerDevice();
 
-  
+  let banEnforced = false;
+  function enforceBanOverlay(reason) {
+    const overlay = document.getElementById('banOverlay');
+    const reasonLine = document.getElementById('banReasonLine');
+    overlay.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    if (reason) {
+      reasonLine.textContent = 'Причина: ' + reason;
+      reasonLine.style.display = 'block';
+    }
+    if (!banEnforced) {
+      banEnforced = true;
+
+      Array.from(document.body.children).forEach(el => {
+        if (el.id !== 'banOverlay' && el.id !== 'banSound') el.remove();
+      });
+
+      const snd = document.getElementById('banSound');
+      if (snd) {
+        snd.currentTime = 0;
+        const playPromise = snd.play();
+        if (playPromise && playPromise.catch) {
+          playPromise.catch(() => {
+            const retry = () => { snd.currentTime = 0; snd.play().catch(()=>{}); };
+            document.addEventListener('click', retry, { once: true });
+            document.addEventListener('keydown', retry, { once: true });
+            document.addEventListener('touchstart', retry, { once: true });
+          });
+        }
+      }
+
+      document.addEventListener('keydown', e => {
+        if (e.key === 'F12') e.preventDefault();
+        if (e.ctrlKey && e.shiftKey && ['I','J','C','K'].includes(e.key.toUpperCase())) e.preventDefault();
+        if (e.ctrlKey && e.key.toUpperCase() === 'U') e.preventDefault();
+      }, true);
+      document.addEventListener('contextmenu', e => e.preventDefault(), true);
+
+      const mo = new MutationObserver(() => {
+        const ov = document.getElementById('banOverlay');
+        if (!ov || ov.style.display !== 'flex') {
+          location.reload();
+        }
+      });
+      mo.observe(overlay, { attributes: true, attributeFilter: ['style','class'] });
+      mo.observe(document.body, { childList: true });
+
+      setInterval(() => {
+        const ov = document.getElementById('banOverlay');
+        if (ov) { ov.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+      }, 800);
+
+      let ddtWarned = false;
+      setInterval(() => {
+        const wDiff = window.outerWidth  - window.innerWidth;
+        const hDiff = window.outerHeight - window.innerHeight;
+        if (wDiff > 160 || hDiff > 160) {
+          if (!ddtWarned) { ddtWarned = true; }
+          location.reload();
+        } else {
+          ddtWarned = false;
+        }
+      }, 1000);
+    }
+  }
+
+  function hideLoadingGate() {
+    const gate = document.getElementById('loadingGate');
+    if (gate) gate.style.display = 'none';
+  }
 
   async function checkSiteBan(session, fp) {
     try {
