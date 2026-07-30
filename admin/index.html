@@ -543,7 +543,6 @@
       <button class="tab" onclick="switchTab('orders')">📦 ЗАКАЗЫ</button>
       <button class="tab" onclick="switchTab('maint')">🛠️ ТЕХРАБОТЫ</button>
       <button class="tab" onclick="switchTab('db')">🗄️ БД</button>
-      <button class="tab" onclick="switchTab('payments')">💳 ОПЛАТА</button>
     </div>
 
     <div id="tabUpload" class="tab-panel active">
@@ -791,6 +790,8 @@
           <div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2;text-align:center;padding:20px">Загрузка...</div>
         </div>
         <div class="status" id="ordersSearchStatus"></div>
+      </div>
+
 <!-- Order chat modal -->
       <div id="orderChatOverlay" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(5,0,0,0.88);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px">
         <div style="background:rgba(12,0,0,0.95);border:1px solid rgba(255,0,0,0.25);border-radius:18px;max-width:640px;width:100%;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 0 60px rgba(255,0,0,0.15)">
@@ -799,7 +800,10 @@
               <div style="font-size:11px;color:#ff2a2a;letter-spacing:1px" id="chatOrderTitle">Заказ #—</div>
               <div style="font-size:7px;color:rgba(255,200,200,0.4);margin-top:4px" id="chatOrderMeta"></div>
             </div>
-            <button class="btn btn-sm" onclick="closeOrderChat()" style="width:auto;font-size:9px">✕</button>
+            <div style="display:flex;gap:6px;align-items:center">
+              <button class="btn btn-sm" onclick="deleteOrderChat()" title="Удалить заказ" style="width:auto;font-size:9px;border-color:rgba(255,0,0,0.35);color:#ff5555">🗑</button>
+              <button class="btn btn-sm" onclick="closeOrderChat()" style="width:auto;font-size:9px">✕</button>
+            </div>
           </div>
           <div id="chatMessages" style="flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:8px;min-height:200px;max-height:50vh"></div>
           <div style="display:flex;gap:8px;padding:12px 20px 18px;border-top:1px solid rgba(255,0,0,0.12)">
@@ -807,6 +811,21 @@
             <button class="btn btn-sm" onclick="adminSendMsg()" style="width:auto;font-size:9px">→</button>
           </div>
         </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">💳 СПОСОБЫ ОПЛАТЫ</div>
+        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+          <input type="text" id="pmKeyInput" placeholder="Ключ (sbp)" style="flex:1;font-size:7px;min-width:80px">
+          <input type="text" id="pmLabelInput" placeholder="Название (СБП)" style="flex:1;font-size:7px;min-width:100px">
+        </div>
+        <button class="btn btn-sm" onclick="addPaymentMethod()" style="margin-bottom:14px;border-color:rgba(0,200,0,0.35);color:#55ff55">➕ Добавить</button>
+        <div class="works-list" id="paymentMethodsList"><div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div></div>
+        <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+          <button class="btn btn-sm" onclick="loadPaymentMethods()">🔄 Загрузить</button>
+          <button class="btn btn-sm" onclick="savePaymentMethods()" style="background:rgba(0,180,0,0.08);border-color:rgba(0,200,0,0.3);color:#55ff55">💾 Сохранить на GitHub</button>
+        </div>
+        <div class="status" id="pmStatus"></div>
       </div>
 
     </div>
@@ -892,22 +911,6 @@
           <div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Выбери таблицу выше</div>
         </div>
       </div>
-    <div id="tabPayments" class="tab-panel">
-      <div class="card">
-        <div class="card-title">💳 СПОСОБЫ ОПЛАТЫ</div>
-        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
-          <input type="text" id="pmKeyInput" placeholder="Ключ (sbp)" style="flex:1;font-size:7px;min-width:80px">
-          <input type="text" id="pmLabelInput" placeholder="Название (СБП)" style="flex:1;font-size:7px;min-width:100px">
-        </div>
-        <button class="btn btn-sm" onclick="addPaymentMethod()" style="margin-bottom:14px;border-color:rgba(0,200,0,0.35);color:#55ff55">➕ Добавить</button>
-        <div class="works-list" id="paymentMethodsList"><div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div></div>
-        <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
-          <button class="btn btn-sm" onclick="loadPaymentMethods()">🔄 Загрузить</button>
-          <button class="btn btn-sm" onclick="savePaymentMethods()" style="background:rgba(0,180,0,0.08);border-color:rgba(0,200,0,0.3);color:#55ff55">💾 Сохранить на GitHub</button>
-        </div>
-        <div class="status" id="pmStatus"></div>
-      </div>
-    </div>
 
   </div><!-- /mainScreen -->
 </div><!-- /wrap -->
@@ -1069,7 +1072,7 @@ function enterUsersGate() {
 }
 
 function switchTab(tab) {
-  const order = ['upload','manage','prices','rules','users','orders','maint','db','payments'];
+  const order = ['upload','manage','prices','rules','users','orders','maint','db'];
   const tabButtons = document.querySelectorAll('.tab');
   tabButtons.forEach((t,i) => t.classList.toggle('active', order[i]===tab));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
@@ -1080,9 +1083,9 @@ function switchTab(tab) {
   if (tab === 'rules') loadRules();
   if (tab === 'users' && getAdminKey()) { loadUsers(); loadUnauthUsers(); loadWatchlist(); loadBannedIps(); }
   if (tab === 'orders' && getAdminKey()) { loadOrders(); loadCategories(); }
+  if (tab === 'orders' && TOKEN) loadPaymentMethods();
   if (tab === 'maint' && getAdminKey()) loadMaintenance();
   if (tab === 'db' && getAdminKey()) loadDbTablesList();
-  if (tab === 'payments' && TOKEN) loadPaymentMethods();
 }
 
 async function login() {
@@ -1322,8 +1325,7 @@ async function loadWorks() {
     container.innerHTML = '';
     const baseUrl = `https://raw.githubusercontent.com/${REPO}/${BRANCH}/`;
 
-    items.slice().reverse().forEach((item, revIdx) => {
-      const realIdx = items.length - 1 - revIdx;
+    items.slice().reverse().forEach((item) => {
       const el = document.createElement('div');
       el.className = 'work-item';
 
@@ -1332,13 +1334,15 @@ async function loadWorks() {
         ? `<video class="work-thumb" src="${baseUrl}${item.img}" muted playsinline preload="metadata"></video>`
         : `<img class="work-thumb" src="${baseUrl}${item.img}" alt="">`;
 
+      const groupBadge = item.inGroup ? ' <span style="opacity:0.5">(в группе)</span>' : '';
+
       el.innerHTML = `
         ${thumbHtml}
         <div class="work-info">
-          <div class="work-type">${item.type}</div>
+          <div class="work-type">${item.type}${groupBadge}</div>
           <div class="work-file">${item.img}</div>
         </div>
-        <div class="work-del" title="Удалить из index.html" onclick="deleteWork(${realIdx})">✕</div>
+        <div class="work-del" title="Удалить из index.html" onclick="deleteWork(${JSON.stringify(item.img)})">✕</div>
       `;
       container.appendChild(el);
     });
@@ -1347,6 +1351,14 @@ async function loadWorks() {
   }
 }
 
+/*
+ * Парсит PORTFOLIO_ITEMS с учётом структуры group: [...] — записи внутри
+ * группы возвращаются наравне с обычными, но с пометкой inGroup:true, чтобы
+ * счётчик и удаление работали корректно вне зависимости от вложенности.
+ * Совпадение объекта { img: "...", type: "...", time: "..." } одинаковое
+ * что на верхнем уровне, что внутри group — регэксп находит все объекты,
+ * а вложенность определяется по позиции относительно ближайшего "group: [".
+ */
 function parsePortfolioItems(html) {
   const start = html.indexOf('const PORTFOLIO_ITEMS = [');
   const end   = html.indexOf('\n  ];', start);
@@ -1354,17 +1366,32 @@ function parsePortfolioItems(html) {
   const block = html.slice(start, end);
   const items = [];
   const single = /\{\s*img:\s*"([^"]+)",\s*type:\s*"([^"]+)",\s*time:\s*"([^"]+)"\s*\}/g;
+  const groupStarts = [];
+  const groupRx = /group:\s*\[/g;
+  let gm;
+  while ((gm = groupRx.exec(block)) !== null) groupStarts.push(gm.index);
+
   let m;
   while ((m = single.exec(block)) !== null) {
-    items.push({ img: m[1], type: m[2], time: m[3] });
+    // определяем, находится ли этот объект внутри ближайшего предшествующего group: [
+    // (грубая, но достаточная эвристика: считаем непарные ] после group-старта)
+    let inGroup = false;
+    for (const gs of groupStarts) {
+      if (gs < m.index) {
+        const between = block.slice(gs, m.index);
+        const closes = (between.match(/\]/g) || []).length;
+        const opens  = (between.match(/\[/g) || []).length;
+        if (opens > closes) inGroup = true;
+      }
+    }
+    items.push({ img: m[1], type: m[2], time: m[3], inGroup });
   }
   return items;
 }
 
-async function deleteWork(idx) {
+async function deleteWork(img) {
   if (!confirm('Удалить запись из PORTFOLIO_ITEMS?\n(Файл в репозитории останется)')) return;
 
-  const container = document.getElementById('worksList');
   try {
     const indexFile = await getFile('index.html');
     if (!indexFile) throw new Error('index.html не найден');
@@ -1374,17 +1401,16 @@ async function deleteWork(idx) {
     const end   = html.indexOf('\n  ];', start);
     if (start === -1 || end === -1) throw new Error('Не найден PORTFOLIO_ITEMS');
 
-    const block  = html.slice(start, end);
-    const single = /\{\s*img:\s*"([^"]+)",\s*type:\s*"([^"]+)",\s*time:\s*"([^"]+)"\s*\}/g;
-    let i = 0, m, toRemove = null, toRemoveFull = null;
-    while ((m = single.exec(block)) !== null) {
-      if (i === idx) { toRemove = m[0]; toRemoveFull = m[0]; break; }
-      i++;
-    }
-    if (!toRemove) throw new Error('Запись не найдена');
+    // Удаляем ровно объект с данным img (уникальный ключ, не завязано на порядок/вложенность)
+    const itemRx = new RegExp(`\\s*\\{\\s*img:\\s*"${escapeRegex(img)}"[^}]*\\}\\s*,?`);
+    if (!itemRx.test(html)) throw new Error('Запись не найдена');
+    html = html.replace(itemRx, '');
 
-    const lineRx = new RegExp(`\\s*\\{\\s*img:\\s*"${escapeRegex(toRemove.match(/img:\s*"([^"]+)"/)[1])}"[^}]+\\},?`);
-    html = html.replace(lineRx, '');
+    // Чистим пустые или однослойные группы, которые могли остаться после удаления
+    // group: [ ] или group: [ ,] -> убираем всю обёртку целиком
+    html = html.replace(/,?\s*\{\s*group:\s*\[\s*,?\s*\]\s*\},?/g, '');
+    // group: [ { единственный элемент } ] -> разворачиваем обратно в обычную запись без group
+    html = html.replace(/\{\s*group:\s*\[\s*(\{\s*img:[\s\S]*?\})\s*,?\s*\]\s*\}/g, '$1');
 
     const htmlB64 = btoa(unescape(encodeURIComponent(html)));
     const res = await ghFetch(`/repos/${REPO}/contents/index.html`, TOKEN, {
@@ -1552,13 +1578,42 @@ async function savePrices() {
         return `      <div class="item" style="animation-delay:${delay}s">\n        <div class="item-row"><span class="item-dot"></span><span class="item-name">${escHtml(it.name)}</span></div><span class="item-price">${escHtml(it.price)}</span>\n      </div>`;
       }).join('\n');
 
-      const sectionRx = new RegExp(
-        '(<div class="section">\\s*<div class="section-label">' + escapeRegex(section) + '<\\/div>\\s*<div class="items-grid">)([\\s\\S]*?)(<\\/div>\\s*<\\/div>)',
-        'g'
+      // Находим начало нужной секции и открывающий тег её items-grid
+      const headerRx = new RegExp(
+        '<div class="section">\\s*<div class="section-label">' + escapeRegex(section) + '<\\/div>\\s*<div class="items-grid">'
       );
-      rawHtml = rawHtml.replace(sectionRx, (m, before, _old, after) => {
-        return before + '\n' + itemsHtml + '\n    ' + after;
-      });
+      const headerMatch = headerRx.exec(rawHtml);
+      if (!headerMatch) return; // секция не найдена в файле — пропускаем, не трогаем rawHtml
+
+      const gridOpenEnd = headerMatch.index + headerMatch[0].length;
+
+      // Считаем баланс <div ...> / </div> от начала содержимого items-grid,
+      // чтобы найти ЕЁ СОБСТВЕННЫЙ закрывающий </div>, а не первые два </div> подряд,
+      // которые могли встретиться раньше внутри вложенных .item
+      const divOpenRx  = /<div\b[^>]*>/g;
+      const divCloseTag = '</div>';
+      let depth = 1; // мы уже внутри открытого items-grid
+      let pos = gridOpenEnd;
+      let gridCloseStart = -1;
+      while (pos < rawHtml.length) {
+        const nextOpen  = rawHtml.indexOf('<div', pos);
+        const nextClose = rawHtml.indexOf(divCloseTag, pos);
+        if (nextClose === -1) break; // битый HTML — не трогаем
+        if (nextOpen !== -1 && nextOpen < nextClose) {
+          // проверяем, что это реально открывающий тег div (а не текст "<div" внутри чего-то ещё — на практике безопасно)
+          depth++;
+          pos = nextOpen + 4;
+        } else {
+          depth--;
+          if (depth === 0) { gridCloseStart = nextClose; break; }
+          pos = nextClose + divCloseTag.length;
+        }
+      }
+      if (gridCloseStart === -1) return; // не смогли безопасно найти конец — пропускаем секцию
+
+      const before = rawHtml.slice(0, gridOpenEnd);
+      const after  = rawHtml.slice(gridCloseStart);
+      rawHtml = before + '\n' + itemsHtml + '\n    ' + after;
     });
 
     showStatus(status, 'Сохраняю...', 'info');
@@ -1598,7 +1653,7 @@ async function loadPaymentMethods() {
     const f = await getFile('common.js');
     if (!f) { paymentMethodsData = []; throw new Error('common.js не найден'); }
     const content = decodeURIComponent(escape(atob(f.content)));
-    const match = content.match(/\/\/ --- PAYMENT_METHODS_START ---\nconst PAYMENT_METHODS = ([\s\S]*?)\/\/ --- PAYMENT_METHODS_END ---/);
+    const match = content.match(/\/\/ --- PAYMENT_METHODS_START ---\nvar PAYMENT_METHODS = ([\s\S]*?)\/\/ --- PAYMENT_METHODS_END ---/);
     if (!match) throw new Error('PAYMENT_METHODS не найден в common.js');
     paymentMethodsData = JSON.parse(match[1].trim().replace(/;\s*$/, ''));
     renderPaymentMethods();
@@ -1653,7 +1708,7 @@ async function savePaymentMethods() {
     const f = await getFile('common.js');
     if (!f) throw new Error('common.js не найден');
     const content = decodeURIComponent(escape(atob(f.content)));
-    const replacement = '// --- PAYMENT_METHODS_START ---\nconst PAYMENT_METHODS = ' + json + ';\n// --- PAYMENT_METHODS_END ---';
+    const replacement = '// --- PAYMENT_METHODS_START ---\nvar PAYMENT_METHODS = ' + json + ';\n// --- PAYMENT_METHODS_END ---';
     const newContent = content.replace(/\/\/ --- PAYMENT_METHODS_START ---[\s\S]*?\/\/ --- PAYMENT_METHODS_END ---/g, replacement);
     const b64 = btoa(unescape(encodeURIComponent(newContent)));
     const body = { message: 'update PAYMENT_METHODS in common.js', content: b64, branch: BRANCH };
@@ -2917,6 +2972,19 @@ function closeOrderChat() {
   ACTIVE_CHAT_ORDER_ID = null;
   document.getElementById('orderChatOverlay').style.display = 'none';
   if (CHAT_POLL_TIMER) { clearInterval(CHAT_POLL_TIMER); CHAT_POLL_TIMER = null; }
+}
+
+async function deleteOrderChat() {
+  if (!ACTIVE_CHAT_ORDER_ID) return;
+  if (!confirm('Удалить заказ #' + ACTIVE_CHAT_ORDER_ID + ' безвозвратно?\nБудут удалены все сообщения и вложения. Действие необратимо.')) return;
+  try {
+    var res = await adminFetch(BOT_API + '/admin/order/' + ACTIVE_CHAT_ORDER_ID, { method: 'DELETE' });
+    if (!res.ok) throw new Error('Сервер отклонил удаление (' + res.status + ')');
+    closeOrderChat();
+    await loadOrders();
+  } catch(e) {
+    alert('Не удалось удалить заказ: ' + e.message);
+  }
 }
 
 async function pollChatMessages() {
