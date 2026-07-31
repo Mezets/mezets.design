@@ -100,9 +100,9 @@ html, body {
   align-self: flex-start;
   background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
 }
-.msg-author { font-size: 6px; color: rgba(255,200,200,0.4); margin-bottom: 5px; }
-.msg-text { font-size: 7px; color: rgba(255,220,220,0.9); line-height: 1.6; font-family: sans-serif; }
-.msg-time { font-size: 5px; color: rgba(255,150,150,0.3); margin-top: 4px; text-align: right; font-family: monospace; }
+.msg-author { font-size: 7px; color: rgba(255,200,200,0.5); margin-bottom: 5px; }
+.msg-text { font-size: 9px; color: rgba(255,220,220,0.9); line-height: 1.7; font-family: sans-serif; }
+.msg-time { font-size: 6px; color: rgba(255,150,150,0.35); margin-top: 4px; text-align: right; font-family: monospace; }
 .msg-attachments { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
 .msg-attachment {
   font-size: 6px; padding: 4px 8px; border-radius: 6px;
@@ -111,6 +111,14 @@ html, body {
   transition: .2s;
 }
 .msg-attachment:hover { border-color: rgba(255,60,60,0.3); }
+.msg-attachment-img {
+  display: block; max-width: 220px; max-height: 220px;
+  border-radius: 8px; overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: .2s;
+}
+.msg-attachment-img:hover { border-color: rgba(255,60,60,0.4); transform: scale(1.02); }
+.msg-attachment-img img { display: block; width: 100%; height: 100%; object-fit: cover; max-height: 220px; }
 
 .chat-input-row {
   display: flex; gap: 8px;
@@ -119,7 +127,7 @@ html, body {
   flex: 1; padding: 12px 14px; border-radius: 10px;
   background: rgba(255,0,0,0.05); border: 1px solid rgba(255,0,0,0.2);
   color: rgba(255,220,220,0.9);
-  font-family: 'Press Start 2P', monospace; font-size: 7px; line-height: 1.6;
+  font-family: 'Press Start 2P', monospace; font-size: 8px; line-height: 1.6;
   outline: none; transition: .2s;
 }
 .chat-input:focus { border-color: rgba(255,0,0,0.45); box-shadow: 0 0 14px rgba(255,0,0,0.1); }
@@ -162,7 +170,7 @@ html, body {
   <div style="width:38px;height:38px;border:3px solid rgba(255,40,40,0.2);border-top-color:#ff3b3b;border-radius:50%;animation:lgSpin .8s linear infinite;"></div>
 </div>
 
-<div id="maintToast" style="position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(140%);z-index:99999;background:#0d0202;border:1px solid rgba(255,40,40,0.3);border-radius:14px;padding:16px 22px;max-width:440px;width:90%;backdrop-filter:blur(12px);transition:transform .4s ease;box-shadow:0 0 40px rgba(255,0,0,0.15);">
+<div id="maintToast" style="position:fixed;bottom:20px;left:20px;z-index:999;width:220px;max-width:80vw;background:rgba(8,0,0,0.97);border:1px solid rgba(255,0,0,0.4);border-radius:14px;padding:14px 14px 12px;backdrop-filter:blur(12px);transform:translateY(140%);pointer-events:none;transition:transform .4s ease;box-shadow:0 0 40px rgba(255,0,0,0.15);">
   <div id="maintToastTitle" style="font-size:10px;color:#ff2a2a;margin-bottom:6px;letter-spacing:1px;">Тех. неполадки</div>
   <div id="maintToastMsg" style="font-size:7px;color:rgba(255,200,200,0.6);line-height:1.6;"></div>
 </div>
@@ -177,7 +185,7 @@ html, body {
   <div style="position:relative">
     <div class="logo" style="display:flex;align-items:center;gap:14px"><img src="https://mezets.github.io/mezets.design/favicon.png" alt="" style="width:48px;height:48px;image-rendering:pixelated;flex-shrink:0"><span style="font-size:22px;letter-spacing:3px">Mezets</span></div>
     <div class="logo-sub">ЧАТ</div>
-    <a href="/mezets.design/order/" class="btn btn-sm" style="position:absolute;top:6px;right:0">← Заказы</a>
+    <a href="/mezets.design/" class="btn btn-sm" style="position:absolute;top:6px;right:0">← На главную</a>
   </div>
 
   <div id="loadingState">
@@ -187,7 +195,7 @@ html, body {
   <div id="notFound" style="display:none">
     <div class="card" style="text-align:center;padding:40px;">
       <div style="font-size:9px;color:rgba(255,200,200,0.4);">Заказ не найден</div>
-      <a href="/mezets.design/order/" class="btn" style="margin-top:16px;">К заказам</a>
+      <a href="/mezets.design/" class="btn" style="margin-top:16px;">На главную</a>
     </div>
   </div>
 
@@ -201,6 +209,9 @@ html, body {
         <div style="text-align:right">
           <div class="order-price" id="orderPrice"></div>
           <div class="order-status-badge" id="orderStatusBadge"></div>
+          <div style="margin-top:8px">
+            <button class="btn btn-sm btn-danger" id="closeOrderBtn" onclick="closeOrder()" style="display:none">Закрыть заказ</button>
+          </div>
         </div>
       </div>
       <div class="order-desc-box" id="orderDescBox"></div>
@@ -239,14 +250,14 @@ async function init() {
   if (!orderId) { showNotFound(); return; }
 
   const session = getSession();
-  if (!session) { window.location.href = '/mezets.design/order/'; return; }
+  if (!session) { window.location.href = '/mezets.design/'; return; }
 
   try {
     const rMe = await fetch(`${API}/api/me?session=${encodeURIComponent(session)}`);
-    if (!rMe.ok) { window.location.href = '/mezets.design/order/'; return; }
+    if (!rMe.ok) { window.location.href = '/mezets.design/'; return; }
     const dMe = await rMe.json();
     currentUser = dMe.user;
-  } catch(e) { window.location.href = '/mezets.design/order/'; return; }
+  } catch(e) { window.location.href = '/mezets.design/'; return; }
 
   await loadOrder();
 
@@ -295,6 +306,11 @@ function showNotFound() {
   g('notFound').style.display = 'block';
 }
 
+const CATEGORY_LABELS = {
+  'design': 'Дизайн', 'discord_bot': 'Discord бот', 'telegram_bot': 'Telegram бот',
+  'website': 'Сайт', 'other': 'Другое',
+};
+
 function renderOrder(order, messages, attachments) {
   g('loadingState').style.display = 'none';
   g('chatContent').style.display = 'block';
@@ -302,14 +318,37 @@ function renderOrder(order, messages, attachments) {
   const statusLabels = { 'new': 'Новый', 'in_progress': 'В работе', 'completed': 'Выполнен', 'cancelled': 'Отменён' };
   g('orderIdDisplay').textContent = `Заказ #${order.id}`;
   document.title = `Mezets - Чат заказа #${order.id}`;
-  g('orderMeta').textContent = `${order.category || ''} · ${order.created_at ? order.created_at.slice(0, 10) : ''}`;
+  g('orderMeta').textContent = `${CATEGORY_LABELS[order.category] || order.category || ''} · ${order.created_at ? order.created_at.slice(0, 10) : ''}`;
   g('orderPrice').textContent = order.estimated_price ? `${order.estimated_price} ₽` : '';
   const badge = g('orderStatusBadge');
   badge.textContent = statusLabels[order.status] || order.status;
   badge.className = 'order-status-badge status-' + order.status;
   g('orderDescBox').textContent = order.description || '';
 
+  const closeBtn = g('closeOrderBtn');
+  if (closeBtn) {
+    closeBtn.style.display = (order.status === 'completed' || order.status === 'cancelled') ? 'none' : 'inline-flex';
+  }
+
   renderMessages(messages, attachments);
+}
+
+async function closeOrder() {
+  if (!confirm('Закрыть заказ #' + orderId + '?\nПосле закрытия оформить его заново будет нельзя — только создать новый.')) return;
+  const session = getSession();
+  const btn = g('closeOrderBtn');
+  btn.disabled = true;
+  try {
+    const r = await fetch(`${API}/api/order/${orderId}/close?session=${encodeURIComponent(session)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (!r.ok) { const err = await r.json().catch(()=>({})); throw new Error(err.error || 'close failed'); }
+    await loadOrder();
+  } catch(e) {
+    alert('Не удалось закрыть заказ: ' + e.message);
+  }
+  btn.disabled = false;
 }
 
 function renderMessages(messages, attachments) {
@@ -326,12 +365,19 @@ function renderMessages(messages, attachments) {
     }
   });
 
+  function isImageFile(name, url) {
+    return /\.(png|jpe?g|gif|webp|bmp|svg)(\?|$)/i.test(name || url || '');
+  }
+
   box.innerHTML = messages.map(m => {
     const isUser = !m.from_discord;
     const atts = attMap[m.id] || [];
-    const attHtml = atts.length ? '<div class="msg-attachments">' + atts.map(a =>
-      `<a href="${a.discord_url}" target="_blank" class="msg-attachment">${a.filename || 'файл'} ↓</a>`
-    ).join('') + '</div>' : '';
+    const attHtml = atts.length ? '<div class="msg-attachments">' + atts.map(a => {
+      if (isImageFile(a.filename, a.discord_url)) {
+        return `<a href="${a.discord_url}" target="_blank" class="msg-attachment-img"><img src="${a.discord_url}" alt="${a.filename || 'изображение'}" loading="lazy"></a>`;
+      }
+      return `<a href="${a.discord_url}" target="_blank" class="msg-attachment">${a.filename || 'файл'} ↓</a>`;
+    }).join('') + '</div>' : '';
     const author = isUser ? 'Вы' : m.author;
     return `<div class="msg msg-${isUser ? 'user' : 'discord'}">
       <div class="msg-author">${isUser ? 'Вы' : m.author}</div>
