@@ -788,6 +788,14 @@
           <div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2;text-align:center;padding:20px">Загрузка...</div>
         </div>
         <div class="status" id="ordersSearchStatus"></div>
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,0,0,0.15)">
+          <div style="font-size:7px;color:rgba(255,200,200,0.4);margin-bottom:8px">Номер следующего заказа</div>
+          <div style="display:flex;gap:8px">
+            <input type="number" id="nextOrderNumInput" placeholder="Например 1" min="1" style="flex:1;font-size:7px">
+            <button class="btn btn-sm" onclick="setNextOrderNumber()" style="width:auto;border-color:rgba(255,120,0,0.35);color:#ffaa55">Установить</button>
+          </div>
+          <div class="status" id="nextOrderNumStatus"></div>
+        </div>
       </div>
 
 <!-- Order chat modal -->
@@ -824,6 +832,13 @@
           <button class="btn btn-sm" onclick="savePaymentMethods()" style="background:rgba(0,180,0,0.08);border-color:rgba(0,200,0,0.3);color:#55ff55">💾 Сохранить на GitHub</button>
         </div>
         <div class="status" id="pmStatus"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🎰 ВЫИГРЫШИ РУЛЕТКИ <span class="badge" id="winnersCount">—</span></div>
+        <button class="btn btn-sm" onclick="loadWinners()" style="margin-bottom:14px">🔄 Обновить список</button>
+        <div class="works-list" id="winnersList"><div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div></div>
+        <div class="status" id="winnersStatus"></div>
       </div>
 
     </div>
@@ -1082,6 +1097,7 @@ function switchTab(tab) {
   if (tab === 'users' && getAdminKey()) { loadUsers(); loadUnauthUsers(); loadWatchlist(); loadBannedIps(); }
   if (tab === 'orders' && getAdminKey()) { loadOrders(); loadCategories(); }
   if (tab === 'orders' && TOKEN) loadPaymentMethods();
+  if (tab === 'orders' && getAdminKey()) loadWinners();
   if (tab === 'maint' && getAdminKey()) loadMaintenance();
   if (tab === 'db' && getAdminKey()) loadDbTablesList();
 }
@@ -1720,6 +1736,47 @@ async function savePaymentMethods() {
     showStatus(status, 'Ошибка: ' + e.message, 'err');
   }
 }
+
+async function loadWinners() {
+  const container = document.getElementById('winnersList');
+  const badge = document.getElementById('winnersCount');
+  container.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div>';
+  try {
+    const res = await adminFetch(BOT_API + '/admin/winners?limit=30');
+    if (!res.ok) throw new Error('Сервер отклонил запрос (' + res.status + ')');
+    const data = await res.json();
+    const winners = data.winners || [];
+    if (badge) badge.textContent = winners.length;
+    if (!winners.length) {
+      container.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Выигрышей пока нет</div>';
+      return;
+    }
+    container.innerHTML = winners.map(function(w) {
+      return '<div class="work-item">' +
+        '<div style="flex:1;min-width:0">' +
+          '<div class="work-type">' + escHtml(w.username || '—') + ' · <span style="color:#ff8888">' + w.discount + '%</span></div>' +
+          '<div class="work-file">' + escHtml(w.win_date || '') + '</div>' +
+        '</div>' +
+        '<button class="btn btn-sm" onclick="resendWinner(' + w.id + ')" style="width:auto;font-size:7px;flex-shrink:0" title="Отправить заново в Discord">↻ Переслать</button>' +
+      '</div>';
+    }).join('');
+  } catch(e) {
+    container.innerHTML = '<div style="font-size:7px;color:rgba(255,100,100,0.7);line-height:2">Ошибка: ' + e.message + '</div>';
+  }
+}
+
+async function resendWinner(id) {
+  const status = document.getElementById('winnersStatus');
+  showStatus(status, 'Отправляю...', 'info');
+  try {
+    const res = await adminFetch(BOT_API + '/admin/winners/' + id + '/resend', { master: true, method: 'POST', body: {} });
+    if (!res.ok) { const err = await res.json().catch(function(){return {};}); throw new Error(err.error || 'Сервер отклонил (' + res.status + ')'); }
+    showStatus(status, 'Отправлено в Discord!', 'ok');
+  } catch(e) {
+    showStatus(status, 'Ошибка: ' + e.message, 'err');
+  }
+}
+
 
 
 let rulesData = []; // [{title, text, important}, ...]
@@ -2982,6 +3039,25 @@ async function deleteOrderChat() {
     await loadOrders();
   } catch(e) {
     alert('Не удалось удалить заказ: ' + e.message);
+  }
+}
+
+async function setNextOrderNumber() {
+  const status = document.getElementById('nextOrderNumStatus');
+  const input  = document.getElementById('nextOrderNumInput');
+  const val = parseInt(input.value, 10);
+  if (!val || val < 1) { showStatus(status, 'Введите положительное число', 'err'); return; }
+  if (!confirm('Установить следующий номер заказа на #' + val + '?\nЭто изменит нумерацию будущих заказов.')) return;
+  showStatus(status, 'Применяю...', 'info');
+  try {
+    var res = await adminFetch(BOT_API + '/admin/orders/set-next-number', {
+      master: true, method: 'POST', body: { next_num: val },
+    });
+    if (!res.ok) { const err = await res.json().catch(function(){return {};}); throw new Error(err.error || 'Сервер отклонил (' + res.status + ')'); }
+    showStatus(status, 'Готово! Следующий заказ будет #' + val, 'ok');
+    input.value = '';
+  } catch(e) {
+    showStatus(status, 'Ошибка: ' + e.message, 'err');
   }
 }
 
