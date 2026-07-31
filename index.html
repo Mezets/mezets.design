@@ -767,9 +767,9 @@
       position: fixed;
       top: 64px; right: 18px;
       z-index: 399;
-      width: 280px; max-width: 90vw; max-height: 420px;
+      width: 240px; max-width: 88vw; max-height: 420px;
       overflow-y: auto;
-      padding: 14px;
+      padding: 12px;
       border-radius: 16px;
       background: var(--bg-panel-95);
       border: 1px solid rgba(255,0,0,0.3);
@@ -1313,6 +1313,16 @@
       transition: transform .15s ease;
     }
     .order-total-row.bump span:last-child { transform: scale(1.15); }
+    .order-total-breakdown {
+      display: flex; flex-direction: column; gap: 4px;
+      margin: 6px 0 10px; padding: 0 4px;
+    }
+    .order-total-breakdown-item {
+      display: flex; justify-content: space-between; gap: 8px;
+      font-size: 6px; color: rgba(255,210,210,0.55);
+      line-height: 1.6;
+    }
+    .order-total-breakdown-item span:last-child { color: rgba(255,140,140,0.7); flex-shrink: 0; }
     .order-label {
       font-size: 8px;
       color: rgba(255,200,200,0.5);
@@ -2161,6 +2171,7 @@
         <span>Итого</span>
         <span id="orderTotalPrice">0 ₽</span>
       </div>
+      <div id="orderTotalBreakdown" class="order-total-breakdown"></div>
       <div class="order-field">
         <div class="order-label">Способ оплаты</div>
         <div class="order-payment-group" id="paymentMethodsContainer">
@@ -2583,6 +2594,7 @@
     const fp = await getBrowserFingerprint();
     if (session) {
       fetch(`${API}/register-device?session=${encodeURIComponent(session)}&fp=${encodeURIComponent(fp)}`, { mode: 'cors' }).catch(()=>{});
+      loadMyProfile(session);
     }
     fetch(`${API}/track-visit?fp=${encodeURIComponent(fp)}&session=${encodeURIComponent(session || '')}`, { mode: 'cors' }).catch(()=>{});
     checkSiteBan(session, fp);
@@ -3262,10 +3274,12 @@
   function updateOrderTotal() {
     var row = document.getElementById('orderTotalRow');
     var out = document.getElementById('orderTotalPrice');
+    var breakdown = document.getElementById('orderTotalBreakdown');
     if (!row || !out) return;
 
     var catSelect = document.getElementById('orderCategory');
     var catName = catSelect ? catSelect.value : '';
+    var catLabel = catSelect ? catSelect.options[catSelect.selectedIndex].text : '';
     var base = 0;
     if (cachedCategories) {
       var found = cachedCategories.find(function(c) { return c.name === catName; });
@@ -3273,15 +3287,27 @@
     }
 
     var total = base;
+    var lines = [];
+    if (base > 0) lines.push({ name: catLabel + ' (база)', price: base });
     document.querySelectorAll('#priceItemsContainer .item-qty').forEach(function(inp) {
       var qty = parseInt(inp.value, 10) || 0;
       var price = parsePriceNumber(inp.getAttribute('data-price'));
-      total += qty * price;
+      if (qty > 0) {
+        total += qty * price;
+        var name = inp.getAttribute('data-name') || 'Услуга';
+        lines.push({ name: name + (qty > 1 ? ' ×' + qty : ''), price: qty * price });
+      }
     });
 
     out.textContent = total.toLocaleString('ru-RU') + ' ₽';
     row.classList.add('bump');
     setTimeout(function() { row.classList.remove('bump'); }, 150);
+
+    if (breakdown) {
+      breakdown.innerHTML = lines.map(function(l) {
+        return '<div class="order-total-breakdown-item"><span>' + l.name + '</span><span>' + l.price.toLocaleString('ru-RU') + ' ₽</span></div>';
+      }).join('');
+    }
   }
 
   function stepItemQty(btn, delta) {
