@@ -811,6 +811,15 @@
               <button class="btn btn-sm" onclick="closeOrderChat()" style="width:auto;font-size:9px">✕</button>
             </div>
           </div>
+          <div style="display:flex;gap:8px;align-items:center;padding:10px 20px;border-bottom:1px solid rgba(255,0,0,0.12);flex-wrap:wrap">
+            <span style="font-size:6px;color:rgba(255,200,200,0.4)">Статус:</span>
+            <select id="chatOrderStatus" style="flex:1;min-width:120px;font-size:7px" onchange="adminChangeOrderStatus()">
+              <option value="new">Новый</option>
+              <option value="in_progress">В работе</option>
+              <option value="completed">Выполнен</option>
+              <option value="cancelled">Закрыт</option>
+            </select>
+          </div>
           <div id="chatMessages" style="flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:8px;min-height:200px;max-height:50vh"></div>
           <div style="display:flex;gap:8px;padding:12px 20px 18px;border-top:1px solid rgba(255,0,0,0.12)">
             <input type="text" id="chatMsgInput" placeholder="Ответить..." style="flex:1;background:rgba(255,0,0,0.05);border:1px solid rgba(255,0,0,0.2);border-radius:10px;padding:12px 14px;font-family:'Press Start 2P',monospace;font-size:7px;color:rgba(255,220,220,0.9);outline:none;line-height:1.6" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();adminSendMsg()}">
@@ -3013,6 +3022,8 @@ async function openOrderChat(orderId) {
     var statusLabels = { 'new': 'Новый', 'in_progress': 'В работе', 'completed': 'Выполнен', 'cancelled': 'Отменён' };
     var meta = (o.category || '—') + ' · ' + (statusLabels[o.status] || o.status) + ' · ' + (o.estimated_price || '?') + '₽ · ' + (o.created_at || '').slice(0,10);
     document.getElementById('chatOrderMeta').textContent = meta;
+    var statusSel = document.getElementById('chatOrderStatus');
+    if (statusSel) statusSel.value = o.status || 'new';
     renderChatMessages(data.messages || [], data.attachments || []);
   } catch(e) {
     document.getElementById('chatMessages').innerHTML = '<div style="font-size:8px;color:rgba(255,100,100,0.5);text-align:center;padding:40px">Не удалось загрузить чат</div>';
@@ -3021,6 +3032,21 @@ async function openOrderChat(orderId) {
   // Start polling
   if (CHAT_POLL_TIMER) clearInterval(CHAT_POLL_TIMER);
   CHAT_POLL_TIMER = setInterval(pollChatMessages, 3000);
+}
+
+async function adminChangeOrderStatus() {
+  if (!ACTIVE_CHAT_ORDER_ID) return;
+  var sel = document.getElementById('chatOrderStatus');
+  var status = sel.value;
+  try {
+    var res = await adminFetch(BOT_API + '/admin/order/' + ACTIVE_CHAT_ORDER_ID + '/status', {
+      method: 'POST', body: { status: status },
+    });
+    if (!res.ok) throw new Error('Сервер отклонил (' + res.status + ')');
+    await loadOrders();
+  } catch(e) {
+    alert('Не удалось изменить статус: ' + e.message);
+  }
 }
 
 function closeOrderChat() {
