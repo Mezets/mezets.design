@@ -1389,14 +1389,14 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      padding: 6px 8px;
+      padding: 7px 8px;
       border-radius: 6px;
       border: 1px solid rgba(255,0,0,0.13);
       background: rgba(255,0,0,0.03);
-      font-size: 6px;
-      color: rgba(255,220,220,0.75);
+      font-size: 7px;
+      color: rgba(255,225,225,0.8);
       transition: border-color .2s, background .2s;
-      line-height: 1.6;
+      line-height: 1.55;
     }
     .order-item-cb:hover {
       border-color: rgba(255,0,0,0.35);
@@ -2165,21 +2165,28 @@
         <div class="order-label">Способ оплаты</div>
         <div class="order-payment-group" id="paymentMethodsContainer">
           <label class="order-payment-option">
-            <input type="radio" name="payment" value="sbp" checked>
+            <input type="radio" name="payment" value="sbp" checked onchange="updateBankSelect()">
             <span>СБП</span>
           </label>
           <label class="order-payment-option">
-            <input type="radio" name="payment" value="card">
+            <input type="radio" name="payment" value="card" onchange="updateBankSelect()">
             <span>Карта</span>
           </label>
           <label class="order-payment-option">
-            <input type="radio" name="payment" value="steam_gift">
+            <input type="radio" name="payment" value="steam_gift" onchange="updateBankSelect()">
             <span>Подарок Steam</span>
           </label>
           <label class="order-payment-option">
-            <input type="radio" name="payment" value="steam_topup">
+            <input type="radio" name="payment" value="steam_topup" onchange="updateBankSelect()">
             <span>Пополнение Steam</span>
           </label>
+        </div>
+        <div id="bankSelectWrap" style="margin-top:8px">
+          <select class="order-select" id="orderBank">
+            <option value="alfa">Альфа-Банк</option>
+            <option value="tbank">Т-Банк</option>
+            <option value="ozon">Озон Банк</option>
+          </select>
         </div>
       </div>
       <div style="font-size:6px;color:rgba(255,200,200,0.35);text-align:center;margin-bottom:8px;">
@@ -2197,6 +2204,7 @@
 <div class="bottom-nav">
   <a class="btn bottom-nav-btn" href="/mezets.design/prices">Цены на оформление</a>
   <a class="btn bottom-nav-btn" href="/mezets.design/rules">Правила оформления</a>
+  <a class="btn bottom-nav-btn" href="#" onclick="openDataPolicy(); return false;">Политика конфиденциальности</a>
 </div>
 
 <section class="portfolio-section">
@@ -2310,10 +2318,6 @@
         Войти через Discord
       </a>
       <div class="login-hint">Нужно войти, чтобы крутить рулетку!</div>
-      <div class="login-hint" style="margin-top:6px;font-size:10px;opacity:0.7">
-        Используя сайт и входя через Discord, вы соглашаетесь с
-        <span onclick="openDataPolicy()" style="text-decoration:underline;cursor:pointer;color:#ff8888">условиями обработки данных</span>
-      </div>
 	    </div>
 
     <script>
@@ -3233,7 +3237,10 @@
       for (var ii = 0; ii < sec.items.length; ii++) {
         var item = sec.items[ii];
         html += '<div class="order-item-cb">' +
-          '<span style="flex:1;min-width:0;text-align:left">' + item.name + ' <span style="opacity:0.5">' + item.price + '</span></span>' +
+          '<span style="flex:1;min-width:0;text-align:left;display:flex;flex-direction:column;gap:3px">' +
+            '<span>' + item.name + '</span>' +
+            '<span style="opacity:0.5">' + item.price + '</span>' +
+          '</span>' +
           '<div class="item-stepper">' +
             '<button type="button" class="item-stepper-btn" onclick="stepItemQty(this,-1)">−</button>' +
             '<input type="text" class="item-qty" readonly value="0" data-price="' + item.price + '" data-name="' + item.name.replace(/"/g,'&quot;') + '">' +
@@ -3296,11 +3303,20 @@
       var m = methods[i];
       var checked = i === 0 ? ' checked' : '';
       html += '<label class="order-payment-option">' +
-        '<input type="radio" name="payment" value="' + m.key.replace(/"/g,'&quot;') + '"' + checked + '>' +
+        '<input type="radio" name="payment" value="' + m.key.replace(/"/g,'&quot;') + '"' + checked + ' onchange="updateBankSelect()">' +
         ' <span>' + (m.label || m.key) + '</span>' +
       '</label>';
     }
     if (html) container.innerHTML = html;
+    updateBankSelect();
+  }
+
+  function updateBankSelect() {
+    var wrap = document.getElementById('bankSelectWrap');
+    if (!wrap) return;
+    var checked = document.querySelector('input[name="payment"]:checked');
+    var val = checked ? checked.value : '';
+    wrap.style.display = (val === 'sbp' || val === 'card') ? 'block' : 'none';
   }
 
   async function submitOrder() {
@@ -3311,6 +3327,9 @@
     const category = document.getElementById('orderCategory').value;
     const paymentEl = document.querySelector('input[name="payment"]:checked');
     const payment_method = paymentEl ? paymentEl.value : null;
+    const bankSelectWrap = document.getElementById('bankSelectWrap');
+    const bankEl = document.getElementById('orderBank');
+    const bankSelected = (bankSelectWrap && bankSelectWrap.style.display !== 'none' && bankEl) ? bankEl.options[bankEl.selectedIndex].text : null;
     const items = [];
     const qtyInputs = document.querySelectorAll('#priceItemsContainer .item-qty');
     for (var i = 0; i < qtyInputs.length; i++) {
@@ -3337,11 +3356,14 @@
     status.textContent = '';
     status.className = 'order-status';
 
+    let finalDesc = desc;
+    if (bankSelected) finalDesc += '\n\nБанк: ' + bankSelected;
+
     try {
       const res = await fetch(API + '/api/order?session=' + encodeURIComponent(session), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ category: category, description: desc, payment_method: payment_method, items: items }),
+        body: JSON.stringify({ category: category, description: finalDesc, payment_method: payment_method, items: items }),
       });
       const data = await res.json();
       if (data.status === 'ok') {
