@@ -800,14 +800,14 @@
 
 <!-- Order chat modal -->
       <div id="orderChatOverlay" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(5,0,0,0.88);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px">
-        <div style="background:rgba(12,0,0,0.95);border:1px solid rgba(255,0,0,0.25);border-radius:18px;max-width:640px;width:100%;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 0 60px rgba(255,0,0,0.15)">
+        <div style="background:rgba(12,0,0,0.95);border:1px solid rgba(255,0,0,0.25);border-radius:18px;max-width:560px;width:100%;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 0 60px rgba(255,0,0,0.15)">
           <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px 12px;border-bottom:1px solid rgba(255,0,0,0.12)">
             <div>
               <div style="font-size:11px;color:#ff2a2a;letter-spacing:1px" id="chatOrderTitle">Заказ #—</div>
               <div style="font-size:7px;color:rgba(255,200,200,0.4);margin-top:4px" id="chatOrderMeta"></div>
             </div>
-            <div style="display:flex;gap:6px;align-items:center">
-              <button class="btn btn-sm" onclick="deleteOrderChat()" title="Удалить заказ" style="width:auto;font-size:9px;border-color:rgba(255,0,0,0.35);color:#ff5555">🗑</button>
+            <div style="display:flex;gap:10px;align-items:center">
+              <span onclick="deleteOrderChat()" title="Удалить заказ" style="cursor:pointer;font-size:12px;opacity:0.4;transition:opacity .2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.4">🗑</span>
               <button class="btn btn-sm" onclick="closeOrderChat()" style="width:auto;font-size:9px">✕</button>
             </div>
           </div>
@@ -822,8 +822,9 @@
           </div>
           <div id="chatMessages" style="flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:8px;min-height:200px;max-height:50vh"></div>
           <div style="display:flex;gap:8px;padding:12px 20px 18px;border-top:1px solid rgba(255,0,0,0.12)">
+            <button class="btn btn-sm" onclick="adminUploadFile()" title="Прикрепить файл" style="width:auto;font-size:11px;flex-shrink:0">📎</button>
             <input type="text" id="chatMsgInput" placeholder="Ответить..." style="flex:1;background:rgba(255,0,0,0.05);border:1px solid rgba(255,0,0,0.2);border-radius:10px;padding:12px 14px;font-family:'Press Start 2P',monospace;font-size:7px;color:rgba(255,220,220,0.9);outline:none;line-height:1.6" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();adminSendMsg()}">
-            <button class="btn btn-sm" onclick="adminSendMsg()" style="width:auto;font-size:9px">→</button>
+            <button class="btn btn-sm" onclick="adminSendMsg()" title="Отправить" style="width:auto;font-size:9px;flex-shrink:0;border-color:rgba(255,0,0,0.35)">Отправить →</button>
           </div>
         </div>
       </div>
@@ -848,6 +849,28 @@
         <button class="btn btn-sm" onclick="loadWinners()" style="margin-bottom:14px">🔄 Обновить список</button>
         <div class="works-list" id="winnersList"><div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div></div>
         <div class="status" id="winnersStatus"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🏷️ ПРОМОКОДЫ <span class="badge" id="promoCodesCount">—</span></div>
+        <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+          <input type="text" id="promoCodeInput" placeholder="Код (например MEZETS10)" style="flex:2;font-size:7px;min-width:120px">
+          <input type="number" id="promoDiscountInput" placeholder="% скидки" min="1" max="100" style="width:70px;font-size:7px">
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+          <select id="promoCategoryInput" style="flex:1;font-size:7px;min-width:120px">
+            <option value="">Любая категория</option>
+            <option value="design">Дизайн</option>
+            <option value="discord_bot">Discord бот</option>
+            <option value="telegram_bot">Telegram бот</option>
+            <option value="website">Сайт</option>
+            <option value="other">Другое</option>
+          </select>
+          <input type="text" id="promoDiscordIdInput" placeholder="Discord ID (необязательно)" style="flex:1;font-size:7px;min-width:120px">
+        </div>
+        <button class="btn btn-sm" onclick="createPromoCode()" style="margin-bottom:14px;border-color:rgba(0,200,0,0.35);color:#55ff55">➕ Создать промокод</button>
+        <div class="works-list" id="promoCodesList"><div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div></div>
+        <div class="status" id="promoCodesStatus"></div>
       </div>
 
     </div>
@@ -1107,6 +1130,7 @@ function switchTab(tab) {
   if (tab === 'orders' && getAdminKey()) { loadOrders(); loadCategories(); }
   if (tab === 'orders' && TOKEN) loadPaymentMethods();
   if (tab === 'orders' && getAdminKey()) loadWinners();
+  if (tab === 'orders' && getAdminKey()) loadPromoCodes();
   if (tab === 'maint' && getAdminKey()) loadMaintenance();
   if (tab === 'db' && getAdminKey()) loadDbTablesList();
 }
@@ -1783,6 +1807,75 @@ async function resendWinner(id) {
     showStatus(status, 'Отправлено в Discord!', 'ok');
   } catch(e) {
     showStatus(status, 'Ошибка: ' + e.message, 'err');
+  }
+}
+
+const categoryLabelsMap = { 'design': 'Дизайн', 'discord_bot': 'Discord бот', 'telegram_bot': 'Telegram бот', 'website': 'Сайт', 'other': 'Другое' };
+
+async function loadPromoCodes() {
+  const container = document.getElementById('promoCodesList');
+  const badge = document.getElementById('promoCodesCount');
+  container.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div>';
+  try {
+    const res = await adminFetch(BOT_API + '/admin/promo-codes');
+    if (!res.ok) throw new Error('Сервер отклонил запрос (' + res.status + ')');
+    const data = await res.json();
+    const codes = data.codes || [];
+    if (badge) badge.textContent = codes.length;
+    if (!codes.length) {
+      container.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Промокодов пока нет</div>';
+      return;
+    }
+    container.innerHTML = codes.map(function(p) {
+      var catLabel = p.category ? (categoryLabelsMap[p.category] || p.category) : 'Любая категория';
+      var usedLabel = p.used ? '<span style="color:rgba(255,120,120,0.7)">использован</span>' : '<span style="color:rgba(120,255,120,0.7)">активен</span>';
+      return '<div class="work-item">' +
+        '<div style="flex:1;min-width:0">' +
+          '<div class="work-type">' + escHtml(p.code) + ' · <span style="color:#ff8888">-' + p.discount + '%</span></div>' +
+          '<div class="work-file">' + catLabel + ' · ' + usedLabel + (p.discord_id ? ' · для ' + escHtml(p.discord_id) : '') + '</div>' +
+        '</div>' +
+        '<div class="work-del" title="Удалить промокод" onclick="deletePromoCode(' + p.id + ')">✕</div>' +
+      '</div>';
+    }).join('');
+  } catch(e) {
+    container.innerHTML = '<div style="font-size:7px;color:rgba(255,100,100,0.7);line-height:2">Ошибка: ' + e.message + '</div>';
+  }
+}
+
+async function createPromoCode() {
+  const status = document.getElementById('promoCodesStatus');
+  const code = document.getElementById('promoCodeInput').value.trim();
+  const discount = parseInt(document.getElementById('promoDiscountInput').value, 10);
+  const category = document.getElementById('promoCategoryInput').value || null;
+  const discordId = document.getElementById('promoDiscordIdInput').value.trim() || null;
+  if (!code || !discount || discount < 1 || discount > 100) {
+    showStatus(status, 'Укажите код и корректный % скидки (1-100)', 'err');
+    return;
+  }
+  showStatus(status, 'Создаю...', 'info');
+  try {
+    const res = await adminFetch(BOT_API + '/admin/promo-codes', {
+      method: 'POST', body: { code: code, discount: discount, category: category, discord_id: discordId },
+    });
+    if (!res.ok) { const err = await res.json().catch(function(){return {};}); throw new Error(err.error || 'Сервер отклонил (' + res.status + ')'); }
+    showStatus(status, 'Промокод создан!', 'ok');
+    document.getElementById('promoCodeInput').value = '';
+    document.getElementById('promoDiscountInput').value = '';
+    document.getElementById('promoDiscordIdInput').value = '';
+    await loadPromoCodes();
+  } catch(e) {
+    showStatus(status, 'Ошибка: ' + e.message, 'err');
+  }
+}
+
+async function deletePromoCode(id) {
+  if (!confirm('Удалить промокод?')) return;
+  try {
+    const res = await adminFetch(BOT_API + '/admin/promo-codes/' + id, { method: 'DELETE' });
+    if (!res.ok) throw new Error('Сервер отклонил (' + res.status + ')');
+    await loadPromoCodes();
+  } catch(e) {
+    alert('Не удалось удалить: ' + e.message);
   }
 }
 
@@ -2991,13 +3084,15 @@ async function loadOrders() {
     }
     if (badge) badge.textContent = data.orders.length;
     const statusLabels = { 'new': 'Новый', 'in_progress': 'В работе', 'completed': 'Выполнен', 'cancelled': 'Отменён' };
+    const categoryLabels = { 'design': 'Дизайн', 'discord_bot': 'Discord бот', 'telegram_bot': 'Telegram бот', 'website': 'Сайт', 'other': 'Другое' };
     container.innerHTML = data.orders.map(function(o) {
       var statusClass = 'status-' + (o.status || 'new');
       var label = statusLabels[o.status] || o.status;
+      var catLabel = categoryLabels[o.category] || o.category || '—';
       return '<div class="work-item" style="cursor:pointer" onclick="openOrderChat(' + o.id + ')">' +
         '<div style="flex:1;min-width:0">' +
-          '<div class="work-type">#' + o.id + ' · ' + escHtml(o.category || '—') + '</div>' +
-          '<div class="work-file">' + escHtml(o.username || '—') + ' · <span class="' + statusClass + '">' + label + '</span> · ' + (o.created_at || '').slice(0,10) + ' · ' + (o.estimated_price || '?') + '₽</div>' +
+          '<div class="work-type">#' + o.id + ' · ' + escHtml(catLabel) + '</div>' +
+          '<div class="work-file">' + escHtml(o.username || '—') + ' · <span class="' + statusClass + '">' + label + '</span> · ' + (o.created_at || '—') + ' · ' + (o.estimated_price || '?') + '₽</div>' +
         '</div>' +
         '<span style="color:rgba(255,150,150,0.4);font-size:9px">→</span>' +
       '</div>';
@@ -3020,7 +3115,8 @@ async function openOrderChat(orderId) {
     var o = data.order || {};
     document.getElementById('chatOrderTitle').textContent = 'Заказ #' + o.id;
     var statusLabels = { 'new': 'Новый', 'in_progress': 'В работе', 'completed': 'Выполнен', 'cancelled': 'Отменён' };
-    var meta = (o.category || '—') + ' · ' + (statusLabels[o.status] || o.status) + ' · ' + (o.estimated_price || '?') + '₽ · ' + (o.created_at || '').slice(0,10);
+    var categoryLabels = { 'design': 'Дизайн', 'discord_bot': 'Discord бот', 'telegram_bot': 'Telegram бот', 'website': 'Сайт', 'other': 'Другое' };
+    var meta = (categoryLabels[o.category] || o.category || '—') + ' · ' + (statusLabels[o.status] || o.status) + ' · ' + (o.estimated_price || '?') + '₽ · ' + (o.created_at || '—');
     document.getElementById('chatOrderMeta').textContent = meta;
     var statusSel = document.getElementById('chatOrderStatus');
     if (statusSel) statusSel.value = o.status || 'new';
@@ -3146,6 +3242,30 @@ async function adminSendMsg() {
   } catch(e) {}
   input.disabled = false;
   input.focus();
+}
+
+function adminUploadFile() {
+  if (!ACTIVE_CHAT_ORDER_ID) return;
+  var input = document.createElement('input');
+  input.type = 'file';
+  input.onchange = async function() {
+    var file = input.files[0];
+    if (!file) return;
+    var key = getAdminKey();
+    var form = new FormData();
+    form.append('order_id', ACTIVE_CHAT_ORDER_ID);
+    form.append('file', file);
+    try {
+      var res = await fetch(BOT_API + '/admin/order/upload', {
+        method: 'POST', headers: { 'X-Admin-Key': key }, body: form,
+      });
+      if (!res.ok) { var err = await res.json().catch(function(){return {};}); throw new Error(err.error || 'Ошибка загрузки'); }
+      await pollChatMessages();
+    } catch(e) {
+      alert('Не удалось загрузить файл: ' + e.message);
+    }
+  };
+  input.click();
 }
 </script>
 </body>
