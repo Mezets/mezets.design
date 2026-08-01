@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Mezets — оформление Discord, VK, YouTube, Twitch для RP-серверов | Province RP, GPA 5 RP, Majestiс, Arizona</title>
-  <meta name="description" content="Mezets — оформление Discord-серверов, групп ВК, превью YouTube, Twitch и форумных аккаунтов. Работаю с игроками Province RP, GPA 5 RP, Majestiс, Arizona. Также делаю ботов для Discord, Telegram и VK. Быстро, качественно, под ключ.">
+  <title>Mezets — оформление Discord, VK, YouTube, Twitch для RP-серверов | Province RP, GPA 5 RP, Majestic, Arizona</title>
+  <meta name="description" content="Mezets — оформление Discord-серверов, групп ВК, превью YouTube, Twitch и форумных аккаунтов. Работаю с игроками Province RP, GPA 5 RP, Majestic, Arizona. Также делаю ботов для Discord, Telegram и VK. Быстро, качественно, под ключ.">
   <meta name="keywords" content="оформление discord, оформление вк, youtube оформление, province rp оформление, gpa 5 rp, majestic оформление, arizona rp, дискорд сервер, бот discord, бот telegram, бот vk, оформление группы вк, twitch оформление, оформление форума, форумный аккаунт">
   <meta name="author" content="Mezets">
   <meta name="robots" content="index, follow">
@@ -14,14 +14,14 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://mezets.github.io/mezets.design/">
   <meta property="og:title" content="Mezets — оформление Discord, VK, YouTube, Twitch для RP-серверов">
-  <meta property="og:description" content="Оформление Discord, ВК, YouTube, Twitch и форумных аккаунтов для RP-проектов: Province RP, GPA 5 RP, Majestiс, Arizona. Делаю ботов для Discord, Telegram, VK.">
+  <meta property="og:description" content="Оформление Discord, ВК, YouTube, Twitch и форумных аккаунтов для RP-проектов: Province RP, GPA 5 RP, Majestic, Arizona. Делаю ботов для Discord, Telegram, VK.">
   <meta property="og:image" content="https://mezets.github.io/mezets.design/avatar_server.png">
   <meta property="og:locale" content="ru_RU">
   <meta property="og:site_name" content="Mezets">
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Mezets — оформление Discord, VK, YouTube, Twitch для RP-серверов">
-  <meta name="twitter:description" content="Оформление Discord, ВК, YouTube, Twitch и форумных аккаунтов для RP-проектов: Province RP, GPA 5 RP, Majestiс, Arizona. Делаю ботов для Discord, Telegram, VK.">
+  <meta name="twitter:description" content="Оформление Discord, ВК, YouTube, Twitch и форумных аккаунтов для RP-проектов: Province RP, GPA 5 RP, Majestic, Arizona. Делаю ботов для Discord, Telegram, VK.">
   <meta name="twitter:image" content="https://mezets.github.io/mezets.design/avatar_server.png">
 
   <link rel="icon" type="image/png" href="/mezets.design/favicon.png">
@@ -46,7 +46,7 @@
     "areaServed": "RU",
     "audience": {
       "@type": "Audience",
-      "audienceType": "RP-сервера: Province RP, GPA 5 RP, Majestiс, Arizona RP"
+      "audienceType": "RP-сервера: Province RP, GPA 5 RP, Majestic, Arizona RP"
     },
     "description": "Оформление Discord-серверов, групп ВК, превью YouTube, оформление Twitch и форумных аккаунтов/разделов, а также создание ботов для Discord, Telegram и VK для RP-проектов.",
     "offers": {
@@ -1323,6 +1323,23 @@
       line-height: 1.6;
     }
     .order-total-breakdown-item span:last-child { color: rgba(255,140,140,0.7); flex-shrink: 0; }
+    .order-my-promo-banner {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,0,0,0.3);
+      background: rgba(255,0,0,0.07);
+      font-size: 6px; color: rgba(255,220,220,0.85);
+      line-height: 1.6;
+    }
+    .order-my-promo-banner button {
+      flex-shrink: 0; padding: 6px 10px; font-size: 6px;
+      background: rgba(255,0,0,0.15); border: 1px solid rgba(255,0,0,0.4);
+      border-radius: 6px; color: #ff8888; cursor: pointer;
+      font-family: 'Press Start 2P', monospace;
+      transition: background .15s;
+    }
+    .order-my-promo-banner button:hover { background: rgba(255,0,0,0.28); }
     .order-label {
       font-size: 8px;
       color: rgba(255,200,200,0.5);
@@ -2170,9 +2187,10 @@
       </div>
       <div class="order-field">
         <div class="order-label">Промокод (необязательно)</div>
-        <div style="display:flex;gap:8px">
-          <input type="text" class="order-input" id="orderPromoInput" placeholder="Есть промокод?" style="flex:1" oninput="document.getElementById('orderPromoStatus').textContent=''">
-          <button type="button" class="btn btn-sm" onclick="checkOrderPromo()" style="width:auto;flex-shrink:0">Применить</button>
+        <div id="orderMyPromoBanner" style="display:none;margin-bottom:8px"></div>
+        <div style="display:flex;gap:6px">
+          <input type="text" class="order-input" id="orderPromoInput" placeholder="Есть промокод?" style="flex:1;padding:8px 10px;font-size:7px" oninput="document.getElementById('orderPromoStatus').textContent=''">
+          <button type="button" class="btn btn-sm" onclick="checkOrderPromo()" style="width:auto;flex-shrink:0;font-size:7px;padding:8px 12px">Применить</button>
         </div>
         <div id="orderPromoStatus" style="font-size:6px;line-height:1.6;margin-top:2px"></div>
       </div>
@@ -2275,7 +2293,7 @@
   <p>
     Я занимаюсь <strong>оформлением Discord-серверов</strong>, групп ВК, превью для YouTube,
     оформлением Twitch и форумных аккаунтов/разделов. Основная аудитория — игроки и администрация
-    RP-проектов: <strong>Province RP</strong>, <strong>GPA 5 RP</strong>, <strong>Majestiс</strong> и
+    RP-проектов: <strong>Province RP</strong>, <strong>GPA 5 RP</strong>, <strong>Majestic</strong> и
     <strong>Arizona RP</strong>. Делаю аватарки, баннеры, фоны приглашений и анимированное
     оформление под стиль конкретного сервера.
   </p>
@@ -2291,7 +2309,7 @@
     <li>Оформление Twitch-профилей</li>
     <li>Оформление форумных аккаунтов и разделов</li>
     <li>Боты для Discord, Telegram, VK</li>
-    <li>Оформление под RP-сервера: Province RP, GPA 5 RP, Majestiс, Arizona RP</li>
+    <li>Оформление под RP-сервера: Province RP, GPA 5 RP, Majestic, Arizona RP</li>
   </ul>
 </section>
 
@@ -2784,6 +2802,16 @@
         btn.style.opacity = '0.4';
         btn.style.cursor  = 'not-allowed';
         btn.onclick       = null;
+        if (data.discount && data.code) {
+          lastCode = data.code;
+          const vis = VISUAL[data.discount];
+          const pctText = vis ? vis.pct : data.discount + '%';
+          document.getElementById('resultPct').innerHTML =
+            `Скидка ${pctText}!<br><span style="font-size:10px;color:rgba(255,200,200,0.7)">${RESULT_PHRASE[data.discount] || ''}</span>`;
+          document.getElementById('resultPct').classList.add('show');
+          document.getElementById('resultCode').textContent = data.code;
+          document.getElementById('resultCode').classList.add('show');
+        }
       } else {
         btn.textContent   = 'Крутить';
         btn.style.opacity = '1';
@@ -3169,6 +3197,7 @@
     await renderCategories();
     renderPriceItems();
     renderPaymentMethods();
+    loadMyRoulettePromo(s);
   }
   function closeOrderModal() {
     document.getElementById('orderModalOverlay').style.display = 'none';
@@ -3313,6 +3342,26 @@
         return '<div class="order-total-breakdown-item"><span>' + l.name + '</span><span>' + l.price.toLocaleString('ru-RU') + ' ₽</span></div>';
       }).join('');
     }
+  }
+
+  async function loadMyRoulettePromo(session) {
+    var banner = document.getElementById('orderMyPromoBanner');
+    if (!banner) return;
+    banner.style.display = 'none';
+    try {
+      var r = await fetch(`${API}/api/promo/my-roulette?session=${encodeURIComponent(session)}`);
+      var d = await r.json();
+      if (!d.has_promo) return;
+      banner.innerHTML = 'У вас есть активный промокод: скидка ' + d.discount + '% ' +
+        '<button type="button" onclick="applyMyRoulettePromo(' + JSON.stringify(d.code) + ')">Применить</button>';
+      banner.className = 'order-my-promo-banner';
+      banner.style.display = 'flex';
+    } catch(e) {}
+  }
+
+  function applyMyRoulettePromo(code) {
+    document.getElementById('orderPromoInput').value = code;
+    checkOrderPromo();
   }
 
   async function checkOrderPromo() {
