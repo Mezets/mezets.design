@@ -6,7 +6,7 @@
 
   <title>Mezets — оформление Discord, VK, YouTube, Twitch для RP-серверов | Province RP, GPA 5 RP, Majestic, Arizona</title>
   <meta name="description" content="Mezets — оформление Discord-серверов, групп ВК, превью YouTube, Twitch и форумных аккаунтов. Работаю с игроками Province RP, GPA 5 RP, Majestic, Arizona. Также делаю ботов для Discord, Telegram и VK. Быстро, качественно, под ключ.">
-  <meta name="keywords" content="оформление discord, оформление вк, youtube оформление, province rp оформление, gpa 5 rp, Majestic оформление, arizona rp, дискорд сервер, бот discord, бот telegram, бот vk, оформление группы вк, twitch оформление, оформление форума, форумный аккаунт">
+  <meta name="keywords" content="оформление discord, оформление вк, youtube оформление, province rp оформление, gpa 5 rp, majestic оформление, arizona rp, дискорд сервер, бот discord, бот telegram, бот vk, оформление группы вк, twitch оформление, оформление форума, форумный аккаунт">
   <meta name="author" content="Mezets">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://mezets.github.io/mezets.design/">
@@ -375,9 +375,9 @@
       flex: 1; margin-top: 0; padding: 16px 8px; font-size: 9px;
     }
     .discord-order-btn-half.site {
-      background: rgba(255,0,0,0.08); border: 1px solid rgba(255,0,0,0.3); color: #ff8888;
+      background: #5865F2; border: 1px solid #5865F2; color: #fff;
     }
-    .discord-order-btn-half.site:hover { box-shadow: 0 0 24px rgba(255,0,0,0.3); }
+    .discord-order-btn-half.site:hover { box-shadow: 0 0 24px rgba(88,101,242,0.5); }
     @media (max-width: 400px) {
       .order-choice-btns-main { flex-direction: column; }
     }
@@ -2132,6 +2132,7 @@
         Discord сервер
       </button>
       <button class="discord-order-btn discord-order-btn-half site" onclick="openOrderModal()">
+        <svg viewBox="0 0 127.14 96.36" fill="currentColor"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2A75.57,75.57,0,0,0,95.9,78.05c.87.65,1.76,1.33,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.9,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53.06s5-12.64,11.43-12.64S54,46.13,53.89,53.06,48.84,65.69,42.45,65.69Zm42.24,0c-6.27,0-11.44-5.69-11.44-12.63s5-12.64,11.44-12.64S96.23,46.13,96.12,53.06,91.08,65.69,84.69,65.69Z"/></svg>
         Через сайт
       </button>
     </div>
@@ -2166,6 +2167,14 @@
       <div class="order-field" id="orderItemsSection">
         <div class="order-label" style="font-size:8px">Выбери услуги</div>
         <div id="priceItemsContainer" style="margin-bottom:6px"></div>
+      </div>
+      <div class="order-field">
+        <div class="order-label">Промокод (необязательно)</div>
+        <div style="display:flex;gap:8px">
+          <input type="text" class="order-input" id="orderPromoInput" placeholder="Есть промокод?" style="flex:1" oninput="document.getElementById('orderPromoStatus').textContent=''">
+          <button type="button" class="btn btn-sm" onclick="checkOrderPromo()" style="width:auto;flex-shrink:0">Применить</button>
+        </div>
+        <div id="orderPromoStatus" style="font-size:6px;line-height:1.6;margin-top:2px"></div>
       </div>
       <div class="order-total-row" id="orderTotalRow">
         <span>Итого</span>
@@ -3271,6 +3280,9 @@
     return digits ? parseInt(digits, 10) : 0;
   }
 
+  let appliedPromoDiscount = 0;
+  let appliedPromoCode = '';
+
   function updateOrderTotal() {
     var row = document.getElementById('orderTotalRow');
     var out = document.getElementById('orderTotalPrice');
@@ -3299,6 +3311,12 @@
       }
     });
 
+    var totalBeforePromo = total;
+    if (appliedPromoDiscount > 0) {
+      total = Math.round(total * (1 - appliedPromoDiscount / 100));
+      lines.push({ name: 'Промокод ' + appliedPromoCode + ' (-' + appliedPromoDiscount + '%)', price: total - totalBeforePromo });
+    }
+
     out.textContent = total.toLocaleString('ru-RU') + ' ₽';
     row.classList.add('bump');
     setTimeout(function() { row.classList.remove('bump'); }, 150);
@@ -3308,6 +3326,35 @@
         return '<div class="order-total-breakdown-item"><span>' + l.name + '</span><span>' + l.price.toLocaleString('ru-RU') + ' ₽</span></div>';
       }).join('');
     }
+  }
+
+  async function checkOrderPromo() {
+    var input = document.getElementById('orderPromoInput');
+    var status = document.getElementById('orderPromoStatus');
+    var code = input.value.trim();
+    if (!code) return;
+    var session; try { session = localStorage.getItem('mezets_session') || ''; } catch(e) { session = ''; }
+    var catSelect = document.getElementById('orderCategory');
+    var catName = catSelect ? catSelect.value : '';
+    status.textContent = 'Проверяю...';
+    status.style.color = 'rgba(255,200,200,0.5)';
+    try {
+      var r = await fetch(`${API}/api/promo/check?code=${encodeURIComponent(code)}&category=${encodeURIComponent(catName)}&session=${encodeURIComponent(session)}`);
+      var d = await r.json();
+      if (!r.ok || !d.valid) {
+        appliedPromoDiscount = 0; appliedPromoCode = '';
+        status.textContent = 'Промокод недействителен или уже использован';
+        status.style.color = 'rgba(255,120,120,0.8)';
+      } else {
+        appliedPromoDiscount = d.discount; appliedPromoCode = code;
+        status.textContent = 'Скидка ' + d.discount + '% применена!';
+        status.style.color = 'rgba(120,255,120,0.8)';
+      }
+    } catch(e) {
+      status.textContent = 'Не удалось проверить промокод';
+      status.style.color = 'rgba(255,120,120,0.8)';
+    }
+    updateOrderTotal();
   }
 
   function stepItemQty(btn, delta) {
@@ -3389,7 +3436,7 @@
       const res = await fetch(API + '/api/order?session=' + encodeURIComponent(session), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ category: category, description: finalDesc, payment_method: payment_method, items: items }),
+        body: JSON.stringify({ category: category, description: finalDesc, payment_method: payment_method, items: items, promo_code: appliedPromoCode || null }),
       });
       const data = await res.json();
       if (data.status === 'ok') {
