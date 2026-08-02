@@ -73,6 +73,7 @@
 
     input[type="text"],
     input[type="password"],
+    input[type="number"],
     textarea,
     select {
       width: 100%;
@@ -93,6 +94,11 @@
       box-shadow: 0 0 14px rgba(255,0,0,0.12);
     }
     textarea { resize: vertical; min-height: 60px; }
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none; margin: 0;
+    }
+    input[type="number"] { -moz-appearance: textfield; }
 
     .rich-toolbar {
       display: flex; flex-wrap: wrap; gap: 4px;
