@@ -20,7 +20,16 @@ html, body {
 .canvas-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
 .wrap {
   position: relative; z-index: 1;
-  max-width: 680px; margin: 0 auto; padding: 48px 20px 100px;
+  max-width: 980px; margin: 0 auto; padding: 48px 20px 100px;
+}
+.chat-layout {
+  display: flex; gap: 20px; align-items: flex-start;
+}
+.chat-layout-sidebar { width: 280px; flex-shrink: 0; }
+.chat-layout-main { flex: 1; min-width: 0; }
+@media (max-width: 760px) {
+  .chat-layout { flex-direction: column; }
+  .chat-layout-sidebar { width: 100%; }
 }
 .header {
   display: flex; align-items: center; justify-content: space-between;
@@ -84,7 +93,7 @@ html, body {
 
 .chat-box {
   display: flex; flex-direction: column;
-  height: 400px; overflow-y: auto; gap: 10px;
+  height: 500px; overflow-y: auto; gap: 10px;
   padding-right: 4px; margin-bottom: 12px;
 }
 .msg {
@@ -199,30 +208,34 @@ html, body {
     </div>
   </div>
 
-  <div id="chatContent" style="display:none">
-    <div class="card">
-      <div class="order-info">
-        <div class="order-info-left">
-          <div class="order-id" id="orderIdDisplay">Заказ #—</div>
-          <div class="order-meta" id="orderMeta"></div>
-        </div>
-        <div style="text-align:right">
-          <div class="order-price" id="orderPrice"></div>
-          <div class="order-status-badge" id="orderStatusBadge"></div>
-          <div style="margin-top:8px">
-            <button class="btn btn-sm btn-danger" id="closeOrderBtn" onclick="closeOrder()" style="display:none">Закрыть заказ</button>
+  <div id="chatContent" style="display:none" class="chat-layout">
+    <div class="chat-layout-sidebar">
+      <div class="card">
+        <div class="order-info">
+          <div class="order-info-left">
+            <div class="order-id" id="orderIdDisplay">Заказ #—</div>
+            <div class="order-meta" id="orderMeta"></div>
+          </div>
+          <div>
+            <div class="order-price" id="orderPrice"></div>
+            <div class="order-status-badge" id="orderStatusBadge"></div>
+            <div style="margin-top:8px">
+              <button class="btn btn-sm btn-danger" id="closeOrderBtn" onclick="closeOrder()" style="display:none;width:100%">Закрыть заказ</button>
+            </div>
           </div>
         </div>
+        <div class="order-desc-box" id="orderDescBox"></div>
       </div>
-      <div class="order-desc-box" id="orderDescBox"></div>
     </div>
 
-    <div class="card">
-      <div class="chat-box" id="chatBox"></div>
-      <div class="chat-input-row">
-        <button class="btn btn-sm chat-file-btn" onclick="uploadFile()" title="Прикрепить файл">📎</button>
-        <input class="chat-input" id="msgInput" placeholder="Сообщение..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}">
-        <button class="btn chat-send" onclick="sendMsg()">→</button>
+    <div class="chat-layout-main">
+      <div class="card">
+        <div class="chat-box" id="chatBox"></div>
+        <div class="chat-input-row">
+          <button class="btn btn-sm chat-file-btn" onclick="uploadFile()" title="Прикрепить файл">📎</button>
+          <input class="chat-input" id="msgInput" placeholder="Сообщение..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}">
+          <button class="btn chat-send" onclick="sendMsg()">→</button>
+        </div>
       </div>
     </div>
   </div>
@@ -378,9 +391,9 @@ function renderMessages(messages, attachments) {
       }
       return `<a href="${a.discord_url}" target="_blank" class="msg-attachment">${a.filename || 'файл'} ↓</a>`;
     }).join('') + '</div>' : '';
-    const author = isUser ? 'Вы' : m.author;
+    const author = isUser ? (currentUser && currentUser.username ? currentUser.username : 'Вы') : m.author;
     return `<div class="msg msg-${isUser ? 'user' : 'discord'}">
-      <div class="msg-author">${isUser ? 'Вы' : m.author}</div>
+      <div class="msg-author">${escapeHtml(author)}</div>
       <div class="msg-text">${escapeHtml(m.content || '')}</div>
       ${attHtml}
       <div class="msg-time">${m.created_at ? m.created_at.slice(11, 19) : ''}</div>
