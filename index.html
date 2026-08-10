@@ -1997,9 +1997,12 @@
   
     /* ── НОВАЯ КОМПОНОВКА ФОРМЫ ЗАКАЗА ── */
     .order-modal {
-      width: 980px;
-      max-width: 96vw;
-      padding: 34px;
+      width: min(1100px, 94vw);
+      aspect-ratio: 16 / 9;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-sizing: border-box;
+      padding: 28px;
       border-radius: 26px;
       background:
         radial-gradient(circle at 18% 8%, rgba(255,0,0,.08), transparent 32%),
@@ -2020,7 +2023,7 @@
         "auth auth auth"
         "status status status"
         "submit submit submit";
-      gap: 14px;
+      gap: 10px;
       text-align: left;
     }
 
@@ -2037,8 +2040,8 @@
 
     #orderDescField {
       grid-area: desc;
-      min-height: 300px;
-      padding: 16px;
+      min-height: 0;
+      padding: 14px;
       border: 1px solid rgba(255,0,0,.22);
       border-radius: 18px;
       background: rgba(255,0,0,.035);
@@ -2056,7 +2059,7 @@
 
     #orderDesc {
       flex: 1;
-      min-height: 248px;
+      min-height: 0;
       height: 100%;
       padding: 14px;
       border-radius: 13px;
@@ -2093,8 +2096,8 @@
     }
 
     #priceItemsContainer {
-      min-height: 128px;
-      max-height: 158px;
+      min-height: 92px;
+      max-height: 125px;
       overflow-y: auto;
       padding-right: 3px;
       scrollbar-width: thin;
@@ -2223,6 +2226,8 @@
     @media (max-width: 760px) {
       .order-modal {
         width: 96vw;
+        aspect-ratio: auto;
+        max-height: 92vh;
         padding: 22px 16px;
         border-radius: 20px;
       }
