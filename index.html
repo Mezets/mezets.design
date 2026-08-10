@@ -1994,7 +1994,282 @@
     }
 
 
-  </style>
+  
+    /* ── НОВАЯ КОМПОНОВКА ФОРМЫ ЗАКАЗА ── */
+    .order-modal {
+      width: 980px;
+      max-width: 96vw;
+      padding: 34px;
+      border-radius: 26px;
+      background:
+        radial-gradient(circle at 18% 8%, rgba(255,0,0,.08), transparent 32%),
+        radial-gradient(circle at 88% 86%, rgba(255,0,0,.055), transparent 34%),
+        var(--bg-panel-92);
+      box-shadow: 0 0 70px rgba(255,0,0,.16), inset 0 0 0 1px rgba(255,255,255,.015);
+    }
+
+    #orderFormStep {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-areas:
+        "title title title"
+        "desc category category"
+        "desc items items"
+        "payment payment promo"
+        "payment payment total"
+        "auth auth auth"
+        "status status status"
+        "submit submit submit";
+      gap: 14px;
+      text-align: left;
+    }
+
+    #orderFormStep > .order-modal-title {
+      grid-area: title;
+      margin: 0 0 6px;
+      padding: 2px 0 12px;
+      text-align: center;
+      font-size: 14px;
+      letter-spacing: 1.5px;
+      text-shadow: 0 0 18px rgba(255,40,40,.45);
+      border-bottom: 1px solid rgba(255,0,0,.12);
+    }
+
+    #orderDescField {
+      grid-area: desc;
+      min-height: 300px;
+      padding: 16px;
+      border: 1px solid rgba(255,0,0,.22);
+      border-radius: 18px;
+      background: rgba(255,0,0,.035);
+      box-shadow: inset 0 0 26px rgba(255,0,0,.025);
+    }
+
+    #orderDescField .order-label,
+    #orderCategoryField .order-label,
+    #orderItemsSection .order-label {
+      color: rgba(255,185,185,.72);
+      font-size: 8px;
+      letter-spacing: 1.2px;
+      margin-bottom: 2px;
+    }
+
+    #orderDesc {
+      flex: 1;
+      min-height: 248px;
+      height: 100%;
+      padding: 14px;
+      border-radius: 13px;
+      background: rgba(0,0,0,.16);
+      border-color: rgba(255,0,0,.18);
+      font-size: 8px;
+      line-height: 1.9;
+    }
+
+    #orderCategoryField {
+      grid-area: category;
+      padding: 14px;
+      border: 1px solid rgba(255,0,0,.18);
+      border-radius: 16px;
+      background: rgba(255,0,0,.035);
+    }
+
+    #orderCategory {
+      margin-top: 5px;
+      height: 48px;
+      padding: 10px 13px;
+      border-radius: 12px;
+      background: rgba(0,0,0,.16);
+      border-color: rgba(255,0,0,.22);
+    }
+
+    #orderItemsSection {
+      grid-area: items;
+      min-height: 0;
+      padding: 14px;
+      border: 1px solid rgba(255,0,0,.18);
+      border-radius: 16px;
+      background: rgba(255,0,0,.035);
+    }
+
+    #priceItemsContainer {
+      min-height: 128px;
+      max-height: 158px;
+      overflow-y: auto;
+      padding-right: 3px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,0,0,.25) transparent;
+    }
+
+    #priceItemsContainer::-webkit-scrollbar { width: 5px; }
+    #priceItemsContainer::-webkit-scrollbar-thumb {
+      background: rgba(255,0,0,.25);
+      border-radius: 5px;
+    }
+
+    #orderPaymentField {
+      grid-area: payment;
+      min-height: 0;
+      padding: 16px;
+      border: 1px solid rgba(255,0,0,.18);
+      border-radius: 18px;
+      background: rgba(255,0,0,.035);
+    }
+
+    #orderPaymentField .order-payment-group {
+      margin-top: 7px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    #orderPaymentField .order-payment-option {
+      min-width: 0;
+      min-height: 62px;
+      padding: 10px;
+      justify-content: center;
+      text-align: center;
+      flex-direction: column;
+      gap: 5px;
+      border-radius: 11px;
+      font-size: 7px;
+      line-height: 1.45;
+      background: rgba(255,0,0,.035);
+    }
+
+    #orderPaymentField .order-payment-option input {
+      width: 13px;
+      height: 13px;
+    }
+
+    #bankSelectWrap { margin-top: 9px !important; }
+
+    #orderPromoField {
+      grid-area: promo;
+      align-self: stretch;
+      padding: 16px;
+      border: 1px solid rgba(255,0,0,.18);
+      border-radius: 18px;
+      background: rgba(255,0,0,.035);
+    }
+
+    #orderPromoField > div[style*="display:flex"] {
+      align-items: stretch;
+    }
+
+    #orderPromoInput {
+      min-width: 0;
+      height: 40px;
+    }
+
+    #orderPromoField .btn {
+      margin: 0;
+      border-radius: 10px;
+      min-width: 86px;
+    }
+
+    #orderTotalRow {
+      grid-area: total;
+      align-self: stretch;
+      min-height: 82px;
+      margin: 0;
+      padding: 16px 18px;
+      border-radius: 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 7px;
+      border-color: rgba(255,0,0,.28);
+      background: linear-gradient(135deg, rgba(255,0,0,.09), rgba(255,0,0,.025));
+    }
+
+    #orderTotalRow span:first-child {
+      font-size: 7px;
+      color: rgba(255,190,190,.58);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+    }
+
+    #orderTotalRow span:last-child {
+      font-size: 18px;
+      letter-spacing: .5px;
+    }
+
+    #orderTotalBreakdown { display: none; }
+
+    #orderAuthHint {
+      grid-area: auth;
+      margin: 0 !important;
+      padding-top: 2px;
+    }
+
+    #orderStatus {
+      grid-area: status;
+      min-height: 18px;
+      margin: 0 !important;
+      text-align: center;
+    }
+
+    #orderSubmit {
+      grid-area: submit;
+      min-height: 54px;
+      margin: 0;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(255,0,0,.12), rgba(255,0,0,.04));
+      font-size: 10px;
+      letter-spacing: .4px;
+    }
+
+    @media (max-width: 760px) {
+      .order-modal {
+        width: 96vw;
+        padding: 22px 16px;
+        border-radius: 20px;
+      }
+
+      #orderFormStep {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "title"
+          "desc"
+          "category"
+          "items"
+          "payment"
+          "promo"
+          "total"
+          "auth"
+          "status"
+          "submit";
+        gap: 11px;
+      }
+
+      #orderDescField { min-height: 230px; }
+      #orderDesc { min-height: 180px; }
+      #priceItemsContainer { max-height: 220px; }
+
+      #orderPaymentField .order-payment-group {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      #orderTotalRow { min-height: 78px; }
+    }
+
+    @media (max-width: 420px) {
+      #orderPaymentField .order-payment-option {
+        min-height: 58px;
+        padding: 8px 5px;
+        font-size: 6px;
+      }
+
+      #orderPromoField > div[style*="display:flex"] {
+        flex-direction: column;
+      }
+
+      #orderPromoField .btn {
+        width: 100% !important;
+      }
+    }
+</style>
 </head>
 <body>
 <div id="banOverlay" style="display:none; position:fixed; inset:0; z-index:999999; background:radial-gradient(ellipse at center, #2a0000 0%, #050000 75%); color:#fff; align-items:center; justify-content:center; text-align:center; flex-direction:column; padding:24px;">
@@ -2171,13 +2446,13 @@
 
     <div id="orderFormStep">
       <div class="order-modal-title">Оформить заказ</div>
-      <div class="order-field">
+      <div class="order-field" id="orderCategoryField">
         <div class="order-label">Категория</div>
         <select class="order-select" id="orderCategory" onchange="renderPriceItems(); updateOrderTotal();">
           <option value="">Загрузка...</option>
         </select>
       </div>
-      <div class="order-field">
+      <div class="order-field" id="orderDescField">
         <div class="order-label">Что нужно сделать?</div>
         <textarea class="order-textarea" id="orderDesc" rows="4" placeholder="Опиши задачу..."></textarea>
       </div>
@@ -2185,7 +2460,7 @@
         <div class="order-label" style="font-size:8px">Выбери услуги</div>
         <div id="priceItemsContainer" style="margin-bottom:6px"></div>
       </div>
-      <div class="order-field">
+      <div class="order-field" id="orderPromoField">
         <div class="order-label">Промокод (необязательно)</div>
         <div id="orderMyPromoBanner" style="display:none;margin-bottom:8px"></div>
         <div style="display:flex;gap:6px">
@@ -2199,7 +2474,7 @@
         <span id="orderTotalPrice">0 ₽</span>
       </div>
       <div id="orderTotalBreakdown" class="order-total-breakdown"></div>
-      <div class="order-field">
+      <div class="order-field" id="orderPaymentField">
         <div class="order-label">Способ оплаты</div>
         <div class="order-payment-group" id="paymentMethodsContainer">
           <label class="order-payment-option">
@@ -2227,7 +2502,7 @@
           </select>
         </div>
       </div>
-      <div style="font-size:6px;color:rgba(255,200,200,0.35);text-align:center;margin-bottom:8px;">
+      <div id="orderAuthHint" style="font-size:6px;color:rgba(255,200,200,0.35);text-align:center;margin-bottom:8px;">
         <span id="orderNotLogged">Войди через Discord, чтобы оформить заказ</span>
       </div>
       <div class="order-status" id="orderStatus" style="margin-bottom:8px"></div>
