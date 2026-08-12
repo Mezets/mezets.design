@@ -3252,11 +3252,10 @@
           '<span style="flex:1;min-width:0;text-align:left;display:flex;flex-direction:column;gap:3px">' +
             '<span>' + item.name + '</span>' +
             '<span style="opacity:0.5">' + item.price + '</span>' +
-            (isNegotiable ? '<span class="order-item-negotiable">цена может увеличиться</span>' : '') +
           '</span>' +
           '<div class="item-stepper">' +
             '<button type="button" class="item-stepper-btn" onclick="stepItemQty(this,-1)">−</button>' +
-            '<input type="text" class="item-qty" readonly value="0" data-price="' + item.price + '" data-name="' + item.name.replace(/"/g,'&quot;') + '">' +
+            '<input type="text" class="item-qty" readonly value="0" data-price="' + item.price + '" data-name="' + item.name.replace(/"/g,'&quot;') + '" data-negotiable="' + (isNegotiable ? '1' : '0') + '">' +
             '<button type="button" class="item-stepper-btn" onclick="stepItemQty(this,1)">+</button>' +
           '</div>' +
         '</div>';
@@ -3286,10 +3285,15 @@
     document.querySelectorAll('#priceItemsContainer .item-qty').forEach(function(inp) {
       var qty = parseInt(inp.value, 10) || 0;
       var price = parsePriceNumber(inp.getAttribute('data-price'));
+      var isNegotiable = inp.getAttribute('data-negotiable') === '1';
       if (qty > 0) {
         total += qty * price;
         var name = inp.getAttribute('data-name') || 'Услуга';
-        lines.push({ name: name + (qty > 1 ? ' ×' + qty : ''), price: qty * price });
+        lines.push({
+          name: name + (qty > 1 ? ' ×' + qty : ''),
+          price: qty * price,
+          negotiable: isNegotiable,
+        });
       }
     });
 
@@ -3305,7 +3309,10 @@
 
     if (breakdown) {
       breakdown.innerHTML = lines.map(function(l) {
-        return '<div class="order-total-breakdown-item"><span>' + l.name + '</span><span>' + l.price.toLocaleString('ru-RU') + ' ₽</span></div>';
+        var priceText = l.negotiable
+          ? '<span class="order-item-negotiable">цена может увеличиться</span>'
+          : l.price.toLocaleString('ru-RU') + ' ₽';
+        return '<div class="order-total-breakdown-item"><span>' + l.name + '</span><span>' + priceText + '</span></div>';
       }).join('');
     }
   }
