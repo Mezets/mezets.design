@@ -6,7 +6,7 @@
 
   <title>Mezets — оформление Discord, VK, YouTube, Twitch для RP-серверов | Province RP, GPA 5 RP, Majestic, Arizona</title>
   <meta name="description" content="Mezets — оформление Discord-серверов, групп ВК, превью YouTube, Twitch и форумных аккаунтов. Работаю с игроками Province RP, GPA 5 RP, Majestic, Arizona. Также делаю ботов для Discord, Telegram и VK. Быстро, качественно, под ключ.">
-  <meta name="keywords" content="оформление discord, оформление вк, youtube оформление, province rp оформление, gpa 5 rp, majestic оформление, arizona rp, дискорд сервер, бот discord, бот telegram, бот vk, оформление группы вк, twitch оформление, оформление форума, форумный аккаунт">
+  <meta name="keywords" content="оформление discord, оформление вк, youtube оформление, province rp оформление, gpa 5 rp, majestik оформление, arizona rp, дискорд сервер, бот discord, бот telegram, бот vk, оформление группы вк, twitch оформление, оформление форума, форумный аккаунт">
   <meta name="author" content="Mezets">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://mezets.github.io/mezets.design/">
@@ -1429,16 +1429,23 @@
       border-color: rgba(255,0,0,0.35);
       background: rgba(255,0,0,0.07);
     }
+    .order-item-negotiable {
+      font-size: 5px; color: rgba(255,170,80,0.75); line-height: 1.4;
+    }
+    .order-two-col {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+      align-items: start;
+    }
+    @media (max-width: 640px) {
+      .order-two-col { grid-template-columns: 1fr; }
+    }
     .order-items-section-label {
       font-size: 6px; color: rgba(255,200,200,0.3);
       margin: 6px 0 4px; letter-spacing: 1px; text-transform: uppercase;
     }
     .order-items-section-label:first-child { margin-top: 0; }
     .order-items-grid {
-      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px;
-    }
-    @media (max-width: 600px) {
-      .order-items-grid { grid-template-columns: 1fr 1fr; }
+      display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
     }
     #priceItemsContainer { min-height: 30px; }
     #paymentMethodsContainer { min-height: 50px; }
@@ -2171,19 +2178,15 @@
 
     <div id="orderFormStep">
       <div class="order-modal-title">Оформить заказ</div>
-      <div class="order-field">
-        <div class="order-label">Категория</div>
-        <select class="order-select" id="orderCategory" onchange="renderPriceItems(); updateOrderTotal();">
-          <option value="">Загрузка...</option>
-        </select>
-      </div>
-      <div class="order-field">
-        <div class="order-label">Что нужно сделать?</div>
-        <textarea class="order-textarea" id="orderDesc" rows="4" placeholder="Опиши задачу..."></textarea>
-      </div>
-      <div class="order-field" id="orderItemsSection">
-        <div class="order-label" style="font-size:8px">Выбери услуги</div>
-        <div id="priceItemsContainer" style="margin-bottom:6px"></div>
+      <div class="order-two-col">
+        <div class="order-field">
+          <div class="order-label">Что нужно сделать?</div>
+          <textarea class="order-textarea" id="orderDesc" rows="8" placeholder="Опиши задачу..."></textarea>
+        </div>
+        <div class="order-field" id="orderItemsSection">
+          <div class="order-label" style="font-size:8px">Выбери услуги</div>
+          <div id="priceItemsContainer" style="margin-bottom:6px"></div>
+        </div>
       </div>
       <div class="order-field">
         <div class="order-label">Промокод (необязательно)</div>
@@ -3194,7 +3197,6 @@
     document.getElementById('orderModalOverlay').style.display = 'flex';
     document.getElementById('orderFormStep').style.display = 'block';
     document.getElementById('orderNotLogged').style.display = 'none';
-    await renderCategories();
     renderPriceItems();
     renderPaymentMethods();
     loadMyRoulettePromo(s);
@@ -3208,44 +3210,9 @@
 
   var cachedCategories = null;
   var cachedPriceItems = null;
-  async function renderCategories() {
-    var sel = document.getElementById('orderCategory');
-    if (!sel) return;
-    if (cachedCategories) {
-      populateCategories(sel, cachedCategories);
-      return;
-    }
-    try {
-      var r = await fetch(API + '/api/categories');
-      var d = await r.json();
-      cachedCategories = d.categories || [];
-      populateCategories(sel, cachedCategories);
-    } catch(e) {
-      // fallback
-      sel.innerHTML = '<option value="design">🎨 Дизайн</option><option value="discord_bot">🤖 Discord бот</option><option value="telegram_bot">📱 Telegram бот</option><option value="website">🌐 Сайт</option><option value="other">📦 Другое</option>';
-    }
-  }
-  function populateCategories(sel, cats) {
-    if (!cats || !cats.length) {
-      sel.innerHTML = '<option value="other">📦 Другое</option>';
-      return;
-    }
-    sel.innerHTML = cats.map(function(c) {
-      var lbl = (c.label || c.name || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-      return '<option value="' + c.name.replace(/"/g,'&quot;') + '">' + (c.emoji || '') + ' ' + lbl + '</option>';
-    }).join('');
-  }
   async function renderPriceItems() {
     var container = document.getElementById('priceItemsContainer');
     if (!container) return;
-    var cat = document.getElementById('orderCategory').value;
-    if (cat === 'discord_bot' || cat === 'telegram_bot') {
-      container.innerHTML = '';
-      document.getElementById('orderItemsSection').style.display = 'none';
-      updateOrderTotal();
-      return;
-    }
-    document.getElementById('orderItemsSection').style.display = '';
     if (cachedPriceItems) {
       renderPriceItemsHTML(container, cachedPriceItems);
       updateOrderTotal();
@@ -3273,10 +3240,12 @@
       html += '<div class="order-items-grid">';
       for (var ii = 0; ii < sec.items.length; ii++) {
         var item = sec.items[ii];
+        var isNegotiable = /договор/i.test(item.price);
         html += '<div class="order-item-cb">' +
           '<span style="flex:1;min-width:0;text-align:left;display:flex;flex-direction:column;gap:3px">' +
             '<span>' + item.name + '</span>' +
             '<span style="opacity:0.5">' + item.price + '</span>' +
+            (isNegotiable ? '<span class="order-item-negotiable">цена может увеличиться</span>' : '') +
           '</span>' +
           '<div class="item-stepper">' +
             '<button type="button" class="item-stepper-btn" onclick="stepItemQty(this,-1)">−</button>' +
@@ -3305,18 +3274,8 @@
     var breakdown = document.getElementById('orderTotalBreakdown');
     if (!row || !out) return;
 
-    var catSelect = document.getElementById('orderCategory');
-    var catName = catSelect ? catSelect.value : '';
-    var catLabel = catSelect ? catSelect.options[catSelect.selectedIndex].text : '';
-    var base = 0;
-    if (cachedCategories) {
-      var found = cachedCategories.find(function(c) { return c.name === catName; });
-      if (found && found.base_price) base = parseInt(found.base_price, 10) || 0;
-    }
-
-    var total = base;
+    var total = 0;
     var lines = [];
-    if (base > 0) lines.push({ name: catLabel + ' (база)', price: base });
     document.querySelectorAll('#priceItemsContainer .item-qty').forEach(function(inp) {
       var qty = parseInt(inp.value, 10) || 0;
       var price = parsePriceNumber(inp.getAttribute('data-price'));
@@ -3370,8 +3329,7 @@
     var code = input.value.trim();
     if (!code) return;
     var session; try { session = localStorage.getItem('mezets_session') || ''; } catch(e) { session = ''; }
-    var catSelect = document.getElementById('orderCategory');
-    var catName = catSelect ? catSelect.value : '';
+    var catName = '';
     status.textContent = 'Проверяю...';
     status.style.color = 'rgba(255,200,200,0.5)';
     try {
@@ -3433,7 +3391,7 @@
     const status = document.getElementById('orderStatus');
     const btn = document.getElementById('orderSubmit');
     const session = (function() { var s; try { s = localStorage.getItem('mezets_session') || ''; } catch(e) { s = ''; } return s; })();
-    const category = document.getElementById('orderCategory').value;
+    const category = 'other';
     const paymentEl = document.querySelector('input[name="payment"]:checked');
     const payment_method = paymentEl ? paymentEl.value : null;
     const bankSelectWrap = document.getElementById('bankSelectWrap');
