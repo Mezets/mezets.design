@@ -6,7 +6,7 @@
 
   <title>Mezets — оформление Discord, VK, YouTube, Twitch для RP-серверов | Province RP, GPA 5 RP, Majestic, Arizona</title>
   <meta name="description" content="Mezets — оформление Discord-серверов, групп ВК, превью YouTube, Twitch и форумных аккаунтов. Работаю с игроками Province RP, GPA 5 RP, Majestic, Arizona. Также делаю ботов для Discord, Telegram и VK. Быстро, качественно, под ключ.">
-  <meta name="keywords" content="оформление discord, оформление вк, youtube оформление, province rp оформление, gpa 5 rp, majestiс оформление, arizona rp, дискорд сервер, бот discord, бот telegram, бот vk, оформление группы вк, twitch оформление, оформление форума, форумный аккаунт">
+  <meta name="keywords" content="оформление discord, оформление вк, youtube оформление, province rp оформление, gpa 5 rp, majestic оформление, arizona rp, дискорд сервер, бот discord, бот telegram, бот vk, оформление группы вк, twitch оформление, оформление форума, форумный аккаунт">
   <meta name="author" content="Mezets">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://mezets.github.io/mezets.design/">
@@ -1434,10 +1434,17 @@
     }
     .order-two-col {
       display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
-      align-items: start;
+      align-items: stretch;
     }
     @media (max-width: 640px) {
       .order-two-col { grid-template-columns: 1fr; }
+    }
+    .order-field-desc { display: flex; flex-direction: column; }
+    .order-textarea-tall {
+      flex: 1; height: auto; min-height: 200px; resize: none;
+    }
+    @media (max-width: 640px) {
+      .order-textarea-tall { min-height: 120px; }
     }
     .order-items-section-label {
       font-size: 6px; color: rgba(255,200,200,0.3);
@@ -2179,9 +2186,9 @@
     <div id="orderFormStep">
       <div class="order-modal-title">Оформить заказ</div>
       <div class="order-two-col">
-        <div class="order-field">
+        <div class="order-field order-field-desc">
           <div class="order-label">Что нужно сделать?</div>
-          <textarea class="order-textarea" id="orderDesc" rows="8" placeholder="Опиши задачу..."></textarea>
+          <textarea class="order-textarea order-textarea-tall" id="orderDesc" placeholder="Опиши задачу..."></textarea>
         </div>
         <div class="order-field" id="orderItemsSection">
           <div class="order-label" style="font-size:8px">Выбери услуги</div>
