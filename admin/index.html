@@ -492,6 +492,66 @@
       from { opacity: 0; transform: translateY(6px); }
       to { opacity: 1; transform: translateY(0); }
     }
+
+    /* ── Редактор заказа ── */
+    .order-edit-box {
+      margin: 10px 20px 0;
+      padding: 14px;
+      border: 1px solid rgba(255,0,0,0.16);
+      border-radius: 12px;
+      background: rgba(255,0,0,0.025);
+    }
+    .order-edit-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .order-edit-grid > div { min-width: 0; }
+    .order-edit-box input, .order-edit-box textarea, .order-edit-box select {
+      margin-bottom: 10px;
+      font-size: 7px;
+      padding: 9px 10px;
+    }
+    .order-edit-box textarea { min-height: 68px; }
+    .order-edit-full { grid-column: 1 / -1; }
+    .order-price-tools {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .order-edit-hint {
+      font-size: 6px;
+      color: rgba(255,200,200,0.28);
+      line-height: 1.8;
+      margin: -4px 0 10px;
+    }
+    .order-edit-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 2px;
+    }
+    .order-edit-actions .btn { flex: 1; min-width: 120px; }
+    .order-custom-row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      margin-bottom: 7px;
+    }
+    .order-custom-row input { margin-bottom: 0 !important; }
+    .order-custom-row .custom-key { flex: 0 0 38%; }
+    .order-custom-row .custom-value { flex: 1; }
+    .order-custom-remove {
+      width: 32px !important;
+      min-width: 32px !important;
+      padding: 8px !important;
+      font-size: 9px !important;
+    }
+    @media (max-width: 520px) {
+      .order-edit-grid, .order-price-tools { grid-template-columns: 1fr; }
+      .order-edit-full { grid-column: auto; }
+    }
+
 </style>
 </head>
 <body>
@@ -825,7 +885,68 @@
               <option value="completed">Выполнен</option>
               <option value="cancelled">Закрыт</option>
             </select>
+            <button class="btn btn-sm" onclick="toggleOrderEditor()" style="width:auto;font-size:7px">✎ Редактировать</button>
           </div>
+
+          <div id="orderEditBox" class="order-edit-box" style="display:none">
+            <div style="font-size:8px;color:#ff4444;letter-spacing:1px;margin-bottom:12px">РЕДАКТИРОВАНИЕ ЗАКАЗА</div>
+
+            <div class="order-edit-grid">
+              <div>
+                <label>Цена, ₽</label>
+                <input type="number" id="orderEditPrice" min="0" step="1" placeholder="Текущая цена">
+              </div>
+              <div>
+                <label>Скидка</label>
+                <div class="order-price-tools">
+                  <input type="number" id="orderEditDiscountPct" min="0" max="100" step="0.01" placeholder="%">
+                  <input type="number" id="orderEditDiscountRub" min="0" step="1" placeholder="₽">
+                </div>
+              </div>
+
+              <div class="order-edit-full">
+                <div class="order-edit-hint">Скидка считается от исходной цены. Можно указать % или ₽. Если заполнены оба поля, применяется большее значение скидки.</div>
+              </div>
+
+              <div>
+                <label>Категория</label>
+                <input type="text" id="orderEditCategory" placeholder="Дизайн">
+              </div>
+              <div>
+                <label>Тип заказа</label>
+                <input type="text" id="orderEditType" placeholder="Тип / оформление">
+              </div>
+
+              <div>
+                <label>Способ оплаты</label>
+                <input type="text" id="orderEditPayment" placeholder="СБП, карта и т.д.">
+              </div>
+              <div>
+                <label>Причина скидки / изменения цены</label>
+                <input type="text" id="orderEditPriceReason" placeholder="Можно оставить пустым">
+              </div>
+
+              <div class="order-edit-full">
+                <label>Описание заказа</label>
+                <textarea id="orderEditDescription" placeholder="Описание заказа..."></textarea>
+              </div>
+
+              <div class="order-edit-full">
+                <label>Дополнительные поля</label>
+                <div id="orderCustomFields"></div>
+                <button class="btn btn-sm" type="button" onclick="addOrderCustomField()" style="width:auto">➕ Добавить поле</button>
+                <div class="order-edit-hint">Здесь можно менять любые дополнительные поля, которые уже существуют в заказе/БД.</div>
+              </div>
+            </div>
+
+            <div class="order-edit-actions">
+              <button class="btn btn-sm" onclick="applyOrderDiscountPreview()" style="border-color:rgba(255,120,0,0.35);color:#ffaa55">Рассчитать скидку</button>
+              <button class="btn btn-sm" onclick="saveOrderEdit()" style="border-color:rgba(0,200,0,0.35);color:#55ff55">💾 Сохранить заказ</button>
+              <button class="btn btn-sm" onclick="toggleOrderEditor()" style="width:auto">Отмена</button>
+            </div>
+            <div class="status" id="orderEditStatus"></div>
+          </div>
+
           <div id="chatMessages" style="flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:8px;min-height:200px;max-height:50vh"></div>
           <div style="display:flex;gap:8px;padding:12px 20px 18px;border-top:1px solid rgba(255,0,0,0.12)">
             <button class="btn btn-sm" onclick="adminUploadFile()" title="Прикрепить файл" style="width:auto;font-size:11px;flex-shrink:0">📎</button>
@@ -3124,6 +3245,7 @@ async function openOrderChat(orderId) {
     var categoryLabels = { 'design': 'Дизайн', 'discord_bot': 'Discord бот', 'telegram_bot': 'Telegram бот', 'website': 'Сайт', 'other': 'Другое' };
     var meta = (categoryLabels[o.category] || o.category || '—') + ' · ' + (statusLabels[o.status] || o.status) + ' · ' + (o.estimated_price || '?') + '₽ · ' + (o.created_at || '—');
     document.getElementById('chatOrderMeta').textContent = meta;
+    populateOrderEditor(o);
     var statusSel = document.getElementById('chatOrderStatus');
     if (statusSel) statusSel.value = o.status || 'new';
     renderChatMessages(data.messages || [], data.attachments || []);
@@ -3148,6 +3270,162 @@ async function adminChangeOrderStatus() {
     await loadOrders();
   } catch(e) {
     alert('Не удалось изменить статус: ' + e.message);
+  }
+}
+
+
+function orderField(o, names) {
+  for (const n of names) {
+    if (o && Object.prototype.hasOwnProperty.call(o, n) && o[n] !== null && o[n] !== undefined) return { key: n, value: o[n] };
+  }
+  return { key: names[0], value: '' };
+}
+
+let ACTIVE_ORDER_DATA = null;
+
+function toggleOrderEditor(force) {
+  const box = document.getElementById('orderEditBox');
+  if (!box) return;
+  const show = force === undefined ? box.style.display === 'none' : !!force;
+  box.style.display = show ? 'block' : 'none';
+  if (show && ACTIVE_ORDER_DATA) populateOrderEditor(ACTIVE_ORDER_DATA);
+}
+
+function populateOrderEditor(o) {
+  ACTIVE_ORDER_DATA = o || {};
+  const price = orderField(o, ['estimated_price','price','amount']);
+  const category = orderField(o, ['category']);
+  const type = orderField(o, ['order_type','type']);
+  const payment = orderField(o, ['payment_method','payment','pay_method']);
+  const desc = orderField(o, ['description','details','comment','text']);
+
+  document.getElementById('orderEditPrice').value = parseFloat(String(price.value).replace(/[^\d.,-]/g,'').replace(',','.')) || 0;
+  document.getElementById('orderEditDiscountPct').value = '';
+  document.getElementById('orderEditDiscountRub').value = '';
+  document.getElementById('orderEditCategory').value = category.value || '';
+  document.getElementById('orderEditType').value = type.value || '';
+  document.getElementById('orderEditPayment').value = payment.value || '';
+  document.getElementById('orderEditDescription').value = desc.value || '';
+  document.getElementById('orderEditPriceReason').value = '';
+  document.getElementById('orderCustomFields').innerHTML = '';
+
+  // Показываем дополнительные реальные поля заказа, которых нет в основных редакторах.
+  const skip = new Set([
+    'id','status','created_at','updated_at','estimated_price','price','amount',
+    'category','order_type','type','payment_method','payment','pay_method',
+    'description','details','comment','text','username','discord_id'
+  ]);
+  Object.keys(o || {}).forEach(function(key) {
+    if (skip.has(key)) return;
+    const val = o[key];
+    if (typeof val === 'object' && val !== null) return;
+    addOrderCustomField(key, val);
+  });
+}
+
+function addOrderCustomField(key, value) {
+  const box = document.getElementById('orderCustomFields');
+  const row = document.createElement('div');
+  row.className = 'order-custom-row';
+  row.innerHTML =
+    '<input class="custom-key" type="text" placeholder="Поле" value="' + escHtml(key || '') + '">' +
+    '<input class="custom-value" type="text" placeholder="Значение" value="' + escHtml(value === undefined || value === null ? '' : String(value)) + '">' +
+    '<button class="btn btn-sm order-custom-remove" type="button" title="Удалить поле">✕</button>';
+  row.querySelector('.order-custom-remove').onclick = function(){ row.remove(); };
+  box.appendChild(row);
+}
+
+function applyOrderDiscountPreview() {
+  const priceInput = document.getElementById('orderEditPrice');
+  const pct = parseFloat(document.getElementById('orderEditDiscountPct').value) || 0;
+  const rub = parseFloat(document.getElementById('orderEditDiscountRub').value) || 0;
+  const base = parseFloat(String(priceInput.value).replace(',','.')) || 0;
+  if (base <= 0) {
+    showStatus(document.getElementById('orderEditStatus'), 'Укажи исходную цену', 'err');
+    return;
+  }
+  const pctRub = base * Math.max(0, Math.min(100, pct)) / 100;
+  const discount = Math.max(0, pctRub, rub);
+  priceInput.value = Math.max(0, Math.round((base - discount) * 100) / 100);
+  showStatus(document.getElementById('orderEditStatus'),
+    'Новая цена: ' + priceInput.value + ' ₽ (скидка ' + Math.round(discount * 100) / 100 + ' ₽)',
+    'info');
+}
+
+async function saveOrderEdit() {
+  if (!ACTIVE_CHAT_ORDER_ID || !ACTIVE_ORDER_DATA) return;
+  const status = document.getElementById('orderEditStatus');
+  const priceInput = document.getElementById('orderEditPrice');
+  const pct = parseFloat(document.getElementById('orderEditDiscountPct').value) || 0;
+  const rub = parseFloat(document.getElementById('orderEditDiscountRub').value) || 0;
+  const newPrice = parseFloat(String(priceInput.value).replace(',','.'));
+
+  if (!Number.isFinite(newPrice) || newPrice < 0) {
+    showStatus(status, 'Укажи корректную цену', 'err');
+    return;
+  }
+
+  const priceField = orderField(ACTIVE_ORDER_DATA, ['estimated_price','price','amount']).key;
+  const categoryField = orderField(ACTIVE_ORDER_DATA, ['category']).key;
+  const typeField = orderField(ACTIVE_ORDER_DATA, ['order_type','type']).key;
+  const paymentField = orderField(ACTIVE_ORDER_DATA, ['payment_method','payment','pay_method']).key;
+  const descField = orderField(ACTIVE_ORDER_DATA, ['description','details','comment','text']).key;
+
+  const fields = {};
+  fields[priceField] = String(newPrice);
+  if (Object.prototype.hasOwnProperty.call(ACTIVE_ORDER_DATA, categoryField))
+    fields[categoryField] = document.getElementById('orderEditCategory').value.trim();
+  if (Object.prototype.hasOwnProperty.call(ACTIVE_ORDER_DATA, typeField))
+    fields[typeField] = document.getElementById('orderEditType').value.trim();
+  if (Object.prototype.hasOwnProperty.call(ACTIVE_ORDER_DATA, paymentField))
+    fields[paymentField] = document.getElementById('orderEditPayment').value.trim();
+  if (Object.prototype.hasOwnProperty.call(ACTIVE_ORDER_DATA, descField))
+    fields[descField] = document.getElementById('orderEditDescription').value.trim();
+
+  // Причина хранится в описании, чтобы функция работала без изменения схемы БД.
+  const reason = document.getElementById('orderEditPriceReason').value.trim();
+  const basePrice = parseFloat(String(ACTIVE_ORDER_DATA[priceField] || '').replace(/[^\d.,-]/g,'').replace(',','.')) || 0;
+  const actualDiscount = Math.max(0, basePrice - newPrice);
+  if (reason && actualDiscount > 0 && Object.prototype.hasOwnProperty.call(ACTIVE_ORDER_DATA, descField)) {
+    const oldDesc = document.getElementById('orderEditDescription').value.trim();
+    fields[descField] = oldDesc + (oldDesc ? '\n\n' : '') +
+      'Изменение цены: -' + Math.round(actualDiscount * 100) / 100 + ' ₽' +
+      (pct > 0 ? ' (' + pct + '%)' : '') +
+      '. Причина: ' + reason;
+  }
+
+  // Дополнительные поля: редактируем только те ключи, которые уже были в заказе.
+  document.querySelectorAll('#orderCustomFields .order-custom-row').forEach(function(row) {
+    const k = row.querySelector('.custom-key').value.trim();
+    const v = row.querySelector('.custom-value').value;
+    if (k && Object.prototype.hasOwnProperty.call(ACTIVE_ORDER_DATA, k)) fields[k] = v;
+  });
+
+  if (!Object.keys(fields).length) {
+    showStatus(status, 'Нет изменений для сохранения', 'err');
+    return;
+  }
+
+  showStatus(status, 'Сохраняю...', 'info');
+  try {
+    const res = await adminFetch(BOT_API + '/admin/db/orders/update', {
+      master: true,
+      method: 'POST',
+      body: { pk_value: String(ACTIVE_CHAT_ORDER_ID), fields: fields }
+    });
+    if (res.status === 403) throw new Error('Неверный мастер-ключ');
+    if (!res.ok) {
+      const d = await res.json().catch(()=>({}));
+      throw new Error(d.error || 'Сервер отклонил сохранение (' + res.status + ')');
+    }
+
+    showStatus(status, 'Заказ сохранён', 'ok');
+    await loadOrders();
+    await openOrderChat(ACTIVE_CHAT_ORDER_ID);
+    document.getElementById('orderEditBox').style.display = 'block';
+    showStatus(document.getElementById('orderEditStatus'), 'Заказ сохранён', 'ok');
+  } catch(e) {
+    showStatus(status, 'Ошибка: ' + e.message, 'err');
   }
 }
 
