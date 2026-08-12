@@ -1435,13 +1435,17 @@
     .order-two-col {
       display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
       align-items: stretch;
+      aspect-ratio: 16 / 9;
+      max-height: 45vh;
     }
     @media (max-width: 640px) {
-      .order-two-col { grid-template-columns: 1fr; }
+      .order-two-col { grid-template-columns: 1fr; aspect-ratio: auto; max-height: none; }
     }
-    .order-field-desc { display: flex; flex-direction: column; }
+    .order-field-desc { display: flex; flex-direction: column; min-height: 0; }
+    #orderItemsSection { display: flex; flex-direction: column; min-height: 0; }
+    #priceItemsContainer { overflow-y: auto; flex: 1; }
     .order-textarea-tall {
-      flex: 1; height: auto; min-height: 130px; resize: none;
+      flex: 1; height: auto; min-height: 0; resize: none;
     }
     @media (max-width: 640px) {
       .order-textarea-tall { min-height: 100px; }
