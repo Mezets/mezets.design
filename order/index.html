@@ -150,6 +150,28 @@ html, body {
 .chat-send { padding: 10px 14px; font-size: 9px; }
 .chat-file-btn { padding: 10px 12px; font-size: 9px; }
 
+.order-label {
+  font-size: 6px; color: rgba(255,200,200,0.5);
+  letter-spacing: 1px; text-transform: uppercase;
+}
+.order-select, .order-textarea {
+  width: 100%; padding: 10px 12px; border-radius: 10px;
+  background: rgba(255,0,0,0.05); border: 1px solid rgba(255,0,0,0.2);
+  color: rgba(255,220,220,0.9);
+  font-family: 'Press Start 2P', monospace; font-size: 7px; line-height: 1.6;
+  outline: none; transition: .2s;
+}
+.order-select:focus, .order-textarea:focus { border-color: rgba(255,0,0,0.45); box-shadow: 0 0 14px rgba(255,0,0,0.1); }
+.order-textarea { resize: vertical; }
+
+.status {
+  font-size: 6px; line-height: 1.6; padding: 8px 10px;
+  border-radius: 8px; display: none;
+}
+.status.ok { display: block; color: rgba(120,255,120,0.85); background: rgba(0,255,0,0.06); border: 1px solid rgba(0,255,0,0.2); }
+.status.err { display: block; color: rgba(255,120,120,0.9); background: rgba(255,0,0,0.06); border: 1px solid rgba(255,0,0,0.25); }
+.status.info { display: block; color: rgba(255,200,200,0.6); background: rgba(255,0,0,0.04); border: 1px solid rgba(255,0,0,0.15); }
+
 .loader {
   width: 28px; height: 28px; border: 3px solid rgba(255,40,40,0.2);
   border-top-color: #ff3b3b; border-radius: 50%;
@@ -226,12 +248,32 @@ html, body {
           <div>
             <div class="order-price" id="orderPrice"></div>
             <div class="order-status-badge" id="orderStatusBadge"></div>
-            <div style="margin-top:8px">
+            <div style="margin-top:8px;display:flex;flex-direction:column;gap:6px">
+              <button class="btn btn-sm" id="editOrderBtn" onclick="toggleOrderEdit()" style="display:none;width:100%">✎ Редактировать</button>
               <button class="btn btn-sm btn-danger" id="closeOrderBtn" onclick="closeOrder()" style="display:none;width:100%">Закрыть заказ</button>
             </div>
           </div>
         </div>
         <div class="order-desc-box" id="orderDescBox"></div>
+
+        <div id="orderEditForm" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,0,0,0.15)">
+          <div class="order-label" style="font-size:6px;margin-bottom:6px">Описание заказа</div>
+          <textarea id="orderEditDescInput" class="order-textarea" style="height:100px;margin-bottom:10px" placeholder="Опиши задачу..."></textarea>
+
+          <div class="order-label" style="font-size:6px;margin-bottom:6px">Способ оплаты</div>
+          <select id="orderEditPaymentInput" class="order-select" style="margin-bottom:10px">
+            <option value="sbp">СБП</option>
+            <option value="card">Карта</option>
+            <option value="steam_gift">Подарок Steam</option>
+            <option value="steam_topup">Пополнение Steam</option>
+          </select>
+
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-sm" onclick="saveOrderEditClient()" style="flex:1;border-color:rgba(0,200,0,0.35);color:#55ff55">💾 Сохранить</button>
+            <button class="btn btn-sm" onclick="toggleOrderEdit(false)" style="flex:1">Отмена</button>
+          </div>
+          <div class="status" id="orderEditStatus" style="margin-top:8px"></div>
+        </div>
       </div>
     </div>
 
@@ -256,6 +298,7 @@ checkMaintenance();
 const API = BAN_API; // из common.js
 let orderId = null;
 let currentUser = null;
+let CURRENT_ORDER = null;
 let pollTimer = null;
 
 function getSession() {
@@ -353,8 +396,56 @@ function renderOrder(order, messages, attachments) {
   if (closeBtn) {
     closeBtn.style.display = (order.status === 'completed' || order.status === 'cancelled') ? 'none' : 'inline-flex';
   }
+  const editBtn = g('editOrderBtn');
+  if (editBtn) {
+    editBtn.style.display = (order.status === 'completed' || order.status === 'cancelled') ? 'none' : 'inline-flex';
+  }
+  CURRENT_ORDER = order;
 
   renderMessages(messages, attachments);
+}
+
+function toggleOrderEdit(force) {
+  const box = g('orderEditForm');
+  if (!box) return;
+  const show = force === undefined ? box.style.display === 'none' : !!force;
+  box.style.display = show ? 'block' : 'none';
+  if (show && CURRENT_ORDER) {
+    g('orderEditDescInput').value = CURRENT_ORDER.description || '';
+    g('orderEditPaymentInput').value = CURRENT_ORDER.payment_method || 'sbp';
+  }
+}
+
+async function saveOrderEditClient() {
+  if (!orderId) return;
+  const status = g('orderEditStatus');
+  const description = g('orderEditDescInput').value.trim();
+  const payment_method = g('orderEditPaymentInput').value;
+  if (!description) {
+    showStatus(status, 'Опиши задачу', 'err');
+    return;
+  }
+  const session = getSession();
+  showStatus(status, 'Сохраняю...', 'info');
+  try {
+    const r = await fetch(`${API}/api/order/${orderId}/edit?session=${encodeURIComponent(session)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ description, payment_method }),
+    });
+    if (!r.ok) { const err = await r.json().catch(()=>({})); throw new Error(err.error || 'Сервер отклонил (' + r.status + ')'); }
+    showStatus(status, 'Сохранено!', 'ok');
+    toggleOrderEdit(false);
+    await loadOrder();
+  } catch(e) {
+    showStatus(status, 'Ошибка: ' + e.message, 'err');
+  }
+}
+
+function showStatus(el, text, kind) {
+  if (!el) return;
+  el.textContent = text;
+  el.className = 'status ' + kind;
 }
 
 async function closeOrder() {
