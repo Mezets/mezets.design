@@ -6,7 +6,7 @@
 
   <title>Mezets — оформление Discord, VK, YouTube, Twitch для RP-серверов | Province RP, GPA 5 RP, Majestic, Arizona</title>
   <meta name="description" content="Mezets — оформление Discord-серверов, групп ВК, превью YouTube, Twitch и форумных аккаунтов. Работаю с игроками Province RP, GPA 5 RP, Majestic, Arizona. Также делаю ботов для Discord, Telegram и VK. Быстро, качественно, под ключ.">
-  <meta name="keywords" content="оформление discord, оформление вк, youtube оформление, province rp оформление, gpa 5 rp, majestic оформление, arizona rp, дискорд сервер, бот discord, бот telegram, бот vk, оформление группы вк, twitch оформление, оформление форума, форумный аккаунт">
+  <meta name="keywords" content="оформление discord, оформление вк, youtube оформление, province rp оформление, gpa 5 rp, majestik оформление, arizona rp, дискорд сервер, бот discord, бот telegram, бот vk, оформление группы вк, twitch оформление, оформление форума, форумный аккаунт">
   <meta name="author" content="Mezets">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://mezets.github.io/mezets.design/">
@@ -1435,20 +1435,19 @@
     .order-two-col {
       display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
       align-items: stretch;
-      aspect-ratio: 16 / 9;
-      max-height: 45vh;
     }
     @media (max-width: 640px) {
-      .order-two-col { grid-template-columns: 1fr; aspect-ratio: auto; max-height: none; }
+      .order-two-col { grid-template-columns: 1fr; }
     }
     .order-field-desc { display: flex; flex-direction: column; min-height: 0; }
-    #orderItemsSection { display: flex; flex-direction: column; min-height: 0; }
+    #orderItemsSection { display: flex; flex-direction: column; min-height: 0; max-height: 340px; }
     #priceItemsContainer { overflow-y: auto; flex: 1; }
     .order-textarea-tall {
-      flex: 1; height: auto; min-height: 0; resize: none;
+      flex: 1; height: auto; min-height: 200px; resize: none;
     }
     @media (max-width: 640px) {
-      .order-textarea-tall { min-height: 100px; }
+      .order-textarea-tall { min-height: 140px; }
+      #orderItemsSection { max-height: 280px; }
     }
     .order-items-section-label {
       font-size: 6px; color: rgba(255,200,200,0.3);
