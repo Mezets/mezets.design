@@ -1384,11 +1384,8 @@
     .order-select option { background: #1a0505; color: rgba(255,220,220,0.9); }
     .order-payment-group {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr 1fr;
+      grid-template-columns: 1fr 1fr;
       gap: 8px;
-    }
-    @media (max-width: 600px) {
-      .order-payment-group { grid-template-columns: 1fr 1fr; }
     }
     .order-payment-option {
       display: flex;
@@ -1449,6 +1446,18 @@
       .order-textarea-tall { min-height: 140px; }
       #orderItemsSection { max-height: 280px; }
     }
+    .order-bottom-grid {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr 1fr;
+      gap: 20px;
+      align-items: start;
+      margin-top: 6px;
+    }
+    @media (max-width: 760px) {
+      .order-bottom-grid { grid-template-columns: 1fr; }
+    }
+    .order-bottom-total { display: flex; flex-direction: column; }
+    .order-bottom-total .order-total-row { margin-top: 0; }
     .order-items-section-label {
       font-size: 6px; color: rgba(255,200,200,0.3);
       margin: 6px 0 4px; letter-spacing: 1px; text-transform: uppercase;
@@ -2201,55 +2210,61 @@
           <div id="priceItemsContainer" style="margin-bottom:6px"></div>
         </div>
       </div>
-      <div class="order-field">
-        <div class="order-label">Промокод (необязательно)</div>
-        <div id="orderMyPromoBanner" style="display:none;margin-bottom:8px"></div>
-        <div style="display:flex;gap:6px">
-          <input type="text" class="order-input" id="orderPromoInput" placeholder="Есть промокод?" style="flex:1;padding:8px 10px;font-size:7px" oninput="document.getElementById('orderPromoStatus').textContent=''">
-          <button type="button" class="btn btn-sm" onclick="checkOrderPromo()" style="width:auto;flex-shrink:0;font-size:7px;padding:8px 12px">Применить</button>
+      <div class="order-bottom-grid">
+        <div class="order-field order-bottom-payment">
+          <div class="order-label">Способ оплаты</div>
+          <div class="order-payment-group" id="paymentMethodsContainer">
+            <label class="order-payment-option">
+              <input type="radio" name="payment" value="sbp" checked onchange="updateBankSelect()">
+              <span>СБП</span>
+            </label>
+            <label class="order-payment-option">
+              <input type="radio" name="payment" value="card" onchange="updateBankSelect()">
+              <span>Карта</span>
+            </label>
+            <label class="order-payment-option">
+              <input type="radio" name="payment" value="steam_gift" onchange="updateBankSelect()">
+              <span>Подарок Steam</span>
+            </label>
+            <label class="order-payment-option">
+              <input type="radio" name="payment" value="steam_topup" onchange="updateBankSelect()">
+              <span>Пополнение Steam</span>
+            </label>
+          </div>
+          <div id="bankSelectWrap" style="margin-top:8px">
+            <select class="order-select" id="orderBank">
+              <option value="alfa">Альфа-Банк</option>
+              <option value="tbank">Т-Банк</option>
+              <option value="ozon">Озон Банк</option>
+            </select>
+          </div>
         </div>
-        <div id="orderPromoStatus" style="font-size:6px;line-height:1.6;margin-top:2px"></div>
-      </div>
-      <div class="order-total-row" id="orderTotalRow">
-        <span>Итого</span>
-        <span id="orderTotalPrice">0 ₽</span>
-      </div>
-      <div id="orderTotalBreakdown" class="order-total-breakdown"></div>
-      <div class="order-field">
-        <div class="order-label">Способ оплаты</div>
-        <div class="order-payment-group" id="paymentMethodsContainer">
-          <label class="order-payment-option">
-            <input type="radio" name="payment" value="sbp" checked onchange="updateBankSelect()">
-            <span>СБП</span>
-          </label>
-          <label class="order-payment-option">
-            <input type="radio" name="payment" value="card" onchange="updateBankSelect()">
-            <span>Карта</span>
-          </label>
-          <label class="order-payment-option">
-            <input type="radio" name="payment" value="steam_gift" onchange="updateBankSelect()">
-            <span>Подарок Steam</span>
-          </label>
-          <label class="order-payment-option">
-            <input type="radio" name="payment" value="steam_topup" onchange="updateBankSelect()">
-            <span>Пополнение Steam</span>
-          </label>
+
+        <div class="order-field order-bottom-promo">
+          <div class="order-label">Промокод (необязательно)</div>
+          <div id="orderMyPromoBanner" style="display:none;margin-bottom:8px"></div>
+          <div style="display:flex;gap:6px">
+            <input type="text" class="order-input" id="orderPromoInput" placeholder="Есть промокод?" style="flex:1;padding:8px 10px;font-size:7px" oninput="document.getElementById('orderPromoStatus').textContent=''">
+            <button type="button" class="btn btn-sm" onclick="checkOrderPromo()" style="width:auto;flex-shrink:0;font-size:7px;padding:8px 12px">Применить</button>
+          </div>
+          <div id="orderPromoStatus" style="font-size:6px;line-height:1.6;margin-top:2px"></div>
         </div>
-        <div id="bankSelectWrap" style="margin-top:8px">
-          <select class="order-select" id="orderBank">
-            <option value="alfa">Альфа-Банк</option>
-            <option value="tbank">Т-Банк</option>
-            <option value="ozon">Озон Банк</option>
-          </select>
+
+        <div class="order-bottom-total">
+          <div class="order-total-row" id="orderTotalRow">
+            <span>Итого</span>
+            <span id="orderTotalPrice">0 ₽</span>
+          </div>
+          <div id="orderTotalBreakdown" class="order-total-breakdown"></div>
+          <div style="font-size:6px;color:rgba(255,200,200,0.35);text-align:center;margin:8px 0;">
+            <span id="orderNotLogged">Войди через Discord, чтобы оформить заказ</span>
+          </div>
+          <div class="order-status" id="orderStatus" style="margin-bottom:8px"></div>
+          <button class="order-submit" id="orderSubmit" onclick="submitOrder()">
+            Отправить заявку
+          </button>
         </div>
       </div>
-      <div style="font-size:6px;color:rgba(255,200,200,0.35);text-align:center;margin-bottom:8px;">
-        <span id="orderNotLogged">Войди через Discord, чтобы оформить заказ</span>
-      </div>
-      <div class="order-status" id="orderStatus" style="margin-bottom:8px"></div>
-      <button class="order-submit" id="orderSubmit" onclick="submitOrder()">
-        Отправить заявку
-      </button>
     </div>
 
   </div>
