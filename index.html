@@ -6,7 +6,7 @@
 
   <title>Mezets — оформление Discord, VK, YouTube, Twitch для RP-серверов | Province RP, GPA 5 RP, Majestic, Arizona</title>
   <meta name="description" content="Mezets — оформление Discord-серверов, групп ВК, превью YouTube, Twitch и форумных аккаунтов. Работаю с игроками Province RP, GPA 5 RP, Majestic, Arizona. Также делаю ботов для Discord, Telegram и VK. Быстро, качественно, под ключ.">
-  <meta name="keywords" content="оформление discord, оформление вк, youtube оформление, province rp оформление, gpa 5 rp, majestiс оформление, arizona rp, дискорд сервер, бот discord, бот telegram, бот vk, оформление группы вк, twitch оформление, оформление форума, форумный аккаунт">
+  <meta name="keywords" content="оформление discord, оформление вк, youtube оформление, province rp оформление, gpa 5 rp, majestic оформление, arizona rp, дискорд сервер, бот discord, бот telegram, бот vk, оформление группы вк, twitch оформление, оформление форума, форумный аккаунт">
   <meta name="author" content="Mezets">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://mezets.github.io/mezets.design/">
@@ -1298,31 +1298,31 @@
     .order-field { display: flex; flex-direction: column; gap: 7px; }
     .order-total-row {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 12px 16px; margin: 4px 0 2px;
+      padding: 14px 18px; margin: 4px 0 2px;
       border-radius: 10px;
       border: 1px solid rgba(255,0,0,0.25);
       background: rgba(255,0,0,0.06);
-      font-size: 9px; color: rgba(255,225,225,0.9);
+      font-size: 11px; color: rgba(255,225,225,0.9);
       letter-spacing: 0.5px;
       transition: box-shadow .2s ease;
     }
     .order-total-row span:last-child {
       color: #ff4444;
-      font-size: 11px;
+      font-size: 14px;
       text-shadow: 0 0 10px rgba(255,40,40,0.5);
       transition: transform .15s ease;
     }
     .order-total-row.bump span:last-child { transform: scale(1.15); }
     .order-total-breakdown {
-      display: flex; flex-direction: column; gap: 4px;
-      margin: 6px 0 10px; padding: 0 4px;
+      display: flex; flex-direction: column; gap: 5px;
+      margin: 8px 0 10px; padding: 0 4px;
     }
     .order-total-breakdown-item {
       display: flex; justify-content: space-between; gap: 8px;
-      font-size: 6px; color: rgba(255,210,210,0.55);
-      line-height: 1.6;
+      font-size: 8px; color: rgba(255,210,210,0.6);
+      line-height: 1.7;
     }
-    .order-total-breakdown-item span:last-child { color: rgba(255,140,140,0.7); flex-shrink: 0; }
+    .order-total-breakdown-item span:last-child { color: rgba(255,140,140,0.75); flex-shrink: 0; }
     .order-my-promo-banner {
       display: flex; align-items: center; justify-content: space-between; gap: 8px;
       padding: 8px 10px;
@@ -1340,6 +1340,12 @@
       transition: background .15s;
     }
     .order-my-promo-banner button:hover { background: rgba(255,0,0,0.28); }
+    .order-my-promo-banner-empty {
+      justify-content: center;
+      color: rgba(255,200,200,0.35);
+      border-color: rgba(255,0,0,0.15);
+      background: rgba(255,0,0,0.03);
+    }
     .order-label {
       font-size: 8px;
       color: rgba(255,200,200,0.5);
@@ -1412,22 +1418,22 @@
     .order-item-cb {
       display: flex;
       align-items: flex-start;
-      gap: 6px;
-      padding: 9px 10px;
+      gap: 8px;
+      padding: 11px 12px;
       border-radius: 6px;
       border: 1px solid rgba(255,0,0,0.13);
       background: rgba(255,0,0,0.03);
-      font-size: 8px;
+      font-size: 9px;
       color: rgba(255,225,225,0.8);
       transition: border-color .2s, background .2s;
-      line-height: 1.6;
+      line-height: 1.65;
     }
     .order-item-cb:hover {
       border-color: rgba(255,0,0,0.35);
       background: rgba(255,0,0,0.07);
     }
     .order-item-negotiable {
-      font-size: 5px; color: rgba(255,170,80,0.75); line-height: 1.4;
+      font-size: 7px; color: rgba(255,170,80,0.8); line-height: 1.5;
     }
     .order-two-col {
       display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
@@ -1437,7 +1443,7 @@
       .order-two-col { grid-template-columns: 1fr; }
     }
     .order-field-desc { display: flex; flex-direction: column; min-height: 0; }
-    #orderItemsSection { display: flex; flex-direction: column; min-height: 0; max-height: 560px; }
+    #orderItemsSection { display: flex; flex-direction: column; min-height: 0; max-height: 78vh; }
     #priceItemsContainer { overflow-y: auto; flex: 1; }
     .order-textarea-tall {
       flex: 1; height: auto; min-height: 300px; resize: none;
@@ -1475,11 +1481,11 @@
     #priceItemsContainer { min-height: 30px; }
     #paymentMethodsContainer { min-height: 50px; }
     .item-stepper {
-      display: flex; align-items: center; gap: 3px; flex-shrink: 0;
+      display: flex; align-items: center; gap: 4px; flex-shrink: 0;
     }
     .item-stepper-btn {
-      width: 16px; height: 16px; padding: 0; box-sizing: border-box;
-      font-family: 'Press Start 2P', monospace; font-size: 8px; line-height: 1;
+      width: 20px; height: 20px; padding: 0; box-sizing: border-box;
+      font-family: 'Press Start 2P', monospace; font-size: 10px; line-height: 1;
       display: flex; align-items: center; justify-content: center;
       background: rgba(255,0,0,0.1); border: 1px solid rgba(255,0,0,0.25);
       border-radius: 4px; color: rgba(255,220,220,0.9); cursor: pointer;
@@ -1488,8 +1494,8 @@
     .item-stepper-btn:hover { background: rgba(255,0,0,0.22); border-color: rgba(255,0,0,0.5); }
     .item-stepper-btn:active { transform: scale(0.92); }
     .item-qty {
-      width: 20px; height: 16px; padding: 0; box-sizing: border-box;
-      font-family: 'Press Start 2P', monospace; font-size: 6px; line-height: 16px;
+      width: 24px; height: 20px; padding: 0; box-sizing: border-box;
+      font-family: 'Press Start 2P', monospace; font-size: 8px; line-height: 20px;
       text-align: center; background: transparent;
       border: none;
       color: rgba(255,220,220,0.9); outline: none;
@@ -1549,7 +1555,7 @@
       -webkit-backdrop-filter: blur(4px);
     }
     .order-modal {
-      width: 1100px; max-width: 97vw; padding: 32px 40px;
+      width: 1280px; max-width: 97vw; padding: 32px 40px;
       border-radius: 22px;
       background: var(--bg-panel-92);
       border: 1px solid rgba(255,0,0,0.3);
@@ -2147,7 +2153,7 @@
     </div>
     <div class="name-row">
       <div class="name">Mezets</div>
-      <div class="age-badge">🎉 16 лет</div>
+      <div class="age-badge">🎉 17 лет</div>
     </div>
 
     <div class="stat-block">
@@ -3306,6 +3312,7 @@
 
     var total = 0;
     var lines = [];
+    var hasNegotiable = false;
     document.querySelectorAll('#priceItemsContainer .item-qty').forEach(function(inp) {
       var qty = parseInt(inp.value, 10) || 0;
       var price = parsePriceNumber(inp.getAttribute('data-price'));
@@ -3313,10 +3320,10 @@
       if (qty > 0) {
         total += qty * price;
         var name = inp.getAttribute('data-name') || 'Услуга';
+        if (isNegotiable) hasNegotiable = true;
         lines.push({
           name: name + (qty > 1 ? ' ×' + qty : ''),
           price: qty * price,
-          negotiable: isNegotiable,
         });
       }
     });
@@ -3332,12 +3339,13 @@
     setTimeout(function() { row.classList.remove('bump'); }, 150);
 
     if (breakdown) {
-      breakdown.innerHTML = lines.map(function(l) {
-        var priceText = l.negotiable
-          ? '<span class="order-item-negotiable">цена может увеличиться</span>'
-          : l.price.toLocaleString('ru-RU') + ' ₽';
-        return '<div class="order-total-breakdown-item"><span>' + l.name + '</span><span>' + priceText + '</span></div>';
+      var itemsHtml = lines.map(function(l) {
+        return '<div class="order-total-breakdown-item"><span>' + l.name + '</span><span>' + l.price.toLocaleString('ru-RU') + ' ₽</span></div>';
       }).join('');
+      var negotiableHtml = hasNegotiable
+        ? '<div class="order-item-negotiable" style="margin-top:6px;text-align:center">цена может увеличиться</div>'
+        : '';
+      breakdown.innerHTML = itemsHtml + negotiableHtml;
     }
   }
 
@@ -3348,7 +3356,12 @@
     try {
       var r = await fetch(`${API}/api/promo/my-roulette?session=${encodeURIComponent(session)}`);
       var d = await r.json();
-      if (!d.has_promo) return;
+      if (!d.has_promo) {
+        banner.innerHTML = 'У вас нет активных промокодов';
+        banner.className = 'order-my-promo-banner order-my-promo-banner-empty';
+        banner.style.display = 'flex';
+        return;
+      }
       banner.innerHTML = 'У вас есть активный промокод: скидка ' + d.discount + '% ' +
         '<button type="button" onclick="applyMyRoulettePromo(' + JSON.stringify(d.code) + ')">Применить</button>';
       banner.className = 'order-my-promo-banner';
