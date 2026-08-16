@@ -6,7 +6,7 @@
 
   <title>Mezets — оформление Discord, VK, YouTube, Twitch для RP-серверов | Province RP, GPA 5 RP, Majestic, Arizona</title>
   <meta name="description" content="Mezets — оформление Discord-серверов, групп ВК, превью YouTube, Twitch и форумных аккаунтов. Работаю с игроками Province RP, GPA 5 RP, Majestic, Arizona. Также делаю ботов для Discord, Telegram и VK. Быстро, качественно, под ключ.">
-  <meta name="keywords" content="оформление discord, оформление вк, youtube оформление, province rp оформление, gpa 5 rp, majestik оформление, arizona rp, дискорд сервер, бот discord, бот telegram, бот vk, оформление группы вк, twitch оформление, оформление форума, форумный аккаунт">
+  <meta name="keywords" content="оформление discord, оформление вк, youtube оформление, province rp оформление, gpa 5 rp, majestiс оформление, arizona rp, дискорд сервер, бот discord, бот telegram, бот vk, оформление группы вк, twitch оформление, оформление форума, форумный аккаунт">
   <meta name="author" content="Mezets">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://mezets.github.io/mezets.design/">
@@ -1413,14 +1413,14 @@
       display: flex;
       align-items: flex-start;
       gap: 6px;
-      padding: 7px 8px;
+      padding: 9px 10px;
       border-radius: 6px;
       border: 1px solid rgba(255,0,0,0.13);
       background: rgba(255,0,0,0.03);
-      font-size: 7px;
+      font-size: 8px;
       color: rgba(255,225,225,0.8);
       transition: border-color .2s, background .2s;
-      line-height: 1.55;
+      line-height: 1.6;
     }
     .order-item-cb:hover {
       border-color: rgba(255,0,0,0.35);
@@ -1437,10 +1437,10 @@
       .order-two-col { grid-template-columns: 1fr; }
     }
     .order-field-desc { display: flex; flex-direction: column; min-height: 0; }
-    #orderItemsSection { display: flex; flex-direction: column; min-height: 0; max-height: 340px; }
+    #orderItemsSection { display: flex; flex-direction: column; min-height: 0; max-height: 560px; }
     #priceItemsContainer { overflow-y: auto; flex: 1; }
     .order-textarea-tall {
-      flex: 1; height: auto; min-height: 200px; resize: none;
+      flex: 1; height: auto; min-height: 300px; resize: none;
     }
     @media (max-width: 640px) {
       .order-textarea-tall { min-height: 140px; }
@@ -1468,6 +1468,9 @@
     }
     @media (min-width: 700px) {
       .order-items-grid { grid-template-columns: 1fr 1fr 1fr; }
+    }
+    @media (min-width: 950px) {
+      .order-items-grid { grid-template-columns: 1fr 1fr 1fr 1fr; }
     }
     #priceItemsContainer { min-height: 30px; }
     #paymentMethodsContainer { min-height: 50px; }
@@ -1546,7 +1549,7 @@
       -webkit-backdrop-filter: blur(4px);
     }
     .order-modal {
-      width: 880px; max-width: 95vw; padding: 32px 34px;
+      width: 1100px; max-width: 97vw; padding: 32px 40px;
       border-radius: 22px;
       background: var(--bg-panel-92);
       border: 1px solid rgba(255,0,0,0.3);
@@ -1557,7 +1560,7 @@
       will-change: transform;
       transition: border-color .25s, box-shadow .25s, transform .15s cubic-bezier(.22,.61,.36,1);
       cursor: default;
-      max-height: 96vh; overflow-y: auto; overflow-x: hidden;
+      max-height: 98vh; overflow-y: auto; overflow-x: hidden;
       animation: modalIn .35s cubic-bezier(.16,1,.3,1);
       scrollbar-width: thin;
       scrollbar-color: rgba(255,0,0,0.3) transparent;
