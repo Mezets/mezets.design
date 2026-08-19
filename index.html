@@ -6,7 +6,7 @@
 
   <title>Mezets — оформление Discord, VK, YouTube, Twitch для RP-серверов | Province RP, GPA 5 RP, Majestic, Arizona</title>
   <meta name="description" content="Mezets — оформление Discord-серверов, групп ВК, превью YouTube, Twitch и форумных аккаунтов. Работаю с игроками Province RP, GPA 5 RP, Majestic, Arizona. Также делаю ботов для Discord, Telegram и VK. Быстро, качественно, под ключ.">
-  <meta name="keywords" content="оформление discord, оформление вк, youtube оформление, province rp оформление, gpa 5 rp, majestic оформление, arizona rp, дискорд сервер, бот discord, бот telegram, бот vk, оформление группы вк, twitch оформление, оформление форума, форумный аккаунт">
+  <meta name="keywords" content="оформление discord, оформление вк, youtube оформление, province rp оформление, gpa 5 rp, majestik оформление, arizona rp, дискорд сервер, бот discord, бот telegram, бот vk, оформление группы вк, twitch оформление, оформление форума, форумный аккаунт">
   <meta name="author" content="Mezets">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://mezets.github.io/mezets.design/">
@@ -1453,15 +1453,13 @@
       .order-two-col { grid-template-columns: 1fr; }
     }
     .order-field-desc { display: flex; flex-direction: column; min-height: 0; }
-    #orderItemsSection { display: flex; flex-direction: column; min-height: 0; max-height: 420px; }
-    #priceItemsContainer { overflow-y: auto; flex: 1; }
+    #orderItemsSection { display: flex; flex-direction: column; min-height: 0; }
+    #priceItemsContainer { flex: 1; min-height: 0; display: flex; flex-direction: column; }
     .order-textarea-tall {
       flex: 1; height: auto; min-height: 200px; resize: none;
     }
     @media (max-width: 640px) {
       .order-textarea-tall { min-height: 140px; }
-      #orderItemsSection { max-height: 320px; }
-      .order-carousel-card { flex-basis: 160px; width: 160px; }
     }
     .order-bottom-grid {
       display: grid;
@@ -1475,37 +1473,59 @@
     }
     .order-bottom-total { display: flex; flex-direction: column; }
     .order-bottom-total .order-total-row { margin-top: 0; }
-    .order-items-section-label {
-      font-size: 6px; color: rgba(255,200,200,0.3);
-      margin: 6px 0 4px; letter-spacing: 1px; text-transform: uppercase;
+
+    .order-cat-carousel {
+      display: flex; align-items: stretch; gap: 6px;
+      flex: 1; min-height: 0;
     }
-    .order-items-section-label:first-child { margin-top: 0; }
-    .order-carousel {
-      display: flex; align-items: center; gap: 4px;
-      margin-bottom: 8px;
+    .order-cat-viewport {
+      flex: 1; min-width: 0; overflow: hidden;
+      border-radius: 10px;
+      border: 1px solid rgba(255,0,0,0.15);
+      background: rgba(255,0,0,0.02);
     }
-    .order-carousel-track {
-      display: flex; gap: 8px;
-      overflow-x: auto; scroll-behavior: smooth;
-      scrollbar-width: none;
-      flex: 1; min-width: 0;
+    .order-cat-track {
+      display: flex;
+      height: 100%;
+      transition: transform .3s cubic-bezier(.22,.61,.36,1);
     }
-    .order-carousel-track::-webkit-scrollbar { display: none; }
-    .order-carousel-card {
-      flex: 0 0 190px;
-      width: 190px;
+    .order-cat-panel {
+      flex: 0 0 100%; width: 100%;
+      padding: 14px;
+      overflow-y: auto;
+      box-sizing: border-box;
+      max-height: 320px;
     }
-    .order-carousel-arrow {
+    .order-cat-panel-title {
+      font-size: 8px; color: rgba(255,200,200,0.4);
+      letter-spacing: 1px; text-transform: uppercase;
+      margin-bottom: 10px; text-align: center;
+    }
+    .order-cat-list {
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .order-cat-arrow {
       flex-shrink: 0;
-      width: 22px; height: 22px;
+      width: 28px;
       display: flex; align-items: center; justify-content: center;
-      border-radius: 50%;
+      border-radius: 10px;
       background: rgba(255,0,0,0.1); border: 1px solid rgba(255,0,0,0.25);
-      color: rgba(255,220,220,0.85); font-size: 12px; line-height: 1;
+      color: rgba(255,220,220,0.85); font-size: 16px; line-height: 1;
       cursor: pointer; transition: background .15s, border-color .15s;
     }
-    .order-carousel-arrow:hover { background: rgba(255,0,0,0.22); border-color: rgba(255,0,0,0.5); }
-    #priceItemsContainer { min-height: 30px; }
+    .order-cat-arrow:hover { background: rgba(255,0,0,0.22); border-color: rgba(255,0,0,0.5); }
+    .order-cat-dots {
+      display: flex; justify-content: center; gap: 6px;
+      margin-top: 10px;
+    }
+    .order-cat-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: rgba(255,0,0,0.2);
+      cursor: pointer; transition: background .2s, transform .2s;
+    }
+    .order-cat-dot:hover { background: rgba(255,0,0,0.4); }
+    .order-cat-dot.active { background: #ff3b3b; transform: scale(1.3); }
+
     #paymentMethodsContainer { min-height: 50px; }
     .item-stepper {
       display: flex; align-items: center; gap: 4px; flex-shrink: 0;
@@ -2180,7 +2200,7 @@
     </div>
     <div class="name-row">
       <div class="name">Mezets</div>
-      <div class="age-badge">🎉 17 лет</div>
+      <div class="age-badge">🎉 16 лет</div>
     </div>
 
     <div class="stat-block">
@@ -3296,23 +3316,29 @@
       container.innerHTML = '<div style="font-size:6px;color:rgba(255,150,150,0.5)">Не удалось загрузить услуги</div>';
     }
   }
+  let orderCatIndex = 0;
+  let orderCatCount = 0;
+
   function renderPriceItemsHTML(container, sections) {
     if (!sections || sections.length === 0) {
       container.innerHTML = '<div style="font-size:6px;color:rgba(255,200,200,0.3)">Нет доступных услуг</div>';
       return;
     }
-    var html = '';
+    orderCatIndex = 0;
+    orderCatCount = sections.length;
+
+    var html = '<div class="order-cat-carousel">';
+    html += '<button type="button" class="order-cat-arrow left" onclick="scrollOrderCategory(-1)">‹</button>';
+    html += '<div class="order-cat-viewport"><div class="order-cat-track" id="orderCatTrack">';
     for (var si = 0; si < sections.length; si++) {
       var sec = sections[si];
-      var trackId = 'orderCarousel_' + si;
-      html += '<div class="order-items-section-label">' + sec.label + '</div>';
-      html += '<div class="order-carousel">';
-      html += '<button type="button" class="order-carousel-arrow left" onclick="scrollOrderCarousel(\'' + trackId + '\',-1)">‹</button>';
-      html += '<div class="order-carousel-track" id="' + trackId + '">';
+      html += '<div class="order-cat-panel">';
+      html += '<div class="order-cat-panel-title">' + sec.label + '</div>';
+      html += '<div class="order-cat-list">';
       for (var ii = 0; ii < sec.items.length; ii++) {
         var item = sec.items[ii];
         var isNegotiable = /договор/i.test(item.price);
-        html += '<div class="order-item-cb order-carousel-card">' +
+        html += '<div class="order-item-cb">' +
           '<span style="flex:1;min-width:0;text-align:left;display:flex;flex-direction:column;gap:3px">' +
             '<span>' + item.name + '</span>' +
             '<span style="opacity:0.5">' + item.price + '</span>' +
@@ -3324,27 +3350,34 @@
           '</div>' +
         '</div>';
       }
-      html += '</div>';
-      html += '<button type="button" class="order-carousel-arrow right" onclick="scrollOrderCarousel(\'' + trackId + '\',1)">›</button>';
-      html += '</div>';
+      html += '</div></div>';
     }
+    html += '</div></div>';
+    html += '<button type="button" class="order-cat-arrow right" onclick="scrollOrderCategory(1)">›</button>';
+    html += '</div>';
+    html += '<div class="order-cat-dots" id="orderCatDots">';
+    for (var di = 0; di < sections.length; di++) {
+      html += '<span class="order-cat-dot' + (di === 0 ? ' active' : '') + '" onclick="goToOrderCategory(' + di + ')"></span>';
+    }
+    html += '</div>';
+
     container.innerHTML = html;
   }
 
-  function scrollOrderCarousel(trackId, dir) {
-    var track = document.getElementById(trackId);
+  function scrollOrderCategory(dir) {
+    orderCatIndex = (orderCatIndex + dir + orderCatCount) % orderCatCount;
+    applyOrderCategoryPosition();
+  }
+  function goToOrderCategory(i) {
+    orderCatIndex = i;
+    applyOrderCategoryPosition();
+  }
+  function applyOrderCategoryPosition() {
+    var track = document.getElementById('orderCatTrack');
     if (!track) return;
-    var cardWidth = track.querySelector('.order-carousel-card') ? track.querySelector('.order-carousel-card').offsetWidth + 8 : 200;
-    var step = cardWidth * 2;
-    var maxScroll = track.scrollWidth - track.clientWidth;
-
-    if (dir > 0 && track.scrollLeft >= maxScroll - 4) {
-      track.scrollTo({ left: 0, behavior: 'smooth' });
-    } else if (dir < 0 && track.scrollLeft <= 4) {
-      track.scrollTo({ left: maxScroll, behavior: 'smooth' });
-    } else {
-      track.scrollBy({ left: dir * step, behavior: 'smooth' });
-    }
+    track.style.transform = 'translateX(-' + (orderCatIndex * 100) + '%)';
+    var dots = document.querySelectorAll('#orderCatDots .order-cat-dot');
+    dots.forEach(function(d, i) { d.classList.toggle('active', i === orderCatIndex); });
   }
 
   function parsePriceNumber(str) {
