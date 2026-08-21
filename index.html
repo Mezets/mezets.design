@@ -1490,7 +1490,7 @@
       transition: transform .3s cubic-bezier(.22,.61,.36,1);
     }
     .order-cat-panel {
-      flex: 0 0 100%; width: 100%;
+      flex-shrink: 0;
       padding: 14px;
       overflow-y: auto;
       box-sizing: border-box;
@@ -3329,10 +3329,10 @@
 
     var html = '<div class="order-cat-carousel">';
     html += '<button type="button" class="order-cat-arrow left" onclick="scrollOrderCategory(-1)">‹</button>';
-    html += '<div class="order-cat-viewport"><div class="order-cat-track" id="orderCatTrack">';
+    html += '<div class="order-cat-viewport"><div class="order-cat-track" id="orderCatTrack" style="width:' + (sections.length * 100) + '%">';
     for (var si = 0; si < sections.length; si++) {
       var sec = sections[si];
-      html += '<div class="order-cat-panel">';
+      html += '<div class="order-cat-panel" style="width:' + (100 / sections.length) + '%">';
       html += '<div class="order-cat-panel-title">' + sec.label + '</div>';
       html += '<div class="order-cat-list">';
       for (var ii = 0; ii < sec.items.length; ii++) {
@@ -3375,7 +3375,8 @@
   function applyOrderCategoryPosition() {
     var track = document.getElementById('orderCatTrack');
     if (!track) return;
-    track.style.transform = 'translateX(-' + (orderCatIndex * 100) + '%)';
+    var step = orderCatCount > 0 ? (100 / orderCatCount) : 100;
+    track.style.transform = 'translateX(-' + (orderCatIndex * step) + '%)';
     var dots = document.querySelectorAll('#orderCatDots .order-cat-dot');
     dots.forEach(function(d, i) { d.classList.toggle('active', i === orderCatIndex); });
   }
