@@ -28,7 +28,10 @@ html, body {
 }
 .chat-layout-sidebar { width: 320px; flex-shrink: 0; order: 2; }
 .chat-layout-main { flex: 1; min-width: 0; order: 1; }
-@media (max-width: 760px) {
+@media (max-width: 700px) {
+  .chat-layout-sidebar { width: 260px; }
+}
+@media (max-width: 480px) {
   .chat-layout { flex-direction: column; }
   .chat-layout-sidebar { width: 100%; order: 1; }
   .chat-layout-main { order: 2; }
@@ -452,13 +455,20 @@ function renderOrder(order, messages, attachments) {
   if (parsed.freeLines.length) {
     html += `<div class="order-desc-row"><span class="order-desc-row-label">Что нужно:</span><span class="order-desc-row-value">${escapeHtml(parsed.task)}</span></div>`;
   }
-  parsed.fieldLines.forEach(([, label, value]) => {
-    html += `<div class="order-desc-row"><span class="order-desc-row-label">${escapeHtml(label)}:</span><span class="order-desc-row-value">${escapeHtml(value)}</span></div>`;
-  });
   if (order.payment_method) {
     const payLabel = PAYMENT_LABELS[order.payment_method] || order.payment_method;
     html += `<div class="order-desc-row"><span class="order-desc-row-label">Способ оплаты:</span><span class="order-desc-row-value">${escapeHtml(payLabel)}</span></div>`;
   }
+  parsed.fieldLines.forEach(([, label, value]) => {
+    const cleanLabel = label.trim().toLowerCase();
+    if (cleanLabel === 'выбрано') {
+      const items = value.split(',').map(v => v.trim()).filter(Boolean);
+      const itemsHtml = items.map(item => `<div class="order-desc-item">${escapeHtml(item)}</div>`).join('');
+      html += `<div class="order-desc-row"><span class="order-desc-row-label">${escapeHtml(label)}:</span><div class="order-desc-row-value order-desc-items">${itemsHtml}</div></div>`;
+    } else {
+      html += `<div class="order-desc-row"><span class="order-desc-row-label">${escapeHtml(label)}:</span><span class="order-desc-row-value">${escapeHtml(value)}</span></div>`;
+    }
+  });
   g('orderDescBox').innerHTML = html || escapeHtml(order.description || '');
 
   const closeBtn = g('closeOrderBtn');
