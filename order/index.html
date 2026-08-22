@@ -163,6 +163,18 @@ html, body {
 }
 .order-select:focus, .order-textarea:focus { border-color: rgba(255,0,0,0.45); box-shadow: 0 0 14px rgba(255,0,0,0.1); }
 .order-textarea { resize: vertical; }
+.payment-option-group { display: flex; flex-direction: column; gap: 6px; }
+.payment-option {
+  width: 100%; padding: 10px 12px; border-radius: 10px;
+  background: rgba(255,0,0,0.05); border: 1px solid rgba(255,0,0,0.2);
+  color: rgba(255,220,220,0.9);
+  font-family: 'Press Start 2P', monospace; font-size: 7px; line-height: 1.6;
+  display: flex; align-items: center; gap: 8px;
+  cursor: pointer; transition: .2s;
+}
+.payment-option:hover { border-color: rgba(255,0,0,0.45); }
+.payment-option.active { background: rgba(255,0,0,0.15); border-color: rgba(255,0,0,0.5); box-shadow: 0 0 14px rgba(255,0,0,0.1); }
+.payment-option input { accent-color: #ff3b3b; margin: 0; flex-shrink: 0; }
 
 .status {
   font-size: 6px; line-height: 1.6; padding: 8px 10px;
@@ -261,12 +273,12 @@ html, body {
           <textarea id="orderEditDescInput" class="order-textarea" style="height:100px;margin-bottom:10px" placeholder="Опиши задачу..."></textarea>
 
           <div class="order-label" style="font-size:6px;margin-bottom:6px">Способ оплаты</div>
-          <select id="orderEditPaymentInput" class="order-select" style="margin-bottom:10px">
-            <option value="sbp">СБП</option>
-            <option value="card">Карта</option>
-            <option value="steam_gift">Подарок Steam</option>
-            <option value="steam_topup">Пополнение Steam</option>
-          </select>
+          <div id="orderEditPaymentInput" class="payment-option-group" data-value="sbp" oninput="onPaymentChange(event)" style="margin-bottom:10px">
+            <label class="payment-option active" data-val="sbp"><input type="radio" name="orderEditPayment" value="sbp" checked>СБП</label>
+            <label class="payment-option" data-val="card"><input type="radio" name="orderEditPayment" value="card">Карта</label>
+            <label class="payment-option" data-val="steam_gift"><input type="radio" name="orderEditPayment" value="steam_gift">Подарок Steam</label>
+            <label class="payment-option" data-val="steam_topup"><input type="radio" name="orderEditPayment" value="steam_topup">Пополнение Steam</label>
+          </div>
 
           <div style="display:flex;gap:8px">
             <button class="btn btn-sm" onclick="saveOrderEditClient()" style="flex:1;border-color:rgba(0,200,0,0.35);color:#55ff55">💾 Сохранить</button>
@@ -405,6 +417,30 @@ function renderOrder(order, messages, attachments) {
   renderMessages(messages, attachments);
 }
 
+function onPaymentChange(e) {
+  const group = e.currentTarget;
+  const val = e.target.value;
+  group.dataset.value = val;
+  group.querySelectorAll('.payment-option').forEach(el => el.classList.toggle('active', el.dataset.val === val));
+}
+
+function setPaymentValue(id, val) {
+  const group = g(id);
+  if (!group) return;
+  group.dataset.value = val;
+  group.querySelectorAll('.payment-option').forEach(el => {
+    const active = el.dataset.val === val;
+    el.classList.toggle('active', active);
+    const input = el.querySelector('input');
+    if (input) input.checked = active;
+  });
+}
+
+function getPaymentValue(id) {
+  const group = g(id);
+  return group ? group.dataset.value : '';
+}
+
 function toggleOrderEdit(force) {
   const box = g('orderEditForm');
   if (!box) return;
@@ -412,7 +448,7 @@ function toggleOrderEdit(force) {
   box.style.display = show ? 'block' : 'none';
   if (show && CURRENT_ORDER) {
     g('orderEditDescInput').value = CURRENT_ORDER.description || '';
-    g('orderEditPaymentInput').value = CURRENT_ORDER.payment_method || 'sbp';
+    setPaymentValue('orderEditPaymentInput', CURRENT_ORDER.payment_method || 'sbp');
   }
 }
 
@@ -420,7 +456,7 @@ async function saveOrderEditClient() {
   if (!orderId) return;
   const status = g('orderEditStatus');
   const description = g('orderEditDescInput').value.trim();
-  const payment_method = g('orderEditPaymentInput').value;
+  const payment_method = getPaymentValue('orderEditPaymentInput');
   if (!description) {
     showStatus(status, 'Опиши задачу', 'err');
     return;
