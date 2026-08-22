@@ -21,6 +21,7 @@ html, body {
 .wrap {
   position: relative; z-index: 1;
   max-width: 980px; margin: 0 auto; padding: 48px 20px 100px;
+  perspective: 1200px;
 }
 .chat-layout {
   display: flex; gap: 20px; align-items: center;
@@ -67,7 +68,12 @@ html, body {
   border-radius: 18px; padding: 20px; margin-bottom: 16px;
   backdrop-filter: blur(10px);
   box-shadow: 0 0 40px rgba(255,0,0,0.06);
+  transition: border-color .25s, box-shadow .25s, transform .15s cubic-bezier(.22,.61,.36,1);
+  transform-style: preserve-3d;
+  will-change: transform;
+  cursor: default;
 }
+.card:hover { border-color: rgba(255,0,0,0.4); box-shadow: 0 0 56px rgba(255,0,0,0.2); }
 
 .order-info {
   display: flex; flex-wrap: nowrap; gap: 16px;
@@ -98,14 +104,13 @@ html, body {
   word-break: break-word;
   white-space: pre-wrap;
 }
-.order-desc-text { padding-bottom: 10px; margin-bottom: 10px; border-bottom: 1px solid rgba(255,0,0,0.12); }
 .order-desc-row {
   display: flex; gap: 6px; padding: 8px 0;
   border-top: 1px solid rgba(255,0,0,0.1);
 }
 .order-desc-row:first-of-type { border-top: none; }
 .order-desc-row-label { color: rgba(255,80,80,0.8); flex-shrink: 0; white-space: nowrap; }
-.order-desc-row-value { color: rgba(255,200,200,0.7); }
+.order-desc-row-value { color: rgba(255,200,200,0.7); white-space: pre-wrap; }
 
 .chat-box {
   display: flex; flex-direction: column;
@@ -278,8 +283,14 @@ html, body {
         <div class="order-desc-box" id="orderDescBox"></div>
 
         <div id="orderEditForm" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,0,0,0.15)">
-          <div class="order-label" style="font-size:6px;margin-bottom:6px">Описание заказа</div>
-          <textarea id="orderEditDescInput" class="order-textarea" style="height:100px;margin-bottom:10px" placeholder="Опиши задачу..."></textarea>
+          <div class="order-label" style="font-size:6px;margin-bottom:6px">Что нужно</div>
+          <textarea id="orderEditTaskInput" class="order-textarea" style="height:80px;margin-bottom:10px" placeholder="Опиши задачу..."></textarea>
+
+          <div class="order-label" style="font-size:6px;margin-bottom:6px">Банк</div>
+          <input id="orderEditBankInput" class="order-select" style="margin-bottom:10px" placeholder="Например: Альфа-Банк">
+
+          <div class="order-label" style="font-size:6px;margin-bottom:6px">Выбрано</div>
+          <input id="orderEditSelectedInput" class="order-select" style="margin-bottom:10px" placeholder="Например: Аватарка × 2">
 
           <div class="order-label" style="font-size:6px;margin-bottom:6px">Способ оплаты</div>
           <div id="orderEditPaymentInput" class="payment-option-group" data-value="sbp" oninput="onPaymentChange(event)" style="margin-bottom:10px">
@@ -394,6 +405,34 @@ const CATEGORY_LABELS = {
   'design': 'Дизайн', 'discord_bot': 'Discord бот', 'telegram_bot': 'Telegram бот',
   'website': 'Сайт', 'other': 'Другое',
 };
+const PAYMENT_LABELS = {
+  'sbp': 'СБП', 'card': 'Карта', 'steam_gift': 'Подарок Steam', 'steam_topup': 'Пополнение Steam',
+};
+
+function parseDescription(description) {
+  const cleanDesc = (description || '')
+    .replace(/\s+(Банк:\s*)/i, '\n$1')
+    .replace(/\s+(Выбрано:\s*)/i, '\n$1')
+    .replace(/^\s+|\s+$/g, '');
+  const lines = cleanDesc.split('\n').map(l => l.trim()).filter(Boolean);
+  const freeLines = [];
+  const fieldLines = [];
+  lines.forEach(line => {
+    const m = line.match(/^([^:]{1,30}):\s*(.+)$/);
+    if (m) fieldLines.push(m); else freeLines.push(line);
+  });
+  const getField = name => {
+    const f = fieldLines.find(([, label]) => label.trim().toLowerCase() === name);
+    return f ? f[2] : '';
+  };
+  return {
+    task: freeLines.join('\n'),
+    bank: getField('банк'),
+    selected: getField('выбрано'),
+    fieldLines,
+    freeLines,
+  };
+}
 
 function renderOrder(order, messages, attachments) {
   g('loadingState').style.display = 'none';
@@ -407,27 +446,20 @@ function renderOrder(order, messages, attachments) {
   const badge = g('orderStatusBadge');
   badge.textContent = statusLabels[order.status] || order.status;
   badge.className = 'order-status-badge status-' + order.status;
-  const description = order.description || '';
-  const cleanDesc = description
-    .replace(/\s+(Банк:\s*)/i, '\n$1')
-    .replace(/\s+(Выбрано:\s*)/i, '\n$1')
-    .replace(/^\s+|\s+$/g, '');
-  const lines = cleanDesc.split('\n').map(l => l.trim()).filter(Boolean);
   const escapeHtml = s => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const parsed = parseDescription(order.description);
   let html = '';
-  const freeLines = [];
-  const fieldLines = [];
-  lines.forEach(line => {
-    const m = line.match(/^([^:]{1,30}):\s*(.+)$/);
-    if (m) fieldLines.push(m); else freeLines.push(line);
-  });
-  if (freeLines.length) {
-    html += `<div class="order-desc-text">${escapeHtml(freeLines.join('\n'))}</div>`;
+  if (parsed.freeLines.length) {
+    html += `<div class="order-desc-row"><span class="order-desc-row-label">Что нужно:</span><span class="order-desc-row-value">${escapeHtml(parsed.task)}</span></div>`;
   }
-  fieldLines.forEach(([, label, value]) => {
+  parsed.fieldLines.forEach(([, label, value]) => {
     html += `<div class="order-desc-row"><span class="order-desc-row-label">${escapeHtml(label)}:</span><span class="order-desc-row-value">${escapeHtml(value)}</span></div>`;
   });
-  g('orderDescBox').innerHTML = html || escapeHtml(cleanDesc);
+  if (order.payment_method) {
+    const payLabel = PAYMENT_LABELS[order.payment_method] || order.payment_method;
+    html += `<div class="order-desc-row"><span class="order-desc-row-label">Способ оплаты:</span><span class="order-desc-row-value">${escapeHtml(payLabel)}</span></div>`;
+  }
+  g('orderDescBox').innerHTML = html || escapeHtml(order.description || '');
 
   const closeBtn = g('closeOrderBtn');
   if (closeBtn) {
@@ -472,7 +504,10 @@ function toggleOrderEdit(force) {
   const show = force === undefined ? box.style.display === 'none' : !!force;
   box.style.display = show ? 'block' : 'none';
   if (show && CURRENT_ORDER) {
-    g('orderEditDescInput').value = CURRENT_ORDER.description || '';
+    const parsed = parseDescription(CURRENT_ORDER.description);
+    g('orderEditTaskInput').value = parsed.task;
+    g('orderEditBankInput').value = parsed.bank;
+    g('orderEditSelectedInput').value = parsed.selected;
     setPaymentValue('orderEditPaymentInput', CURRENT_ORDER.payment_method || 'sbp');
   }
 }
@@ -480,12 +515,18 @@ function toggleOrderEdit(force) {
 async function saveOrderEditClient() {
   if (!orderId) return;
   const status = g('orderEditStatus');
-  const description = g('orderEditDescInput').value.trim();
+  const task = g('orderEditTaskInput').value.trim();
+  const bank = g('orderEditBankInput').value.trim();
+  const selected = g('orderEditSelectedInput').value.trim();
   const payment_method = getPaymentValue('orderEditPaymentInput');
-  if (!description) {
+  if (!task) {
     showStatus(status, 'Опиши задачу', 'err');
     return;
   }
+  const parts = [task];
+  if (bank) parts.push(`Банк: ${bank}`);
+  if (selected) parts.push(`Выбрано: ${selected}`);
+  const description = parts.join('\n');
   const session = getSession();
   showStatus(status, 'Сохраняю...', 'info');
   try {
@@ -644,6 +685,22 @@ function uploadFile() {
   };
   input.click();
 }
+
+function tilt(card) {
+  let rafId = null;
+  card.addEventListener('mousemove', e => {
+    if (rafId) return;
+    rafId = requestAnimationFrame(() => {
+      const r = card.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width  - 0.5;
+      const y = (e.clientY - r.top)  / r.height - 0.5;
+      card.style.transform = `rotateY(${x*10}deg) rotateX(${-y*10}deg)`;
+      rafId = null;
+    });
+  });
+  card.addEventListener('mouseleave', () => { card.style.transform = 'rotateY(0) rotateX(0)'; });
+}
+document.querySelectorAll('.card').forEach(tilt);
 
 document.addEventListener('DOMContentLoaded', init);
 </script>
