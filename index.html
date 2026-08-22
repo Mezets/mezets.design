@@ -2085,6 +2085,50 @@
 
 
   </style>
+
+<style id="mezets-blocks-fix">
+/* FIX: карточки профиля/отзывов не должны зависеть от стартовой анимации */
+.main {
+  position: relative !important;
+  display: flex !important;
+  width: 100% !important;
+  min-height: auto !important;
+  justify-content: center !important;
+  align-items: stretch !important;
+  flex-wrap: wrap !important;
+  gap: 40px !important;
+  padding: 60px 20px !important;
+  z-index: 2 !important;
+}
+.main > .card.stats,
+.main > .reviews-card {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+  animation: none !important;
+}
+.main > .card.stats {
+  flex: 0 0 340px !important;
+  min-height: 520px !important;
+}
+.main > .reviews-card {
+  flex: 0 0 340px !important;
+  min-height: 220px !important;
+  max-height: 560px !important;
+}
+.reviews-list {
+  min-height: 120px !important;
+}
+@media (max-width: 760px) {
+  .main { padding: 35px 16px !important; gap: 20px !important; }
+  .main > .card.stats,
+  .main > .reviews-card {
+    flex: 0 1 340px !important;
+    width: 100% !important;
+    max-width: 340px !important;
+  }
+}
+</style>
 </head>
 <body>
 <div id="banOverlay" style="display:none; position:fixed; inset:0; z-index:999999; background:radial-gradient(ellipse at center, #2a0000 0%, #050000 75%); color:#fff; align-items:center; justify-content:center; text-align:center; flex-direction:column; padding:24px;">
