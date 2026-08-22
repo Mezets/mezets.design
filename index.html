@@ -132,10 +132,7 @@
     }
 
     body {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
+      display: block;
       min-height: 100vh;
     }
 
@@ -263,6 +260,7 @@
       justify-content: center;
       align-items: stretch;
       gap: 40px;
+      width: 100%;
       z-index: 2;
       padding: 60px 20px;
       perspective: 1200px;
@@ -1245,54 +1243,6 @@
       width: 260px;
     }
 
-    .restored-sections {
-      position: relative;
-      z-index: 2;
-      width: min(760px, calc(100% - 40px));
-      margin: 10px auto 30px;
-      display: flex;
-      align-items: stretch;
-      justify-content: center;
-      gap: 40px;
-      flex-wrap: wrap;
-    }
-
-    .restored-sections .reviews-card,
-    .restored-sections .order-card {
-      flex: 1 1 340px;
-      max-width: 360px;
-    }
-
-    .restored-sections .reviews-card {
-      width: auto;
-      max-height: 420px;
-    }
-
-    .restored-sections .order-card {
-      width: auto;
-      max-width: 360px;
-    }
-
-    .restored-sections .order-submit,
-    .restored-sections .order-dc-btn {
-      width: 100%;
-      border: 1px solid rgba(255,0,0,0.3);
-      cursor: pointer;
-    }
-
-    @media (max-width: 760px) {
-      .restored-sections {
-        width: calc(100% - 32px);
-        gap: 24px;
-        margin-bottom: 24px;
-      }
-      .restored-sections .reviews-card,
-      .restored-sections .order-card {
-        width: 100%;
-        max-width: 360px;
-      }
-    }
-
     .order-card {
       width: 360px;
       padding: 26px 22px;
@@ -1372,17 +1322,15 @@
     .order-total-price-wrap .order-item-negotiable { font-size: 6px; }
     .order-total-row.bump #orderTotalPrice { transform: scale(1.15); }
     .order-total-breakdown {
-      display: flex; flex-direction: column; gap: 9px;
-      margin: 0; padding: 0;
+      display: flex; flex-direction: column; gap: 5px;
+      margin: 8px 0 10px; padding: 0 4px;
     }
     .order-total-breakdown-item {
-      display: flex; justify-content: space-between; align-items: baseline; gap: 10px;
+      display: flex; justify-content: space-between; gap: 8px;
       font-size: 8px; color: rgba(255,210,210,0.6);
-      line-height: 1.6;
+      line-height: 1.7;
     }
-    .order-total-breakdown-item span:first-child { flex: 1; min-width: 0; }
-    .order-total-breakdown-item span:last-child { color: rgba(255,140,140,0.75); flex-shrink: 0; white-space: nowrap; }
-    .order-bottom-selected-empty { font-size: 7px; color: rgba(255,200,200,0.3); text-align: center; padding: 6px 0; }
+    .order-total-breakdown-item span:last-child { color: rgba(255,140,140,0.75); flex-shrink: 0; }
     .order-my-promo-banner {
       display: flex; align-items: center; justify-content: space-between; gap: 8px;
       padding: 10px 12px;
@@ -1513,28 +1461,16 @@
     }
     .order-bottom-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr 1.15fr 1fr;
-      gap: 16px;
-      align-items: stretch;
+      grid-template-columns: 1.3fr 1fr 1fr;
+      gap: 20px;
+      align-items: start;
       margin-top: 6px;
-    }
-    @media (max-width: 900px) {
-      .order-bottom-grid { grid-template-columns: 1fr 1fr; }
     }
     @media (max-width: 760px) {
       .order-bottom-grid { grid-template-columns: 1fr; }
     }
-    .order-bottom-total { display: flex; flex-direction: column; height: 100%; }
+    .order-bottom-total { display: flex; flex-direction: column; }
     .order-bottom-total .order-total-row { margin-top: 0; }
-    .order-bottom-submit-group { margin-top: auto; display: flex; flex-direction: column; }
-    .order-bottom-selected {
-      border-radius: 10px;
-      border: 1px solid rgba(255,0,0,0.15);
-      background: rgba(255,0,0,0.02);
-      padding: 12px 14px;
-      height: 100%;
-      box-sizing: border-box;
-    }
 
     .order-cat-carousel {
       display: flex; align-items: center; gap: 8px;
@@ -1950,6 +1886,7 @@
       display: flex;
       flex-direction: column;
       gap: 0;
+      max-height: 560px;
       overflow: hidden;
       transform-style: preserve-3d;
       will-change: transform;
@@ -1961,6 +1898,8 @@
       animation: cardFadeIn .7s cubic-bezier(.16,1,.3,1) .12s forwards;
     }
     .reviews-card:hover { border-color: rgba(255,0,0,0.4); box-shadow: 0 0 56px rgba(255,0,0,0.22); }
+    /* Reviews must remain part of the normal page flow and stay visible. */
+    .reviews-card { min-height: 220px; }
 
     .reviews-title {
       font-size: 11px;
@@ -2307,6 +2246,13 @@
     </div>
   </div>
 
+  <div class="reviews-card">
+    <div class="reviews-title">Отзывы</div>
+    <div class="reviews-list" id="reviewsList">
+      <div class="reviews-loading">Загружаем отзывы...</div>
+    </div>
+  </div>
+
 
 </div>
 
@@ -2366,11 +2312,6 @@
           <div id="orderPromoStatus" style="font-size:6px;line-height:1.6;margin-top:2px"></div>
         </div>
 
-        <div class="order-field order-bottom-selected">
-          <div class="order-label">Выбранные</div>
-          <div id="orderTotalBreakdown" class="order-total-breakdown"></div>
-        </div>
-
         <div class="order-bottom-total">
           <div class="order-total-row" id="orderTotalRow">
             <span>Итого</span>
@@ -2379,15 +2320,14 @@
               <span id="orderTotalNegotiable" class="order-item-negotiable" style="display:none">цена может увеличиться</span>
             </span>
           </div>
-          <div class="order-bottom-submit-group">
-            <div style="font-size:6px;color:rgba(255,200,200,0.35);text-align:center;margin:8px 0;">
-              <span id="orderNotLogged">Войди через Discord, чтобы оформить заказ</span>
-            </div>
-            <div class="order-status" id="orderStatus" style="margin-bottom:8px"></div>
-            <button class="order-submit" id="orderSubmit" onclick="submitOrder()">
-              Отправить заявку
-            </button>
+          <div id="orderTotalBreakdown" class="order-total-breakdown"></div>
+          <div style="font-size:6px;color:rgba(255,200,200,0.35);text-align:center;margin:8px 0;">
+            <span id="orderNotLogged">Войди через Discord, чтобы оформить заказ</span>
           </div>
+          <div class="order-status" id="orderStatus" style="margin-bottom:8px"></div>
+          <button class="order-submit" id="orderSubmit" onclick="submitOrder()">
+            Отправить заявку
+          </button>
         </div>
       </div>
     </div>
@@ -2405,32 +2345,6 @@
   <div class="portfolio-title">Мои работы</div>
   <div class="portfolio-track-wrap">
     <div class="portfolio-track" id="portfolioTrack"></div>
-  </div>
-</section>
-
-<section class="restored-sections" aria-label="Отзывы и заказ">
-  <div class="reviews-card">
-    <div class="reviews-title">Отзывы</div>
-    <div class="reviews-list" id="reviewsList">
-      <div class="reviews-loading">Загружаем отзывы...</div>
-    </div>
-  </div>
-
-  <div class="order-card" id="orderCard">
-    <div class="order-title">Оформить заказ</div>
-    <div class="order-package">
-      <div class="order-package-title">Что можно заказать</div>
-      <div class="order-package-item"><span class="order-package-dot"></span>Оформление Discord / VK</div>
-      <div class="order-package-item"><span class="order-package-dot"></span>Превью YouTube / Twitch</div>
-      <div class="order-package-item"><span class="order-package-dot"></span>Оформление форумов</div>
-      <div class="order-package-item"><span class="order-package-dot"></span>Боты для Discord / Telegram / VK</div>
-    </div>
-    <div class="order-total-row">
-      <span>Заказ</span>
-      <span style="color:#ff4444">под ключ</span>
-    </div>
-    <button type="button" class="order-submit" onclick="openOrderModal()">Оформить заказ</button>
-    <button type="button" class="order-dc-btn" onclick="orderViaDiscord()">Заказать через Discord</button>
   </div>
 </section>
 
@@ -2541,7 +2455,7 @@
 	    </div>
 
     <script>
-      function openDataPolicy() { rearmEntranceAnimation(document.getElementById('dataPolicyBox')); document.getElementById('dataPolicyOverlay').style.display = 'flex'; }
+      function openDataPolicy() { document.getElementById('dataPolicyOverlay').style.display = 'flex'; }
       function closeDataPolicy() { document.getElementById('dataPolicyOverlay').style.display = 'none'; }
     </script>
 
@@ -3322,20 +3236,7 @@
   loadStats();
   setInterval(loadStats, 60000);
 
-  function releaseEntranceAnimation(el) {
-    if (!el) return;
-    el.addEventListener('animationend', function(e) {
-      if (e.target !== el) return;
-      el.style.animation = 'none';
-    });
-  }
-  function rearmEntranceAnimation(el) {
-    if (!el) return;
-    el.style.animation = '';
-  }
-
   function tilt(card) {
-    releaseEntranceAnimation(card);
     let rafId = null;
     card.addEventListener('mousemove', e => {
       if (rafId) return;
@@ -3356,7 +3257,6 @@
 
   function tiltOverlay(overlayEl, boxEl) {
     if (!overlayEl || !boxEl) return;
-    releaseEntranceAnimation(boxEl);
     let rafId = null;
     overlayEl.addEventListener('mousemove', e => {
       if (rafId) return;
@@ -3388,7 +3288,6 @@
       try { var r = await fetch(API + '/discord-login-url'); var d = await r.json(); window.location.href = d.url; } catch(e) { window.location.href = API + '/discord-login-url'; }
       return;
     }
-    rearmEntranceAnimation(document.getElementById('orderModalBox'));
     document.getElementById('orderModalOverlay').style.display = 'flex';
     document.getElementById('orderFormStep').style.display = 'block';
     document.getElementById('orderNotLogged').style.display = 'none';
@@ -3535,11 +3434,9 @@
     if (negoEl) negoEl.style.display = hasNegotiable ? 'block' : 'none';
 
     if (breakdown) {
-      breakdown.innerHTML = lines.length
-        ? lines.map(function(l) {
-            return '<div class="order-total-breakdown-item"><span>' + l.name + '</span><span>' + l.price.toLocaleString('ru-RU') + ' ₽</span></div>';
-          }).join('')
-        : '<div class="order-bottom-selected-empty">Ничего не выбрано</div>';
+      breakdown.innerHTML = lines.map(function(l) {
+        return '<div class="order-total-breakdown-item"><span>' + l.name + '</span><span>' + l.price.toLocaleString('ru-RU') + ' ₽</span></div>';
+      }).join('');
     }
   }
 
