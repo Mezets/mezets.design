@@ -1245,6 +1245,54 @@
       width: 260px;
     }
 
+    .restored-sections {
+      position: relative;
+      z-index: 2;
+      width: min(760px, calc(100% - 40px));
+      margin: 10px auto 30px;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+
+    .restored-sections .reviews-card,
+    .restored-sections .order-card {
+      flex: 1 1 340px;
+      max-width: 360px;
+    }
+
+    .restored-sections .reviews-card {
+      width: auto;
+      max-height: 420px;
+    }
+
+    .restored-sections .order-card {
+      width: auto;
+      max-width: 360px;
+    }
+
+    .restored-sections .order-submit,
+    .restored-sections .order-dc-btn {
+      width: 100%;
+      border: 1px solid rgba(255,0,0,0.3);
+      cursor: pointer;
+    }
+
+    @media (max-width: 760px) {
+      .restored-sections {
+        width: calc(100% - 32px);
+        gap: 24px;
+        margin-bottom: 24px;
+      }
+      .restored-sections .reviews-card,
+      .restored-sections .order-card {
+        width: 100%;
+        max-width: 360px;
+      }
+    }
+
     .order-card {
       width: 360px;
       padding: 26px 22px;
@@ -2259,13 +2307,6 @@
     </div>
   </div>
 
-  <div class="reviews-card">
-    <div class="reviews-title">Отзывы</div>
-    <div class="reviews-list" id="reviewsList">
-      <div class="reviews-loading">Загружаем отзывы...</div>
-    </div>
-  </div>
-
 
 </div>
 
@@ -2364,6 +2405,32 @@
   <div class="portfolio-title">Мои работы</div>
   <div class="portfolio-track-wrap">
     <div class="portfolio-track" id="portfolioTrack"></div>
+  </div>
+</section>
+
+<section class="restored-sections" aria-label="Отзывы и заказ">
+  <div class="reviews-card">
+    <div class="reviews-title">Отзывы</div>
+    <div class="reviews-list" id="reviewsList">
+      <div class="reviews-loading">Загружаем отзывы...</div>
+    </div>
+  </div>
+
+  <div class="order-card" id="orderCard">
+    <div class="order-title">Оформить заказ</div>
+    <div class="order-package">
+      <div class="order-package-title">Что можно заказать</div>
+      <div class="order-package-item"><span class="order-package-dot"></span>Оформление Discord / VK</div>
+      <div class="order-package-item"><span class="order-package-dot"></span>Превью YouTube / Twitch</div>
+      <div class="order-package-item"><span class="order-package-dot"></span>Оформление форумов</div>
+      <div class="order-package-item"><span class="order-package-dot"></span>Боты для Discord / Telegram / VK</div>
+    </div>
+    <div class="order-total-row">
+      <span>Заказ</span>
+      <span style="color:#ff4444">под ключ</span>
+    </div>
+    <button type="button" class="order-submit" onclick="openOrderModal()">Оформить заказ</button>
+    <button type="button" class="order-dc-btn" onclick="orderViaDiscord()">Заказать через Discord</button>
   </div>
 </section>
 
