@@ -1456,10 +1456,10 @@
     #orderItemsSection { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
     #priceItemsContainer { flex: 1; min-height: 0; display: flex; flex-direction: column; }
     .order-textarea-tall {
-      flex: 1; height: auto; min-height: 200px; resize: none;
+      flex: 1; height: 260px; min-height: 260px; resize: none;
     }
     @media (max-width: 640px) {
-      .order-textarea-tall { min-height: 140px; }
+      .order-textarea-tall { min-height: 140px; height: auto; }
     }
     .order-bottom-grid {
       display: grid;
@@ -1475,7 +1475,7 @@
     .order-bottom-total .order-total-row { margin-top: 0; }
 
     .order-cat-carousel {
-      display: flex; align-items: stretch; gap: 6px;
+      display: flex; align-items: center; gap: 8px;
       min-width: 0; width: 100%;
     }
     .order-cat-viewport {
@@ -1483,10 +1483,12 @@
       border-radius: 10px;
       border: 1px solid rgba(255,0,0,0.15);
       background: rgba(255,0,0,0.02);
+      height: 260px;
     }
     .order-cat-track {
       display: flex;
-      align-items: flex-start;
+      align-items: stretch;
+      height: 100%;
       transition: transform .3s cubic-bezier(.22,.61,.36,1);
     }
     .order-cat-panel {
@@ -1494,7 +1496,7 @@
       padding: 14px;
       overflow-y: auto;
       box-sizing: border-box;
-      max-height: 320px;
+      height: 100%;
     }
     .order-cat-panel-title {
       font-size: 8px; color: rgba(255,200,200,0.4);
@@ -1502,21 +1504,23 @@
       margin-bottom: 10px; text-align: center;
     }
     .order-cat-list {
-      display: flex; flex-direction: column; gap: 6px;
+      display: flex; flex-direction: column; gap: 8px;
     }
     .order-cat-arrow {
       flex-shrink: 0;
-      width: 28px;
+      width: 30px; height: 30px;
+      align-self: center;
       display: flex; align-items: center; justify-content: center;
-      border-radius: 10px;
+      border-radius: 50%;
       background: rgba(255,0,0,0.1); border: 1px solid rgba(255,0,0,0.25);
-      color: rgba(255,220,220,0.85); font-size: 16px; line-height: 1;
-      cursor: pointer; transition: background .15s, border-color .15s;
+      color: rgba(255,220,220,0.85); font-size: 14px; line-height: 1;
+      cursor: pointer; transition: background .15s, border-color .15s, transform .1s;
     }
     .order-cat-arrow:hover { background: rgba(255,0,0,0.22); border-color: rgba(255,0,0,0.5); }
+    .order-cat-arrow:active { transform: scale(0.92); }
     .order-cat-dots {
       display: flex; justify-content: center; gap: 6px;
-      margin-top: 10px;
+      margin-top: 12px;
     }
     .order-cat-dot {
       width: 6px; height: 6px; border-radius: 50%;
