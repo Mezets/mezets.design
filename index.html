@@ -2124,9 +2124,9 @@
 .main > .reviews-card {
   flex: 0 0 340px !important;
   width: 340px !important;
-  height: 520px !important;
-  min-height: 520px !important;
-  max-height: 520px !important;
+  height: 620px !important;
+  min-height: 620px !important;
+  max-height: 620px !important;
   box-sizing: border-box !important;
 }
 
@@ -2204,12 +2204,54 @@
     flex: 0 1 340px !important;
     width: 100% !important;
     max-width: 340px !important;
-    height: 520px !important;
-    min-height: 520px !important;
-    max-height: 520px !important;
+    height: 620px !important;
+    min-height: 620px !important;
+    max-height: 620px !important;
   }
 }
 </style>
+
+<style id="mezets-order-visibility-fix">
+/* Полностью показываем нижнюю часть карточки, включая кнопки заказа */
+.main > .card.stats {
+  overflow: visible !important;
+  flex-shrink: 0 !important;
+}
+
+.main > .card.stats .stats-body {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+}
+
+.main > .card.stats .order-choice-title {
+  flex: 0 0 auto !important;
+  margin-top: 18px !important;
+  margin-bottom: 2px !important;
+}
+
+.main > .card.stats .order-choice-btns-main {
+  flex: 0 0 auto !important;
+  margin-bottom: 8px !important;
+}
+
+.main > .card.stats .discord-order-btn-half {
+  min-height: 58px !important;
+}
+
+/* Отзывы остаются точно такой же высоты */
+.main > .reviews-card {
+  overflow: hidden !important;
+  flex-shrink: 0 !important;
+}
+
+/* На маленьких экранах не ужимаем кнопки */
+@media (max-width: 400px) {
+  .main > .card.stats .order-choice-btns-main {
+    flex-direction: column !important;
+  }
+}
+</style>
+
 </head>
 <body>
 <div id="banOverlay" style="display:none; position:fixed; inset:0; z-index:999999; background:radial-gradient(ellipse at center, #2a0000 0%, #050000 75%); color:#fff; align-items:center; justify-content:center; text-align:center; flex-direction:column; padding:24px;">
