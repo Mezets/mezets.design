@@ -23,13 +23,14 @@ html, body {
   max-width: 980px; margin: 0 auto; padding: 48px 20px 100px;
 }
 .chat-layout {
-  display: flex; gap: 20px; align-items: flex-start;
+  display: flex; gap: 20px; align-items: center;
 }
-.chat-layout-sidebar { width: 320px; flex-shrink: 0; }
-.chat-layout-main { flex: 1; min-width: 0; }
+.chat-layout-sidebar { width: 320px; flex-shrink: 0; order: 2; }
+.chat-layout-main { flex: 1; min-width: 0; order: 1; }
 @media (max-width: 760px) {
   .chat-layout { flex-direction: column; }
-  .chat-layout-sidebar { width: 100%; }
+  .chat-layout-sidebar { width: 100%; order: 1; }
+  .chat-layout-main { order: 2; }
 }
 .header {
   display: flex; align-items: center; justify-content: space-between;
@@ -97,6 +98,14 @@ html, body {
   word-break: break-word;
   white-space: pre-wrap;
 }
+.order-desc-text { padding-bottom: 10px; margin-bottom: 10px; border-bottom: 1px solid rgba(255,0,0,0.12); }
+.order-desc-row {
+  display: flex; gap: 6px; padding: 8px 0;
+  border-top: 1px solid rgba(255,0,0,0.1);
+}
+.order-desc-row:first-of-type { border-top: none; }
+.order-desc-row-label { color: rgba(255,80,80,0.8); flex-shrink: 0; white-space: nowrap; }
+.order-desc-row-value { color: rgba(255,200,200,0.7); }
 
 .chat-box {
   display: flex; flex-direction: column;
@@ -399,10 +408,26 @@ function renderOrder(order, messages, attachments) {
   badge.textContent = statusLabels[order.status] || order.status;
   badge.className = 'order-status-badge status-' + order.status;
   const description = order.description || '';
-  g('orderDescBox').textContent = description
+  const cleanDesc = description
     .replace(/\s+(Банк:\s*)/i, '\n$1')
     .replace(/\s+(Выбрано:\s*)/i, '\n$1')
     .replace(/^\s+|\s+$/g, '');
+  const lines = cleanDesc.split('\n').map(l => l.trim()).filter(Boolean);
+  const escapeHtml = s => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  let html = '';
+  const freeLines = [];
+  const fieldLines = [];
+  lines.forEach(line => {
+    const m = line.match(/^([^:]{1,30}):\s*(.+)$/);
+    if (m) fieldLines.push(m); else freeLines.push(line);
+  });
+  if (freeLines.length) {
+    html += `<div class="order-desc-text">${escapeHtml(freeLines.join('\n'))}</div>`;
+  }
+  fieldLines.forEach(([, label, value]) => {
+    html += `<div class="order-desc-row"><span class="order-desc-row-label">${escapeHtml(label)}:</span><span class="order-desc-row-value">${escapeHtml(value)}</span></div>`;
+  });
+  g('orderDescBox').innerHTML = html || escapeHtml(cleanDesc);
 
   const closeBtn = g('closeOrderBtn');
   if (closeBtn) {
