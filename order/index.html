@@ -287,25 +287,7 @@ html, body {
           </div>
         </div>
         <div class="order-desc-box" id="orderDescBox"></div>
-
-        <div id="orderEditForm" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,0,0,0.15)">
-          <div class="order-label" style="font-size:6px;margin-bottom:6px">Описание заказа</div>
-          <textarea id="orderEditDescInput" class="order-textarea" style="height:120px;margin-bottom:10px" placeholder="Опиши задачу..."></textarea>
-
-          <div class="order-label" style="font-size:6px;margin-bottom:6px">Способ оплаты</div>
-          <div id="orderEditPaymentInput" class="payment-option-group" data-value="sbp" oninput="onPaymentChange(event)" style="margin-bottom:10px">
-            <label class="payment-option active" data-val="sbp"><input type="radio" name="orderEditPayment" value="sbp" checked>СБП</label>
-            <label class="payment-option" data-val="card"><input type="radio" name="orderEditPayment" value="card">Карта</label>
-            <label class="payment-option" data-val="steam_gift"><input type="radio" name="orderEditPayment" value="steam_gift">Подарок Steam</label>
-            <label class="payment-option" data-val="steam_topup"><input type="radio" name="orderEditPayment" value="steam_topup">Пополнение Steam</label>
-          </div>
-
-          <div style="display:flex;gap:8px">
-            <button class="btn btn-sm" onclick="saveOrderEditClient()" style="flex:1;border-color:rgba(0,200,0,0.35);color:#55ff55">💾 Сохранить</button>
-            <button class="btn btn-sm" onclick="toggleOrderEdit(false)" style="flex:1">Отмена</button>
-          </div>
-          <div class="status" id="orderEditStatus" style="margin-top:8px"></div>
-        </div>
+        <div class="status" id="orderEditStatus" style="margin-top:8px"></div>
       </div>
     </div>
 
@@ -434,18 +416,7 @@ function parseDescription(description) {
   };
 }
 
-function renderOrder(order, messages, attachments) {
-  g('loadingState').style.display = 'none';
-  g('chatContent').style.display = 'block';
-
-  const statusLabels = { 'new': 'Новый', 'in_progress': 'В работе', 'completed': 'Выполнен', 'cancelled': 'Отменён' };
-  g('orderIdDisplay').textContent = `Заказ #${order.id}`;
-  document.title = `Mezets - Чат заказа #${order.id}`;
-  g('orderMeta').textContent = `${CATEGORY_LABELS[order.category] || order.category || ''} · ${order.created_at ? order.created_at.slice(0, 10) : ''}`;
-  g('orderPrice').textContent = order.estimated_price ? `${order.estimated_price} ₽` : '';
-  const badge = g('orderStatusBadge');
-  badge.textContent = statusLabels[order.status] || order.status;
-  badge.className = 'order-status-badge status-' + order.status;
+function renderDescView(order) {
   const escapeHtml = s => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const parsed = parseDescription(order.description);
   let html = '';
@@ -467,6 +438,22 @@ function renderOrder(order, messages, attachments) {
     }
   });
   g('orderDescBox').innerHTML = html || escapeHtml(order.description || '');
+}
+
+function renderOrder(order, messages, attachments) {
+  g('loadingState').style.display = 'none';
+  g('chatContent').style.display = 'flex';
+
+  const statusLabels = { 'new': 'Новый', 'in_progress': 'В работе', 'completed': 'Выполнен', 'cancelled': 'Отменён' };
+  g('orderIdDisplay').textContent = `Заказ #${order.id}`;
+  document.title = `Mezets - Чат заказа #${order.id}`;
+  g('orderMeta').textContent = `${CATEGORY_LABELS[order.category] || order.category || ''} · ${order.created_at ? order.created_at.slice(0, 10) : ''}`;
+  g('orderPrice').textContent = order.estimated_price ? `${order.estimated_price} ₽` : '';
+  const badge = g('orderStatusBadge');
+  badge.textContent = statusLabels[order.status] || order.status;
+  badge.className = 'order-status-badge status-' + order.status;
+  CURRENT_ORDER = order;
+  renderDescView(order);
 
   const closeBtn = g('closeOrderBtn');
   if (closeBtn) {
@@ -476,10 +463,11 @@ function renderOrder(order, messages, attachments) {
   if (editBtn) {
     editBtn.style.display = (order.status === 'completed' || order.status === 'cancelled') ? 'none' : 'inline-flex';
   }
-  CURRENT_ORDER = order;
 
   renderMessages(messages, attachments);
 }
+
+const escapeHtml = s => (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 function onPaymentChange(e) {
   const group = e.currentTarget;
@@ -488,43 +476,65 @@ function onPaymentChange(e) {
   group.querySelectorAll('.payment-option').forEach(el => el.classList.toggle('active', el.dataset.val === val));
 }
 
-function setPaymentValue(id, val) {
-  const group = g(id);
-  if (!group) return;
-  group.dataset.value = val;
-  group.querySelectorAll('.payment-option').forEach(el => {
-    const active = el.dataset.val === val;
-    el.classList.toggle('active', active);
-    const input = el.querySelector('input');
-    if (input) input.checked = active;
-  });
-}
-
 function getPaymentValue(id) {
   const group = g(id);
   return group ? group.dataset.value : '';
 }
 
+let EDITING_ORDER = false;
+
+function renderDescEdit(order) {
+  const parsed = parseDescription(order.description);
+  const payValue = order.payment_method || 'sbp';
+  const payOptions = [
+    ['sbp', 'СБП'], ['card', 'Карта'], ['steam_gift', 'Подарок Steam'], ['steam_topup', 'Пополнение Steam'],
+  ];
+  const payHtml = payOptions.map(([val, label]) =>
+    `<label class="payment-option${val === payValue ? ' active' : ''}" data-val="${val}"><input type="radio" name="orderEditPayment" value="${val}"${val === payValue ? ' checked' : ''}>${label}</label>`
+  ).join('');
+  g('orderDescBox').innerHTML = `
+    <div class="order-desc-row"><span class="order-desc-row-label">Что нужно:</span></div>
+    <textarea id="orderEditTaskInput" class="order-textarea" style="height:70px;margin:4px 0 12px" placeholder="Опиши задачу...">${escapeHtml(parsed.task)}</textarea>
+    <div class="order-desc-row"><span class="order-desc-row-label">Способ оплаты:</span></div>
+    <div id="orderEditPaymentInput" class="payment-option-group" data-value="${payValue}" oninput="onPaymentChange(event)" style="margin:4px 0 12px">${payHtml}</div>
+    <div class="order-desc-row"><span class="order-desc-row-label">Банк:</span></div>
+    <input id="orderEditBankInput" class="order-select" style="margin:4px 0 12px" value="${escapeHtml(parsed.bank)}" placeholder="Например: Альфа-Банк">
+    <div class="order-desc-row"><span class="order-desc-row-label">Выбрано:</span></div>
+    <input id="orderEditSelectedInput" class="order-select" style="margin:4px 0 12px" value="${escapeHtml(parsed.selected)}" placeholder="Например: Аватарка × 2">
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-sm" onclick="saveOrderEditClient()" style="flex:1;border-color:rgba(0,200,0,0.35);color:#55ff55">💾 Сохранить</button>
+      <button class="btn btn-sm" onclick="toggleOrderEdit(false)" style="flex:1">Отмена</button>
+    </div>
+  `;
+}
+
 function toggleOrderEdit(force) {
-  const box = g('orderEditForm');
-  if (!box) return;
-  const show = force === undefined ? box.style.display === 'none' : !!force;
-  box.style.display = show ? 'block' : 'none';
-  if (show && CURRENT_ORDER) {
-    g('orderEditDescInput').value = CURRENT_ORDER.description || '';
-    setPaymentValue('orderEditPaymentInput', CURRENT_ORDER.payment_method || 'sbp');
+  if (!CURRENT_ORDER) return;
+  const show = force === undefined ? !EDITING_ORDER : !!force;
+  EDITING_ORDER = show;
+  if (show) {
+    renderDescEdit(CURRENT_ORDER);
+  } else {
+    renderDescView(CURRENT_ORDER);
+    g('orderEditStatus').innerHTML = '';
   }
 }
 
 async function saveOrderEditClient() {
   if (!orderId) return;
   const status = g('orderEditStatus');
-  const description = g('orderEditDescInput').value.trim();
+  const task = g('orderEditTaskInput').value.trim();
+  const bank = g('orderEditBankInput').value.trim();
+  const selected = g('orderEditSelectedInput').value.trim();
   const payment_method = getPaymentValue('orderEditPaymentInput');
-  if (!description) {
+  if (!task) {
     showStatus(status, 'Опиши задачу', 'err');
     return;
   }
+  const parts = [task];
+  if (bank) parts.push(`Банк: ${bank}`);
+  if (selected) parts.push(`Выбрано: ${selected}`);
+  const description = parts.join('\n');
   const session = getSession();
   showStatus(status, 'Сохраняю...', 'info');
   try {
@@ -534,9 +544,9 @@ async function saveOrderEditClient() {
       body: JSON.stringify({ description, payment_method }),
     });
     if (!r.ok) { const err = await r.json().catch(()=>({})); throw new Error(err.error || 'Сервер отклонил (' + r.status + ')'); }
-    showStatus(status, 'Сохранено!', 'ok');
-    toggleOrderEdit(false);
+    EDITING_ORDER = false;
     await loadOrder();
+    showStatus(g('orderEditStatus'), 'Сохранено!', 'ok');
   } catch(e) {
     showStatus(status, 'Ошибка: ' + e.message, 'err');
   }
