@@ -132,7 +132,10 @@
     }
 
     body {
-      display: block;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
       min-height: 100vh;
     }
 
@@ -260,7 +263,6 @@
       justify-content: center;
       align-items: stretch;
       gap: 40px;
-      width: 100%;
       z-index: 2;
       padding: 60px 20px;
       perspective: 1200px;
@@ -1322,15 +1324,17 @@
     .order-total-price-wrap .order-item-negotiable { font-size: 6px; }
     .order-total-row.bump #orderTotalPrice { transform: scale(1.15); }
     .order-total-breakdown {
-      display: flex; flex-direction: column; gap: 5px;
-      margin: 8px 0 10px; padding: 0 4px;
+      display: flex; flex-direction: column; gap: 9px;
+      margin: 0; padding: 0;
     }
     .order-total-breakdown-item {
-      display: flex; justify-content: space-between; gap: 8px;
+      display: flex; justify-content: space-between; align-items: baseline; gap: 10px;
       font-size: 8px; color: rgba(255,210,210,0.6);
-      line-height: 1.7;
+      line-height: 1.6;
     }
-    .order-total-breakdown-item span:last-child { color: rgba(255,140,140,0.75); flex-shrink: 0; }
+    .order-total-breakdown-item span:first-child { flex: 1; min-width: 0; }
+    .order-total-breakdown-item span:last-child { color: rgba(255,140,140,0.75); flex-shrink: 0; white-space: nowrap; }
+    .order-bottom-selected-empty { font-size: 7px; color: rgba(255,200,200,0.3); text-align: center; padding: 6px 0; }
     .order-my-promo-banner {
       display: flex; align-items: center; justify-content: space-between; gap: 8px;
       padding: 10px 12px;
@@ -1461,16 +1465,28 @@
     }
     .order-bottom-grid {
       display: grid;
-      grid-template-columns: 1.3fr 1fr 1fr;
-      gap: 20px;
-      align-items: start;
+      grid-template-columns: 1fr 1fr 1.15fr 1fr;
+      gap: 16px;
+      align-items: stretch;
       margin-top: 6px;
+    }
+    @media (max-width: 900px) {
+      .order-bottom-grid { grid-template-columns: 1fr 1fr; }
     }
     @media (max-width: 760px) {
       .order-bottom-grid { grid-template-columns: 1fr; }
     }
-    .order-bottom-total { display: flex; flex-direction: column; }
+    .order-bottom-total { display: flex; flex-direction: column; height: 100%; }
     .order-bottom-total .order-total-row { margin-top: 0; }
+    .order-bottom-submit-group { margin-top: auto; display: flex; flex-direction: column; }
+    .order-bottom-selected {
+      border-radius: 10px;
+      border: 1px solid rgba(255,0,0,0.15);
+      background: rgba(255,0,0,0.02);
+      padding: 12px 14px;
+      height: 100%;
+      box-sizing: border-box;
+    }
 
     .order-cat-carousel {
       display: flex; align-items: center; gap: 8px;
@@ -1886,7 +1902,6 @@
       display: flex;
       flex-direction: column;
       gap: 0;
-      max-height: 560px;
       overflow: hidden;
       transform-style: preserve-3d;
       will-change: transform;
@@ -1898,8 +1913,6 @@
       animation: cardFadeIn .7s cubic-bezier(.16,1,.3,1) .12s forwards;
     }
     .reviews-card:hover { border-color: rgba(255,0,0,0.4); box-shadow: 0 0 56px rgba(255,0,0,0.22); }
-    /* Reviews must remain part of the normal page flow and stay visible. */
-    .reviews-card { min-height: 220px; }
 
     .reviews-title {
       font-size: 11px;
@@ -2085,173 +2098,6 @@
 
 
   </style>
-
-<style id="mezets-blocks-fix">
-/* FIX: восстановленные карточки + 3D tilt как у «Рулетки скидок» */
-.main {
-  position: relative !important;
-  display: flex !important;
-  width: 100% !important;
-  justify-content: center !important;
-  align-items: stretch !important;
-  flex-wrap: wrap !important;
-  gap: 40px !important;
-  padding: 60px 20px !important;
-  z-index: 2 !important;
-  perspective: 1200px !important;
-}
-
-.main > .card.stats,
-.main > .reviews-card {
-  opacity: 1 !important;
-  visibility: visible !important;
-  animation: none !important;
-
-  /* ВАЖНО: transform НЕ фиксируем через !important.
-     JS-функция tilt() должна свободно задавать rotateX/rotateY. */
-  transform-style: preserve-3d !important;
-  will-change: transform !important;
-  transition:
-    border-color .25s,
-    box-shadow .25s,
-    transform .15s cubic-bezier(.22,.61,.36,1) !important;
-  position: relative !important;
-  overflow: hidden;
-}
-
-/* Общая высота двух верхних карточек */
-.main > .card.stats,
-.main > .reviews-card {
-  flex: 0 0 340px !important;
-  width: 340px !important;
-  height: 620px !important;
-  min-height: 620px !important;
-  max-height: 620px !important;
-  box-sizing: border-box !important;
-}
-
-/* Глубина и «срез» граней, как у 3D-карточек рулетки */
-.main > .card.stats::before,
-.main > .reviews-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 22px;
-  pointer-events: none;
-  z-index: 20;
-  transform: translateZ(18px);
-  border: 1px solid rgba(255, 45, 45, .16);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 100, 100, .10),
-    inset 0 -18px 35px rgba(80, 0, 0, .16);
-}
-
-.main > .card.stats::after,
-.main > .reviews-card::after {
-  content: "";
-  position: absolute;
-  left: 14px;
-  right: 14px;
-  bottom: -7px;
-  height: 18px;
-  border-radius: 0 0 16px 16px;
-  pointer-events: none;
-  z-index: -1;
-  transform: translateZ(-12px) skewX(-14deg);
-  border-bottom: 2px solid rgba(255, 35, 35, .75);
-  border-left: 1px solid rgba(255, 35, 35, .35);
-  border-right: 1px solid rgba(255, 35, 35, .35);
-  box-shadow: 0 12px 24px rgba(255, 0, 0, .16);
-}
-
-.main > .card.stats:hover,
-.main > .reviews-card:hover {
-  border-color: rgba(255,0,0,.52) !important;
-  box-shadow:
-    0 0 28px rgba(255,0,0,.18),
-    0 0 70px rgba(255,0,0,.12) !important;
-}
-
-/* Отзывы по высоте ровно как карточка статистики */
-.main > .reviews-card {
-  display: flex !important;
-  flex-direction: column !important;
-  padding: 30px 26px !important;
-}
-
-.main > .reviews-card .reviews-list {
-  flex: 1 1 auto !important;
-  min-height: 0 !important;
-  max-height: none !important;
-  overflow-y: auto !important;
-}
-
-/* Чтобы контент не оказался под 3D-слоем */
-.main > .card.stats > *,
-.main > .reviews-card > * {
-  position: relative;
-  z-index: 2;
-}
-
-@media (max-width: 760px) {
-  .main {
-    padding: 35px 16px !important;
-    gap: 24px !important;
-  }
-
-  .main > .card.stats,
-  .main > .reviews-card {
-    flex: 0 1 340px !important;
-    width: 100% !important;
-    max-width: 340px !important;
-    height: 620px !important;
-    min-height: 620px !important;
-    max-height: 620px !important;
-  }
-}
-</style>
-
-<style id="mezets-order-visibility-fix">
-/* Полностью показываем нижнюю часть карточки, включая кнопки заказа */
-.main > .card.stats {
-  overflow: visible !important;
-  flex-shrink: 0 !important;
-}
-
-.main > .card.stats .stats-body {
-  flex: 1 1 auto !important;
-  min-height: 0 !important;
-}
-
-.main > .card.stats .order-choice-title {
-  flex: 0 0 auto !important;
-  margin-top: 18px !important;
-  margin-bottom: 2px !important;
-}
-
-.main > .card.stats .order-choice-btns-main {
-  flex: 0 0 auto !important;
-  margin-bottom: 8px !important;
-}
-
-.main > .card.stats .discord-order-btn-half {
-  min-height: 58px !important;
-}
-
-/* Отзывы остаются точно такой же высоты */
-.main > .reviews-card {
-  overflow: hidden !important;
-  flex-shrink: 0 !important;
-}
-
-/* На маленьких экранах не ужимаем кнопки */
-@media (max-width: 400px) {
-  .main > .card.stats .order-choice-btns-main {
-    flex-direction: column !important;
-  }
-}
-</style>
-
 </head>
 <body>
 <div id="banOverlay" style="display:none; position:fixed; inset:0; z-index:999999; background:radial-gradient(ellipse at center, #2a0000 0%, #050000 75%); color:#fff; align-items:center; justify-content:center; text-align:center; flex-direction:column; padding:24px;">
@@ -2479,6 +2325,11 @@
           <div id="orderPromoStatus" style="font-size:6px;line-height:1.6;margin-top:2px"></div>
         </div>
 
+        <div class="order-field order-bottom-selected">
+          <div class="order-label">Выбранные</div>
+          <div id="orderTotalBreakdown" class="order-total-breakdown"></div>
+        </div>
+
         <div class="order-bottom-total">
           <div class="order-total-row" id="orderTotalRow">
             <span>Итого</span>
@@ -2487,14 +2338,15 @@
               <span id="orderTotalNegotiable" class="order-item-negotiable" style="display:none">цена может увеличиться</span>
             </span>
           </div>
-          <div id="orderTotalBreakdown" class="order-total-breakdown"></div>
-          <div style="font-size:6px;color:rgba(255,200,200,0.35);text-align:center;margin:8px 0;">
-            <span id="orderNotLogged">Войди через Discord, чтобы оформить заказ</span>
+          <div class="order-bottom-submit-group">
+            <div style="font-size:6px;color:rgba(255,200,200,0.35);text-align:center;margin:8px 0;">
+              <span id="orderNotLogged">Войди через Discord, чтобы оформить заказ</span>
+            </div>
+            <div class="order-status" id="orderStatus" style="margin-bottom:8px"></div>
+            <button class="order-submit" id="orderSubmit" onclick="submitOrder()">
+              Отправить заявку
+            </button>
           </div>
-          <div class="order-status" id="orderStatus" style="margin-bottom:8px"></div>
-          <button class="order-submit" id="orderSubmit" onclick="submitOrder()">
-            Отправить заявку
-          </button>
         </div>
       </div>
     </div>
@@ -2622,7 +2474,7 @@
 	    </div>
 
     <script>
-      function openDataPolicy() { document.getElementById('dataPolicyOverlay').style.display = 'flex'; }
+      function openDataPolicy() { rearmEntranceAnimation(document.getElementById('dataPolicyBox')); document.getElementById('dataPolicyOverlay').style.display = 'flex'; }
       function closeDataPolicy() { document.getElementById('dataPolicyOverlay').style.display = 'none'; }
     </script>
 
@@ -3403,7 +3255,20 @@
   loadStats();
   setInterval(loadStats, 60000);
 
+  function releaseEntranceAnimation(el) {
+    if (!el) return;
+    el.addEventListener('animationend', function(e) {
+      if (e.target !== el) return;
+      el.style.animation = 'none';
+    });
+  }
+  function rearmEntranceAnimation(el) {
+    if (!el) return;
+    el.style.animation = '';
+  }
+
   function tilt(card) {
+    releaseEntranceAnimation(card);
     let rafId = null;
     card.addEventListener('mousemove', e => {
       if (rafId) return;
@@ -3411,18 +3276,20 @@
         const r = card.getBoundingClientRect();
         const x = (e.clientX - r.left) / r.width  - 0.5;
         const y = (e.clientY - r.top)  / r.height - 0.5;
-        card.style.transform = `rotateY(${x*10}deg) rotateX(${-y*10}deg) translateZ(8px)`;
+        card.style.transform = `rotateY(${x*10}deg) rotateX(${-y*10}deg)`;
         rafId = null;
       });
     });
-    card.addEventListener('mouseleave', () => { card.style.transform = 'rotateY(0) rotateX(0) translateZ(0)'; });
+    card.addEventListener('mouseleave', () => { card.style.transform = 'rotateY(0) rotateX(0)'; });
   }
   tilt(document.getElementById('card2'));
-  tilt(document.querySelector('.reviews-card'));
 
+  const reviewsCard = document.querySelector('.reviews-card');
+  if (reviewsCard) tilt(reviewsCard);
 
   function tiltOverlay(overlayEl, boxEl) {
     if (!overlayEl || !boxEl) return;
+    releaseEntranceAnimation(boxEl);
     let rafId = null;
     overlayEl.addEventListener('mousemove', e => {
       if (rafId) return;
@@ -3454,6 +3321,7 @@
       try { var r = await fetch(API + '/discord-login-url'); var d = await r.json(); window.location.href = d.url; } catch(e) { window.location.href = API + '/discord-login-url'; }
       return;
     }
+    rearmEntranceAnimation(document.getElementById('orderModalBox'));
     document.getElementById('orderModalOverlay').style.display = 'flex';
     document.getElementById('orderFormStep').style.display = 'block';
     document.getElementById('orderNotLogged').style.display = 'none';
@@ -3600,9 +3468,11 @@
     if (negoEl) negoEl.style.display = hasNegotiable ? 'block' : 'none';
 
     if (breakdown) {
-      breakdown.innerHTML = lines.map(function(l) {
-        return '<div class="order-total-breakdown-item"><span>' + l.name + '</span><span>' + l.price.toLocaleString('ru-RU') + ' ₽</span></div>';
-      }).join('');
+      breakdown.innerHTML = lines.length
+        ? lines.map(function(l) {
+            return '<div class="order-total-breakdown-item"><span>' + l.name + '</span><span>' + l.price.toLocaleString('ru-RU') + ' ₽</span></div>';
+          }).join('')
+        : '<div class="order-bottom-selected-empty">Ничего не выбрано</div>';
     }
   }
 
