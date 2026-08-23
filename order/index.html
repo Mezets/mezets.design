@@ -26,8 +26,8 @@ html, body {
 .chat-layout {
   display: flex; gap: 20px; align-items: center;
 }
-.chat-layout-sidebar { width: 320px; flex-shrink: 0; order: 2; }
-.chat-layout-main { flex: 1; min-width: 0; order: 1; }
+.chat-layout-sidebar { width: 320px; flex-shrink: 0; order: 1; }
+.chat-layout-main { flex: 1; min-width: 0; order: 2; }
 @media (max-width: 700px) {
   .chat-layout-sidebar { width: 260px; }
 }
@@ -289,14 +289,8 @@ html, body {
         <div class="order-desc-box" id="orderDescBox"></div>
 
         <div id="orderEditForm" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,0,0,0.15)">
-          <div class="order-label" style="font-size:6px;margin-bottom:6px">Что нужно</div>
-          <textarea id="orderEditTaskInput" class="order-textarea" style="height:80px;margin-bottom:10px" placeholder="Опиши задачу..."></textarea>
-
-          <div class="order-label" style="font-size:6px;margin-bottom:6px">Банк</div>
-          <input id="orderEditBankInput" class="order-select" style="margin-bottom:10px" placeholder="Например: Альфа-Банк">
-
-          <div class="order-label" style="font-size:6px;margin-bottom:6px">Выбрано</div>
-          <input id="orderEditSelectedInput" class="order-select" style="margin-bottom:10px" placeholder="Например: Аватарка × 2">
+          <div class="order-label" style="font-size:6px;margin-bottom:6px">Описание заказа</div>
+          <textarea id="orderEditDescInput" class="order-textarea" style="height:120px;margin-bottom:10px" placeholder="Опиши задачу..."></textarea>
 
           <div class="order-label" style="font-size:6px;margin-bottom:6px">Способ оплаты</div>
           <div id="orderEditPaymentInput" class="payment-option-group" data-value="sbp" oninput="onPaymentChange(event)" style="margin-bottom:10px">
@@ -442,7 +436,7 @@ function parseDescription(description) {
 
 function renderOrder(order, messages, attachments) {
   g('loadingState').style.display = 'none';
-  g('chatContent').style.display = 'flex';
+  g('chatContent').style.display = 'block';
 
   const statusLabels = { 'new': 'Новый', 'in_progress': 'В работе', 'completed': 'Выполнен', 'cancelled': 'Отменён' };
   g('orderIdDisplay').textContent = `Заказ #${order.id}`;
@@ -517,10 +511,7 @@ function toggleOrderEdit(force) {
   const show = force === undefined ? box.style.display === 'none' : !!force;
   box.style.display = show ? 'block' : 'none';
   if (show && CURRENT_ORDER) {
-    const parsed = parseDescription(CURRENT_ORDER.description);
-    g('orderEditTaskInput').value = parsed.task;
-    g('orderEditBankInput').value = parsed.bank;
-    g('orderEditSelectedInput').value = parsed.selected;
+    g('orderEditDescInput').value = CURRENT_ORDER.description || '';
     setPaymentValue('orderEditPaymentInput', CURRENT_ORDER.payment_method || 'sbp');
   }
 }
@@ -528,18 +519,12 @@ function toggleOrderEdit(force) {
 async function saveOrderEditClient() {
   if (!orderId) return;
   const status = g('orderEditStatus');
-  const task = g('orderEditTaskInput').value.trim();
-  const bank = g('orderEditBankInput').value.trim();
-  const selected = g('orderEditSelectedInput').value.trim();
+  const description = g('orderEditDescInput').value.trim();
   const payment_method = getPaymentValue('orderEditPaymentInput');
-  if (!task) {
+  if (!description) {
     showStatus(status, 'Опиши задачу', 'err');
     return;
   }
-  const parts = [task];
-  if (bank) parts.push(`Банк: ${bank}`);
-  if (selected) parts.push(`Выбрано: ${selected}`);
-  const description = parts.join('\n');
   const session = getSession();
   showStatus(status, 'Сохраняю...', 'info');
   try {
