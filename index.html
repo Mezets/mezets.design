@@ -1465,13 +1465,10 @@
     }
     .order-bottom-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr 1.15fr 1fr;
-      gap: 16px;
+      grid-template-columns: 1.3fr 1fr 1fr;
+      gap: 20px;
       align-items: stretch;
       margin-top: 6px;
-    }
-    @media (max-width: 900px) {
-      .order-bottom-grid { grid-template-columns: 1fr 1fr; }
     }
     @media (max-width: 760px) {
       .order-bottom-grid { grid-template-columns: 1fr; }
@@ -1479,14 +1476,31 @@
     .order-bottom-total { display: flex; flex-direction: column; height: 100%; }
     .order-bottom-total .order-total-row { margin-top: 0; }
     .order-bottom-submit-group { margin-top: auto; display: flex; flex-direction: column; }
-    .order-bottom-selected {
-      border-radius: 10px;
-      border: 1px solid rgba(255,0,0,0.15);
-      background: rgba(255,0,0,0.02);
-      padding: 12px 14px;
-      height: 100%;
-      box-sizing: border-box;
+
+    .order-modal-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: stretch;
+      gap: 20px;
     }
+    .order-side-panel {
+      width: 260px;
+      flex-shrink: 0;
+      border-radius: 22px;
+      background: var(--bg-panel-92);
+      border: 1px solid rgba(255,0,0,0.3);
+      box-shadow: 0 0 40px rgba(255,0,0,0.14);
+      padding: 24px 20px;
+      max-height: 92vh;
+      overflow-y: auto;
+      box-sizing: border-box;
+      transform-style: preserve-3d;
+      will-change: transform;
+      transition: border-color .25s, box-shadow .25s, transform .15s cubic-bezier(.22,.61,.36,1);
+      cursor: default;
+    }
+    .order-side-panel:hover { border-color: rgba(255,0,0,0.5); box-shadow: 0 0 60px rgba(255,0,0,0.24); }
 
     .order-cat-carousel {
       display: flex; align-items: center; gap: 8px;
@@ -2271,6 +2285,7 @@
 </div>
 
 <div class="order-modal-overlay" id="orderModalOverlay" onclick="if(event.target===this)closeOrderModal()" style="display:none">
+  <div class="order-modal-row">
   <div class="order-modal" id="orderModalBox">
     <div class="order-modal-close" onclick="closeOrderModal()">✕</div>
 
@@ -2326,11 +2341,6 @@
           <div id="orderPromoStatus" style="font-size:6px;line-height:1.6;margin-top:2px"></div>
         </div>
 
-        <div class="order-field order-bottom-selected">
-          <div class="order-label">Выбранные</div>
-          <div id="orderTotalBreakdown" class="order-total-breakdown"></div>
-        </div>
-
         <div class="order-bottom-total">
           <div class="order-total-row" id="orderTotalRow">
             <span>Итого</span>
@@ -2351,6 +2361,13 @@
         </div>
       </div>
     </div>
+
+  </div>
+
+  <div class="order-side-panel" id="orderSidePanel">
+    <div class="order-label">Выбранные</div>
+    <div id="orderTotalBreakdown" class="order-total-breakdown"></div>
+  </div>
 
   </div>
 </div>
