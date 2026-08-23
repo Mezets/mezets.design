@@ -442,7 +442,7 @@ function parseDescription(description) {
 
 function renderOrder(order, messages, attachments) {
   g('loadingState').style.display = 'none';
-  g('chatContent').style.display = 'block';
+  g('chatContent').style.display = 'flex';
 
   const statusLabels = { 'new': 'Новый', 'in_progress': 'В работе', 'completed': 'Выполнен', 'cancelled': 'Отменён' };
   g('orderIdDisplay').textContent = `Заказ #${order.id}`;
