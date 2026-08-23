@@ -3259,6 +3259,8 @@
     if (!el) return;
     el.addEventListener('animationend', function(e) {
       if (e.target !== el) return;
+      el.style.opacity = '1';
+      el.style.transform = 'translateY(0) scale(1)';
       el.style.animation = 'none';
     });
   }
