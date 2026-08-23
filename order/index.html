@@ -114,6 +114,9 @@ html, body {
 .order-desc-row:first-of-type { border-top: none; }
 .order-desc-row-label { color: rgba(255,80,80,0.8); flex-shrink: 0; white-space: nowrap; }
 .order-desc-row-value { color: rgba(255,200,200,0.7); white-space: pre-wrap; }
+.order-desc-items { display: flex; flex-direction: column; gap: 4px; }
+.order-desc-item { position: relative; padding-left: 10px; }
+.order-desc-item::before { content: ''; position: absolute; left: 0; top: 6px; width: 4px; height: 4px; border-radius: 50%; background: rgba(255,80,80,0.6); }
 
 .chat-box {
   display: flex; flex-direction: column;
