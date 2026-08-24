@@ -466,8 +466,6 @@ function renderOrder(order, messages, attachments) {
   renderMessages(messages, attachments);
 }
 
-const escapeHtml = s => (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-
 function onPaymentChange(e) {
   const group = e.currentTarget;
   const val = e.target.value;
