@@ -183,18 +183,6 @@ html, body {
 }
 .order-select:focus, .order-textarea:focus { border-color: rgba(255,0,0,0.45); box-shadow: 0 0 14px rgba(255,0,0,0.1); }
 .order-textarea { resize: vertical; }
-.payment-option-group { display: flex; flex-direction: column; gap: 6px; }
-.payment-option {
-  width: 100%; padding: 10px 12px; border-radius: 10px;
-  background: rgba(255,0,0,0.05); border: 1px solid rgba(255,0,0,0.2);
-  color: rgba(255,220,220,0.9);
-  font-family: 'Press Start 2P', monospace; font-size: 7px; line-height: 1.6;
-  display: flex; align-items: center; gap: 8px;
-  cursor: pointer; transition: .2s;
-}
-.payment-option:hover { border-color: rgba(255,0,0,0.45); }
-.payment-option.active { background: rgba(255,0,0,0.15); border-color: rgba(255,0,0,0.5); box-shadow: 0 0 14px rgba(255,0,0,0.1); }
-.payment-option input { accent-color: #ff3b3b; margin: 0; flex-shrink: 0; }
 
 .status {
   font-size: 6px; line-height: 1.6; padding: 8px 10px;
@@ -466,19 +454,9 @@ function renderOrder(order, messages, attachments) {
   renderMessages(messages, attachments);
 }
 
-function onPaymentChange(e) {
-  const group = e.currentTarget;
-  const val = e.target.value;
-  group.dataset.value = val;
-  group.querySelectorAll('.payment-option').forEach(el => el.classList.toggle('active', el.dataset.val === val));
-}
-
-function getPaymentValue(id) {
-  const group = g(id);
-  return group ? group.dataset.value : '';
-}
-
 let EDITING_ORDER = false;
+
+const BANK_OPTIONS = ['Т-Банк', 'Сбербанк', 'Альфа-Банк', 'ВТБ', 'Райффайзен', 'Газпромбанк', 'Озон Банк', 'Другой'];
 
 function renderDescEdit(order) {
   const parsed = parseDescription(order.description);
@@ -487,17 +465,19 @@ function renderDescEdit(order) {
     ['sbp', 'СБП'], ['card', 'Карта'], ['steam_gift', 'Подарок Steam'], ['steam_topup', 'Пополнение Steam'],
   ];
   const payHtml = payOptions.map(([val, label]) =>
-    `<label class="payment-option${val === payValue ? ' active' : ''}" data-val="${val}"><input type="radio" name="orderEditPayment" value="${val}"${val === payValue ? ' checked' : ''}>${label}</label>`
+    `<option value="${val}"${val === payValue ? ' selected' : ''}>${label}</option>`
   ).join('');
+  const bankList = BANK_OPTIONS.includes(parsed.bank) || !parsed.bank ? BANK_OPTIONS : [parsed.bank, ...BANK_OPTIONS];
+  const bankHtml = bankList.map(b => `<option value="${escapeHtml(b)}"${b === parsed.bank ? ' selected' : ''}>${escapeHtml(b)}</option>`).join('');
   g('orderDescBox').innerHTML = `
-    <div class="order-desc-row"><span class="order-desc-row-label">Что нужно:</span></div>
-    <textarea id="orderEditTaskInput" class="order-textarea" style="height:70px;margin:4px 0 12px" placeholder="Опиши задачу...">${escapeHtml(parsed.task)}</textarea>
-    <div class="order-desc-row"><span class="order-desc-row-label">Способ оплаты:</span></div>
-    <div id="orderEditPaymentInput" class="payment-option-group" data-value="${payValue}" oninput="onPaymentChange(event)" style="margin:4px 0 12px">${payHtml}</div>
-    <div class="order-desc-row"><span class="order-desc-row-label">Банк:</span></div>
-    <input id="orderEditBankInput" class="order-select" style="margin:4px 0 12px" value="${escapeHtml(parsed.bank)}" placeholder="Например: Альфа-Банк">
-    <div class="order-desc-row"><span class="order-desc-row-label">Выбрано:</span></div>
-    <input id="orderEditSelectedInput" class="order-select" style="margin:4px 0 12px" value="${escapeHtml(parsed.selected)}" placeholder="Например: Аватарка × 2">
+    <div class="order-label" style="margin-bottom:6px">Что нужно</div>
+    <textarea id="orderEditTaskInput" class="order-textarea" style="height:70px;margin-bottom:10px" placeholder="Опиши задачу...">${escapeHtml(parsed.task)}</textarea>
+    <div class="order-label" style="margin-bottom:6px">Способ оплаты</div>
+    <select id="orderEditPaymentInput" class="order-select" style="margin-bottom:10px">${payHtml}</select>
+    <div class="order-label" style="margin-bottom:6px">Банк</div>
+    <select id="orderEditBankInput" class="order-select" style="margin-bottom:10px">${bankHtml}</select>
+    <div class="order-label" style="margin-bottom:6px">Выбрано</div>
+    <input id="orderEditSelectedInput" class="order-select" style="margin-bottom:10px" value="${escapeHtml(parsed.selected)}" placeholder="Например: Аватарка × 2">
     <div style="display:flex;gap:8px">
       <button class="btn btn-sm" onclick="saveOrderEditClient()" style="flex:1;border-color:rgba(0,200,0,0.35);color:#55ff55">💾 Сохранить</button>
       <button class="btn btn-sm" onclick="toggleOrderEdit(false)" style="flex:1">Отмена</button>
@@ -523,7 +503,7 @@ async function saveOrderEditClient() {
   const task = g('orderEditTaskInput').value.trim();
   const bank = g('orderEditBankInput').value.trim();
   const selected = g('orderEditSelectedInput').value.trim();
-  const payment_method = getPaymentValue('orderEditPaymentInput');
+  const payment_method = g('orderEditPaymentInput').value;
   if (!task) {
     showStatus(status, 'Опиши задачу', 'err');
     return;
