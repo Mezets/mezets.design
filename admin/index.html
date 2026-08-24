@@ -3371,52 +3371,58 @@ async function saveOrderEdit() {
   const paymentField = orderField(ACTIVE_ORDER_DATA, ['payment_method','payment','pay_method']).key;
   const descField = orderField(ACTIVE_ORDER_DATA, ['description','details','comment','text']).key;
 
-  const fields = {};
-  fields[priceField] = String(newPrice);
-  if (Object.prototype.hasOwnProperty.call(ACTIVE_ORDER_DATA, categoryField))
-    fields[categoryField] = document.getElementById('orderEditCategory').value.trim();
-  if (Object.prototype.hasOwnProperty.call(ACTIVE_ORDER_DATA, typeField))
-    fields[typeField] = document.getElementById('orderEditType').value.trim();
-  if (Object.prototype.hasOwnProperty.call(ACTIVE_ORDER_DATA, paymentField))
-    fields[paymentField] = document.getElementById('orderEditPayment').value.trim();
-  if (Object.prototype.hasOwnProperty.call(ACTIVE_ORDER_DATA, descField))
-    fields[descField] = document.getElementById('orderEditDescription').value.trim();
+  let descriptionValue = document.getElementById('orderEditDescription').value.trim();
+  const paymentValue = document.getElementById('orderEditPayment').value.trim();
 
   // Причина хранится в описании, чтобы функция работала без изменения схемы БД.
   const reason = document.getElementById('orderEditPriceReason').value.trim();
   const basePrice = parseFloat(String(ACTIVE_ORDER_DATA[priceField] || '').replace(/[^\d.,-]/g,'').replace(',','.')) || 0;
   const actualDiscount = Math.max(0, basePrice - newPrice);
-  if (reason && actualDiscount > 0 && Object.prototype.hasOwnProperty.call(ACTIVE_ORDER_DATA, descField)) {
-    const oldDesc = document.getElementById('orderEditDescription').value.trim();
-    fields[descField] = oldDesc + (oldDesc ? '\n\n' : '') +
+  if (reason && actualDiscount > 0) {
+    descriptionValue = descriptionValue + (descriptionValue ? '\n\n' : '') +
       'Изменение цены: -' + Math.round(actualDiscount * 100) / 100 + ' ₽' +
       (pct > 0 ? ' (' + pct + '%)' : '') +
       '. Причина: ' + reason;
   }
 
-  // Дополнительные поля: редактируем только те ключи, которые уже были в заказе.
+  // Доп. поля (категория, тип, произвольные ключи) — редактируем только те, что уже были в заказе.
+  const extraFields = {};
+  if (Object.prototype.hasOwnProperty.call(ACTIVE_ORDER_DATA, categoryField))
+    extraFields[categoryField] = document.getElementById('orderEditCategory').value.trim();
+  if (Object.prototype.hasOwnProperty.call(ACTIVE_ORDER_DATA, typeField))
+    extraFields[typeField] = document.getElementById('orderEditType').value.trim();
   document.querySelectorAll('#orderCustomFields .order-custom-row').forEach(function(row) {
     const k = row.querySelector('.custom-key').value.trim();
     const v = row.querySelector('.custom-value').value;
-    if (k && Object.prototype.hasOwnProperty.call(ACTIVE_ORDER_DATA, k)) fields[k] = v;
+    if (k && Object.prototype.hasOwnProperty.call(ACTIVE_ORDER_DATA, k)) extraFields[k] = v;
   });
-
-  if (!Object.keys(fields).length) {
-    showStatus(status, 'Нет изменений для сохранения', 'err');
-    return;
-  }
 
   showStatus(status, 'Сохраняю...', 'info');
   try {
-    const res = await adminFetch(BOT_API + '/admin/db/orders/update', {
-      master: true,
+    // Описание / способ оплаты / цена — через отдельный эндпоинт: он сам пишет
+    // системные сообщения об изменениях (что добавили/убрали/цена) в чат заказа.
+    const editRes = await adminFetch(BOT_API + '/admin/order/' + ACTIVE_CHAT_ORDER_ID + '/edit', {
       method: 'POST',
-      body: { pk_value: String(ACTIVE_CHAT_ORDER_ID), fields: fields }
+      body: { description: descriptionValue, payment_method: paymentValue, estimated_price: newPrice }
     });
-    if (res.status === 403) throw new Error('Неверный мастер-ключ');
-    if (!res.ok) {
-      const d = await res.json().catch(()=>({}));
-      throw new Error(d.error || 'Сервер отклонил сохранение (' + res.status + ')');
+    if (editRes.status === 403) throw new Error('Неверный ключ администратора');
+    if (!editRes.ok) {
+      const d = await editRes.json().catch(()=>({}));
+      throw new Error(d.error || 'Сервер отклонил сохранение (' + editRes.status + ')');
+    }
+
+    // Категория / тип / произвольные поля — через старый универсальный DB-редактор.
+    if (Object.keys(extraFields).length) {
+      const res = await adminFetch(BOT_API + '/admin/db/orders/update', {
+        master: true,
+        method: 'POST',
+        body: { pk_value: String(ACTIVE_CHAT_ORDER_ID), fields: extraFields }
+      });
+      if (res.status === 403) throw new Error('Неверный мастер-ключ');
+      if (!res.ok) {
+        const d = await res.json().catch(()=>({}));
+        throw new Error(d.error || 'Сервер отклонил сохранение доп. полей (' + res.status + ')');
+      }
     }
 
     showStatus(status, 'Заказ сохранён', 'ok');
@@ -3491,6 +3497,11 @@ function renderChatMessages(messages, attachments) {
     }
   });
   box.innerHTML = messages.map(function(m) {
+    if (m.author_id === 'system') {
+      return '<div style="align-self:center;max-width:92%;text-align:center;padding:2px 10px">' +
+        '<div style="font-size:6px;font-style:italic;color:rgba(255,180,180,0.5);line-height:1.6">' + escHtml(m.content || '') + '</div>' +
+      '</div>';
+    }
     var isAdmin = m.author_id === 'admin';
     var isUser = !m.from_discord && !isAdmin;
     var atts = attMap[m.id] || [];
