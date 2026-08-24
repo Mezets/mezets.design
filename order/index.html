@@ -118,6 +118,64 @@ html, body {
 .order-desc-item { position: relative; padding-left: 10px; }
 .order-desc-item::before { content: ''; position: absolute; left: 0; top: 6px; width: 4px; height: 4px; border-radius: 50%; background: rgba(255,80,80,0.6); }
 
+.order-cat-carousel { display: flex; align-items: center; gap: 6px; min-width: 0; width: 100%; }
+.order-cat-viewport {
+  flex: 1; min-width: 0; overflow: hidden; border-radius: 10px;
+  border: 1px solid rgba(255,0,0,0.15); background: rgba(255,0,0,0.02);
+  height: 190px;
+}
+.order-cat-track { display: flex; align-items: stretch; height: 100%; transition: transform .3s cubic-bezier(.22,.61,.36,1); }
+.order-cat-panel { flex-shrink: 0; padding: 10px; overflow-y: auto; box-sizing: border-box; height: 100%; }
+.order-cat-panel-title {
+  font-size: 6px; color: rgba(255,200,200,0.4); letter-spacing: 1px;
+  text-transform: uppercase; margin-bottom: 8px; text-align: center;
+}
+.order-cat-list { display: flex; flex-direction: column; gap: 6px; }
+.order-cat-arrow {
+  flex-shrink: 0; width: 22px; height: 22px; align-self: center;
+  display: flex; align-items: center; justify-content: center; border-radius: 50%;
+  background: rgba(255,0,0,0.1); border: 1px solid rgba(255,0,0,0.25);
+  color: rgba(255,220,220,0.85); font-size: 11px; line-height: 1;
+  cursor: pointer; transition: background .15s, border-color .15s, transform .1s;
+}
+.order-cat-arrow:hover { background: rgba(255,0,0,0.22); border-color: rgba(255,0,0,0.5); }
+.order-cat-arrow:active { transform: scale(0.92); }
+.order-cat-dots { display: flex; justify-content: center; gap: 5px; margin-top: 8px; }
+.order-cat-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,0,0,0.2); cursor: pointer; transition: background .2s, transform .2s; }
+.order-cat-dot:hover { background: rgba(255,0,0,0.4); }
+.order-cat-dot.active { background: #ff3b3b; transform: scale(1.3); }
+.order-item-cb {
+  display: flex; align-items: flex-start; gap: 6px; padding: 8px 9px; border-radius: 6px;
+  border: 1px solid rgba(255,0,0,0.13); background: rgba(255,0,0,0.03);
+  font-size: 6px; color: rgba(255,225,225,0.8); line-height: 1.6;
+  transition: border-color .2s, background .2s;
+}
+.order-item-cb:hover { border-color: rgba(255,0,0,0.35); background: rgba(255,0,0,0.07); }
+.item-stepper { display: flex; align-items: center; gap: 3px; flex-shrink: 0; }
+.item-stepper-btn {
+  width: 17px; height: 17px; padding: 0; box-sizing: border-box;
+  font-family: 'Press Start 2P', monospace; font-size: 8px; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,0,0,0.1); border: 1px solid rgba(255,0,0,0.25);
+  border-radius: 4px; color: rgba(255,220,220,0.9); cursor: pointer;
+  transition: background .15s, border-color .15s;
+}
+.item-stepper-btn:hover { background: rgba(255,0,0,0.22); border-color: rgba(255,0,0,0.5); }
+.item-stepper-btn:active { transform: scale(0.92); }
+.item-qty {
+  width: 20px; height: 17px; padding: 0; box-sizing: border-box;
+  font-family: 'Press Start 2P', monospace; font-size: 7px; line-height: 17px;
+  text-align: center; background: transparent; border: none;
+  color: rgba(255,220,220,0.9); outline: none; pointer-events: none;
+}
+.order-edit-total {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 7px; color: rgba(255,200,200,0.7); margin: 8px 0 12px;
+  padding: 8px 10px; border-radius: 8px; background: rgba(255,0,0,0.05);
+  border: 1px solid rgba(255,0,0,0.15);
+}
+.order-edit-total b { color: #ff5555; font-size: 9px; }
+
 .chat-box {
   display: flex; flex-direction: column;
   height: 500px; overflow-y: auto; gap: 10px;
@@ -455,8 +513,131 @@ function renderOrder(order, messages, attachments) {
 }
 
 let EDITING_ORDER = false;
+let editCatIndex = 0;
+let editCatCount = 0;
+let editPriceSections = null;
 
 const BANK_OPTIONS = ['Т-Банк', 'Сбербанк', 'Альфа-Банк', 'ВТБ', 'Райффайзен', 'Газпромбанк', 'Озон Банк', 'Другой'];
+
+function parsePriceNumber(str) {
+  if (!str) return 0;
+  const digits = String(str).replace(/[^\d]/g, '');
+  return digits ? parseInt(digits, 10) : 0;
+}
+
+function parseSelectedItems(selected) {
+  // "Аватарка, Обложка × 2" -> { "Аватарка": 1, "Обложка": 2 }
+  const map = {};
+  (selected || '').split(',').map(s => s.trim()).filter(Boolean).forEach(entry => {
+    const m = entry.match(/^(.*?)(?:\s*×\s*(\d+))?$/);
+    if (!m) return;
+    const name = m[1].trim();
+    const qty = m[2] ? parseInt(m[2], 10) : 1;
+    if (name) map[name] = (map[name] || 0) + qty;
+  });
+  return map;
+}
+
+async function loadEditPriceSections() {
+  if (editPriceSections) return editPriceSections;
+  try {
+    const r = await fetch(`${API}/api/prices`);
+    const d = await r.json();
+    editPriceSections = d.sections || [];
+  } catch(e) {
+    editPriceSections = [];
+  }
+  return editPriceSections;
+}
+
+function renderEditItemsCarouselHTML(sections, selectedMap) {
+  if (!sections || sections.length === 0) {
+    return '<div style="font-size:6px;color:rgba(255,200,200,0.4)">Не удалось загрузить услуги</div>';
+  }
+  editCatIndex = 0;
+  editCatCount = sections.length;
+  let html = '<div class="order-cat-carousel">';
+  html += '<button type="button" class="order-cat-arrow" onclick="scrollEditCategory(-1)">‹</button>';
+  html += `<div class="order-cat-viewport"><div class="order-cat-track" id="editCatTrack" style="width:${sections.length * 100}%">`;
+  sections.forEach(sec => {
+    html += `<div class="order-cat-panel" style="width:${100 / sections.length}%">`;
+    html += `<div class="order-cat-panel-title">${escapeHtml(sec.label)}</div>`;
+    html += '<div class="order-cat-list">';
+    sec.items.forEach(item => {
+      const isNegotiable = /договор/i.test(item.price);
+      const qty = selectedMap[item.name] || 0;
+      html += '<div class="order-item-cb">' +
+        '<span style="flex:1;min-width:0;text-align:left;display:flex;flex-direction:column;gap:3px">' +
+          `<span>${escapeHtml(item.name)}</span>` +
+          `<span style="opacity:0.5">${escapeHtml(item.price)}</span>` +
+        '</span>' +
+        '<div class="item-stepper">' +
+          '<button type="button" class="item-stepper-btn" onclick="stepEditItemQty(this,-1)">−</button>' +
+          `<input type="text" class="item-qty" readonly value="${qty}" data-price="${escapeHtml(item.price)}" data-name="${escapeHtml(item.name)}" data-negotiable="${isNegotiable ? '1' : '0'}">` +
+          '<button type="button" class="item-stepper-btn" onclick="stepEditItemQty(this,1)">+</button>' +
+        '</div>' +
+      '</div>';
+    });
+    html += '</div></div>';
+  });
+  html += '</div></div>';
+  html += '<button type="button" class="order-cat-arrow" onclick="scrollEditCategory(1)">›</button>';
+  html += '</div>';
+  html += '<div class="order-cat-dots" id="editCatDots">';
+  sections.forEach((_, i) => {
+    html += `<span class="order-cat-dot${i === 0 ? ' active' : ''}" onclick="goToEditCategory(${i})"></span>`;
+  });
+  html += '</div>';
+  return html;
+}
+
+function scrollEditCategory(dir) {
+  editCatIndex = (editCatIndex + dir + editCatCount) % editCatCount;
+  applyEditCategoryPosition();
+}
+function goToEditCategory(i) {
+  editCatIndex = i;
+  applyEditCategoryPosition();
+}
+function applyEditCategoryPosition() {
+  const track = g('editCatTrack');
+  if (!track) return;
+  const step = editCatCount > 0 ? (100 / editCatCount) : 100;
+  track.style.transform = `translateX(-${editCatIndex * step}%)`;
+  document.querySelectorAll('#editCatDots .order-cat-dot').forEach((d, i) => d.classList.toggle('active', i === editCatIndex));
+}
+
+function stepEditItemQty(btn, delta) {
+  const stepper = btn.parentElement;
+  const input = stepper.querySelector('.item-qty');
+  let val = (parseInt(input.value, 10) || 0) + delta;
+  if (val < 0) val = 0;
+  if (val > 99) val = 99;
+  input.value = val;
+  updateEditTotal();
+}
+
+function collectEditItems() {
+  const items = [];
+  let total = 0;
+  document.querySelectorAll('#orderEditItemsBox .item-qty').forEach(inp => {
+    const qty = parseInt(inp.value, 10) || 0;
+    if (qty <= 0) return;
+    const price = parsePriceNumber(inp.getAttribute('data-price'));
+    const name = inp.getAttribute('data-name') || '';
+    total += qty * price;
+    items.push(qty > 1 ? `${name} × ${qty}` : name);
+  });
+  return { items, total };
+}
+
+function updateEditTotal() {
+  const { total } = collectEditItems();
+  const out = g('orderEditTotalPrice');
+  if (out) out.textContent = `${total} ₽`;
+  const topPrice = g('orderPrice');
+  if (topPrice) topPrice.textContent = `${total} ₽`;
+}
 
 function renderDescEdit(order) {
   const parsed = parseDescription(order.description);
@@ -477,12 +658,22 @@ function renderDescEdit(order) {
     <div class="order-label" style="margin-bottom:6px">Банк</div>
     <select id="orderEditBankInput" class="order-select" style="margin-bottom:10px">${bankHtml}</select>
     <div class="order-label" style="margin-bottom:6px">Выбрано</div>
-    <input id="orderEditSelectedInput" class="order-select" style="margin-bottom:10px" value="${escapeHtml(parsed.selected)}" placeholder="Например: Аватарка × 2">
+    <div id="orderEditItemsBox" style="margin-bottom:10px">
+      <div style="font-size:6px;color:rgba(255,200,200,0.4)">Загружаю услуги...</div>
+    </div>
+    <div class="order-edit-total"><span>Итого</span><b id="orderEditTotalPrice">${order.estimated_price ? order.estimated_price : 0} ₽</b></div>
     <div style="display:flex;gap:8px">
       <button class="btn btn-sm" onclick="saveOrderEditClient()" style="flex:1;border-color:rgba(0,200,0,0.35);color:#55ff55">💾 Сохранить</button>
       <button class="btn btn-sm" onclick="toggleOrderEdit(false)" style="flex:1">Отмена</button>
     </div>
   `;
+  loadEditPriceSections().then(sections => {
+    const box = g('orderEditItemsBox');
+    if (!box) return;
+    const selectedMap = parseSelectedItems(parsed.selected);
+    box.innerHTML = renderEditItemsCarouselHTML(sections, selectedMap);
+    updateEditTotal();
+  });
 }
 
 function toggleOrderEdit(force) {
@@ -493,6 +684,8 @@ function toggleOrderEdit(force) {
     renderDescEdit(CURRENT_ORDER);
   } else {
     renderDescView(CURRENT_ORDER);
+    const topPrice = g('orderPrice');
+    if (topPrice) topPrice.textContent = CURRENT_ORDER.estimated_price ? `${CURRENT_ORDER.estimated_price} ₽` : '';
     g('orderEditStatus').innerHTML = '';
   }
 }
@@ -502,23 +695,24 @@ async function saveOrderEditClient() {
   const status = g('orderEditStatus');
   const task = g('orderEditTaskInput').value.trim();
   const bank = g('orderEditBankInput').value.trim();
-  const selected = g('orderEditSelectedInput').value.trim();
   const payment_method = g('orderEditPaymentInput').value;
+  const { items, total } = collectEditItems();
   if (!task) {
     showStatus(status, 'Опиши задачу', 'err');
     return;
   }
   const parts = [task];
   if (bank) parts.push(`Банк: ${bank}`);
-  if (selected) parts.push(`Выбрано: ${selected}`);
+  if (items.length) parts.push(`Выбрано: ${items.join(', ')}`);
   const description = parts.join('\n');
+  const estimated_price = total;
   const session = getSession();
   showStatus(status, 'Сохраняю...', 'info');
   try {
     const r = await fetch(`${API}/api/order/${orderId}/edit?session=${encodeURIComponent(session)}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ description, payment_method }),
+      body: JSON.stringify({ description, payment_method, estimated_price }),
     });
     if (!r.ok) { const err = await r.json().catch(()=>({})); throw new Error(err.error || 'Сервер отклонил (' + r.status + ')'); }
     EDITING_ORDER = false;
