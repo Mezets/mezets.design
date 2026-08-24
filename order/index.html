@@ -194,6 +194,13 @@ html, body {
   align-self: flex-start;
   background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
 }
+.msg-system {
+  align-self: center; max-width: 92%;
+  background: transparent; border: none; padding: 4px 10px;
+  text-align: center;
+}
+.msg-system .msg-text { font-size: 7px; font-style: italic; color: rgba(255,180,180,0.55); line-height: 1.6; }
+.msg-system .msg-author, .msg-system .msg-time { display: none; }
 .msg-author { font-size: 7px; color: rgba(255,200,200,0.5); margin-bottom: 5px; }
 .msg-text { font-size: 9px; color: rgba(255,220,220,0.9); line-height: 1.7; font-family: sans-serif; }
 .msg-time { font-size: 6px; color: rgba(255,150,150,0.35); margin-top: 4px; text-align: right; font-family: monospace; }
@@ -766,6 +773,9 @@ function renderMessages(messages, attachments) {
   }
 
   box.innerHTML = messages.map(m => {
+    if (m.author_id === 'system') {
+      return `<div class="msg msg-system"><div class="msg-text">${escapeHtml(m.content || '')}</div></div>`;
+    }
     const isUser = !m.from_discord;
     const atts = attMap[m.id] || [];
     const attHtml = atts.length ? '<div class="msg-attachments">' + atts.map(a => {
