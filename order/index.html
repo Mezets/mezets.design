@@ -417,7 +417,6 @@ function parseDescription(description) {
 }
 
 function renderDescView(order) {
-  const escapeHtml = s => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const parsed = parseDescription(order.description);
   let html = '';
   if (parsed.freeLines.length) {
