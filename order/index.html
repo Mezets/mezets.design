@@ -122,15 +122,15 @@ html, body {
 .order-cat-viewport {
   flex: 1; min-width: 0; overflow: hidden; border-radius: 10px;
   border: 1px solid rgba(255,0,0,0.15); background: rgba(255,0,0,0.02);
-  max-height: 150px;
+  height: 190px;
 }
-.order-cat-track { display: flex; align-items: stretch; transition: transform .3s cubic-bezier(.22,.61,.36,1); }
-.order-cat-panel { flex-shrink: 0; padding: 8px; overflow-y: auto; box-sizing: border-box; max-height: 150px; }
+.order-cat-track { display: flex; align-items: stretch; height: 100%; transition: transform .3s cubic-bezier(.22,.61,.36,1); }
+.order-cat-panel { flex-shrink: 0; padding: 10px; overflow-y: auto; box-sizing: border-box; height: 100%; }
 .order-cat-panel-title {
   font-size: 6px; color: rgba(255,200,200,0.4); letter-spacing: 1px;
-  text-transform: uppercase; margin-bottom: 6px; text-align: center;
+  text-transform: uppercase; margin-bottom: 8px; text-align: center;
 }
-.order-cat-list { display: flex; flex-direction: column; gap: 4px; }
+.order-cat-list { display: flex; flex-direction: column; gap: 6px; }
 .order-cat-arrow {
   flex-shrink: 0; width: 22px; height: 22px; align-self: center;
   display: flex; align-items: center; justify-content: center; border-radius: 50%;
@@ -140,14 +140,14 @@ html, body {
 }
 .order-cat-arrow:hover { background: rgba(255,0,0,0.22); border-color: rgba(255,0,0,0.5); }
 .order-cat-arrow:active { transform: scale(0.92); }
-.order-cat-dots { display: flex; justify-content: center; gap: 5px; margin-top: 5px; }
+.order-cat-dots { display: flex; justify-content: center; gap: 5px; margin-top: 8px; }
 .order-cat-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,0,0,0.2); cursor: pointer; transition: background .2s, transform .2s; }
 .order-cat-dot:hover { background: rgba(255,0,0,0.4); }
 .order-cat-dot.active { background: #ff3b3b; transform: scale(1.3); }
 .order-item-cb {
-  display: flex; align-items: flex-start; gap: 6px; padding: 6px 8px; border-radius: 6px;
+  display: flex; align-items: flex-start; gap: 6px; padding: 8px 9px; border-radius: 6px;
   border: 1px solid rgba(255,0,0,0.13); background: rgba(255,0,0,0.03);
-  font-size: 6px; color: rgba(255,225,225,0.8); line-height: 1.5;
+  font-size: 6px; color: rgba(255,225,225,0.8); line-height: 1.6;
   transition: border-color .2s, background .2s;
 }
 .order-item-cb:hover { border-color: rgba(255,0,0,0.35); background: rgba(255,0,0,0.07); }
@@ -170,8 +170,8 @@ html, body {
 }
 .order-edit-total {
   display: flex; justify-content: space-between; align-items: center;
-  font-size: 7px; color: rgba(255,200,200,0.7); margin: 4px 0 8px;
-  padding: 7px 10px; border-radius: 8px; background: rgba(255,0,0,0.05);
+  font-size: 7px; color: rgba(255,200,200,0.7); margin: 8px 0 12px;
+  padding: 8px 10px; border-radius: 8px; background: rgba(255,0,0,0.05);
   border: 1px solid rgba(255,0,0,0.15);
 }
 .order-edit-total b { color: #ff5555; font-size: 9px; }
@@ -658,14 +658,14 @@ function renderDescEdit(order) {
   const bankList = BANK_OPTIONS.includes(parsed.bank) || !parsed.bank ? BANK_OPTIONS : [parsed.bank, ...BANK_OPTIONS];
   const bankHtml = bankList.map(b => `<option value="${escapeHtml(b)}"${b === parsed.bank ? ' selected' : ''}>${escapeHtml(b)}</option>`).join('');
   g('orderDescBox').innerHTML = `
-    <div class="order-label" style="margin-bottom:4px">Что нужно</div>
-    <textarea id="orderEditTaskInput" class="order-textarea" style="height:56px;margin-bottom:6px" placeholder="Опиши задачу...">${escapeHtml(parsed.task)}</textarea>
-    <div class="order-label" style="margin-bottom:4px">Способ оплаты</div>
-    <select id="orderEditPaymentInput" class="order-select" style="margin-bottom:6px">${payHtml}</select>
-    <div class="order-label" style="margin-bottom:4px">Банк</div>
-    <select id="orderEditBankInput" class="order-select" style="margin-bottom:6px">${bankHtml}</select>
-    <div class="order-label" style="margin-bottom:4px">Выбрано</div>
-    <div id="orderEditItemsBox" style="margin-bottom:6px">
+    <div class="order-label" style="margin-bottom:6px">Что нужно</div>
+    <textarea id="orderEditTaskInput" class="order-textarea" style="height:70px;margin-bottom:10px" placeholder="Опиши задачу...">${escapeHtml(parsed.task)}</textarea>
+    <div class="order-label" style="margin-bottom:6px">Способ оплаты</div>
+    <select id="orderEditPaymentInput" class="order-select" style="margin-bottom:10px">${payHtml}</select>
+    <div class="order-label" style="margin-bottom:6px">Банк</div>
+    <select id="orderEditBankInput" class="order-select" style="margin-bottom:10px">${bankHtml}</select>
+    <div class="order-label" style="margin-bottom:6px">Выбрано</div>
+    <div id="orderEditItemsBox" style="margin-bottom:10px">
       <div style="font-size:6px;color:rgba(255,200,200,0.4)">Загружаю услуги...</div>
     </div>
     <div class="order-edit-total"><span>Итого</span><b id="orderEditTotalPrice">${order.estimated_price ? order.estimated_price : 0} ₽</b></div>
