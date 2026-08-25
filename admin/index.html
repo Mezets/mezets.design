@@ -492,15 +492,30 @@
       from { opacity: 0; transform: translateY(6px); }
       to { opacity: 1; transform: translateY(0); }
     }
+    @keyframes orderChatModalIn {
+      from { opacity: 0; transform: translateY(14px) scale(.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .order-chat-modal-in { animation: orderChatModalIn .28s cubic-bezier(.22,.61,.36,1); }
 
     /* ── Редактор заказа ── */
+    .order-edit-wrap {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows .32s cubic-bezier(.22,.61,.36,1);
+      margin: 0 20px;
+    }
+    .order-edit-wrap.open { grid-template-rows: 1fr; margin-top: 10px; }
+    .order-edit-wrap-inner { overflow: hidden; min-height: 0; }
     .order-edit-box {
-      margin: 10px 20px 0;
+      opacity: 0; transform: translateY(-6px);
+      transition: opacity .22s ease .05s, transform .22s ease .05s;
       padding: 14px;
       border: 1px solid rgba(255,0,0,0.16);
       border-radius: 12px;
       background: rgba(255,0,0,0.025);
     }
+    .order-edit-wrap.open .order-edit-box { opacity: 1; transform: translateY(0); }
     .order-edit-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -511,6 +526,13 @@
       margin-bottom: 10px;
       font-size: 7px;
       padding: 9px 10px;
+    }
+    .order-edit-box select {
+      width: 100%; box-sizing: border-box; appearance: none; -webkit-appearance: none;
+      background: rgba(255,0,0,0.05) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ff6666' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center;
+      background-size: 12px; border: 1px solid rgba(255,0,0,0.2); border-radius: 8px;
+      color: rgba(255,220,220,0.9); font-family: 'Press Start 2P', monospace;
+      cursor: pointer;
     }
     .order-edit-box textarea { min-height: 68px; }
     .order-edit-full { grid-column: 1 / -1; }
@@ -537,7 +559,9 @@
       gap: 6px;
       align-items: center;
       margin-bottom: 7px;
+      animation: fieldRowIn .18s ease;
     }
+    @keyframes fieldRowIn { from { opacity: 0; transform: translateX(-6px); } to { opacity: 1; transform: translateX(0); } }
     .order-custom-row input { margin-bottom: 0 !important; }
     .order-custom-row .custom-key { flex: 0 0 38%; }
     .order-custom-row .custom-value { flex: 1; }
@@ -551,6 +575,68 @@
       .order-edit-grid, .order-price-tools { grid-template-columns: 1fr; }
       .order-edit-full { grid-column: auto; }
     }
+
+    /* Карусель услуг (как в чате заказа на сайте) */
+    .order-cat-carousel-wrap { margin-bottom: 6px; }
+    .order-cat-carousel { display: flex; align-items: center; gap: 6px; min-width: 0; width: 100%; }
+    .order-cat-viewport {
+      flex: 1; min-width: 0; overflow: hidden; border-radius: 10px;
+      border: 1px solid rgba(255,0,0,0.15); background: rgba(255,0,0,0.02);
+      max-height: 160px;
+    }
+    .order-cat-track { display: flex; align-items: stretch; transition: transform .3s cubic-bezier(.22,.61,.36,1); }
+    .order-cat-panel { flex-shrink: 0; padding: 8px; overflow-y: auto; box-sizing: border-box; max-height: 160px; }
+    .order-cat-panel-title {
+      font-size: 6px; color: rgba(255,200,200,0.4); letter-spacing: 1px;
+      text-transform: uppercase; margin-bottom: 6px; text-align: center;
+    }
+    .order-cat-list { display: flex; flex-direction: column; gap: 4px; }
+    .order-cat-arrow {
+      flex-shrink: 0; width: 22px; height: 22px; align-self: center;
+      display: flex; align-items: center; justify-content: center; border-radius: 50%;
+      background: rgba(255,0,0,0.1); border: 1px solid rgba(255,0,0,0.25);
+      color: rgba(255,220,220,0.85); font-size: 11px; line-height: 1;
+      cursor: pointer; transition: background .15s, border-color .15s, transform .1s;
+    }
+    .order-cat-arrow:hover { background: rgba(255,0,0,0.22); border-color: rgba(255,0,0,0.5); }
+    .order-cat-arrow:active { transform: scale(0.92); }
+    .order-cat-dots { display: flex; justify-content: center; gap: 5px; margin-top: 5px; }
+    .order-cat-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,0,0,0.2); cursor: pointer; transition: background .2s, transform .2s; }
+    .order-cat-dot:hover { background: rgba(255,0,0,0.4); }
+    .order-cat-dot.active { background: #ff3b3b; transform: scale(1.3); }
+    .order-item-cb {
+      display: flex; align-items: flex-start; gap: 6px; padding: 6px 8px; border-radius: 6px;
+      border: 1px solid rgba(255,0,0,0.13); background: rgba(255,0,0,0.03);
+      font-size: 6px; color: rgba(255,225,225,0.8); line-height: 1.5;
+      transition: border-color .2s, background .2s;
+    }
+    .order-item-cb:hover { border-color: rgba(255,0,0,0.35); background: rgba(255,0,0,0.07); }
+    .item-stepper { display: flex; align-items: center; gap: 3px; flex-shrink: 0; }
+    .item-stepper-btn {
+      width: 17px; height: 17px; padding: 0; box-sizing: border-box;
+      font-family: 'Press Start 2P', monospace; font-size: 8px; line-height: 1;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(255,0,0,0.1); border: 1px solid rgba(255,0,0,0.25);
+      border-radius: 4px; color: rgba(255,220,220,0.9); cursor: pointer;
+      transition: background .15s, border-color .15s;
+    }
+    .item-stepper-btn:hover { background: rgba(255,0,0,0.22); border-color: rgba(255,0,0,0.5); }
+    .item-stepper-btn:active { transform: scale(0.92); }
+    .item-qty {
+      width: 20px; height: 17px; padding: 0; box-sizing: border-box;
+      font-family: 'Press Start 2P', monospace; font-size: 7px; line-height: 17px;
+      text-align: center; background: transparent; border: none;
+      color: rgba(255,220,220,0.9); outline: none; pointer-events: none;
+    }
+    .qty-pulse { animation: qtyPulse .25s ease; }
+    @keyframes qtyPulse { 0% { transform: scale(1.35); color: #ff5555; } 100% { transform: scale(1); } }
+    .order-edit-total {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 7px; color: rgba(255,200,200,0.7); margin: 4px 0 10px;
+      padding: 7px 10px; border-radius: 8px; background: rgba(255,0,0,0.05);
+      border: 1px solid rgba(255,0,0,0.15);
+    }
+    .order-edit-total b { color: #ff5555; font-size: 9px; transition: transform .15s ease; }
 
 </style>
 </head>
@@ -888,7 +974,9 @@
             <button class="btn btn-sm" onclick="toggleOrderEditor()" style="width:auto;font-size:7px">✎ Редактировать</button>
           </div>
 
-          <div id="orderEditBox" class="order-edit-box" style="display:none">
+          <div id="orderEditWrap" class="order-edit-wrap">
+          <div class="order-edit-wrap-inner">
+          <div id="orderEditBox" class="order-edit-box">
             <div style="font-size:8px;color:#ff4444;letter-spacing:1px;margin-bottom:12px">РЕДАКТИРОВАНИЕ ЗАКАЗА</div>
 
             <div class="order-edit-grid">
@@ -919,7 +1007,12 @@
 
               <div>
                 <label>Способ оплаты</label>
-                <input type="text" id="orderEditPayment" placeholder="СБП, карта и т.д.">
+                <select id="orderEditPayment">
+                  <option value="sbp">СБП</option>
+                  <option value="card">Карта</option>
+                  <option value="steam_gift">Подарок Steam</option>
+                  <option value="steam_topup">Пополнение Steam</option>
+                </select>
               </div>
               <div>
                 <label>Причина скидки / изменения цены</label>
@@ -927,8 +1020,33 @@
               </div>
 
               <div class="order-edit-full">
-                <label>Описание заказа</label>
-                <textarea id="orderEditDescription" placeholder="Описание заказа..."></textarea>
+                <label>Что нужно</label>
+                <textarea id="orderEditDescription" placeholder="Описание задачи..." style="min-height:56px"></textarea>
+              </div>
+
+              <div>
+                <label>Банк</label>
+                <select id="orderEditBank">
+                  <option value="">— не указан —</option>
+                  <option value="Т-Банк">Т-Банк</option>
+                  <option value="Сбербанк">Сбербанк</option>
+                  <option value="Альфа-Банк">Альфа-Банк</option>
+                  <option value="ВТБ">ВТБ</option>
+                  <option value="Райффайзен">Райффайзен</option>
+                  <option value="Газпромбанк">Газпромбанк</option>
+                  <option value="Озон Банк">Озон Банк</option>
+                  <option value="Другой">Другой</option>
+                </select>
+              </div>
+              <div></div>
+
+              <div class="order-edit-full">
+                <label>Выбранные позиции</label>
+                <div id="orderEditItemsBox" class="order-cat-carousel-wrap">
+                  <div style="font-size:6px;color:rgba(255,200,200,0.35)">Загружаю услуги...</div>
+                </div>
+                <div class="order-edit-total"><span>Итого по позициям</span><b id="orderEditItemsTotal">0 ₽</b></div>
+                <div class="order-edit-hint">Цену выше можно оставить синхронизированной с позициями или задать вручную — сохранится то, что указано в поле «Цена».</div>
               </div>
 
               <div class="order-edit-full">
@@ -945,6 +1063,8 @@
               <button class="btn btn-sm" onclick="toggleOrderEditor()" style="width:auto">Отмена</button>
             </div>
             <div class="status" id="orderEditStatus"></div>
+          </div>
+          </div>
           </div>
 
           <div id="chatMessages" style="flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:8px;min-height:200px;max-height:50vh"></div>
@@ -3231,8 +3351,15 @@ async function loadOrders() {
 
 async function openOrderChat(orderId) {
   ACTIVE_CHAT_ORDER_ID = orderId;
+  admSeenMsgIds = new Set();
   var overlay = document.getElementById('orderChatOverlay');
   overlay.style.display = 'flex';
+  var box = overlay.querySelector('div');
+  if (box) {
+    box.classList.remove('order-chat-modal-in');
+    void box.offsetWidth;
+    box.classList.add('order-chat-modal-in');
+  }
   document.getElementById('chatMsgInput').value = '';
 
   try {
@@ -3282,13 +3409,167 @@ function orderField(o, names) {
 }
 
 let ACTIVE_ORDER_DATA = null;
+let adminEditCatIndex = 0;
+let adminEditCatCount = 0;
+let adminEditPriceSections = null;
 
 function toggleOrderEditor(force) {
-  const box = document.getElementById('orderEditBox');
-  if (!box) return;
-  const show = force === undefined ? box.style.display === 'none' : !!force;
-  box.style.display = show ? 'block' : 'none';
+  const wrap = document.getElementById('orderEditWrap');
+  if (!wrap) return;
+  const show = force === undefined ? !wrap.classList.contains('open') : !!force;
   if (show && ACTIVE_ORDER_DATA) populateOrderEditor(ACTIVE_ORDER_DATA);
+  wrap.classList.toggle('open', show);
+}
+
+// ── Разбор/сборка описания заказа: 'Что нужно' + 'Банк:' + 'Выбрано:' ──
+
+function admExtractFieldLine(description, fieldName) {
+  if (!description) return '';
+  const re = new RegExp('^' + fieldName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*:\\s*(.+)$', 'i');
+  for (const raw of String(description).replace(/\r\n/g, '\n').split('\n')) {
+    const line = raw.trim();
+    const m = line.match(re);
+    if (m) return m[1].trim();
+  }
+  return '';
+}
+function admExtractTaskText(description) {
+  if (!description) return '';
+  return String(description).replace(/\r\n/g, '\n').split('\n')
+    .map(l => l.trim())
+    .filter(l => l && !/^(Банк|Выбрано)\s*:/i.test(l))
+    .join('\n');
+}
+function admParseDescription(description) {
+  return {
+    task: admExtractTaskText(description),
+    bank: admExtractFieldLine(description, 'Банк'),
+    selected: admExtractFieldLine(description, 'Выбрано'),
+  };
+}
+function admParseSelectedItems(text) {
+  const map = {};
+  (text || '').split(',').map(s => s.trim()).filter(Boolean).forEach(entry => {
+    const m = entry.match(/^(.*?)(?:\s*×\s*(\d+))?$/);
+    if (!m) return;
+    const name = m[1].trim();
+    const qty = m[2] ? parseInt(m[2], 10) : 1;
+    if (name) map[name] = (map[name] || 0) + qty;
+  });
+  return map;
+}
+function admParsePriceNumber(str) {
+  if (!str) return 0;
+  const digits = String(str).replace(/[^\d]/g, '');
+  return digits ? parseInt(digits, 10) : 0;
+}
+
+async function admLoadPriceSections() {
+  if (adminEditPriceSections) return adminEditPriceSections;
+  try {
+    const r = await fetch(`${BOT_API}/api/prices`);
+    const d = await r.json();
+    adminEditPriceSections = d.sections || [];
+  } catch(e) {
+    adminEditPriceSections = [];
+  }
+  return adminEditPriceSections;
+}
+
+function admRenderItemsCarouselHTML(sections, selectedMap) {
+  if (!sections || sections.length === 0) {
+    return '<div style="font-size:6px;color:rgba(255,200,200,0.4)">Не удалось загрузить услуги</div>';
+  }
+  adminEditCatIndex = 0;
+  adminEditCatCount = sections.length;
+  let html = '<div class="order-cat-carousel">';
+  html += '<button type="button" class="order-cat-arrow" onclick="admScrollCategory(-1)">‹</button>';
+  html += `<div class="order-cat-viewport"><div class="order-cat-track" id="admEditCatTrack" style="width:${sections.length * 100}%">`;
+  sections.forEach(sec => {
+    html += `<div class="order-cat-panel" style="width:${100 / sections.length}%">`;
+    html += `<div class="order-cat-panel-title">${escHtml(sec.label)}</div>`;
+    html += '<div class="order-cat-list">';
+    sec.items.forEach(item => {
+      const qty = selectedMap[item.name] || 0;
+      html += '<div class="order-item-cb">' +
+        '<span style="flex:1;min-width:0;text-align:left;display:flex;flex-direction:column;gap:3px">' +
+          `<span>${escHtml(item.name)}</span>` +
+          `<span style="opacity:0.5">${escHtml(item.price)}</span>` +
+        '</span>' +
+        '<div class="item-stepper">' +
+          '<button type="button" class="item-stepper-btn" onclick="admStepItemQty(this,-1)">−</button>' +
+          `<input type="text" class="item-qty" readonly value="${qty}" data-price="${escHtml(item.price)}" data-name="${escHtml(item.name)}">` +
+          '<button type="button" class="item-stepper-btn" onclick="admStepItemQty(this,1)">+</button>' +
+        '</div>' +
+      '</div>';
+    });
+    html += '</div></div>';
+  });
+  html += '</div></div>';
+  html += '<button type="button" class="order-cat-arrow" onclick="admScrollCategory(1)">›</button>';
+  html += '</div>';
+  html += '<div class="order-cat-dots" id="admEditCatDots">';
+  sections.forEach((_, i) => {
+    html += `<span class="order-cat-dot${i === 0 ? ' active' : ''}" onclick="admGoToCategory(${i})"></span>`;
+  });
+  html += '</div>';
+  return html;
+}
+function admScrollCategory(dir) {
+  adminEditCatIndex = (adminEditCatIndex + dir + adminEditCatCount) % adminEditCatCount;
+  admApplyCategoryPosition();
+}
+function admGoToCategory(i) {
+  adminEditCatIndex = i;
+  admApplyCategoryPosition();
+}
+function admApplyCategoryPosition() {
+  const track = document.getElementById('admEditCatTrack');
+  if (!track) return;
+  const step = adminEditCatCount > 0 ? (100 / adminEditCatCount) : 100;
+  track.style.transform = `translateX(-${adminEditCatIndex * step}%)`;
+  document.querySelectorAll('#admEditCatDots .order-cat-dot').forEach((d, i) => d.classList.toggle('active', i === adminEditCatIndex));
+}
+function admStepItemQty(btn, delta) {
+  const stepper = btn.parentElement;
+  const input = stepper.querySelector('.item-qty');
+  let val = (parseInt(input.value, 10) || 0) + delta;
+  if (val < 0) val = 0;
+  if (val > 99) val = 99;
+  input.value = val;
+  input.classList.remove('qty-pulse');
+  void input.offsetWidth;
+  input.classList.add('qty-pulse');
+  admUpdateItemsTotal();
+}
+function admCollectItems() {
+  const items = [];
+  let total = 0;
+  document.querySelectorAll('#orderEditItemsBox .item-qty').forEach(inp => {
+    const qty = parseInt(inp.value, 10) || 0;
+    if (qty <= 0) return;
+    const price = admParsePriceNumber(inp.getAttribute('data-price'));
+    const name = inp.getAttribute('data-name') || '';
+    total += qty * price;
+    items.push(qty > 1 ? `${name} × ${qty}` : name);
+  });
+  return { items, total };
+}
+function admUpdateItemsTotal() {
+  const { total } = admCollectItems();
+  const out = document.getElementById('orderEditItemsTotal');
+  if (out) {
+    out.textContent = `${total} ₽`;
+    out.classList.remove('total-pulse');
+    void out.offsetWidth;
+    out.classList.add('total-pulse');
+  }
+}
+function admApplyItemsTotalToPrice() {
+  const { total } = admCollectItems();
+  const priceInput = document.getElementById('orderEditPrice');
+  if (priceInput) priceInput.value = total;
+  showStatus(document.getElementById('orderEditStatus'), 'Цена обновлена по позициям: ' + total + ' ₽', 'info');
 }
 
 function populateOrderEditor(o) {
@@ -3298,16 +3579,36 @@ function populateOrderEditor(o) {
   const type = orderField(o, ['order_type','type']);
   const payment = orderField(o, ['payment_method','payment','pay_method']);
   const desc = orderField(o, ['description','details','comment','text']);
+  const parsed = admParseDescription(desc.value || '');
 
   document.getElementById('orderEditPrice').value = parseFloat(String(price.value).replace(/[^\d.,-]/g,'').replace(',','.')) || 0;
   document.getElementById('orderEditDiscountPct').value = '';
   document.getElementById('orderEditDiscountRub').value = '';
   document.getElementById('orderEditCategory').value = category.value || '';
   document.getElementById('orderEditType').value = type.value || '';
-  document.getElementById('orderEditPayment').value = payment.value || '';
-  document.getElementById('orderEditDescription').value = desc.value || '';
+  const payVal = payment.value || 'sbp';
+  const paySelect = document.getElementById('orderEditPayment');
+  paySelect.value = ['sbp','card','steam_gift','steam_topup'].includes(payVal) ? payVal : 'sbp';
+  document.getElementById('orderEditDescription').value = parsed.task || '';
+  const bankSelect = document.getElementById('orderEditBank');
+  const bankOptions = Array.from(bankSelect.options).map(op => op.value);
+  if (parsed.bank && !bankOptions.includes(parsed.bank)) {
+    const opt = document.createElement('option');
+    opt.value = parsed.bank; opt.textContent = parsed.bank;
+    bankSelect.insertBefore(opt, bankSelect.options[1]);
+  }
+  bankSelect.value = parsed.bank || '';
   document.getElementById('orderEditPriceReason').value = '';
   document.getElementById('orderCustomFields').innerHTML = '';
+
+  const itemsBox = document.getElementById('orderEditItemsBox');
+  itemsBox.innerHTML = '<div style="font-size:6px;color:rgba(255,200,200,0.35)">Загружаю услуги...</div>';
+  admLoadPriceSections().then(sections => {
+    const selectedMap = admParseSelectedItems(parsed.selected);
+    itemsBox.innerHTML = admRenderItemsCarouselHTML(sections, selectedMap) +
+      '<div style="text-align:right;margin-top:4px"><a href="javascript:void(0)" onclick="admApplyItemsTotalToPrice()" style="font-size:6px;color:rgba(255,150,150,0.6);text-decoration:underline">↦ применить сумму позиций к цене</a></div>';
+    admUpdateItemsTotal();
+  });
 
   // Показываем дополнительные реальные поля заказа, которых нет в основных редакторах.
   const skip = new Set([
@@ -3368,11 +3669,16 @@ async function saveOrderEdit() {
   const priceField = orderField(ACTIVE_ORDER_DATA, ['estimated_price','price','amount']).key;
   const categoryField = orderField(ACTIVE_ORDER_DATA, ['category']).key;
   const typeField = orderField(ACTIVE_ORDER_DATA, ['order_type','type']).key;
-  const paymentField = orderField(ACTIVE_ORDER_DATA, ['payment_method','payment','pay_method']).key;
-  const descField = orderField(ACTIVE_ORDER_DATA, ['description','details','comment','text']).key;
 
-  let descriptionValue = document.getElementById('orderEditDescription').value.trim();
-  const paymentValue = document.getElementById('orderEditPayment').value.trim();
+  const task = document.getElementById('orderEditDescription').value.trim();
+  const bank = document.getElementById('orderEditBank').value.trim();
+  const paymentValue = document.getElementById('orderEditPayment').value;
+  const { items } = admCollectItems();
+
+  const descParts = [task];
+  if (bank) descParts.push(`Банк: ${bank}`);
+  if (items.length) descParts.push(`Выбрано: ${items.join(', ')}`);
+  let descriptionValue = descParts.join('\n');
 
   // Причина хранится в описании, чтобы функция работала без изменения схемы БД.
   const reason = document.getElementById('orderEditPriceReason').value.trim();
@@ -3428,7 +3734,6 @@ async function saveOrderEdit() {
     showStatus(status, 'Заказ сохранён', 'ok');
     await loadOrders();
     await openOrderChat(ACTIVE_CHAT_ORDER_ID);
-    document.getElementById('orderEditBox').style.display = 'block';
     showStatus(document.getElementById('orderEditStatus'), 'Заказ сохранён', 'ok');
   } catch(e) {
     showStatus(status, 'Ошибка: ' + e.message, 'err');
@@ -3438,6 +3743,8 @@ async function saveOrderEdit() {
 function closeOrderChat() {
   ACTIVE_CHAT_ORDER_ID = null;
   document.getElementById('orderChatOverlay').style.display = 'none';
+  var wrap = document.getElementById('orderEditWrap');
+  if (wrap) wrap.classList.remove('open');
   if (CHAT_POLL_TIMER) { clearInterval(CHAT_POLL_TIMER); CHAT_POLL_TIMER = null; }
 }
 
@@ -3483,6 +3790,8 @@ async function pollChatMessages() {
   } catch(e) {}
 }
 
+let admSeenMsgIds = new Set();
+
 function renderChatMessages(messages, attachments) {
   var box = document.getElementById('chatMessages');
   if (!messages || !messages.length) {
@@ -3497,8 +3806,10 @@ function renderChatMessages(messages, attachments) {
     }
   });
   box.innerHTML = messages.map(function(m) {
+    var isNew = m.id !== undefined && !admSeenMsgIds.has(m.id);
+    var animStyle = isNew ? 'animation:msgIn .28s cubic-bezier(.22,.61,.36,1);' : '';
     if (m.author_id === 'system') {
-      return '<div style="align-self:center;max-width:92%;text-align:center;padding:2px 10px">' +
+      return '<div style="align-self:center;max-width:92%;text-align:center;padding:2px 10px;' + animStyle + '">' +
         '<div style="font-size:6px;font-style:italic;color:rgba(255,180,180,0.5);line-height:1.6">' + escHtml(m.content || '') + '</div>' +
       '</div>';
     }
@@ -3513,13 +3824,14 @@ function renderChatMessages(messages, attachments) {
     var border = isAdmin ? 'rgba(88,101,242,0.2)' : isUser ? 'rgba(255,0,0,0.18)' : 'rgba(255,255,255,0.08)';
     var author = isAdmin ? '👑 Администратор' : isUser ? '👤 ' + (m.author || 'Пользователь') : '🤖 ' + (m.author || 'Discord');
     var time = m.created_at ? m.created_at.slice(11, 19) : '';
-    return '<div style="align-self:' + align + ';max-width:80%;padding:10px 14px;border-radius:12px;background:' + bg + ';border:1px solid ' + border + ';animation:msgIn .2s ease">' +
+    return '<div style="align-self:' + align + ';max-width:80%;padding:10px 14px;border-radius:12px;background:' + bg + ';border:1px solid ' + border + ';' + animStyle + '">' +
       '<div style="font-size:6px;color:rgba(255,200,200,0.4);margin-bottom:4px">' + author + '</div>' +
       '<div style="font-size:7px;color:rgba(255,220,220,0.9);line-height:1.6;font-family:sans-serif;word-break:break-word">' + escHtml(m.content || '') + '</div>' +
       attHtml +
       '<div style="font-size:5px;color:rgba(255,150,150,0.3);margin-top:4px;text-align:right;font-family:monospace">' + time + '</div>' +
     '</div>';
   }).join('');
+  messages.forEach(function(m) { if (m.id !== undefined) admSeenMsgIds.add(m.id); });
   box.scrollTop = box.scrollHeight;
 }
 
