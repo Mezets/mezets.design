@@ -499,14 +499,42 @@
     .order-chat-modal-in { animation: orderChatModalIn .28s cubic-bezier(.22,.61,.36,1); }
 
     /* ── Редактор заказа ── */
+    .order-chat-row {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .order-chat-col-main {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid rgba(255,0,0,0.12);
+    }
+    .order-chat-col-side {
+      width: 340px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+    @media (max-width: 760px) {
+      .order-chat-row { flex-direction: column; overflow-y: auto; }
+      .order-chat-col-main { border-right: none; border-bottom: 1px solid rgba(255,0,0,0.12); }
+      .order-chat-col-side { width: 100%; overflow-y: visible; }
+    }
+    .order-chat-col-side .order-edit-grid { grid-template-columns: 1fr; }
+    .order-chat-col-side .order-edit-full { grid-column: auto; }
+
     .order-edit-wrap {
       display: grid;
       grid-template-rows: 0fr;
       transition: grid-template-rows .32s cubic-bezier(.22,.61,.36,1);
-      margin: 0 20px;
+      margin: 0 16px;
     }
     .order-edit-wrap.open { grid-template-rows: 1fr; margin-top: 10px; }
-    .order-edit-wrap-inner { overflow-y: auto; overflow-x: hidden; min-height: 0; max-height: 46vh; padding-right: 4px; }
+    .order-edit-wrap-inner { overflow: hidden; min-height: 0; }
     .order-edit-box {
       opacity: 0; transform: translateY(-6px);
       transition: opacity .22s ease .05s, transform .22s ease .05s;
@@ -953,7 +981,7 @@
 
 <!-- Order chat modal -->
       <div id="orderChatOverlay" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(5,0,0,0.88);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px">
-        <div style="background:rgba(12,0,0,0.95);border:1px solid rgba(255,0,0,0.25);border-radius:18px;max-width:560px;width:100%;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 0 60px rgba(255,0,0,0.15);overflow:hidden">
+        <div style="background:rgba(12,0,0,0.95);border:1px solid rgba(255,0,0,0.25);border-radius:18px;max-width:960px;width:100%;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 0 60px rgba(255,0,0,0.15);overflow:hidden">
           <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px 12px;border-bottom:1px solid rgba(255,0,0,0.12);flex-shrink:0">
             <div>
               <div style="font-size:11px;color:#ff2a2a;letter-spacing:1px" id="chatOrderTitle">Заказ #—</div>
@@ -964,116 +992,116 @@
               <button class="btn btn-sm" onclick="closeOrderChat()" style="width:auto;font-size:9px">✕</button>
             </div>
           </div>
-          <div style="display:flex;gap:8px;align-items:center;padding:10px 20px;border-bottom:1px solid rgba(255,0,0,0.12);flex-wrap:wrap;flex-shrink:0">
-            <span style="font-size:6px;color:rgba(255,200,200,0.4)">Статус:</span>
-            <select id="chatOrderStatus" style="flex:1;min-width:120px;font-size:7px" onchange="adminChangeOrderStatus()">
-              <option value="new">Новый</option>
-              <option value="in_progress">В работе</option>
-              <option value="completed">Выполнен</option>
-              <option value="cancelled">Закрыт</option>
-            </select>
-            <button class="btn btn-sm" onclick="toggleOrderEditor()" style="width:auto;font-size:7px">✎ Редактировать</button>
-          </div>
 
-          <div id="orderEditWrap" class="order-edit-wrap">
-          <div class="order-edit-wrap-inner">
-          <div id="orderEditBox" class="order-edit-box">
-            <div style="font-size:8px;color:#ff4444;letter-spacing:1px;margin-bottom:12px">РЕДАКТИРОВАНИЕ ЗАКАЗА</div>
-
-            <div class="order-edit-grid">
-              <div>
-                <label>Цена, ₽</label>
-                <input type="number" id="orderEditPrice" min="0" step="1" placeholder="Текущая цена">
-              </div>
-              <div>
-                <label>Скидка</label>
-                <div class="order-price-tools">
-                  <input type="number" id="orderEditDiscountPct" min="0" max="100" step="0.01" placeholder="%">
-                  <input type="number" id="orderEditDiscountRub" min="0" step="1" placeholder="₽">
-                </div>
-              </div>
-
-              <div class="order-edit-full">
-                <div class="order-edit-hint">Скидка считается от исходной цены. Можно указать % или ₽. Если заполнены оба поля, применяется большее значение скидки.</div>
-              </div>
-
-              <div>
-                <label>Категория</label>
-                <input type="text" id="orderEditCategory" placeholder="Дизайн">
-              </div>
-              <div>
-                <label>Тип заказа</label>
-                <input type="text" id="orderEditType" placeholder="Тип / оформление">
-              </div>
-
-              <div>
-                <label>Способ оплаты</label>
-                <select id="orderEditPayment">
-                  <option value="sbp">СБП</option>
-                  <option value="card">Карта</option>
-                  <option value="steam_gift">Подарок Steam</option>
-                  <option value="steam_topup">Пополнение Steam</option>
-                </select>
-              </div>
-              <div>
-                <label>Причина скидки / изменения цены</label>
-                <input type="text" id="orderEditPriceReason" placeholder="Можно оставить пустым">
-              </div>
-
-              <div class="order-edit-full">
-                <label>Что нужно</label>
-                <textarea id="orderEditDescription" placeholder="Описание задачи..." style="min-height:56px"></textarea>
-              </div>
-
-              <div>
-                <label>Банк</label>
-                <select id="orderEditBank">
-                  <option value="">— не указан —</option>
-                  <option value="Т-Банк">Т-Банк</option>
-                  <option value="Сбербанк">Сбербанк</option>
-                  <option value="Альфа-Банк">Альфа-Банк</option>
-                  <option value="ВТБ">ВТБ</option>
-                  <option value="Райффайзен">Райффайзен</option>
-                  <option value="Газпромбанк">Газпромбанк</option>
-                  <option value="Озон Банк">Озон Банк</option>
-                  <option value="Другой">Другой</option>
-                </select>
-              </div>
-              <div></div>
-
-              <div class="order-edit-full">
-                <label>Выбранные позиции</label>
-                <div id="orderEditItemsBox" class="order-cat-carousel-wrap">
-                  <div style="font-size:6px;color:rgba(255,200,200,0.35)">Загружаю услуги...</div>
-                </div>
-                <div class="order-edit-total"><span>Итого по позициям</span><b id="orderEditItemsTotal">0 ₽</b></div>
-                <div class="order-edit-hint">Цену выше можно оставить синхронизированной с позициями или задать вручную — сохранится то, что указано в поле «Цена».</div>
-              </div>
-
-              <div class="order-edit-full">
-                <label>Дополнительные поля</label>
-                <div id="orderCustomFields"></div>
-                <button class="btn btn-sm" type="button" onclick="addOrderCustomField()" style="width:auto">➕ Добавить поле</button>
-                <div class="order-edit-hint">Здесь можно менять любые дополнительные поля, которые уже существуют в заказе/БД.</div>
+          <div class="order-chat-row">
+            <div class="order-chat-col-main">
+              <div id="chatMessages" style="flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:8px;min-height:120px"></div>
+              <div style="display:flex;gap:8px;padding:12px 20px 18px;border-top:1px solid rgba(255,0,0,0.12);flex-shrink:0">
+                <button class="btn btn-sm" onclick="adminUploadFile()" title="Прикрепить файл" style="width:auto;font-size:11px;flex-shrink:0">📎</button>
+                <input type="text" id="chatMsgInput" placeholder="Ответить..." style="flex:1;background:rgba(255,0,0,0.05);border:1px solid rgba(255,0,0,0.2);border-radius:10px;padding:12px 14px;font-family:'Press Start 2P',monospace;font-size:7px;color:rgba(255,220,220,0.9);outline:none;line-height:1.6" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();adminSendMsg()}">
+                <button class="btn btn-sm" onclick="adminSendMsg()" title="Отправить" style="width:auto;font-size:9px;flex-shrink:0;border-color:rgba(255,0,0,0.35)">Отправить →</button>
               </div>
             </div>
 
-            <div class="order-edit-actions">
-              <button class="btn btn-sm" onclick="applyOrderDiscountPreview()" style="border-color:rgba(255,120,0,0.35);color:#ffaa55">Рассчитать скидку</button>
-              <button class="btn btn-sm" onclick="saveOrderEdit()" style="border-color:rgba(0,200,0,0.35);color:#55ff55">💾 Сохранить заказ</button>
-              <button class="btn btn-sm" onclick="toggleOrderEditor()" style="width:auto">Отмена</button>
-            </div>
-            <div class="status" id="orderEditStatus"></div>
-          </div>
-          </div>
-          </div>
+            <div class="order-chat-col-side">
+              <div style="display:flex;gap:8px;align-items:center;padding:14px 16px;border-bottom:1px solid rgba(255,0,0,0.12);flex-wrap:wrap;flex-shrink:0">
+                <span style="font-size:6px;color:rgba(255,200,200,0.4)">Статус:</span>
+                <select id="chatOrderStatus" style="flex:1;min-width:110px;font-size:7px" onchange="adminChangeOrderStatus()">
+                  <option value="new">Новый</option>
+                  <option value="in_progress">В работе</option>
+                  <option value="completed">Выполнен</option>
+                  <option value="cancelled">Закрыт</option>
+                </select>
+              </div>
+              <button class="btn btn-sm" onclick="toggleOrderEditor()" style="margin:12px 16px 0;width:calc(100% - 32px)">✎ Редактировать заказ</button>
 
-          <div style="flex:1;min-height:0;display:flex;flex-direction:column">
-            <div id="chatMessages" style="flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:8px;min-height:120px"></div>
-            <div style="display:flex;gap:8px;padding:12px 20px 18px;border-top:1px solid rgba(255,0,0,0.12);flex-shrink:0">
-              <button class="btn btn-sm" onclick="adminUploadFile()" title="Прикрепить файл" style="width:auto;font-size:11px;flex-shrink:0">📎</button>
-              <input type="text" id="chatMsgInput" placeholder="Ответить..." style="flex:1;background:rgba(255,0,0,0.05);border:1px solid rgba(255,0,0,0.2);border-radius:10px;padding:12px 14px;font-family:'Press Start 2P',monospace;font-size:7px;color:rgba(255,220,220,0.9);outline:none;line-height:1.6" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();adminSendMsg()}">
-              <button class="btn btn-sm" onclick="adminSendMsg()" title="Отправить" style="width:auto;font-size:9px;flex-shrink:0;border-color:rgba(255,0,0,0.35)">Отправить →</button>
+              <div id="orderEditWrap" class="order-edit-wrap">
+              <div class="order-edit-wrap-inner">
+              <div id="orderEditBox" class="order-edit-box">
+                <div style="font-size:8px;color:#ff4444;letter-spacing:1px;margin-bottom:12px">РЕДАКТИРОВАНИЕ ЗАКАЗА</div>
+
+                <div class="order-edit-grid">
+                  <div>
+                    <label>Цена, ₽</label>
+                    <input type="number" id="orderEditPrice" min="0" step="1" placeholder="Текущая цена">
+                  </div>
+                  <div>
+                    <label>Скидка</label>
+                    <div class="order-price-tools">
+                      <input type="number" id="orderEditDiscountPct" min="0" max="100" step="0.01" placeholder="%">
+                      <input type="number" id="orderEditDiscountRub" min="0" step="1" placeholder="₽">
+                    </div>
+                  </div>
+
+                  <div class="order-edit-full">
+                    <div class="order-edit-hint">Скидка считается от исходной цены. Можно указать % или ₽. Если заполнены оба поля, применяется большее значение скидки.</div>
+                  </div>
+
+                  <div>
+                    <label>Категория</label>
+                    <input type="text" id="orderEditCategory" placeholder="Дизайн">
+                  </div>
+                  <div>
+                    <label>Тип заказа</label>
+                    <input type="text" id="orderEditType" placeholder="Тип / оформление">
+                  </div>
+
+                  <div>
+                    <label>Способ оплаты</label>
+                    <select id="orderEditPayment">
+                      <option value="sbp">СБП</option>
+                      <option value="card">Карта</option>
+                      <option value="steam_gift">Подарок Steam</option>
+                      <option value="steam_topup">Пополнение Steam</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label>Причина скидки / изменения цены</label>
+                    <input type="text" id="orderEditPriceReason" placeholder="Можно оставить пустым">
+                  </div>
+
+                  <div class="order-edit-full">
+                    <label>Что нужно</label>
+                    <textarea id="orderEditDescription" placeholder="Описание задачи..." style="min-height:56px"></textarea>
+                  </div>
+
+                  <div>
+                    <label>Банк</label>
+                    <select id="orderEditBank">
+                      <option value="">— не указан —</option>
+                      <option value="Т-Банк">Т-Банк</option>
+                      <option value="Альфа-Банк">Альфа-Банк</option>
+                      <option value="Озон Банк">Озон Банк</option>
+                    </select>
+                  </div>
+                  <div></div>
+
+                  <div class="order-edit-full">
+                    <label>Выбранные позиции</label>
+                    <div id="orderEditItemsBox" class="order-cat-carousel-wrap">
+                      <div style="font-size:6px;color:rgba(255,200,200,0.35)">Загружаю услуги...</div>
+                    </div>
+                    <div class="order-edit-total"><span>Итого по позициям</span><b id="orderEditItemsTotal">0 ₽</b></div>
+                    <div class="order-edit-hint">Цену выше можно оставить синхронизированной с позициями или задать вручную — сохранится то, что указано в поле «Цена».</div>
+                  </div>
+
+                  <div class="order-edit-full">
+                    <label>Дополнительные поля</label>
+                    <div id="orderCustomFields"></div>
+                    <button class="btn btn-sm" type="button" onclick="addOrderCustomField()" style="width:auto">➕ Добавить поле</button>
+                    <div class="order-edit-hint">Здесь можно менять любые дополнительные поля, которые уже существуют в заказе/БД.</div>
+                  </div>
+                </div>
+
+                <div class="order-edit-actions">
+                  <button class="btn btn-sm" onclick="applyOrderDiscountPreview()" style="border-color:rgba(255,120,0,0.35);color:#ffaa55">Рассчитать скидку</button>
+                  <button class="btn btn-sm" onclick="saveOrderEdit()" style="border-color:rgba(0,200,0,0.35);color:#55ff55">💾 Сохранить заказ</button>
+                  <button class="btn btn-sm" onclick="toggleOrderEditor()" style="width:auto">Отмена</button>
+                </div>
+                <div class="status" id="orderEditStatus"></div>
+              </div>
+              </div>
+              </div>
             </div>
           </div>
         </div>
