@@ -107,6 +107,8 @@ html, body {
   word-break: break-word;
   white-space: pre-wrap;
 }
+.order-desc-box.swap { animation: descSwap .25s cubic-bezier(.22,.61,.36,1); }
+@keyframes descSwap { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 .order-desc-row {
   display: flex; gap: 6px; padding: 8px 0;
   border-top: 1px solid rgba(255,0,0,0.1);
@@ -122,15 +124,15 @@ html, body {
 .order-cat-viewport {
   flex: 1; min-width: 0; overflow: hidden; border-radius: 10px;
   border: 1px solid rgba(255,0,0,0.15); background: rgba(255,0,0,0.02);
-  height: 190px;
+  max-height: 150px;
 }
-.order-cat-track { display: flex; align-items: stretch; height: 100%; transition: transform .3s cubic-bezier(.22,.61,.36,1); }
-.order-cat-panel { flex-shrink: 0; padding: 10px; overflow-y: auto; box-sizing: border-box; height: 100%; }
+.order-cat-track { display: flex; align-items: stretch; transition: transform .3s cubic-bezier(.22,.61,.36,1); }
+.order-cat-panel { flex-shrink: 0; padding: 8px; overflow-y: auto; box-sizing: border-box; max-height: 150px; }
 .order-cat-panel-title {
   font-size: 6px; color: rgba(255,200,200,0.4); letter-spacing: 1px;
-  text-transform: uppercase; margin-bottom: 8px; text-align: center;
+  text-transform: uppercase; margin-bottom: 6px; text-align: center;
 }
-.order-cat-list { display: flex; flex-direction: column; gap: 6px; }
+.order-cat-list { display: flex; flex-direction: column; gap: 4px; }
 .order-cat-arrow {
   flex-shrink: 0; width: 22px; height: 22px; align-self: center;
   display: flex; align-items: center; justify-content: center; border-radius: 50%;
@@ -140,14 +142,14 @@ html, body {
 }
 .order-cat-arrow:hover { background: rgba(255,0,0,0.22); border-color: rgba(255,0,0,0.5); }
 .order-cat-arrow:active { transform: scale(0.92); }
-.order-cat-dots { display: flex; justify-content: center; gap: 5px; margin-top: 8px; }
+.order-cat-dots { display: flex; justify-content: center; gap: 5px; margin-top: 5px; }
 .order-cat-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,0,0,0.2); cursor: pointer; transition: background .2s, transform .2s; }
 .order-cat-dot:hover { background: rgba(255,0,0,0.4); }
 .order-cat-dot.active { background: #ff3b3b; transform: scale(1.3); }
 .order-item-cb {
-  display: flex; align-items: flex-start; gap: 6px; padding: 8px 9px; border-radius: 6px;
+  display: flex; align-items: flex-start; gap: 6px; padding: 6px 8px; border-radius: 6px;
   border: 1px solid rgba(255,0,0,0.13); background: rgba(255,0,0,0.03);
-  font-size: 6px; color: rgba(255,225,225,0.8); line-height: 1.6;
+  font-size: 6px; color: rgba(255,225,225,0.8); line-height: 1.5;
   transition: border-color .2s, background .2s;
 }
 .order-item-cb:hover { border-color: rgba(255,0,0,0.35); background: rgba(255,0,0,0.07); }
@@ -168,10 +170,14 @@ html, body {
   text-align: center; background: transparent; border: none;
   color: rgba(255,220,220,0.9); outline: none; pointer-events: none;
 }
+.qty-pulse { animation: qtyPulse .25s ease; }
+@keyframes qtyPulse { 0% { transform: scale(1.35); color: #ff5555; } 100% { transform: scale(1); } }
+.order-edit-total b { transition: transform .15s ease; }
+.total-pulse { animation: qtyPulse .25s ease; }
 .order-edit-total {
   display: flex; justify-content: space-between; align-items: center;
-  font-size: 7px; color: rgba(255,200,200,0.7); margin: 8px 0 12px;
-  padding: 8px 10px; border-radius: 8px; background: rgba(255,0,0,0.05);
+  font-size: 7px; color: rgba(255,200,200,0.7); margin: 4px 0 8px;
+  padding: 7px 10px; border-radius: 8px; background: rgba(255,0,0,0.05);
   border: 1px solid rgba(255,0,0,0.15);
 }
 .order-edit-total b { color: #ff5555; font-size: 9px; }
@@ -183,9 +189,10 @@ html, body {
 }
 .msg {
   padding: 12px 14px; border-radius: 12px;
-  max-width: 85%; word-break: break-word; animation: msgIn .2s ease;
+  max-width: 85%; word-break: break-word;
 }
-@keyframes msgIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.msg-enter { animation: msgIn .28s cubic-bezier(.22,.61,.36,1); }
+@keyframes msgIn { from { opacity: 0; transform: translateY(10px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
 .msg-user {
   align-self: flex-end;
   background: rgba(255,0,0,0.08); border: 1px solid rgba(255,0,0,0.18);
@@ -469,6 +476,14 @@ function parseDescription(description) {
   };
 }
 
+function playDescSwap() {
+  const box = g('orderDescBox');
+  if (!box) return;
+  box.classList.remove('swap');
+  void box.offsetWidth; // форсируем reflow, чтобы анимация перезапустилась
+  box.classList.add('swap');
+}
+
 function renderDescView(order) {
   const parsed = parseDescription(order.description);
   let html = '';
@@ -490,6 +505,7 @@ function renderDescView(order) {
     }
   });
   g('orderDescBox').innerHTML = html || escapeHtml(order.description || '');
+  playDescSwap();
 }
 
 function renderOrder(order, messages, attachments) {
@@ -621,6 +637,9 @@ function stepEditItemQty(btn, delta) {
   if (val < 0) val = 0;
   if (val > 99) val = 99;
   input.value = val;
+  input.classList.remove('qty-pulse');
+  void input.offsetWidth;
+  input.classList.add('qty-pulse');
   updateEditTotal();
 }
 
@@ -641,9 +660,19 @@ function collectEditItems() {
 function updateEditTotal() {
   const { total } = collectEditItems();
   const out = g('orderEditTotalPrice');
-  if (out) out.textContent = `${total} ₽`;
+  if (out) {
+    out.textContent = `${total} ₽`;
+    out.classList.remove('total-pulse');
+    void out.offsetWidth;
+    out.classList.add('total-pulse');
+  }
   const topPrice = g('orderPrice');
-  if (topPrice) topPrice.textContent = `${total} ₽`;
+  if (topPrice) {
+    topPrice.textContent = `${total} ₽`;
+    topPrice.classList.remove('total-pulse');
+    void topPrice.offsetWidth;
+    topPrice.classList.add('total-pulse');
+  }
 }
 
 function renderDescEdit(order) {
@@ -658,14 +687,14 @@ function renderDescEdit(order) {
   const bankList = BANK_OPTIONS.includes(parsed.bank) || !parsed.bank ? BANK_OPTIONS : [parsed.bank, ...BANK_OPTIONS];
   const bankHtml = bankList.map(b => `<option value="${escapeHtml(b)}"${b === parsed.bank ? ' selected' : ''}>${escapeHtml(b)}</option>`).join('');
   g('orderDescBox').innerHTML = `
-    <div class="order-label" style="margin-bottom:6px">Что нужно</div>
-    <textarea id="orderEditTaskInput" class="order-textarea" style="height:70px;margin-bottom:10px" placeholder="Опиши задачу...">${escapeHtml(parsed.task)}</textarea>
-    <div class="order-label" style="margin-bottom:6px">Способ оплаты</div>
-    <select id="orderEditPaymentInput" class="order-select" style="margin-bottom:10px">${payHtml}</select>
-    <div class="order-label" style="margin-bottom:6px">Банк</div>
-    <select id="orderEditBankInput" class="order-select" style="margin-bottom:10px">${bankHtml}</select>
-    <div class="order-label" style="margin-bottom:6px">Выбрано</div>
-    <div id="orderEditItemsBox" style="margin-bottom:10px">
+    <div class="order-label" style="margin-bottom:4px">Что нужно</div>
+    <textarea id="orderEditTaskInput" class="order-textarea" style="height:56px;margin-bottom:6px" placeholder="Опиши задачу...">${escapeHtml(parsed.task)}</textarea>
+    <div class="order-label" style="margin-bottom:4px">Способ оплаты</div>
+    <select id="orderEditPaymentInput" class="order-select" style="margin-bottom:6px">${payHtml}</select>
+    <div class="order-label" style="margin-bottom:4px">Банк</div>
+    <select id="orderEditBankInput" class="order-select" style="margin-bottom:6px">${bankHtml}</select>
+    <div class="order-label" style="margin-bottom:4px">Выбрано</div>
+    <div id="orderEditItemsBox" style="margin-bottom:6px">
       <div style="font-size:6px;color:rgba(255,200,200,0.4)">Загружаю услуги...</div>
     </div>
     <div class="order-edit-total"><span>Итого</span><b id="orderEditTotalPrice">${order.estimated_price ? order.estimated_price : 0} ₽</b></div>
@@ -674,6 +703,7 @@ function renderDescEdit(order) {
       <button class="btn btn-sm" onclick="toggleOrderEdit(false)" style="flex:1">Отмена</button>
     </div>
   `;
+  playDescSwap();
   loadEditPriceSections().then(sections => {
     const box = g('orderEditItemsBox');
     if (!box) return;
@@ -754,6 +784,8 @@ async function closeOrder() {
   btn.disabled = false;
 }
 
+let seenMsgIds = new Set();
+
 function renderMessages(messages, attachments) {
   const box = g('chatBox');
   if (!messages.length) {
@@ -773,8 +805,10 @@ function renderMessages(messages, attachments) {
   }
 
   box.innerHTML = messages.map(m => {
+    const isNew = m.id !== undefined && !seenMsgIds.has(m.id);
+    const enterClass = isNew ? ' msg-enter' : '';
     if (m.author_id === 'system') {
-      return `<div class="msg msg-system"><div class="msg-text">${escapeHtml(m.content || '')}</div></div>`;
+      return `<div class="msg msg-system${enterClass}"><div class="msg-text">${escapeHtml(m.content || '')}</div></div>`;
     }
     const isUser = !m.from_discord;
     const atts = attMap[m.id] || [];
@@ -785,13 +819,14 @@ function renderMessages(messages, attachments) {
       return `<a href="${a.discord_url}" target="_blank" class="msg-attachment">${a.filename || 'файл'} ↓</a>`;
     }).join('') + '</div>' : '';
     const author = isUser ? (currentUser && currentUser.username ? currentUser.username : 'Вы') : m.author;
-    return `<div class="msg msg-${isUser ? 'user' : 'discord'}">
+    return `<div class="msg msg-${isUser ? 'user' : 'discord'}${enterClass}">
       <div class="msg-author">${escapeHtml(author)}</div>
       <div class="msg-text">${escapeHtml(m.content || '')}</div>
       ${attHtml}
       <div class="msg-time">${m.created_at ? m.created_at.slice(11, 19) : ''}</div>
     </div>`;
   }).join('');
+  messages.forEach(m => { if (m.id !== undefined) seenMsgIds.add(m.id); });
   box.scrollTop = box.scrollHeight;
 }
 
