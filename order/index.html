@@ -382,12 +382,20 @@ let orderId = null;
 let currentUser = null;
 let CURRENT_ORDER = null;
 let pollTimer = null;
+let ADMIN_IDENTITY = { name: 'Администратор', avatar_url: null };
 
 function getSession() {
   try { return localStorage.getItem('mezets_session') || ''; } catch(e) { return ''; }
 }
 
 function g(name) { return document.getElementById(name); }
+
+async function loadAdminIdentity() {
+  try {
+    const r = await fetch(`${API}/api/admin-identity`);
+    if (r.ok) ADMIN_IDENTITY = await r.json();
+  } catch(e) { /* используем значения по умолчанию */ }
+}
 
 async function init() {
   const params = new URLSearchParams(window.location.search);
@@ -404,6 +412,7 @@ async function init() {
     currentUser = dMe.user;
   } catch(e) { window.location.href = '/mezets.design/'; return; }
 
+  await loadAdminIdentity();
   await loadOrder();
 
   // Точки как в админке
@@ -795,7 +804,10 @@ async function closeOrder() {
 let seenMsgIds = new Set();
 
 const AVATAR_COLORS = ['#ff5555','#ffaa55','#ffe066','#55ff88','#55ddff','#7d8bff','#c07dff','#ff7dc7'];
-function avatarFor(name) {
+function avatarFor(name, avatarUrl) {
+  if (avatarUrl) {
+    return `<img class="msg-avatar" src="${avatarUrl}" alt="${escapeHtml(name || '')}" style="object-fit:cover">`;
+  }
   const n = (name || '?').trim();
   const letter = n.charAt(0).toUpperCase() || '?';
   let sum = 0;
@@ -828,7 +840,8 @@ function renderMessages(messages, attachments) {
     if (m.author_id === 'system') {
       return `<div class="msg msg-system${enterClass}"><div class="msg-text">${escapeHtml(m.content || '')}</div></div>`;
     }
-    const isUser = !m.from_discord;
+    const isAdmin = m.author_id === 'admin';
+    const isUser = !m.from_discord && !isAdmin;
     const atts = attMap[m.id] || [];
     const attHtml = atts.length ? '<div class="msg-attachments">' + atts.map(a => {
       if (isImageFile(a.filename, a.discord_url)) {
@@ -836,14 +849,16 @@ function renderMessages(messages, attachments) {
       }
       return `<a href="${a.discord_url}" target="_blank" class="msg-attachment">${a.filename || 'файл'} ↓</a>`;
     }).join('') + '</div>' : '';
-    const author = isUser ? (currentUser && currentUser.username ? currentUser.username : 'Вы') : m.author;
-    const bubble = `<div class="msg msg-${isUser ? 'user' : 'discord'}${enterClass}">
+    const author = isAdmin ? (ADMIN_IDENTITY.name || 'Администратор') : isUser ? (currentUser && currentUser.username ? currentUser.username : 'Вы') : m.author;
+    const rowClass = isUser ? 'user' : 'discord';
+    const bubble = `<div class="msg msg-${rowClass}${enterClass}">
       <div class="msg-author">${escapeHtml(author)}</div>
       <div class="msg-text">${escapeHtml(m.content || '')}</div>
       ${attHtml}
       <div class="msg-time">${m.created_at ? m.created_at.slice(11, 19) : ''}</div>
     </div>`;
-    return `<div class="msg-row msg-row-${isUser ? 'user' : 'discord'}">${avatarFor(author)}${bubble}</div>`;
+    const avatarHtml = isAdmin ? avatarFor(author, ADMIN_IDENTITY.avatar_url) : avatarFor(author);
+    return `<div class="msg-row msg-row-${rowClass}">${avatarHtml}${bubble}</div>`;
   }).join('');
   messages.forEach(m => { if (m.id !== undefined) seenMsgIds.add(m.id); });
   box.scrollTop = box.scrollHeight;
