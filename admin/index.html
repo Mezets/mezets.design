@@ -567,6 +567,7 @@
     .order-edit-box select option { background: #1a0505; color: rgba(255,220,220,0.9); }
     .order-edit-box textarea { min-height: 68px; }
     .order-edit-full { grid-column: 1 / -1; }
+    #orderEditBankWrap { margin-top: 8px; }
     .order-price-tools {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -585,6 +586,32 @@
       margin-top: 2px;
     }
     .order-edit-actions .btn { flex: 1; min-width: 120px; }
+    .order-edit-section {
+      margin-top: 16px;
+      padding: 12px;
+      border: 1px solid rgba(255,0,0,0.14);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.015);
+    }
+    .order-edit-section .order-edit-hint { margin-bottom: 8px; }
+    .order-edit-section-title {
+      font-size: 7px; color: rgba(255,150,150,0.7);
+      letter-spacing: 1px; text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .custom-fields-panel {
+      position: absolute; top: 0; right: 0; height: 100%; width: 320px; max-width: 88%;
+      background: rgba(8,0,0,0.98); border-left: 1px solid rgba(255,0,0,0.25);
+      transform: translateX(100%); transition: transform .28s cubic-bezier(.22,.61,.36,1);
+      z-index: 5; display: flex; flex-direction: column; box-shadow: -24px 0 50px rgba(0,0,0,0.45);
+    }
+    .custom-fields-panel.open { transform: translateX(0); }
+    .custom-fields-panel-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 18px; border-bottom: 1px solid rgba(255,0,0,0.15);
+      font-size: 8px; color: #ff5555; letter-spacing: 1px; flex-shrink: 0;
+    }
+    .custom-fields-panel-body { padding: 16px 18px; overflow-y: auto; flex: 1; }
     .order-custom-row {
       display: flex;
       gap: 6px;
@@ -607,56 +634,34 @@
       .order-edit-full { grid-column: auto; }
     }
 
-    /* Карусель услуг (как в чате заказа на сайте) */
+    /* Список услуг: select категории + прокручиваемый список позиций */
     .order-cat-carousel-wrap { margin-bottom: 6px; max-width: 100%; overflow: hidden; }
-    .order-cat-carousel { display: flex; align-items: center; gap: 6px; min-width: 0; width: 100%; }
-    .order-cat-viewport {
-      flex: 1; min-width: 0; overflow: hidden; border-radius: 10px;
-      border: 1px solid rgba(255,0,0,0.15); background: rgba(255,0,0,0.02);
-      max-height: 160px;
+    #admItemsListBox {
+      display: flex; flex-direction: column; gap: 6px;
+      max-height: 300px; overflow-y: auto; overflow-x: hidden; padding-right: 4px;
     }
-    .order-cat-track { display: flex; align-items: stretch; transition: transform .3s cubic-bezier(.22,.61,.36,1); }
-    .order-cat-panel { flex-shrink: 0; padding: 8px; overflow-y: auto; overflow-x: hidden; box-sizing: border-box; max-height: 160px; }
-    .order-cat-panel-title {
-      font-size: 6px; color: rgba(255,200,200,0.4); letter-spacing: 1px;
-      text-transform: uppercase; margin-bottom: 6px; text-align: center;
-    }
-    .order-cat-list { display: flex; flex-direction: column; gap: 4px; }
-    .order-cat-arrow {
-      flex-shrink: 0; width: 22px; height: 22px; align-self: center;
-      display: flex; align-items: center; justify-content: center; border-radius: 50%;
-      background: rgba(255,0,0,0.1); border: 1px solid rgba(255,0,0,0.25);
-      color: rgba(255,220,220,0.85); font-size: 11px; line-height: 1;
-      cursor: pointer; transition: background .15s, border-color .15s, transform .1s;
-    }
-    .order-cat-arrow:hover { background: rgba(255,0,0,0.22); border-color: rgba(255,0,0,0.5); }
-    .order-cat-arrow:active { transform: scale(0.92); }
-    .order-cat-dots { display: flex; justify-content: center; gap: 5px; margin-top: 5px; }
-    .order-cat-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,0,0,0.2); cursor: pointer; transition: background .2s, transform .2s; }
-    .order-cat-dot:hover { background: rgba(255,0,0,0.4); }
-    .order-cat-dot.active { background: #ff3b3b; transform: scale(1.3); }
     .order-item-cb {
-      display: flex; align-items: flex-start; gap: 6px; padding: 6px 8px; border-radius: 6px;
+      display: flex; align-items: center; gap: 8px; padding: 9px 10px; border-radius: 8px;
       border: 1px solid rgba(255,0,0,0.13); background: rgba(255,0,0,0.03);
-      font-size: 6px; color: rgba(255,225,225,0.8); line-height: 1.5;
+      font-size: 7.5px; color: rgba(255,225,225,0.85); line-height: 1.6;
       transition: border-color .2s, background .2s;
       width: 100%; min-width: 0; box-sizing: border-box;
     }
     .order-item-cb:hover { border-color: rgba(255,0,0,0.35); background: rgba(255,0,0,0.07); }
-    .item-stepper { display: flex; align-items: center; gap: 3px; flex-shrink: 0; }
+    .item-stepper { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
     .item-stepper-btn {
-      width: 17px; height: 17px; padding: 0; box-sizing: border-box;
-      font-family: 'Press Start 2P', monospace; font-size: 8px; line-height: 1;
+      width: 22px; height: 22px; padding: 0; box-sizing: border-box;
+      font-family: 'Press Start 2P', monospace; font-size: 10px; line-height: 1;
       display: flex; align-items: center; justify-content: center;
       background: rgba(255,0,0,0.1); border: 1px solid rgba(255,0,0,0.25);
-      border-radius: 4px; color: rgba(255,220,220,0.9); cursor: pointer;
+      border-radius: 5px; color: rgba(255,220,220,0.9); cursor: pointer;
       transition: background .15s, border-color .15s;
     }
     .item-stepper-btn:hover { background: rgba(255,0,0,0.22); border-color: rgba(255,0,0,0.5); }
     .item-stepper-btn:active { transform: scale(0.92); }
     .item-qty {
-      width: 20px; height: 17px; padding: 0; box-sizing: border-box;
-      font-family: 'Press Start 2P', monospace; font-size: 7px; line-height: 17px;
+      width: 26px; height: 22px; padding: 0; box-sizing: border-box;
+      font-family: 'Press Start 2P', monospace; font-size: 8.5px; line-height: 22px;
       text-align: center; background: transparent; border: none;
       color: rgba(255,220,220,0.9); outline: none; pointer-events: none;
     }
@@ -984,13 +989,14 @@
 
 <!-- Order chat modal -->
       <div id="orderChatOverlay" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(5,0,0,0.88);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px">
-        <div style="background:rgba(12,0,0,0.95);border:1px solid rgba(255,0,0,0.25);border-radius:18px;max-width:960px;width:100%;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 0 60px rgba(255,0,0,0.15);overflow:hidden">
+        <div style="position:relative;background:rgba(12,0,0,0.95);border:1px solid rgba(255,0,0,0.25);border-radius:18px;max-width:960px;width:100%;height:85vh;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 0 60px rgba(255,0,0,0.15);overflow:hidden">
           <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px 12px;border-bottom:1px solid rgba(255,0,0,0.12);flex-shrink:0">
             <div>
               <div style="font-size:11px;color:#ff2a2a;letter-spacing:1px" id="chatOrderTitle">Заказ #—</div>
               <div style="font-size:7px;color:rgba(255,200,200,0.4);margin-top:4px" id="chatOrderMeta"></div>
             </div>
             <div style="display:flex;gap:10px;align-items:center">
+              <span onclick="toggleCustomFieldsPanel()" title="Дополнительные поля" style="cursor:pointer;font-size:14px;opacity:0.45;transition:opacity .2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.45">»</span>
               <span onclick="deleteOrderChat()" title="Удалить заказ" style="cursor:pointer;font-size:12px;opacity:0.4;transition:opacity .2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.4">🗑</span>
               <button class="btn btn-sm" onclick="closeOrderChat()" style="width:auto;font-size:9px">✕</button>
             </div>
@@ -1024,60 +1030,51 @@
                 <div style="font-size:8px;color:#ff4444;letter-spacing:1px;margin-bottom:12px">РЕДАКТИРОВАНИЕ ЗАКАЗА</div>
 
                 <div class="order-edit-grid">
-                  <div>
+                  <div class="order-edit-full">
                     <label>Цена, ₽</label>
                     <input type="number" id="orderEditPrice" min="0" step="1" placeholder="Текущая цена">
-                  </div>
-                  <div>
-                    <label>Скидка</label>
-                    <div class="order-price-tools">
-                      <input type="number" id="orderEditDiscountPct" min="0" max="100" step="0.01" placeholder="%">
-                      <input type="number" id="orderEditDiscountRub" min="0" step="1" placeholder="₽">
-                    </div>
-                  </div>
-
-                  <div class="order-edit-full">
-                    <div class="order-edit-hint">Скидка считается от исходной цены. Можно указать % или ₽. Если заполнены оба поля, применяется большее значение скидки.</div>
+                    <div class="order-edit-hint">Базовая цена заказа. Сохраняется вместе с остальными полями кнопкой «Сохранить заказ» внизу.</div>
                   </div>
 
                   <div>
                     <label>Категория</label>
-                    <input type="text" id="orderEditCategory" placeholder="Дизайн">
+                    <select id="orderEditCategory">
+                      <option value="design">Дизайн</option>
+                      <option value="discord_bot">Discord бот</option>
+                      <option value="telegram_bot">Telegram бот</option>
+                      <option value="website">Сайт</option>
+                      <option value="other">Другое</option>
+                    </select>
                   </div>
                   <div>
                     <label>Тип заказа</label>
-                    <input type="text" id="orderEditType" placeholder="Тип / оформление">
+                    <input type="text" id="orderEditType" list="orderTypeSuggestions" placeholder="Тип / оформление">
+                    <datalist id="orderTypeSuggestions"></datalist>
                   </div>
 
-                  <div>
+                  <div class="order-edit-full">
                     <label>Способ оплаты</label>
-                    <select id="orderEditPayment">
+                    <select id="orderEditPayment" onchange="admOnPaymentChange()">
                       <option value="sbp">СБП</option>
                       <option value="card">Карта</option>
                       <option value="steam_gift">Подарок Steam</option>
                       <option value="steam_topup">Пополнение Steam</option>
                     </select>
-                  </div>
-                  <div>
-                    <label>Причина скидки / изменения цены</label>
-                    <input type="text" id="orderEditPriceReason" placeholder="Можно оставить пустым">
+                    <div id="orderEditBankWrap">
+                      <label>Банк</label>
+                      <select id="orderEditBank">
+                        <option value="">— не указан —</option>
+                        <option value="Т-Банк">Т-Банк</option>
+                        <option value="Альфа-Банк">Альфа-Банк</option>
+                        <option value="Озон Банк">Озон Банк</option>
+                      </select>
+                    </div>
                   </div>
 
                   <div class="order-edit-full">
                     <label>Что нужно</label>
                     <textarea id="orderEditDescription" placeholder="Описание задачи..." style="min-height:56px"></textarea>
                   </div>
-
-                  <div>
-                    <label>Банк</label>
-                    <select id="orderEditBank">
-                      <option value="">— не указан —</option>
-                      <option value="Т-Банк">Т-Банк</option>
-                      <option value="Альфа-Банк">Альфа-Банк</option>
-                      <option value="Озон Банк">Озон Банк</option>
-                    </select>
-                  </div>
-                  <div></div>
 
                   <div class="order-edit-full">
                     <label>Выбранные позиции</label>
@@ -1087,24 +1084,43 @@
                     <div class="order-edit-total"><span>Итого по позициям</span><b id="orderEditItemsTotal">0 ₽</b></div>
                     <div class="order-edit-hint">Цену выше можно оставить синхронизированной с позициями или задать вручную — сохранится то, что указано в поле «Цена».</div>
                   </div>
-
-                  <div class="order-edit-full">
-                    <label>Дополнительные поля</label>
-                    <div id="orderCustomFields"></div>
-                    <button class="btn btn-sm" type="button" onclick="addOrderCustomField()" style="width:auto">➕ Добавить поле</button>
-                    <div class="order-edit-hint">Здесь можно менять любые дополнительные поля, которые уже существуют в заказе/БД.</div>
-                  </div>
                 </div>
 
                 <div class="order-edit-actions">
-                  <button class="btn btn-sm" onclick="applyOrderDiscountPreview()" style="border-color:rgba(255,120,0,0.35);color:#ffaa55">Рассчитать скидку</button>
                   <button class="btn btn-sm" onclick="saveOrderEdit()" style="border-color:rgba(0,200,0,0.35);color:#55ff55">💾 Сохранить заказ</button>
                   <button class="btn btn-sm" onclick="toggleOrderEditor()" style="width:auto">Отмена</button>
                 </div>
                 <div class="status" id="orderEditStatus"></div>
+
+                <div class="order-edit-section">
+                  <div class="order-edit-section-title">🏷️ Выдать скидку</div>
+                  <div id="orderDiscountStatus" class="order-edit-hint" style="margin-top:0"></div>
+                  <div class="order-price-tools">
+                    <input type="number" id="discountPct" min="0" max="100" step="0.01" placeholder="Скидка, %" oninput="admPreviewDiscount()">
+                    <input type="number" id="discountRub" min="0" step="1" placeholder="Скидка, ₽" oninput="admPreviewDiscount()">
+                  </div>
+                  <input type="text" id="discountReason" placeholder="Причина скидки (необязательно)" style="margin-top:0">
+                  <div id="discountPreview" class="order-edit-hint" style="margin-top:0;color:rgba(255,180,120,0.7)"></div>
+                  <div style="display:flex;gap:8px">
+                    <button class="btn btn-sm" onclick="admPreviewDiscount()" style="flex:1">Рассчитать</button>
+                    <button class="btn btn-sm" onclick="admApplyDiscount()" style="flex:1;border-color:rgba(255,120,0,0.35);color:#ffaa55">Применить скидку</button>
+                  </div>
+                </div>
               </div>
               </div>
               </div>
+            </div>
+          </div>
+
+          <div id="customFieldsPanel" class="custom-fields-panel">
+            <div class="custom-fields-panel-header">
+              <span>⚙️ Дополнительные поля</span>
+              <span onclick="toggleCustomFieldsPanel(false)" style="cursor:pointer;font-size:12px">✕</span>
+            </div>
+            <div class="custom-fields-panel-body">
+              <div class="order-edit-hint" style="margin-top:0">Служебные поля заказа (не входят в основную форму). Изменения сохраняются вместе с кнопкой «Сохранить заказ» в редактировании.</div>
+              <div id="orderCustomFields"></div>
+              <button class="btn btn-sm" type="button" onclick="addOrderCustomField()" style="width:auto">➕ Добавить поле</button>
             </div>
           </div>
         </div>
@@ -3350,6 +3366,8 @@ async function searchOrders() {
 }
 let ACTIVE_CHAT_ORDER_ID = null;
 let CHAT_POLL_TIMER = null;
+let LAST_LOADED_ORDERS = [];
+const ORDER_CATEGORY_LABELS = { 'design': 'Дизайн', 'discord_bot': 'Discord бот', 'telegram_bot': 'Telegram бот', 'website': 'Сайт', 'other': 'Другое' };
 
 async function loadOrders() {
   const container = document.getElementById('ordersList');
@@ -3358,6 +3376,7 @@ async function loadOrders() {
     const res = await adminFetch(BOT_API + '/admin/orders?limit=100');
     if (!res.ok) { container.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);text-align:center;padding:20px">Ошибка загрузки</div>'; return; }
     const data = await res.json();
+    LAST_LOADED_ORDERS = data.orders || [];
     if (!data.orders || !data.orders.length) {
       container.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);text-align:center;padding:20px">Нет заказов</div>';
       if (badge) badge.textContent = '0';
@@ -3365,11 +3384,10 @@ async function loadOrders() {
     }
     if (badge) badge.textContent = data.orders.length;
     const statusLabels = { 'new': 'Новый', 'in_progress': 'В работе', 'completed': 'Выполнен', 'cancelled': 'Отменён' };
-    const categoryLabels = { 'design': 'Дизайн', 'discord_bot': 'Discord бот', 'telegram_bot': 'Telegram бот', 'website': 'Сайт', 'other': 'Другое' };
     container.innerHTML = data.orders.map(function(o) {
       var statusClass = 'status-' + (o.status || 'new');
       var label = statusLabels[o.status] || o.status;
-      var catLabel = categoryLabels[o.category] || o.category || '—';
+      var catLabel = ORDER_CATEGORY_LABELS[o.category] || o.category || '—';
       return '<div class="work-item" style="cursor:pointer" onclick="openOrderChat(' + o.id + ')">' +
         '<div style="flex:1;min-width:0">' +
           '<div class="work-type">#' + o.id + ' · ' + escHtml(catLabel) + '</div>' +
@@ -3443,9 +3461,13 @@ function orderField(o, names) {
 }
 
 let ACTIVE_ORDER_DATA = null;
-let adminEditCatIndex = 0;
-let adminEditCatCount = 0;
 let adminEditPriceSections = null;
+
+function admOnPaymentChange() {
+  const pay = document.getElementById('orderEditPayment').value;
+  const wrap = document.getElementById('orderEditBankWrap');
+  if (wrap) wrap.style.display = (pay === 'card' || pay === 'sbp') ? '' : 'none';
+}
 
 function toggleOrderEditor(force) {
   const wrap = document.getElementById('orderEditWrap');
@@ -3510,80 +3532,78 @@ async function admLoadPriceSections() {
   return adminEditPriceSections;
 }
 
-function admRenderItemsCarouselHTML(sections, selectedMap) {
+let admItemQuantities = {};
+
+function admRenderItemsPickerHTML(sections, selectedMap) {
+  adminEditPriceSections = sections;
+  admItemQuantities = Object.assign({}, selectedMap);
   if (!sections || sections.length === 0) {
-    return '<div style="font-size:6px;color:rgba(255,200,200,0.4)">Не удалось загрузить услуги</div>';
+    return '<div style="font-size:7px;color:rgba(255,200,200,0.4)">Не удалось загрузить услуги</div>';
   }
-  adminEditCatIndex = 0;
-  adminEditCatCount = sections.length;
-  let html = '<div class="order-cat-carousel">';
-  html += '<button type="button" class="order-cat-arrow" onclick="admScrollCategory(-1)">‹</button>';
-  html += `<div class="order-cat-viewport"><div class="order-cat-track" id="admEditCatTrack" style="width:${sections.length * 100}%">`;
-  sections.forEach(sec => {
-    html += `<div class="order-cat-panel" style="width:${100 / sections.length}%">`;
-    html += `<div class="order-cat-panel-title">${escHtml(sec.label)}</div>`;
-    html += '<div class="order-cat-list">';
-    sec.items.forEach(item => {
-      const qty = selectedMap[item.name] || 0;
-      html += '<div class="order-item-cb">' +
-        '<span style="flex:1;min-width:0;text-align:left;display:flex;flex-direction:column;gap:3px">' +
-          `<span>${escHtml(item.name)}</span>` +
-          `<span style="opacity:0.5">${escHtml(item.price)}</span>` +
-        '</span>' +
-        '<div class="item-stepper">' +
-          '<button type="button" class="item-stepper-btn" onclick="admStepItemQty(this,-1)">−</button>' +
-          `<input type="text" class="item-qty" readonly value="${qty}" data-price="${escHtml(item.price)}" data-name="${escHtml(item.name)}">` +
-          '<button type="button" class="item-stepper-btn" onclick="admStepItemQty(this,1)">+</button>' +
-        '</div>' +
-      '</div>';
-    });
-    html += '</div></div>';
+  let html = '<select id="admItemsCategorySelect" class="order-select" style="margin-bottom:8px" onchange="admRenderItemsList()">';
+  sections.forEach((sec, i) => {
+    html += `<option value="${i}">${escHtml(sec.label)}</option>`;
   });
-  html += '</div></div>';
-  html += '<button type="button" class="order-cat-arrow" onclick="admScrollCategory(1)">›</button>';
-  html += '</div>';
-  html += '<div class="order-cat-dots" id="admEditCatDots">';
-  sections.forEach((_, i) => {
-    html += `<span class="order-cat-dot${i === 0 ? ' active' : ''}" onclick="admGoToCategory(${i})"></span>`;
-  });
-  html += '</div>';
+  html += '</select><div id="admItemsListBox"></div>';
   return html;
 }
-function admScrollCategory(dir) {
-  adminEditCatIndex = (adminEditCatIndex + dir + adminEditCatCount) % adminEditCatCount;
-  admApplyCategoryPosition();
+
+function admRenderItemsList() {
+  const sel = document.getElementById('admItemsCategorySelect');
+  const box = document.getElementById('admItemsListBox');
+  if (!sel || !box || !adminEditPriceSections) return;
+  const sec = adminEditPriceSections[parseInt(sel.value, 10)];
+  if (!sec) { box.innerHTML = ''; return; }
+  box.innerHTML = sec.items.map(item => {
+    const qty = admItemQuantities[item.name] || 0;
+    const nameAttr = escHtml(item.name);
+    return '<div class="order-item-cb">' +
+      '<span style="flex:1;min-width:0;text-align:left;display:flex;flex-direction:column;gap:3px">' +
+        `<span>${escHtml(item.name)}</span>` +
+        `<span style="opacity:0.5">${escHtml(item.price)}</span>` +
+      '</span>' +
+      '<div class="item-stepper">' +
+        `<button type="button" class="item-stepper-btn" onclick="admStepItemQty('${nameAttr}',-1)">−</button>` +
+        `<input type="text" class="item-qty" readonly value="${qty}" data-name="${nameAttr}">` +
+        `<button type="button" class="item-stepper-btn" onclick="admStepItemQty('${nameAttr}',1)">+</button>` +
+      '</div>' +
+    '</div>';
+  }).join('');
 }
-function admGoToCategory(i) {
-  adminEditCatIndex = i;
-  admApplyCategoryPosition();
+
+function admPriceForItem(name) {
+  if (!adminEditPriceSections) return 0;
+  for (const sec of adminEditPriceSections) {
+    for (const item of sec.items) {
+      if (item.name === name) return admParsePriceNumber(item.price);
+    }
+  }
+  return 0;
 }
-function admApplyCategoryPosition() {
-  const track = document.getElementById('admEditCatTrack');
-  if (!track) return;
-  const step = adminEditCatCount > 0 ? (100 / adminEditCatCount) : 100;
-  track.style.transform = `translateX(-${adminEditCatIndex * step}%)`;
-  document.querySelectorAll('#admEditCatDots .order-cat-dot').forEach((d, i) => d.classList.toggle('active', i === adminEditCatIndex));
-}
-function admStepItemQty(btn, delta) {
-  const stepper = btn.parentElement;
-  const input = stepper.querySelector('.item-qty');
-  let val = (parseInt(input.value, 10) || 0) + delta;
+
+function admStepItemQty(name, delta) {
+  let val = (admItemQuantities[name] || 0) + delta;
   if (val < 0) val = 0;
   if (val > 99) val = 99;
-  input.value = val;
-  input.classList.remove('qty-pulse');
-  void input.offsetWidth;
-  input.classList.add('qty-pulse');
+  admItemQuantities[name] = val;
+  admRenderItemsList();
   admUpdateItemsTotal();
+  document.querySelectorAll('#admItemsListBox .item-qty').forEach(inp => {
+    if (inp.getAttribute('data-name') === name) {
+      inp.classList.remove('qty-pulse');
+      void inp.offsetWidth;
+      inp.classList.add('qty-pulse');
+    }
+  });
 }
+
 function admCollectItems() {
   const items = [];
   let total = 0;
-  document.querySelectorAll('#orderEditItemsBox .item-qty').forEach(inp => {
-    const qty = parseInt(inp.value, 10) || 0;
+  Object.keys(admItemQuantities).forEach(name => {
+    const qty = admItemQuantities[name] || 0;
     if (qty <= 0) return;
-    const price = admParsePriceNumber(inp.getAttribute('data-price'));
-    const name = inp.getAttribute('data-name') || '';
+    const price = admPriceForItem(name);
     total += qty * price;
     items.push(qty > 1 ? `${name} × ${qty}` : name);
   });
@@ -3606,6 +3626,20 @@ function admApplyItemsTotalToPrice() {
   showStatus(document.getElementById('orderEditStatus'), 'Цена обновлена по позициям: ' + total + ' ₽', 'info');
 }
 
+function renderDiscountStatus(o) {
+  const el = document.getElementById('orderDiscountStatus');
+  if (!el) return;
+  if (!o.discount_type || !o.discount_value) {
+    el.textContent = 'Скидка пока не выдавалась.';
+    return;
+  }
+  const label = o.discount_type === 'percent' ? `${o.discount_value}%` : `${o.discount_value} ₽`;
+  let text = `Текущая скидка: −${label}`;
+  if (o.final_price !== undefined && o.final_price !== null) text += ` · итоговая цена: ${o.final_price} ₽`;
+  if (o.discount_reason) text += ` · причина: ${o.discount_reason}`;
+  el.textContent = text;
+}
+
 function populateOrderEditor(o) {
   ACTIVE_ORDER_DATA = o || {};
   const price = orderField(o, ['estimated_price','price','amount']);
@@ -3616,10 +3650,25 @@ function populateOrderEditor(o) {
   const parsed = admParseDescription(desc.value || '');
 
   document.getElementById('orderEditPrice').value = parseFloat(String(price.value).replace(/[^\d.,-]/g,'').replace(',','.')) || 0;
-  document.getElementById('orderEditDiscountPct').value = '';
-  document.getElementById('orderEditDiscountRub').value = '';
-  document.getElementById('orderEditCategory').value = category.value || '';
+
+  const catSelect = document.getElementById('orderEditCategory');
+  const catVal = category.value || 'other';
+  catSelect.value = Object.prototype.hasOwnProperty.call(ORDER_CATEGORY_LABELS, catVal) ? catVal : 'other';
+
   document.getElementById('orderEditType').value = type.value || '';
+  const typeList = document.getElementById('orderTypeSuggestions');
+  const seenTypes = new Set();
+  typeList.innerHTML = '';
+  LAST_LOADED_ORDERS.forEach(function(ord) {
+    const t = ord.order_type || ord.type;
+    if (t && !seenTypes.has(t)) {
+      seenTypes.add(t);
+      const opt = document.createElement('option');
+      opt.value = t;
+      typeList.appendChild(opt);
+    }
+  });
+
   const payVal = payment.value || 'sbp';
   const paySelect = document.getElementById('orderEditPayment');
   paySelect.value = ['sbp','card','steam_gift','steam_topup'].includes(payVal) ? payVal : 'sbp';
@@ -3632,15 +3681,22 @@ function populateOrderEditor(o) {
     bankSelect.insertBefore(opt, bankSelect.options[1]);
   }
   bankSelect.value = parsed.bank || '';
-  document.getElementById('orderEditPriceReason').value = '';
+  admOnPaymentChange();
+
+  document.getElementById('discountPct').value = '';
+  document.getElementById('discountRub').value = '';
+  document.getElementById('discountReason').value = '';
+  renderDiscountStatus(o);
+
   document.getElementById('orderCustomFields').innerHTML = '';
 
   const itemsBox = document.getElementById('orderEditItemsBox');
   itemsBox.innerHTML = '<div style="font-size:6px;color:rgba(255,200,200,0.35)">Загружаю услуги...</div>';
   admLoadPriceSections().then(sections => {
     const selectedMap = admParseSelectedItems(parsed.selected);
-    itemsBox.innerHTML = admRenderItemsCarouselHTML(sections, selectedMap) +
+    itemsBox.innerHTML = admRenderItemsPickerHTML(sections, selectedMap) +
       '<div style="text-align:right;margin-top:4px"><a href="javascript:void(0)" onclick="admApplyItemsTotalToPrice()" style="font-size:6px;color:rgba(255,150,150,0.6);text-decoration:underline">↦ применить сумму позиций к цене</a></div>';
+    admRenderItemsList();
     admUpdateItemsTotal();
   });
 
@@ -3648,7 +3704,8 @@ function populateOrderEditor(o) {
   const skip = new Set([
     'id','status','created_at','updated_at','estimated_price','price','amount',
     'category','order_type','type','payment_method','payment','pay_method',
-    'description','details','comment','text','username','discord_id'
+    'description','details','comment','text','username','discord_id',
+    'discount_type','discount_value','discount_reason','final_price'
   ]);
   Object.keys(o || {}).forEach(function(key) {
     if (skip.has(key)) return;
@@ -3658,41 +3715,90 @@ function populateOrderEditor(o) {
   });
 }
 
+const CUSTOM_FIELD_LABELS = {
+  avatar: 'Аватар', discord_channel_id: 'ID канала Discord', ip: 'IP-адрес',
+  fingerprint: 'Отпечаток устройства', session: 'Сессия', promo_code: 'Промокод',
+};
+
 function addOrderCustomField(key, value) {
   const box = document.getElementById('orderCustomFields');
   const row = document.createElement('div');
   row.className = 'order-custom-row';
+  const friendly = CUSTOM_FIELD_LABELS[key] || '';
   row.innerHTML =
-    '<input class="custom-key" type="text" placeholder="Поле" value="' + escHtml(key || '') + '">' +
+    '<div style="flex:0 0 38%;min-width:0">' +
+      '<input class="custom-key" type="text" placeholder="Поле" value="' + escHtml(key || '') + '">' +
+      (friendly ? '<div style="font-size:5px;color:rgba(255,200,200,0.3);margin-top:2px;padding-left:2px">' + escHtml(friendly) + '</div>' : '') +
+    '</div>' +
     '<input class="custom-value" type="text" placeholder="Значение" value="' + escHtml(value === undefined || value === null ? '' : String(value)) + '">' +
     '<button class="btn btn-sm order-custom-remove" type="button" title="Удалить поле">✕</button>';
   row.querySelector('.order-custom-remove').onclick = function(){ row.remove(); };
   box.appendChild(row);
 }
 
-function applyOrderDiscountPreview() {
-  const priceInput = document.getElementById('orderEditPrice');
-  const pct = parseFloat(document.getElementById('orderEditDiscountPct').value) || 0;
-  const rub = parseFloat(document.getElementById('orderEditDiscountRub').value) || 0;
-  const base = parseFloat(String(priceInput.value).replace(',','.')) || 0;
-  if (base <= 0) {
-    showStatus(document.getElementById('orderEditStatus'), 'Укажи исходную цену', 'err');
+function admPreviewDiscount() {
+  const preview = document.getElementById('discountPreview');
+  const pct = parseFloat(document.getElementById('discountPct').value);
+  const rub = parseFloat(document.getElementById('discountRub').value);
+  const hasPct = Number.isFinite(pct) && pct > 0;
+  const hasRub = Number.isFinite(rub) && rub > 0;
+  if (!hasPct && !hasRub) { preview.textContent = ''; return; }
+  if (hasPct && hasRub) { preview.textContent = 'Укажи только одно значение — % или ₽'; return; }
+  const base = (ACTIVE_ORDER_DATA && (ACTIVE_ORDER_DATA.final_price ?? ACTIVE_ORDER_DATA.estimated_price)) ||
+    parseFloat(document.getElementById('orderEditPrice').value) || 0;
+  const discountAmount = hasPct ? base * pct / 100 : rub;
+  const result = Math.max(0, Math.round((base - discountAmount) * 100) / 100);
+  preview.textContent = `Будет: ${result} ₽ (−${Math.round(discountAmount * 100) / 100} ₽ от ${base} ₽)`;
+}
+
+async function admApplyDiscount() {
+  if (!ACTIVE_CHAT_ORDER_ID) return;
+  const status = document.getElementById('orderEditStatus');
+  const pct = parseFloat(document.getElementById('discountPct').value);
+  const rub = parseFloat(document.getElementById('discountRub').value);
+  const reason = document.getElementById('discountReason').value.trim();
+  const hasPct = Number.isFinite(pct) && pct > 0;
+  const hasRub = Number.isFinite(rub) && rub > 0;
+  if (hasPct === hasRub) {
+    showStatus(status, 'Укажи ровно одно значение скидки — % или ₽', 'err');
     return;
   }
-  const pctRub = base * Math.max(0, Math.min(100, pct)) / 100;
-  const discount = Math.max(0, pctRub, rub);
-  priceInput.value = Math.max(0, Math.round((base - discount) * 100) / 100);
-  showStatus(document.getElementById('orderEditStatus'),
-    'Новая цена: ' + priceInput.value + ' ₽ (скидка ' + Math.round(discount * 100) / 100 + ' ₽)',
-    'info');
+  const body = hasPct ? { type: 'percent', value: pct } : { type: 'fixed', value: rub };
+  if (reason) body.reason = reason;
+  showStatus(status, 'Применяю скидку...', 'info');
+  try {
+    const res = await adminFetch(BOT_API + '/admin/order/' + ACTIVE_CHAT_ORDER_ID + '/discount', {
+      method: 'POST', body: body
+    });
+    if (res.status === 403) throw new Error('Неверный ключ администратора');
+    const d = await res.json().catch(()=>({}));
+    if (!res.ok) throw new Error(d.error || 'Сервер отклонил скидку (' + res.status + ')');
+    showStatus(status, 'Скидка применена! Итоговая цена: ' + d.final_price + ' ₽', 'ok');
+    await loadOrders();
+    ACTIVE_ORDER_DATA = Object.assign({}, ACTIVE_ORDER_DATA, {
+      final_price: d.final_price, discount_type: body.type, discount_value: body.value, discount_reason: reason || null,
+    });
+    renderDiscountStatus(ACTIVE_ORDER_DATA);
+    document.getElementById('discountPct').value = '';
+    document.getElementById('discountRub').value = '';
+    document.getElementById('discountReason').value = '';
+    document.getElementById('discountPreview').textContent = '';
+  } catch(e) {
+    showStatus(status, 'Ошибка: ' + e.message, 'err');
+  }
+}
+
+function toggleCustomFieldsPanel(force) {
+  const panel = document.getElementById('customFieldsPanel');
+  if (!panel) return;
+  const show = force === undefined ? !panel.classList.contains('open') : !!force;
+  panel.classList.toggle('open', show);
 }
 
 async function saveOrderEdit() {
   if (!ACTIVE_CHAT_ORDER_ID || !ACTIVE_ORDER_DATA) return;
   const status = document.getElementById('orderEditStatus');
   const priceInput = document.getElementById('orderEditPrice');
-  const pct = parseFloat(document.getElementById('orderEditDiscountPct').value) || 0;
-  const rub = parseFloat(document.getElementById('orderEditDiscountRub').value) || 0;
   const newPrice = parseFloat(String(priceInput.value).replace(',','.'));
 
   if (!Number.isFinite(newPrice) || newPrice < 0) {
@@ -3700,7 +3806,6 @@ async function saveOrderEdit() {
     return;
   }
 
-  const priceField = orderField(ACTIVE_ORDER_DATA, ['estimated_price','price','amount']).key;
   const categoryField = orderField(ACTIVE_ORDER_DATA, ['category']).key;
   const typeField = orderField(ACTIVE_ORDER_DATA, ['order_type','type']).key;
 
@@ -3712,23 +3817,12 @@ async function saveOrderEdit() {
   const descParts = [task];
   if (bank) descParts.push(`Банк: ${bank}`);
   if (items.length) descParts.push(`Выбрано: ${items.join(', ')}`);
-  let descriptionValue = descParts.join('\n');
-
-  // Причина хранится в описании, чтобы функция работала без изменения схемы БД.
-  const reason = document.getElementById('orderEditPriceReason').value.trim();
-  const basePrice = parseFloat(String(ACTIVE_ORDER_DATA[priceField] || '').replace(/[^\d.,-]/g,'').replace(',','.')) || 0;
-  const actualDiscount = Math.max(0, basePrice - newPrice);
-  if (reason && actualDiscount > 0) {
-    descriptionValue = descriptionValue + (descriptionValue ? '\n\n' : '') +
-      'Изменение цены: -' + Math.round(actualDiscount * 100) / 100 + ' ₽' +
-      (pct > 0 ? ' (' + pct + '%)' : '') +
-      '. Причина: ' + reason;
-  }
+  const descriptionValue = descParts.join('\n');
 
   // Доп. поля (категория, тип, произвольные ключи) — редактируем только те, что уже были в заказе.
   const extraFields = {};
   if (Object.prototype.hasOwnProperty.call(ACTIVE_ORDER_DATA, categoryField))
-    extraFields[categoryField] = document.getElementById('orderEditCategory').value.trim();
+    extraFields[categoryField] = document.getElementById('orderEditCategory').value;
   if (Object.prototype.hasOwnProperty.call(ACTIVE_ORDER_DATA, typeField))
     extraFields[typeField] = document.getElementById('orderEditType').value.trim();
   document.querySelectorAll('#orderCustomFields .order-custom-row').forEach(function(row) {
@@ -3779,6 +3873,8 @@ function closeOrderChat() {
   document.getElementById('orderChatOverlay').style.display = 'none';
   var wrap = document.getElementById('orderEditWrap');
   if (wrap) wrap.classList.remove('open');
+  var panel = document.getElementById('customFieldsPanel');
+  if (panel) panel.classList.remove('open');
   if (CHAT_POLL_TIMER) { clearInterval(CHAT_POLL_TIMER); CHAT_POLL_TIMER = null; }
 }
 
@@ -3826,6 +3922,16 @@ async function pollChatMessages() {
 
 let admSeenMsgIds = new Set();
 
+const AVATAR_COLORS = ['#ff5555','#ffaa55','#ffe066','#55ff88','#55ddff','#7d8bff','#c07dff','#ff7dc7'];
+function avatarFor(name) {
+  const n = (name || '?').trim();
+  const letter = n.charAt(0).toUpperCase() || '?';
+  let sum = 0;
+  for (let i = 0; i < n.length; i++) sum += n.charCodeAt(i);
+  const color = AVATAR_COLORS[sum % AVATAR_COLORS.length];
+  return '<div style="flex-shrink:0;width:22px;height:22px;border-radius:50%;background:' + color + '22;border:1px solid ' + color + '55;color:' + color + ';display:flex;align-items:center;justify-content:center;font-size:8px;font-family:\'Press Start 2P\',monospace">' + escHtml(letter) + '</div>';
+}
+
 function renderChatMessages(messages, attachments) {
   var box = document.getElementById('chatMessages');
   if (!messages || !messages.length) {
@@ -3856,14 +3962,18 @@ function renderChatMessages(messages, attachments) {
     var align = isAdmin ? 'flex-end' : 'flex-start';
     var bg = isAdmin ? 'rgba(88,101,242,0.12)' : isUser ? 'rgba(255,0,0,0.08)' : 'rgba(255,255,255,0.04)';
     var border = isAdmin ? 'rgba(88,101,242,0.2)' : isUser ? 'rgba(255,0,0,0.18)' : 'rgba(255,255,255,0.08)';
+    var authorName = isAdmin ? 'Администратор' : isUser ? (m.author || 'Пользователь') : (m.author || 'Discord');
     var author = isAdmin ? '👑 Администратор' : isUser ? '👤 ' + (m.author || 'Пользователь') : '🤖 ' + (m.author || 'Discord');
     var time = m.created_at ? m.created_at.slice(11, 19) : '';
-    return '<div style="align-self:' + align + ';max-width:80%;padding:10px 14px;border-radius:12px;background:' + bg + ';border:1px solid ' + border + ';' + animStyle + '">' +
+    var bubble = '<div style="max-width:100%;padding:10px 14px;border-radius:12px;background:' + bg + ';border:1px solid ' + border + '">' +
       '<div style="font-size:6px;color:rgba(255,200,200,0.4);margin-bottom:4px">' + author + '</div>' +
       '<div style="font-size:7px;color:rgba(255,220,220,0.9);line-height:1.6;font-family:sans-serif;word-break:break-word">' + escHtml(m.content || '') + '</div>' +
       attHtml +
       '<div style="font-size:5px;color:rgba(255,150,150,0.3);margin-top:4px;text-align:right;font-family:monospace">' + time + '</div>' +
     '</div>';
+    var avatar = avatarFor(authorName);
+    var rowContent = isAdmin ? (bubble + avatar) : (avatar + bubble);
+    return '<div style="align-self:' + align + ';max-width:82%;display:flex;gap:6px;align-items:flex-end;' + animStyle + '">' + rowContent + '</div>';
   }).join('');
   messages.forEach(function(m) { if (m.id !== undefined) admSeenMsgIds.add(m.id); });
   box.scrollTop = box.scrollHeight;
