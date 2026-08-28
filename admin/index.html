@@ -950,6 +950,17 @@
 <div id="tabOrders" class="tab-panel">
 
       <div class="card">
+        <div class="card-title">👑 ПРОФИЛЬ АДМИНА В ЧАТЕ</div>
+        <div style="font-size:6px;color:rgba(255,200,200,0.4);margin-bottom:10px;line-height:1.7">Имя и аватар, которые видят клиенты в чате заказа, когда отвечает администратор.</div>
+        <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center">
+          <input type="text" id="adminIdentityName" placeholder="Администратор" style="flex:2;font-size:7px;min-width:120px">
+          <input type="text" id="adminIdentityAvatar" placeholder="Ссылка на аватар (необязательно)" style="flex:3;font-size:7px;min-width:160px">
+        </div>
+        <button class="btn btn-sm" onclick="saveAdminIdentity()" style="border-color:rgba(0,200,0,0.35);color:#55ff55">💾 Сохранить профиль</button>
+        <div class="status" id="adminIdentityStatus"></div>
+      </div>
+
+      <div class="card">
         <div class="card-title">📦 КАТЕГОРИИ ЗАКАЗОВ</div>
         <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
           <input type="text" id="catNameInput" placeholder="Ключ (design)" style="flex:2;font-size:7px;min-width:100px">
@@ -1424,7 +1435,7 @@ function switchTab(tab) {
   if (tab === 'prices') loadPrices();
   if (tab === 'rules') loadRules();
   if (tab === 'users' && getAdminKey()) { loadUsers(); loadUnauthUsers(); loadWatchlist(); loadBannedIps(); }
-  if (tab === 'orders' && getAdminKey()) { loadOrders(); loadCategories(); }
+  if (tab === 'orders' && getAdminKey()) { loadOrders(); loadCategories(); loadAdminIdentity(); }
   if (tab === 'orders' && TOKEN) loadPaymentMethods();
   if (tab === 'orders' && getAdminKey()) loadWinners();
   if (tab === 'orders' && getAdminKey()) loadPromoCodes();
@@ -3921,15 +3932,53 @@ async function pollChatMessages() {
 }
 
 let admSeenMsgIds = new Set();
+let ADMIN_IDENTITY = { name: 'Администратор', avatar_url: null };
 
 const AVATAR_COLORS = ['#ff5555','#ffaa55','#ffe066','#55ff88','#55ddff','#7d8bff','#c07dff','#ff7dc7'];
-function avatarFor(name) {
+function avatarFor(name, avatarUrl) {
+  if (avatarUrl) {
+    return '<img src="' + avatarUrl + '" alt="' + escHtml(name || '') + '" style="flex-shrink:0;width:22px;height:22px;border-radius:50%;object-fit:cover">';
+  }
   const n = (name || '?').trim();
   const letter = n.charAt(0).toUpperCase() || '?';
   let sum = 0;
   for (let i = 0; i < n.length; i++) sum += n.charCodeAt(i);
   const color = AVATAR_COLORS[sum % AVATAR_COLORS.length];
   return '<div style="flex-shrink:0;width:22px;height:22px;border-radius:50%;background:' + color + '22;border:1px solid ' + color + '55;color:' + color + ';display:flex;align-items:center;justify-content:center;font-size:8px;font-family:\'Press Start 2P\',monospace">' + escHtml(letter) + '</div>';
+}
+
+async function loadAdminIdentity() {
+  try {
+    const r = await fetch(`${BOT_API}/api/admin-identity`);
+    if (r.ok) ADMIN_IDENTITY = await r.json();
+  } catch(e) { /* используем значения по умолчанию */ }
+  const nameInput = document.getElementById('adminIdentityName');
+  const avatarInput = document.getElementById('adminIdentityAvatar');
+  if (nameInput) nameInput.value = ADMIN_IDENTITY.name || '';
+  if (avatarInput) avatarInput.value = ADMIN_IDENTITY.avatar_url || '';
+}
+
+async function saveAdminIdentity() {
+  const status = document.getElementById('adminIdentityStatus');
+  const name = document.getElementById('adminIdentityName').value.trim();
+  const avatarUrl = document.getElementById('adminIdentityAvatar').value.trim();
+  if (!name) {
+    showStatus(status, 'Укажи имя', 'err');
+    return;
+  }
+  showStatus(status, 'Сохраняю...', 'info');
+  try {
+    const res = await adminFetch(BOT_API + '/admin/settings/identity', {
+      method: 'POST', body: { name: name, avatar_url: avatarUrl }
+    });
+    if (res.status === 403) throw new Error('Неверный ключ администратора');
+    const d = await res.json().catch(()=>({}));
+    if (!res.ok) throw new Error(d.error || 'Сервер отклонил (' + res.status + ')');
+    ADMIN_IDENTITY = { name: d.name, avatar_url: d.avatar_url };
+    showStatus(status, 'Профиль сохранён', 'ok');
+  } catch(e) {
+    showStatus(status, 'Ошибка: ' + e.message, 'err');
+  }
 }
 
 function renderChatMessages(messages, attachments) {
@@ -3962,8 +4011,8 @@ function renderChatMessages(messages, attachments) {
     var align = isAdmin ? 'flex-end' : 'flex-start';
     var bg = isAdmin ? 'rgba(88,101,242,0.12)' : isUser ? 'rgba(255,0,0,0.08)' : 'rgba(255,255,255,0.04)';
     var border = isAdmin ? 'rgba(88,101,242,0.2)' : isUser ? 'rgba(255,0,0,0.18)' : 'rgba(255,255,255,0.08)';
-    var authorName = isAdmin ? 'Администратор' : isUser ? (m.author || 'Пользователь') : (m.author || 'Discord');
-    var author = isAdmin ? '👑 Администратор' : isUser ? '👤 ' + (m.author || 'Пользователь') : '🤖 ' + (m.author || 'Discord');
+    var authorName = isAdmin ? (ADMIN_IDENTITY.name || 'Администратор') : isUser ? (m.author || 'Пользователь') : (m.author || 'Discord');
+    var author = isAdmin ? '👑 ' + escHtml(authorName) : isUser ? '👤 ' + escHtml(authorName) : '🤖 ' + escHtml(authorName);
     var time = m.created_at ? m.created_at.slice(11, 19) : '';
     var bubble = '<div style="max-width:100%;padding:10px 14px;border-radius:12px;background:' + bg + ';border:1px solid ' + border + '">' +
       '<div style="font-size:6px;color:rgba(255,200,200,0.4);margin-bottom:4px">' + author + '</div>' +
@@ -3971,7 +4020,7 @@ function renderChatMessages(messages, attachments) {
       attHtml +
       '<div style="font-size:5px;color:rgba(255,150,150,0.3);margin-top:4px;text-align:right;font-family:monospace">' + time + '</div>' +
     '</div>';
-    var avatar = avatarFor(authorName);
+    var avatar = isAdmin ? avatarFor(authorName, ADMIN_IDENTITY.avatar_url) : avatarFor(authorName);
     var rowContent = isAdmin ? (bubble + avatar) : (avatar + bubble);
     return '<div style="align-self:' + align + ';max-width:82%;display:flex;gap:6px;align-items:flex-end;' + animStyle + '">' + rowContent + '</div>';
   }).join('');
