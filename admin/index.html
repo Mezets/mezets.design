@@ -527,6 +527,23 @@
       .order-chat-col-side { width: 100%; overflow-y: visible; }
     }
 
+    .meta-price-trigger {
+      cursor: pointer; color: #ff8888; text-decoration: underline dotted;
+      text-underline-offset: 2px; transition: color .15s;
+    }
+    .meta-price-trigger:hover { color: #ffb0b0; }
+    .price-popover {
+      display: none;
+      position: absolute; top: calc(100% + 8px); left: 0; z-index: 40;
+      width: 260px; max-width: 80vw;
+      padding: 14px;
+      border: 1px solid rgba(255,0,0,0.3);
+      border-radius: 12px;
+      background: rgba(12,0,0,0.98);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      animation: orderChatModalIn .2s cubic-bezier(.22,.61,.36,1);
+    }
+    .price-popover.open { display: block; }
     .order-edit-modal-overlay {
       display: none;
       position: fixed; inset: 0; z-index: 60;
@@ -999,9 +1016,36 @@
       <div id="orderChatOverlay" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(5,0,0,0.88);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px">
         <div style="position:relative;background:rgba(12,0,0,0.95);border:1px solid rgba(255,0,0,0.25);border-radius:18px;max-width:960px;width:100%;height:85vh;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 0 60px rgba(255,0,0,0.15);overflow:hidden">
           <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px 12px;border-bottom:1px solid rgba(255,0,0,0.12);flex-shrink:0">
-            <div onclick="toggleOrderEditor()" title="Открыть редактирование заказа" style="cursor:pointer">
+            <div style="position:relative">
               <div style="font-size:11px;color:#ff2a2a;letter-spacing:1px" id="chatOrderTitle">Заказ #—</div>
               <div style="font-size:7px;color:rgba(255,200,200,0.4);margin-top:4px" id="chatOrderMeta"></div>
+
+              <div id="pricePopover" class="price-popover">
+                <label>Цена, ₽</label>
+                <input type="number" id="orderEditPrice" min="0" step="1" placeholder="Текущая цена">
+                <div class="order-edit-hint">Базовая цена заказа.</div>
+
+                <div class="order-edit-section" style="margin-top:10px">
+                  <div class="order-edit-section-title">🏷️ Выдать скидку</div>
+                  <div id="orderDiscountStatus" class="order-edit-hint" style="margin-top:0"></div>
+                  <div class="order-price-tools">
+                    <input type="number" id="discountPct" min="0" max="100" step="0.01" placeholder="Скидка, %" oninput="admPreviewDiscount()">
+                    <input type="number" id="discountRub" min="0" step="1" placeholder="Скидка, ₽" oninput="admPreviewDiscount()">
+                  </div>
+                  <input type="text" id="discountReason" placeholder="Причина скидки (необязательно)" style="margin-top:0">
+                  <div id="discountPreview" class="order-edit-hint" style="margin-top:0;color:rgba(255,180,120,0.7)"></div>
+                  <div style="display:flex;gap:8px">
+                    <button class="btn btn-sm" onclick="admPreviewDiscount()" style="flex:1">Рассчитать</button>
+                    <button class="btn btn-sm" onclick="admApplyDiscount()" style="flex:1;border-color:rgba(255,120,0,0.35);color:#ffaa55">Применить скидку</button>
+                  </div>
+                </div>
+
+                <div style="display:flex;gap:8px;margin-top:10px">
+                  <button class="btn btn-sm" onclick="saveOrderEdit()" style="flex:1;border-color:rgba(0,200,0,0.35);color:#55ff55">💾 Сохранить цену</button>
+                  <button class="btn btn-sm" onclick="togglePricePopover(false)" style="width:auto">Отмена</button>
+                </div>
+                <div class="status" id="orderEditStatus"></div>
+              </div>
             </div>
             <div style="display:flex;gap:10px;align-items:center">
               <span onclick="toggleCustomFieldsPanel()" title="Дополнительные поля" style="cursor:pointer;font-size:14px;opacity:0.45;transition:opacity .2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.45">»</span>
@@ -1037,12 +1081,6 @@
                 <div style="font-size:8px;color:#ff4444;letter-spacing:1px;margin-bottom:12px">РЕДАКТИРОВАНИЕ ЗАКАЗА</div>
 
                 <div class="order-edit-grid">
-                  <div class="order-edit-full">
-                    <label>Цена, ₽</label>
-                    <input type="number" id="orderEditPrice" min="0" step="1" placeholder="Текущая цена">
-                    <div class="order-edit-hint">Базовая цена заказа. Сохраняется вместе с остальными полями кнопкой «Сохранить заказ» внизу.</div>
-                  </div>
-
                   <div>
                     <label>Категория</label>
                     <select id="orderEditCategory">
@@ -1097,22 +1135,7 @@
                   <button class="btn btn-sm" onclick="saveOrderEdit()" style="border-color:rgba(0,200,0,0.35);color:#55ff55">💾 Сохранить заказ</button>
                   <button class="btn btn-sm" onclick="toggleOrderEditor()" style="width:auto">Отмена</button>
                 </div>
-                <div class="status" id="orderEditStatus"></div>
-
-                <div class="order-edit-section">
-                  <div class="order-edit-section-title">🏷️ Выдать скидку</div>
-                  <div id="orderDiscountStatus" class="order-edit-hint" style="margin-top:0"></div>
-                  <div class="order-price-tools">
-                    <input type="number" id="discountPct" min="0" max="100" step="0.01" placeholder="Скидка, %" oninput="admPreviewDiscount()">
-                    <input type="number" id="discountRub" min="0" step="1" placeholder="Скидка, ₽" oninput="admPreviewDiscount()">
-                  </div>
-                  <input type="text" id="discountReason" placeholder="Причина скидки (необязательно)" style="margin-top:0">
-                  <div id="discountPreview" class="order-edit-hint" style="margin-top:0;color:rgba(255,180,120,0.7)"></div>
-                  <div style="display:flex;gap:8px">
-                    <button class="btn btn-sm" onclick="admPreviewDiscount()" style="flex:1">Рассчитать</button>
-                    <button class="btn btn-sm" onclick="admApplyDiscount()" style="flex:1;border-color:rgba(255,120,0,0.35);color:#ffaa55">Применить скидку</button>
-                  </div>
-                </div>
+                <div class="status" id="orderMainEditStatus"></div>
               </div>
               </div>
             </div>
@@ -3428,8 +3451,11 @@ async function openOrderChat(orderId) {
     document.getElementById('chatOrderTitle').textContent = 'Заказ #' + o.id;
     var statusLabels = { 'new': 'Новый', 'in_progress': 'В работе', 'completed': 'Выполнен', 'cancelled': 'Отменён' };
     var categoryLabels = { 'design': 'Дизайн', 'discord_bot': 'Discord бот', 'telegram_bot': 'Telegram бот', 'website': 'Сайт', 'other': 'Другое' };
-    var meta = (categoryLabels[o.category] || o.category || '—') + ' · ' + (statusLabels[o.status] || o.status) + ' · ' + (o.estimated_price || '?') + '₽ · ' + (o.created_at || '—');
-    document.getElementById('chatOrderMeta').textContent = meta;
+    var priceText = (o.estimated_price !== undefined && o.estimated_price !== null) ? o.estimated_price : '?';
+    var meta = escHtml(categoryLabels[o.category] || o.category || '—') + ' · ' + escHtml(statusLabels[o.status] || o.status) +
+      ' · <span class="meta-price-trigger" onclick="event.stopPropagation();togglePricePopover()" title="Изменить цену / выдать скидку">' + escHtml(String(priceText)) + '₽ ✎</span>' +
+      ' · ' + escHtml(o.created_at || '—');
+    document.getElementById('chatOrderMeta').innerHTML = meta;
     populateOrderEditor(o);
     var statusSel = document.getElementById('chatOrderStatus');
     if (statusSel) statusSel.value = o.status || 'new';
@@ -3482,6 +3508,21 @@ function toggleOrderEditor(force) {
   if (show && ACTIVE_ORDER_DATA) populateOrderEditor(ACTIVE_ORDER_DATA);
   overlay.classList.toggle('open', show);
 }
+
+function togglePricePopover(force) {
+  const pop = document.getElementById('pricePopover');
+  if (!pop) return;
+  const show = force === undefined ? !pop.classList.contains('open') : !!force;
+  if (show && ACTIVE_ORDER_DATA) populateOrderEditor(ACTIVE_ORDER_DATA);
+  pop.classList.toggle('open', show);
+}
+document.addEventListener('click', function(e) {
+  const pop = document.getElementById('pricePopover');
+  if (!pop || !pop.classList.contains('open')) return;
+  if (pop.contains(e.target)) return;
+  if (e.target.closest && e.target.closest('.meta-price-trigger')) return;
+  togglePricePopover(false);
+});
 
 // ── Разбор/сборка описания заказа: 'Что нужно' + 'Банк:' + 'Выбрано:' ──
 
@@ -3803,12 +3844,13 @@ function toggleCustomFieldsPanel(force) {
 
 async function saveOrderEdit() {
   if (!ACTIVE_CHAT_ORDER_ID || !ACTIVE_ORDER_DATA) return;
-  const status = document.getElementById('orderEditStatus');
+  const statusEls = [document.getElementById('orderEditStatus'), document.getElementById('orderMainEditStatus')].filter(Boolean);
+  const showBoth = (msg, type) => statusEls.forEach(el => showStatus(el, msg, type));
   const priceInput = document.getElementById('orderEditPrice');
   const newPrice = parseFloat(String(priceInput.value).replace(',','.'));
 
   if (!Number.isFinite(newPrice) || newPrice < 0) {
-    showStatus(status, 'Укажи корректную цену', 'err');
+    showBoth('Укажи корректную цену', 'err');
     return;
   }
 
@@ -3837,7 +3879,7 @@ async function saveOrderEdit() {
     if (k && Object.prototype.hasOwnProperty.call(ACTIVE_ORDER_DATA, k)) extraFields[k] = v;
   });
 
-  showStatus(status, 'Сохраняю...', 'info');
+  showBoth('Сохраняю...', 'info');
   try {
     // Описание / способ оплаты / цена — через отдельный эндпоинт: он сам пишет
     // системные сообщения об изменениях (что добавили/убрали/цена) в чат заказа.
@@ -3865,12 +3907,12 @@ async function saveOrderEdit() {
       }
     }
 
-    showStatus(status, 'Заказ сохранён', 'ok');
+    showBoth('Заказ сохранён', 'ok');
     await loadOrders();
     await openOrderChat(ACTIVE_CHAT_ORDER_ID);
-    showStatus(document.getElementById('orderEditStatus'), 'Заказ сохранён', 'ok');
+    showBoth('Заказ сохранён', 'ok');
   } catch(e) {
-    showStatus(status, 'Ошибка: ' + e.message, 'err');
+    showBoth('Ошибка: ' + e.message, 'err');
   }
 }
 
@@ -3881,6 +3923,8 @@ function closeOrderChat() {
   if (editOverlay) editOverlay.classList.remove('open');
   var panel = document.getElementById('customFieldsPanel');
   if (panel) panel.classList.remove('open');
+  var pricePop = document.getElementById('pricePopover');
+  if (pricePop) pricePop.classList.remove('open');
   if (CHAT_POLL_TIMER) { clearInterval(CHAT_POLL_TIMER); CHAT_POLL_TIMER = null; }
 }
 
