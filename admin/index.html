@@ -527,11 +527,12 @@
       .order-chat-col-side { width: 100%; overflow-y: visible; }
     }
 
-    .meta-price-trigger {
+    .meta-trigger {
       cursor: pointer; color: #ff8888; text-decoration: underline dotted;
       text-underline-offset: 2px; transition: color .15s;
+      display: inline-block;
     }
-    .meta-price-trigger:hover { color: #ffb0b0; }
+    .meta-trigger:hover { color: #ffb0b0; }
     .price-popover {
       display: none;
       position: absolute; top: calc(100% + 8px); left: 0; z-index: 40;
@@ -545,21 +546,10 @@
     }
     .price-popover.open { display: block; }
 
-    .quick-edit-chips { display: flex; flex-direction: column; gap: 6px; padding: 12px 16px; }
-    .qe-trigger-wrap { position: relative; }
-    .qe-chip {
-      width: 100%; text-align: left; font-size: 6px; padding: 9px 10px;
-      background: rgba(255,0,0,0.04); border: 1px solid rgba(255,0,0,0.15); border-radius: 8px;
-      color: rgba(255,210,210,0.75); cursor: pointer; transition: border-color .15s, background .15s;
-      font-family: 'Press Start 2P', monospace;
-      display: flex; align-items: center; gap: 6px;
-    }
-    .qe-chip:hover { border-color: rgba(255,0,0,0.4); background: rgba(255,0,0,0.08); }
-    .qe-chip span:not(.qe-edit-icon) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .qe-edit-icon { margin-left: auto; opacity: 0.45; flex-shrink: 0; }
     .field-popover {
       display: none;
-      position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 40;
+      position: absolute; top: calc(100% + 6px); left: 0; z-index: 40;
+      width: 280px; max-width: 80vw;
       padding: 14px;
       border: 1px solid rgba(255,0,0,0.3);
       border-radius: 12px;
@@ -1031,6 +1021,81 @@
                 </div>
                 <div class="status qe-status" id="orderEditStatus"></div>
               </div>
+
+              <div id="categoryPopover" class="field-popover">
+                <label>Категория</label>
+                <select id="orderEditCategory">
+                  <option value="design">Дизайн</option>
+                  <option value="discord_bot">Discord бот</option>
+                  <option value="telegram_bot">Telegram бот</option>
+                  <option value="website">Сайт</option>
+                  <option value="other">Другое</option>
+                </select>
+                <div style="display:flex;gap:8px;margin-top:10px">
+                  <button class="btn btn-sm" onclick="saveOrderEdit()" style="flex:1;border-color:rgba(0,200,0,0.35);color:#55ff55">💾 Сохранить</button>
+                  <button class="btn btn-sm" onclick="toggleFieldPopover('category', false)" style="width:auto">Отмена</button>
+                </div>
+                <div class="status qe-status"></div>
+              </div>
+
+              <div id="typePopover" class="field-popover">
+                <label>Тип заказа</label>
+                <input type="text" id="orderEditType" list="orderTypeSuggestions" placeholder="Тип / оформление">
+                <datalist id="orderTypeSuggestions"></datalist>
+                <div style="display:flex;gap:8px;margin-top:10px">
+                  <button class="btn btn-sm" onclick="saveOrderEdit()" style="flex:1;border-color:rgba(0,200,0,0.35);color:#55ff55">💾 Сохранить</button>
+                  <button class="btn btn-sm" onclick="toggleFieldPopover('type', false)" style="width:auto">Отмена</button>
+                </div>
+                <div class="status qe-status"></div>
+              </div>
+
+              <div id="paymentPopover" class="field-popover">
+                <label>Способ оплаты</label>
+                <select id="orderEditPayment" onchange="admOnPaymentChange()">
+                  <option value="sbp">СБП</option>
+                  <option value="card">Карта</option>
+                  <option value="steam_gift">Подарок Steam</option>
+                  <option value="steam_topup">Пополнение Steam</option>
+                </select>
+                <div id="orderEditBankWrap">
+                  <label>Банк</label>
+                  <select id="orderEditBank">
+                    <option value="">— не указан —</option>
+                    <option value="Т-Банк">Т-Банк</option>
+                    <option value="Альфа-Банк">Альфа-Банк</option>
+                    <option value="Озон Банк">Озон Банк</option>
+                  </select>
+                </div>
+                <div style="display:flex;gap:8px;margin-top:10px">
+                  <button class="btn btn-sm" onclick="saveOrderEdit()" style="flex:1;border-color:rgba(0,200,0,0.35);color:#55ff55">💾 Сохранить</button>
+                  <button class="btn btn-sm" onclick="toggleFieldPopover('payment', false)" style="width:auto">Отмена</button>
+                </div>
+                <div class="status qe-status"></div>
+              </div>
+
+              <div id="taskPopover" class="field-popover">
+                <label>Что нужно</label>
+                <textarea id="orderEditDescription" placeholder="Описание задачи..." style="min-height:80px"></textarea>
+                <div style="display:flex;gap:8px;margin-top:10px">
+                  <button class="btn btn-sm" onclick="saveOrderEdit()" style="flex:1;border-color:rgba(0,200,0,0.35);color:#55ff55">💾 Сохранить</button>
+                  <button class="btn btn-sm" onclick="toggleFieldPopover('task', false)" style="width:auto">Отмена</button>
+                </div>
+                <div class="status qe-status"></div>
+              </div>
+
+              <div id="itemsPopover" class="field-popover">
+                <label>Выбранные позиции</label>
+                <div id="orderEditItemsBox" class="order-cat-carousel-wrap">
+                  <div style="font-size:6px;color:rgba(255,200,200,0.35)">Загружаю услуги...</div>
+                </div>
+                <div class="order-edit-total"><span>Итого по позициям</span><b id="orderEditItemsTotal">0 ₽</b></div>
+                <div class="order-edit-hint">Цену в поповере «₽» выше можно оставить синхронизированной с позициями или задать вручную.</div>
+                <div style="display:flex;gap:8px;margin-top:6px">
+                  <button class="btn btn-sm" onclick="saveOrderEdit()" style="flex:1;border-color:rgba(0,200,0,0.35);color:#55ff55">💾 Сохранить</button>
+                  <button class="btn btn-sm" onclick="toggleFieldPopover('items', false)" style="width:auto">Отмена</button>
+                </div>
+                <div class="status qe-status"></div>
+              </div>
             </div>
             <div style="display:flex;gap:10px;align-items:center">
               <span onclick="toggleCustomFieldsPanel()" title="Дополнительные поля" style="cursor:pointer;font-size:14px;opacity:0.45;transition:opacity .2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.45">»</span>
@@ -1058,97 +1123,6 @@
                   <option value="completed">Выполнен</option>
                   <option value="cancelled">Закрыт</option>
                 </select>
-              </div>
-              <div class="quick-edit-chips">
-                <div class="qe-trigger-wrap">
-                  <button class="qe-chip" onclick="toggleFieldPopover('category')">📁 <span id="qeCategoryLabel">—</span><span class="qe-edit-icon">✎</span></button>
-                  <div id="categoryPopover" class="field-popover">
-                    <label>Категория</label>
-                    <select id="orderEditCategory">
-                      <option value="design">Дизайн</option>
-                      <option value="discord_bot">Discord бот</option>
-                      <option value="telegram_bot">Telegram бот</option>
-                      <option value="website">Сайт</option>
-                      <option value="other">Другое</option>
-                    </select>
-                    <div style="display:flex;gap:8px;margin-top:10px">
-                      <button class="btn btn-sm" onclick="saveOrderEdit()" style="flex:1;border-color:rgba(0,200,0,0.35);color:#55ff55">💾 Сохранить</button>
-                      <button class="btn btn-sm" onclick="toggleFieldPopover('category', false)" style="width:auto">Отмена</button>
-                    </div>
-                    <div class="status qe-status"></div>
-                  </div>
-                </div>
-
-                <div class="qe-trigger-wrap">
-                  <button class="qe-chip" onclick="toggleFieldPopover('type')">🏷 <span id="qeTypeLabel">Тип не указан</span><span class="qe-edit-icon">✎</span></button>
-                  <div id="typePopover" class="field-popover">
-                    <label>Тип заказа</label>
-                    <input type="text" id="orderEditType" list="orderTypeSuggestions" placeholder="Тип / оформление">
-                    <datalist id="orderTypeSuggestions"></datalist>
-                    <div style="display:flex;gap:8px;margin-top:10px">
-                      <button class="btn btn-sm" onclick="saveOrderEdit()" style="flex:1;border-color:rgba(0,200,0,0.35);color:#55ff55">💾 Сохранить</button>
-                      <button class="btn btn-sm" onclick="toggleFieldPopover('type', false)" style="width:auto">Отмена</button>
-                    </div>
-                    <div class="status qe-status"></div>
-                  </div>
-                </div>
-
-                <div class="qe-trigger-wrap">
-                  <button class="qe-chip" onclick="toggleFieldPopover('payment')">💳 <span id="qePaymentLabel">—</span><span class="qe-edit-icon">✎</span></button>
-                  <div id="paymentPopover" class="field-popover">
-                    <label>Способ оплаты</label>
-                    <select id="orderEditPayment" onchange="admOnPaymentChange()">
-                      <option value="sbp">СБП</option>
-                      <option value="card">Карта</option>
-                      <option value="steam_gift">Подарок Steam</option>
-                      <option value="steam_topup">Пополнение Steam</option>
-                    </select>
-                    <div id="orderEditBankWrap">
-                      <label>Банк</label>
-                      <select id="orderEditBank">
-                        <option value="">— не указан —</option>
-                        <option value="Т-Банк">Т-Банк</option>
-                        <option value="Альфа-Банк">Альфа-Банк</option>
-                        <option value="Озон Банк">Озон Банк</option>
-                      </select>
-                    </div>
-                    <div style="display:flex;gap:8px;margin-top:10px">
-                      <button class="btn btn-sm" onclick="saveOrderEdit()" style="flex:1;border-color:rgba(0,200,0,0.35);color:#55ff55">💾 Сохранить</button>
-                      <button class="btn btn-sm" onclick="toggleFieldPopover('payment', false)" style="width:auto">Отмена</button>
-                    </div>
-                    <div class="status qe-status"></div>
-                  </div>
-                </div>
-
-                <div class="qe-trigger-wrap">
-                  <button class="qe-chip" onclick="toggleFieldPopover('task')">📝 <span id="qeTaskLabel">Что нужно</span><span class="qe-edit-icon">✎</span></button>
-                  <div id="taskPopover" class="field-popover">
-                    <label>Что нужно</label>
-                    <textarea id="orderEditDescription" placeholder="Описание задачи..." style="min-height:80px"></textarea>
-                    <div style="display:flex;gap:8px;margin-top:10px">
-                      <button class="btn btn-sm" onclick="saveOrderEdit()" style="flex:1;border-color:rgba(0,200,0,0.35);color:#55ff55">💾 Сохранить</button>
-                      <button class="btn btn-sm" onclick="toggleFieldPopover('task', false)" style="width:auto">Отмена</button>
-                    </div>
-                    <div class="status qe-status"></div>
-                  </div>
-                </div>
-
-                <div class="qe-trigger-wrap">
-                  <button class="qe-chip" onclick="toggleFieldPopover('items')">🛒 <span id="qeItemsLabel">Позиции</span><span class="qe-edit-icon">✎</span></button>
-                  <div id="itemsPopover" class="field-popover">
-                    <label>Выбранные позиции</label>
-                    <div id="orderEditItemsBox" class="order-cat-carousel-wrap">
-                      <div style="font-size:6px;color:rgba(255,200,200,0.35)">Загружаю услуги...</div>
-                    </div>
-                    <div class="order-edit-total"><span>Итого по позициям</span><b id="orderEditItemsTotal">0 ₽</b></div>
-                    <div class="order-edit-hint">Цену в поповере «₽» выше можно оставить синхронизированной с позициями или задать вручную.</div>
-                    <div style="display:flex;gap:8px;margin-top:6px">
-                      <button class="btn btn-sm" onclick="saveOrderEdit()" style="flex:1;border-color:rgba(0,200,0,0.35);color:#55ff55">💾 Сохранить</button>
-                      <button class="btn btn-sm" onclick="toggleFieldPopover('items', false)" style="width:auto">Отмена</button>
-                    </div>
-                    <div class="status qe-status"></div>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -3464,8 +3438,14 @@ async function openOrderChat(orderId) {
     var statusLabels = { 'new': 'Новый', 'in_progress': 'В работе', 'completed': 'Выполнен', 'cancelled': 'Отменён' };
     var categoryLabels = { 'design': 'Дизайн', 'discord_bot': 'Discord бот', 'telegram_bot': 'Telegram бот', 'website': 'Сайт', 'other': 'Другое' };
     var priceText = (o.estimated_price !== undefined && o.estimated_price !== null) ? o.estimated_price : '?';
-    var meta = escHtml(categoryLabels[o.category] || o.category || '—') + ' · ' + escHtml(statusLabels[o.status] || o.status) +
-      ' · <span class="meta-price-trigger" onclick="event.stopPropagation();togglePricePopover()" title="Изменить цену / выдать скидку">' + escHtml(String(priceText)) + '₽ ✎</span>' +
+    var meta =
+      '<span class="meta-trigger" onclick="event.stopPropagation();toggleFieldPopover(\'category\')" title="Изменить категорию">📁 <span id="qeCategoryLabel">' + escHtml(categoryLabels[o.category] || o.category || '—') + '</span></span>' +
+      ' · <span class="meta-trigger" onclick="event.stopPropagation();toggleFieldPopover(\'type\')" title="Изменить тип заказа">🏷 <span id="qeTypeLabel">Тип не указан</span></span>' +
+      ' · ' + escHtml(statusLabels[o.status] || o.status) +
+      ' · <span class="meta-trigger" onclick="event.stopPropagation();togglePricePopover()" title="Изменить цену / выдать скидку">' + escHtml(String(priceText)) + '₽ ✎</span>' +
+      ' · <span class="meta-trigger" onclick="event.stopPropagation();toggleFieldPopover(\'payment\')" title="Изменить способ оплаты и банк">💳 <span id="qePaymentLabel">—</span></span>' +
+      ' · <span class="meta-trigger" onclick="event.stopPropagation();toggleFieldPopover(\'task\')" title="Изменить описание задачи">📝 <span id="qeTaskLabel">Что нужно</span></span>' +
+      ' · <span class="meta-trigger" onclick="event.stopPropagation();toggleFieldPopover(\'items\')" title="Изменить позиции">🛒 <span id="qeItemsLabel">Позиции</span></span>' +
       ' · ' + escHtml(o.created_at || '—');
     document.getElementById('chatOrderMeta').innerHTML = meta;
     populateOrderEditor(o);
@@ -3551,7 +3531,7 @@ document.addEventListener('click', function(e) {
     const pop = document.getElementById(id);
     if (!pop || !pop.classList.contains('open')) return;
     if (pop.contains(e.target)) return;
-    if (e.target.closest && e.target.closest('.meta-price-trigger, .qe-chip')) return;
+    if (e.target.closest && e.target.closest('.meta-trigger')) return;
     pop.classList.remove('open');
   });
 });
