@@ -2128,8 +2128,8 @@
 </div>
 <style>@keyframes lgSpin { to { transform: rotate(360deg); } }</style>
 
-<div id="dataPolicyOverlay" style="display:none; position:fixed; inset:0; z-index:99998; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:20px; perspective:1200px;">
-  <div id="dataPolicyBox" style="background:#0d0202; border:1px solid rgba(255,40,40,0.25); border-radius:14px; max-width:680px; width:100%; max-height:80vh; overflow-y:auto; padding:28px; color:#eee; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; font-size:14px; line-height:1.65; box-shadow:0 0 60px rgba(255,0,0,0.15); transform-style:preserve-3d; will-change:transform; transition:border-color .25s, box-shadow .25s, transform .15s cubic-bezier(.22,.61,.36,1); cursor:default;">
+<div id="dataPolicyOverlay" style="display:none; position:fixed; inset:0; z-index:99998; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:20px;">
+  <div id="dataPolicyBox" style="background:#0d0202; border:1px solid rgba(255,40,40,0.25); border-radius:14px; max-width:680px; width:100%; max-height:80vh; overflow-y:auto; padding:28px; color:#eee; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; font-size:14px; line-height:1.65;">
     <div style="font-family:'Press Start 2P',monospace; font-size:13px; font-weight:400; margin-bottom:18px; color:#fff; line-height:1.6;">📄 Обработка персональных данных</div>
     <p style="margin-bottom:10px">При посещении настоящего сайта — независимо от того, авторизуетесь ли вы через Discord — администрация сайта автоматически собирает, обрабатывает и хранит следующие данные:</p>
     <ul style="margin:0 0 10px 18px; padding:0;">
@@ -2142,7 +2142,25 @@
     <p style="margin-bottom:10px">Указанные данные обрабатываются исключительно в целях обеспечения корректной работы функционала сайта, предотвращения злоупотреблений (включая создание множественных учётных записей и обход ограничений доступа), а также для целей модерации, аналитики посещаемости и обеспечения безопасности сайта.</p>
     <p style="margin-bottom:10px">Персональные данные хранятся в течение периода, необходимого для достижения указанных целей, и не передаются третьим лицам, за исключением случаев, предусмотренных действующим законодательством.</p>
     <p style="margin-bottom:0">Если пользователь не согласен с условиями настоящего уведомления, ему следует покинуть сайт и воздержаться от дальнейшего его использования, а также от прохождения авторизации через Discord на данном сайте.</p>
-    <button class="btn" onclick="closeDataPolicy()" style="margin-top:18px;width:100%;cursor:pointer">Понятно</button>
+    <button onclick="closeDataPolicy()" style="margin-top:18px;width:100%;cursor:pointer;padding:10px;border:none;border-radius:8px;background:linear-gradient(180deg,#ff3b3b,#c81e1e);color:#fff;font-weight:700;">Понятно</button>
+  </div>
+</div>
+
+<div id="termsOverlay" style="display:none; position:fixed; inset:0; z-index:99998; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:20px;">
+  <div style="background:#0d0202; border:1px solid rgba(255,40,40,0.25); border-radius:14px; max-width:680px; width:100%; max-height:80vh; overflow-y:auto; padding:28px; color:#eee; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; font-size:14px; line-height:1.65;">
+    <div style="font-family:'Press Start 2P',monospace; font-size:13px; font-weight:400; margin-bottom:18px; color:#fff; line-height:1.6;">📜 Условия использования</div>
+    <p style="margin-bottom:10px">Оформляя заказ на этом сайте, вы соглашаетесь со следующими условиями:</p>
+    <ul style="margin:0 0 10px 18px; padding:0;">
+      <li>все работы выполняются вручную, сроки указываются ориентировочно и могут меняться в зависимости от загруженности;</li>
+      <li>стоимость заказа фиксируется на момент оформления и оплачивается способом, указанным в разделе «Цены»;</li>
+      <li>после начала работы над заказом оплата не возвращается — исключение делается только при вине исполнителя;</li>
+      <li>количество правок и условия их внесения оговариваются индивидуально в чате заказа;</li>
+      <li>готовые материалы передаются только заказчику и не подлежат дальнейшей перепродаже без согласования;</li>
+      <li>администрация вправе отказать в выполнении заказа без объяснения причин, вернув оплату при её наличии.</li>
+    </ul>
+    <p style="margin-bottom:10px">Полный список правил оформления заказа доступен на странице «Правила».</p>
+    <p style="margin-bottom:0">Использование сайта означает согласие с настоящими условиями. Если вы не согласны — пожалуйста, воздержитесь от оформления заказа.</p>
+    <button onclick="closeTermsOfUse()" style="margin-top:18px;width:100%;cursor:pointer;padding:10px;border:none;border-radius:8px;background:linear-gradient(180deg,#ff3b3b,#c81e1e);color:#fff;font-weight:700;">Понятно</button>
   </div>
 </div>
 <a class="home-arrow" href="https://mezets.github.io/" title="На главную">
@@ -2375,7 +2393,6 @@
 <div class="bottom-nav">
   <a class="btn bottom-nav-btn" href="/mezets.design/prices">Цены на оформление</a>
   <a class="btn bottom-nav-btn" href="/mezets.design/rules">Правила оформления</a>
-  <a class="btn bottom-nav-btn" href="#" onclick="openDataPolicy(); return false;">Политика конфиденциальности</a>
 </div>
 
 <section class="portfolio-section">
@@ -2446,6 +2463,12 @@
   </ul>
 </section>
 
+<div style="text-align:center; padding:20px 16px 30px; font-family:'Press Start 2P',monospace; font-size:7px; color:rgba(255,150,150,0.4); position:relative; z-index:2;">
+  <a onclick="openDataPolicy()" style="text-decoration:underline;cursor:pointer;color:inherit;">Политика конфиденциальности</a>
+  &nbsp;·&nbsp;
+  <a onclick="openTermsOfUse()" style="text-decoration:underline;cursor:pointer;color:inherit;">Условия использования</a>
+</div>
+
 <div class="koleso-btn" onclick="openRoulette()" title="Рулетка скидок">
   <img src="koleso.png" alt="Рулетка">
   <span class="koleso-hint" id="kolesoHint">
@@ -2492,8 +2515,10 @@
 	    </div>
 
     <script>
-      function openDataPolicy() { rearmEntranceAnimation(document.getElementById('dataPolicyBox')); document.getElementById('dataPolicyOverlay').style.display = 'flex'; }
+      function openDataPolicy() { document.getElementById('dataPolicyOverlay').style.display = 'flex'; }
       function closeDataPolicy() { document.getElementById('dataPolicyOverlay').style.display = 'none'; }
+      function openTermsOfUse() { document.getElementById('termsOverlay').style.display = 'flex'; }
+      function closeTermsOfUse() { document.getElementById('termsOverlay').style.display = 'none'; }
     </script>
 
     <div id="spinBlock" style="display:none">
@@ -3333,7 +3358,6 @@
 
   tiltOverlay(document.getElementById('orderModalOverlay'), document.getElementById('orderModalBox'));
   tiltOverlay(document.getElementById('rouletteOverlay'), document.getElementById('rouletteBox'));
-  tiltOverlay(document.getElementById('dataPolicyOverlay'), document.getElementById('dataPolicyBox'));
 
   /* ── МОДАЛКА ЗАКАЗА ── */
   async function openOrderModal() {
