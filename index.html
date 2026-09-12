@@ -2128,41 +2128,6 @@
 </div>
 <style>@keyframes lgSpin { to { transform: rotate(360deg); } }</style>
 
-<div id="dataPolicyOverlay" style="display:none; position:fixed; inset:0; z-index:99998; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:20px;">
-  <div id="dataPolicyBox" style="background:#0d0202; border:1px solid rgba(255,40,40,0.25); border-radius:14px; max-width:680px; width:100%; max-height:80vh; overflow-y:auto; padding:28px; color:#eee; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; font-size:14px; line-height:1.65;">
-    <div style="font-family:'Press Start 2P',monospace; font-size:13px; font-weight:400; margin-bottom:18px; color:#fff; line-height:1.6;">📄 Обработка персональных данных</div>
-    <p style="margin-bottom:10px">При посещении настоящего сайта — независимо от того, авторизуетесь ли вы через Discord — администрация сайта автоматически собирает, обрабатывает и хранит следующие данные:</p>
-    <ul style="margin:0 0 10px 18px; padding:0;">
-      <li>IP-адрес устройства, с которого осуществляется доступ к сайту, и определяемое по нему примерное географическое положение (страна, регион, город);</li>
-      <li>уникальный цифровой отпечаток браузера (browser fingerprint), формируемый на основе технических параметров устройства и программного обеспечения;</li>
-      <li>сведения о браузере и операционной системе устройства (тип, версия);</li>
-      <li>файлы cookie и данные локального хранилища браузера (localStorage), используемые для поддержания сессии авторизации.</li>
-    </ul>
-    <p style="margin-bottom:10px">Дополнительно, при прохождении авторизации через сервис Discord, обрабатываются идентификатор учётной записи Discord (Discord ID), имя пользователя и изображение профиля (аватар).</p>
-    <p style="margin-bottom:10px">Указанные данные обрабатываются исключительно в целях обеспечения корректной работы функционала сайта, предотвращения злоупотреблений (включая создание множественных учётных записей и обход ограничений доступа), а также для целей модерации, аналитики посещаемости и обеспечения безопасности сайта.</p>
-    <p style="margin-bottom:10px">Персональные данные хранятся в течение периода, необходимого для достижения указанных целей, и не передаются третьим лицам, за исключением случаев, предусмотренных действующим законодательством.</p>
-    <p style="margin-bottom:0">Если пользователь не согласен с условиями настоящего уведомления, ему следует покинуть сайт и воздержаться от дальнейшего его использования, а также от прохождения авторизации через Discord на данном сайте.</p>
-    <button onclick="closeDataPolicy()" style="margin-top:18px;width:100%;cursor:pointer;padding:10px;border:none;border-radius:8px;background:linear-gradient(180deg,#ff3b3b,#c81e1e);color:#fff;font-weight:700;">Понятно</button>
-  </div>
-</div>
-
-<div id="termsOverlay" style="display:none; position:fixed; inset:0; z-index:99998; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:20px;">
-  <div style="background:#0d0202; border:1px solid rgba(255,40,40,0.25); border-radius:14px; max-width:680px; width:100%; max-height:80vh; overflow-y:auto; padding:28px; color:#eee; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; font-size:14px; line-height:1.65;">
-    <div style="font-family:'Press Start 2P',monospace; font-size:13px; font-weight:400; margin-bottom:18px; color:#fff; line-height:1.6;">📜 Условия использования</div>
-    <p style="margin-bottom:10px">Оформляя заказ на этом сайте, вы соглашаетесь со следующими условиями:</p>
-    <ul style="margin:0 0 10px 18px; padding:0;">
-      <li>все работы выполняются вручную, сроки указываются ориентировочно и могут меняться в зависимости от загруженности;</li>
-      <li>стоимость заказа фиксируется на момент оформления и оплачивается способом, указанным в разделе «Цены»;</li>
-      <li>после начала работы над заказом оплата не возвращается — исключение делается только при вине исполнителя;</li>
-      <li>количество правок и условия их внесения оговариваются индивидуально в чате заказа;</li>
-      <li>готовые материалы передаются только заказчику и не подлежат дальнейшей перепродаже без согласования;</li>
-      <li>администрация вправе отказать в выполнении заказа без объяснения причин, вернув оплату при её наличии.</li>
-    </ul>
-    <p style="margin-bottom:10px">Полный список правил оформления заказа доступен на странице «Правила».</p>
-    <p style="margin-bottom:0">Использование сайта означает согласие с настоящими условиями. Если вы не согласны — пожалуйста, воздержитесь от оформления заказа.</p>
-    <button onclick="closeTermsOfUse()" style="margin-top:18px;width:100%;cursor:pointer;padding:10px;border:none;border-radius:8px;background:linear-gradient(180deg,#ff3b3b,#c81e1e);color:#fff;font-weight:700;">Понятно</button>
-  </div>
-</div>
 <a class="home-arrow" href="https://mezets.github.io/" title="На главную">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
     <line x1="19" y1="12" x2="5" y2="12"></line>
@@ -2463,12 +2428,6 @@
   </ul>
 </section>
 
-<div style="text-align:center; padding:20px 16px 30px; font-family:'Press Start 2P',monospace; font-size:7px; color:rgba(255,150,150,0.4); position:relative; z-index:2;">
-  <a onclick="openDataPolicy()" style="text-decoration:underline;cursor:pointer;color:inherit;">Политика конфиденциальности</a>
-  &nbsp;·&nbsp;
-  <a onclick="openTermsOfUse()" style="text-decoration:underline;cursor:pointer;color:inherit;">Условия использования</a>
-</div>
-
 <div class="koleso-btn" onclick="openRoulette()" title="Рулетка скидок">
   <img src="koleso.png" alt="Рулетка">
   <span class="koleso-hint" id="kolesoHint">
@@ -2513,13 +2472,6 @@
       </a>
       <div class="login-hint">Нужно войти, чтобы крутить рулетку!</div>
 	    </div>
-
-    <script>
-      function openDataPolicy() { document.getElementById('dataPolicyOverlay').style.display = 'flex'; }
-      function closeDataPolicy() { document.getElementById('dataPolicyOverlay').style.display = 'none'; }
-      function openTermsOfUse() { document.getElementById('termsOverlay').style.display = 'flex'; }
-      function closeTermsOfUse() { document.getElementById('termsOverlay').style.display = 'none'; }
-    </script>
 
     <div id="spinBlock" style="display:none">
       <div class="logged-as" id="loggedAs"></div>
