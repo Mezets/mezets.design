@@ -114,6 +114,28 @@ html, body {
   border-top: 1px solid rgba(255,0,0,0.1);
 }
 .order-desc-row:first-of-type { border-top: none; }
+.order-desc-row-clickable { cursor: pointer; transition: background .15s; margin: 0 -6px; padding: 8px 6px; border-radius: 6px; }
+.order-desc-row-clickable:hover { background: rgba(255,0,0,0.05); }
+.edit-hint { opacity: 0.5; }
+.field-popover {
+  display: none;
+  position: absolute; top: calc(100% + 6px); left: 0; z-index: 40;
+  width: 280px; max-width: 90vw;
+  padding: 14px;
+  border: 1px solid rgba(255,0,0,0.3);
+  border-radius: 12px;
+  background: rgba(15,0,0,0.98);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+  animation: fieldPopoverIn .2s cubic-bezier(.22,.61,.36,1);
+}
+.field-popover.open { display: block; }
+.field-popover-wide { width: 340px; }
+.field-popover label {
+  font-size: 6px; color: rgba(255,200,200,0.5);
+  letter-spacing: 1px; text-transform: uppercase;
+  display: block; margin-bottom: 4px;
+}
+@keyframes fieldPopoverIn { from { opacity: 0; transform: translateY(8px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
 .order-desc-row-label { color: rgba(255,80,80,0.8); flex-shrink: 0; white-space: nowrap; }
 .order-desc-row-value { color: rgba(255,200,200,0.7); white-space: pre-wrap; }
 .order-desc-items { display: flex; flex-direction: column; gap: 4px; }
@@ -349,12 +371,45 @@ html, body {
             <div class="order-price" id="orderPrice"></div>
             <div class="order-status-badge" id="orderStatusBadge"></div>
             <div style="margin-top:8px;display:flex;flex-direction:column;gap:6px">
-              <button class="btn btn-sm" id="editOrderBtn" onclick="toggleOrderEdit()" style="display:none;width:100%">✎ Редактировать</button>
               <button class="btn btn-sm btn-danger" id="closeOrderBtn" onclick="closeOrder()" style="display:none;width:100%">Закрыть заказ</button>
             </div>
           </div>
         </div>
-        <div class="order-desc-box" id="orderDescBox"></div>
+        <div id="orderDescWrap" style="position:relative">
+          <div class="order-desc-box" id="orderDescBox"></div>
+
+          <div id="taskPopover" class="field-popover">
+            <label>Что нужно</label>
+            <textarea id="orderEditTaskInput" class="order-textarea" style="height:70px" placeholder="Опиши задачу..."></textarea>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button class="btn btn-sm" onclick="saveOrderEditClient()" style="flex:1;border-color:rgba(0,200,0,0.35);color:#55ff55">💾 Сохранить</button>
+              <button class="btn btn-sm" onclick="toggleFieldPopover(null,'task',false)" style="width:auto">Отмена</button>
+            </div>
+          </div>
+
+          <div id="paymentPopover" class="field-popover">
+            <label>Способ оплаты</label>
+            <select id="orderEditPaymentInput" class="order-select"></select>
+            <label style="margin-top:8px">Банк</label>
+            <select id="orderEditBankInput" class="order-select"></select>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button class="btn btn-sm" onclick="saveOrderEditClient()" style="flex:1;border-color:rgba(0,200,0,0.35);color:#55ff55">💾 Сохранить</button>
+              <button class="btn btn-sm" onclick="toggleFieldPopover(null,'payment',false)" style="width:auto">Отмена</button>
+            </div>
+          </div>
+
+          <div id="itemsPopover" class="field-popover field-popover-wide">
+            <label>Выбрано</label>
+            <div id="orderEditItemsBox">
+              <div style="font-size:6px;color:rgba(255,200,200,0.4)">Загружаю услуги...</div>
+            </div>
+            <div class="order-edit-total"><span>Итого</span><b id="orderEditTotalPrice">0 ₽</b></div>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button class="btn btn-sm" onclick="saveOrderEditClient()" style="flex:1;border-color:rgba(0,200,0,0.35);color:#55ff55">💾 Сохранить</button>
+              <button class="btn btn-sm" onclick="toggleFieldPopover(null,'items',false)" style="width:auto">Отмена</button>
+            </div>
+          </div>
+        </div>
         <div class="status" id="orderEditStatus" style="margin-top:8px"></div>
       </div>
     </div>
@@ -503,20 +558,25 @@ function playDescSwap() {
 
 function renderDescView(order) {
   const parsed = parseDescription(order.description);
+  const canEdit = order.status !== 'completed' && order.status !== 'cancelled';
+  const rowAttrs = key => canEdit ? ` class="order-desc-row order-desc-row-clickable" onclick="toggleFieldPopover(this,'${key}')"` : ' class="order-desc-row"';
+  const editHint = canEdit ? ' <span class="edit-hint">✎</span>' : '';
   let html = '';
   if (parsed.freeLines.length) {
-    html += `<div class="order-desc-row"><span class="order-desc-row-label">Что нужно:</span><span class="order-desc-row-value">${escapeHtml(parsed.task)}</span></div>`;
+    html += `<div${rowAttrs('task')}><span class="order-desc-row-label">Что нужно:${editHint}</span><span class="order-desc-row-value">${escapeHtml(parsed.task)}</span></div>`;
   }
   if (order.payment_method) {
     const payLabel = PAYMENT_LABELS[order.payment_method] || order.payment_method;
-    html += `<div class="order-desc-row"><span class="order-desc-row-label">Способ оплаты:</span><span class="order-desc-row-value">${escapeHtml(payLabel)}</span></div>`;
+    html += `<div${rowAttrs('payment')}><span class="order-desc-row-label">Способ оплаты:${editHint}</span><span class="order-desc-row-value">${escapeHtml(payLabel)}</span></div>`;
   }
   parsed.fieldLines.forEach(([, label, value]) => {
     const cleanLabel = label.trim().toLowerCase();
     if (cleanLabel === 'выбрано') {
       const items = value.split(',').map(v => v.trim()).filter(Boolean);
       const itemsHtml = items.map(item => `<div class="order-desc-item">${escapeHtml(item)}</div>`).join('');
-      html += `<div class="order-desc-row"><span class="order-desc-row-label">${escapeHtml(label)}:</span><div class="order-desc-row-value order-desc-items">${itemsHtml}</div></div>`;
+      html += `<div${rowAttrs('items')}><span class="order-desc-row-label">${escapeHtml(label)}:${editHint}</span><div class="order-desc-row-value order-desc-items">${itemsHtml}</div></div>`;
+    } else if (cleanLabel === 'банк') {
+      html += `<div${rowAttrs('payment')}><span class="order-desc-row-label">${escapeHtml(label)}:${editHint}</span><span class="order-desc-row-value">${escapeHtml(value)}</span></div>`;
     } else {
       html += `<div class="order-desc-row"><span class="order-desc-row-label">${escapeHtml(label)}:</span><span class="order-desc-row-value">${escapeHtml(value)}</span></div>`;
     }
@@ -539,20 +599,16 @@ function renderOrder(order, messages, attachments) {
   badge.className = 'order-status-badge status-' + order.status;
   CURRENT_ORDER = order;
   renderDescView(order);
+  populateEditPopovers(order);
 
   const closeBtn = g('closeOrderBtn');
   if (closeBtn) {
     closeBtn.style.display = (order.status === 'completed' || order.status === 'cancelled') ? 'none' : 'inline-flex';
   }
-  const editBtn = g('editOrderBtn');
-  if (editBtn) {
-    editBtn.style.display = (order.status === 'completed' || order.status === 'cancelled') ? 'none' : 'inline-flex';
-  }
 
   renderMessages(messages, attachments);
 }
 
-let EDITING_ORDER = false;
 let editCatIndex = 0;
 let editCatCount = 0;
 let editPriceSections = null;
@@ -692,56 +748,85 @@ function updateEditTotal() {
   }
 }
 
-function renderDescEdit(order) {
+const ALL_POPOVER_IDS = ['taskPopover', 'paymentPopover', 'itemsPopover'];
+
+function closeAllPopovers(except) {
+  ALL_POPOVER_IDS.forEach(id => {
+    if (id === except) return;
+    const el = g(id);
+    if (el) el.classList.remove('open');
+  });
+}
+
+function positionPopover(popId, triggerEl) {
+  const pop = g(popId);
+  const anchor = g('orderDescWrap');
+  if (!pop || !anchor || !triggerEl) return;
+  const aRect = anchor.getBoundingClientRect();
+  const tRect = triggerEl.getBoundingClientRect();
+  let left = tRect.left - aRect.left;
+  const top = tRect.bottom - aRect.top + 6;
+  const maxLeft = Math.max(0, anchor.offsetWidth - pop.offsetWidth);
+  if (left > maxLeft) left = Math.max(0, maxLeft);
+  if (left < 0) left = 0;
+  pop.style.top = top + 'px';
+  pop.style.left = left + 'px';
+}
+
+function toggleFieldPopover(triggerEl, key, force) {
+  const id = key + 'Popover';
+  const pop = g(id);
+  if (!pop) return;
+  const show = force === undefined ? !pop.classList.contains('open') : !!force;
+  if (show) {
+    closeAllPopovers(id);
+    if (CURRENT_ORDER) populateEditPopovers(CURRENT_ORDER);
+  } else if (key === 'items' && CURRENT_ORDER) {
+    const topPrice = g('orderPrice');
+    if (topPrice) topPrice.textContent = CURRENT_ORDER.estimated_price ? `${CURRENT_ORDER.estimated_price} ₽` : '';
+  }
+  pop.classList.toggle('open', show);
+  if (show && triggerEl) positionPopover(id, triggerEl);
+}
+
+document.addEventListener('click', function(e) {
+  ALL_POPOVER_IDS.forEach(id => {
+    const pop = g(id);
+    if (!pop || !pop.classList.contains('open')) return;
+    if (pop.contains(e.target)) return;
+    if (e.target.closest && e.target.closest('.order-desc-row-clickable')) return;
+    pop.classList.remove('open');
+  });
+});
+window.addEventListener('resize', function() {
+  ALL_POPOVER_IDS.forEach(id => {
+    const pop = g(id);
+    if (pop) pop.classList.remove('open');
+  });
+});
+
+function populateEditPopovers(order) {
   const parsed = parseDescription(order.description);
   const payValue = order.payment_method || 'sbp';
   const payOptions = [
     ['sbp', 'СБП'], ['card', 'Карта'], ['steam_gift', 'Подарок Steam'], ['steam_topup', 'Пополнение Steam'],
   ];
-  const payHtml = payOptions.map(([val, label]) =>
+  g('orderEditPaymentInput').innerHTML = payOptions.map(([val, label]) =>
     `<option value="${val}"${val === payValue ? ' selected' : ''}>${label}</option>`
   ).join('');
   const bankList = BANK_OPTIONS.includes(parsed.bank) || !parsed.bank ? BANK_OPTIONS : [parsed.bank, ...BANK_OPTIONS];
-  const bankHtml = bankList.map(b => `<option value="${escapeHtml(b)}"${b === parsed.bank ? ' selected' : ''}>${escapeHtml(b)}</option>`).join('');
-  g('orderDescBox').innerHTML = `
-    <div class="order-label" style="margin-bottom:3px;line-height:1.2">Что нужно</div>
-    <textarea id="orderEditTaskInput" class="order-textarea" style="height:48px;margin-bottom:5px;padding:8px 10px;line-height:1.3" placeholder="Опиши задачу...">${escapeHtml(parsed.task)}</textarea>
-    <div class="order-label" style="margin-bottom:3px;line-height:1.2">Способ оплаты</div>
-    <select id="orderEditPaymentInput" class="order-select" style="margin-bottom:5px;padding:8px 10px;line-height:1.3">${payHtml}</select>
-    <div class="order-label" style="margin-bottom:3px;line-height:1.2">Банк</div>
-    <select id="orderEditBankInput" class="order-select" style="margin-bottom:5px;padding:8px 10px;line-height:1.3">${bankHtml}</select>
-    <div class="order-label" style="margin-bottom:3px;line-height:1.2">Выбрано</div>
-    <div id="orderEditItemsBox" style="margin-bottom:5px">
-      <div style="font-size:6px;color:rgba(255,200,200,0.4)">Загружаю услуги...</div>
-    </div>
-    <div class="order-edit-total"><span>Итого</span><b id="orderEditTotalPrice">${order.estimated_price ? order.estimated_price : 0} ₽</b></div>
-    <div style="display:flex;gap:8px">
-      <button class="btn btn-sm" onclick="saveOrderEditClient()" style="flex:1;border-color:rgba(0,200,0,0.35);color:#55ff55">💾 Сохранить</button>
-      <button class="btn btn-sm" onclick="toggleOrderEdit(false)" style="flex:1">Отмена</button>
-    </div>
-  `;
-  playDescSwap();
+  g('orderEditBankInput').innerHTML = bankList.map(b =>
+    `<option value="${escapeHtml(b)}"${b === parsed.bank ? ' selected' : ''}>${escapeHtml(b)}</option>`
+  ).join('');
+  g('orderEditTaskInput').value = parsed.task;
+
+  const box = g('orderEditItemsBox');
   loadEditPriceSections().then(sections => {
-    const box = g('orderEditItemsBox');
     if (!box) return;
     const selectedMap = parseSelectedItems(parsed.selected);
     box.innerHTML = renderEditItemsCarouselHTML(sections, selectedMap);
     updateEditTotal();
   });
-}
-
-function toggleOrderEdit(force) {
-  if (!CURRENT_ORDER) return;
-  const show = force === undefined ? !EDITING_ORDER : !!force;
-  EDITING_ORDER = show;
-  if (show) {
-    renderDescEdit(CURRENT_ORDER);
-  } else {
-    renderDescView(CURRENT_ORDER);
-    const topPrice = g('orderPrice');
-    if (topPrice) topPrice.textContent = CURRENT_ORDER.estimated_price ? `${CURRENT_ORDER.estimated_price} ₽` : '';
-    g('orderEditStatus').innerHTML = '';
-  }
 }
 
 async function saveOrderEditClient() {
@@ -769,7 +854,7 @@ async function saveOrderEditClient() {
       body: JSON.stringify({ description, payment_method, estimated_price }),
     });
     if (!r.ok) { const err = await r.json().catch(()=>({})); throw new Error(err.error || 'Сервер отклонил (' + r.status + ')'); }
-    EDITING_ORDER = false;
+    closeAllPopovers();
     await loadOrder();
     showStatus(g('orderEditStatus'), 'Сохранено!', 'ok');
   } catch(e) {
