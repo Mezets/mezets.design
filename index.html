@@ -2104,6 +2104,32 @@
       .card, .order-card, .winners-card, .reviews-card, .order-modal, .top-right-profile, .my-orders-panel { background: rgba(20,0,0,0.88); }
     }
 
+    /* --- liquid glass v2: ambient light, glass buttons, cursor sheen --- */
+    .lg-orbs { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+    .lg-orbs i { position: absolute; border-radius: 50%; filter: blur(70px); opacity: 0.55; will-change: transform; animation: lgFloat 24s ease-in-out infinite alternate; }
+    .lg-orbs i:nth-child(1) { width: 46vmax; height: 46vmax; left: -12vmax; top: -14vmax; background: rgba(255,30,30,0.55); }
+    .lg-orbs i:nth-child(2) { width: 38vmax; height: 38vmax; right: -10vmax; bottom: -12vmax; background: rgba(200,0,60,0.5); animation-duration: 30s; animation-direction: alternate-reverse; }
+    .lg-orbs i:nth-child(3) { width: 26vmax; height: 26vmax; left: 52%; top: 18%; background: rgba(255,100,70,0.28); animation-duration: 36s; }
+    @keyframes lgFloat { to { transform: translate3d(7vw, 5vh, 0) scale(1.14); } }
+    @media (prefers-reduced-motion: reduce) { .lg-orbs i { animation: none; } }
+
+    .card, .order-card, .winners-card, .reviews-card, .order-modal {
+      background:
+        radial-gradient(280px circle at var(--mx, 15%) var(--my, 0%), rgba(255,255,255,0.15), rgba(255,255,255,0) 62%),
+        var(--lg-bg);
+    }
+    .btn, .discord-order-btn, .order-submit, .order-dc-btn {
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.2), rgba(255,255,255,0.03) 52%, rgba(255,0,0,0.14)),
+        rgba(255,0,0,0.2);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-top-color: rgba(255,255,255,0.46);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.45), inset 0 -10px 18px rgba(255,0,0,0.14), 0 6px 20px rgba(0,0,0,0.35), 0 0 22px rgba(255,0,0,0.2);
+      -webkit-backdrop-filter: blur(10px) saturate(160%);
+      backdrop-filter: blur(10px) saturate(160%);
+    }
+    .spin-tab { -webkit-backdrop-filter: blur(8px) saturate(150%); backdrop-filter: blur(8px) saturate(150%); box-shadow: inset 0 1px 0 rgba(255,255,255,0.25); }
+
     /* --- break-ui: long user strings --- */
     .review-order, .roulette-winner-meta, .logged-as, .my-orders-item-id { overflow-wrap: anywhere; min-width: 0; }
     .review-comment { overflow-wrap: anywhere; }
@@ -2143,6 +2169,7 @@
 <audio id="sound67" src="67.mp3" preload="auto"></audio>
 
 <canvas id="bg"></canvas>
+<div class="lg-orbs" aria-hidden="true"><i></i><i></i><i></i></div>
 
 <div class="top-right-profile" id="topRightProfile" style="display:none" onclick="toggleMyOrdersPanel()"></div>
 <div class="my-orders-panel" id="myOrdersPanel" style="display:none">
@@ -4232,6 +4259,17 @@
   renderPortfolio();
   if (!portfolioReducedMotion) requestAnimationFrame(portfolioTick);
 
+
+  // liquid glass: блик следует за курсором
+  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    document.addEventListener('pointermove', (e) => {
+      const c = e.target.closest && e.target.closest('.card, .order-card, .winners-card, .reviews-card, .order-modal');
+      if (!c) return;
+      const r = c.getBoundingClientRect();
+      c.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100).toFixed(1) + '%');
+      c.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100).toFixed(1) + '%');
+    }, { passive: true });
+  }
 </script>
 </body>
 </html>
