@@ -497,6 +497,21 @@
       margin-top: 4px;
       letter-spacing: .3px;
     }
+    .portfolio-card-new {
+      position: absolute;
+      top: 8px; left: 8px;
+      background: linear-gradient(135deg, #ff2a2a, #b00000);
+      color: #fff;
+      font-size: 7px;
+      letter-spacing: .5px;
+      padding: 4px 7px;
+      border-radius: 8px;
+      pointer-events: none;
+      box-shadow: 0 0 12px rgba(255,0,0,0.6);
+      animation: newPulse 1.8s ease-in-out infinite;
+    }
+    @keyframes newPulse { 0%, 100% { box-shadow: 0 0 8px rgba(255,0,0,0.45); } 50% { box-shadow: 0 0 18px rgba(255,0,0,0.9); } }
+    @media (prefers-reduced-motion: reduce) { .portfolio-card-new { animation: none; } }
     .portfolio-card-badge {
       position: absolute;
       top: 8px; right: 8px;
@@ -2128,6 +2143,9 @@
     .cur-hover .cur-dot { opacity: 0.35; }
     .cur-down .cur-ring { width: 22px; height: 22px; margin: -11px 0 0 -11px; }
     .cur-text .cur-dot, .cur-text .cur-ring { opacity: 0; }
+    .cur-off .cur-dot, .cur-off .cur-ring { opacity: 0; }
+    html.has-cursor .portfolio-fs-img-wrap, html.has-cursor .portfolio-fs-img-wrap * { cursor: zoom-in !important; }
+    html.has-cursor .portfolio-fs-img-wrap.zoomed, html.has-cursor .portfolio-fs-img-wrap.zoomed * { cursor: zoom-out !important; }
 </style>
 </head>
 <body>
@@ -4124,6 +4142,7 @@
 
         const card = document.createElement('div');
         card.className = 'portfolio-card';
+        card.dataset.img = cover.img;
         card.appendChild(buildCardMedia(cover));
 
         if (items.length > 1) {
@@ -4243,6 +4262,33 @@
   if (!portfolioReducedMotion) requestAnimationFrame(portfolioTick);
 
 
+  // бейдж «НОВОЕ»: список приходит с бэкенда (Railway), выдаётся из админки
+  let portfolioNewSet = new Set(PORTFOLIO_ITEMS.flatMap(e => (e.new ? [(e.group ? e.group[0] : e).img] : [])));
+  function applyNewBadges() {
+    document.querySelectorAll('.portfolio-card').forEach(card => {
+      const has = portfolioNewSet.has(card.dataset.img);
+      const el = card.querySelector('.portfolio-card-new');
+      if (has && !el) {
+        const b = document.createElement('div');
+        b.className = 'portfolio-card-new';
+        b.textContent = 'НОВОЕ';
+        card.appendChild(b);
+      } else if (!has && el) el.remove();
+    });
+  }
+  async function loadNewBadges() {
+    try {
+      const res = await fetch(`${API}/api/portfolio/new`, { mode: 'cors' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      const fromApi = Array.isArray(data.items) ? data.items : [];
+      portfolioNewSet = new Set(fromApi);
+    } catch (e) { /* эндпоинта нет или бэкенд недоступен — остаются флаги из PORTFOLIO_ITEMS */ }
+    applyNewBadges();
+  }
+  loadNewBadges();
+  setInterval(loadNewBadges, 300000);
+
   // custom cursor: точка + кольцо (только мышь)
   (function () {
     if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
@@ -4268,6 +4314,7 @@
       const t = e.target;
       root.classList.toggle('cur-hover', !!(t.closest && t.closest(INTERACTIVE)));
       root.classList.toggle('cur-text', !!(t.closest && t.closest('input, textarea')));
+      root.classList.toggle('cur-off', !!(t.closest && t.closest('.portfolio-fs-img-wrap')));
       if (!raf) raf = requestAnimationFrame(loop);
     }, { passive: true });
     addEventListener('pointerdown', () => root.classList.add('cur-down'));
