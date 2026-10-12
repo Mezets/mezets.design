@@ -2130,6 +2130,30 @@
     }
     .spin-tab { -webkit-backdrop-filter: blur(8px) saturate(150%); backdrop-filter: blur(8px) saturate(150%); box-shadow: inset 0 1px 0 rgba(255,255,255,0.25); }
 
+    /* --- custom cursor (только мышь) --- */
+    html.has-cursor, html.has-cursor * { cursor: none !important; }
+    html.has-cursor input, html.has-cursor textarea, html.has-cursor select { cursor: text !important; }
+    .lg-cursor-dot, .lg-cursor-ring {
+      position: fixed; left: 0; top: 0; z-index: 2147483647; pointer-events: none;
+      border-radius: 50%; opacity: 0; will-change: transform;
+      transition: opacity .2s ease, width .25s cubic-bezier(.16,1,.3,1), height .25s cubic-bezier(.16,1,.3,1), margin .25s cubic-bezier(.16,1,.3,1), background-color .2s ease, border-color .2s ease;
+    }
+    .lg-cursor-dot { width: 6px; height: 6px; margin: -3px 0 0 -3px; background: #ff2a2a; box-shadow: 0 0 10px rgba(255,42,42,0.9); }
+    .lg-cursor-ring {
+      width: 34px; height: 34px; margin: -17px 0 0 -17px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.32);
+      border-top-color: rgba(255,255,255,0.6);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 0 18px rgba(255,0,0,0.25);
+      -webkit-backdrop-filter: blur(3px) saturate(170%);
+      backdrop-filter: blur(3px) saturate(170%);
+    }
+    .lg-cursor-on .lg-cursor-dot, .lg-cursor-on .lg-cursor-ring { opacity: 1; }
+    .lg-cursor-hover .lg-cursor-ring { width: 56px; height: 56px; margin: -28px 0 0 -28px; background: rgba(255,40,40,0.14); border-color: rgba(255,120,120,0.7); }
+    .lg-cursor-hover .lg-cursor-dot { opacity: 0.4; }
+    .lg-cursor-down .lg-cursor-ring { width: 26px; height: 26px; margin: -13px 0 0 -13px; }
+    .lg-cursor-text .lg-cursor-dot, .lg-cursor-text .lg-cursor-ring { opacity: 0; }
+
     /* --- break-ui: long user strings --- */
     .review-order, .roulette-winner-meta, .logged-as, .my-orders-item-id { overflow-wrap: anywhere; min-width: 0; }
     .review-comment { overflow-wrap: anywhere; }
@@ -4270,6 +4294,39 @@
       c.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100).toFixed(1) + '%');
     }, { passive: true });
   }
+
+  // custom cursor: точка + стеклянное кольцо (только мышь)
+  (function () {
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    const root = document.documentElement;
+    const dot = document.createElement('div'); dot.className = 'lg-cursor-dot';
+    const ring = document.createElement('div'); ring.className = 'lg-cursor-ring';
+    document.body.append(ring, dot);
+    root.classList.add('has-cursor');
+    const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const INTERACTIVE = 'a, button, [onclick], [role="button"], label, summary, select, .btn, .spin-tab, .koleso-btn, .top-right-profile, .order-cat-arrow, .item-stepper-btn';
+    let x = -100, y = -100, rx = -100, ry = -100, raf = 0;
+    function loop() {
+      const k = calm ? 1 : 0.2;
+      rx += (x - rx) * k; ry += (y - ry) * k;
+      ring.style.transform = 'translate3d(' + rx.toFixed(1) + 'px,' + ry.toFixed(1) + 'px,0)';
+      raf = (Math.abs(x - rx) > 0.1 || Math.abs(y - ry) > 0.1) ? requestAnimationFrame(loop) : 0;
+    }
+    addEventListener('pointermove', (e) => {
+      if (e.pointerType && e.pointerType !== 'mouse') return;
+      x = e.clientX; y = e.clientY;
+      dot.style.transform = 'translate3d(' + x + 'px,' + y + 'px,0)';
+      root.classList.add('lg-cursor-on');
+      const t = e.target;
+      root.classList.toggle('lg-cursor-hover', !!(t.closest && t.closest(INTERACTIVE)));
+      root.classList.toggle('lg-cursor-text', !!(t.closest && t.closest('input, textarea')));
+      if (!raf) raf = requestAnimationFrame(loop);
+    }, { passive: true });
+    addEventListener('pointerdown', () => root.classList.add('lg-cursor-down'));
+    addEventListener('pointerup', () => root.classList.remove('lg-cursor-down'));
+    document.addEventListener('pointerleave', () => root.classList.remove('lg-cursor-on'));
+    document.addEventListener('mouseleave', () => root.classList.remove('lg-cursor-on'));
+  })();
 </script>
 </body>
 </html>
