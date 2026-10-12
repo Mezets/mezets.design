@@ -2113,10 +2113,22 @@
 
 
   
-    /* --- custom cursor: неоновая точка со шлейфом (только мышь) --- */
+    /* --- custom cursor: точка + кольцо (только мышь) --- */
     html.has-cursor, html.has-cursor * { cursor: none !important; }
     html.has-cursor input, html.has-cursor textarea, html.has-cursor select { cursor: text !important; }
-  </style>
+    .cur-dot, .cur-ring {
+      position: fixed; left: 0; top: 0; z-index: 2147483647; pointer-events: none;
+      border-radius: 50%; opacity: 0; will-change: transform;
+      transition: opacity .2s ease, width .25s cubic-bezier(.16,1,.3,1), height .25s cubic-bezier(.16,1,.3,1), margin .25s cubic-bezier(.16,1,.3,1), background-color .2s ease, border-color .2s ease;
+    }
+    .cur-dot { width: 6px; height: 6px; margin: -3px 0 0 -3px; background: #ff2a2a; box-shadow: 0 0 10px rgba(255,42,42,0.9); }
+    .cur-ring { width: 32px; height: 32px; margin: -16px 0 0 -16px; border: 1.5px solid rgba(255,60,60,0.75); }
+    .cur-on .cur-dot, .cur-on .cur-ring { opacity: 1; }
+    .cur-hover .cur-ring { width: 54px; height: 54px; margin: -27px 0 0 -27px; background: rgba(255,40,40,0.12); border-color: rgba(255,110,110,0.95); }
+    .cur-hover .cur-dot { opacity: 0.35; }
+    .cur-down .cur-ring { width: 22px; height: 22px; margin: -11px 0 0 -11px; }
+    .cur-text .cur-dot, .cur-text .cur-ring { opacity: 0; }
+</style>
 </head>
 <body>
 <div id="banOverlay" style="display:none; position:fixed; inset:0; z-index:999999; background:radial-gradient(ellipse at center, #2a0000 0%, #050000 75%); color:#fff; align-items:center; justify-content:center; text-align:center; flex-direction:column; padding:24px;">
@@ -4231,81 +4243,36 @@
   if (!portfolioReducedMotion) requestAnimationFrame(portfolioTick);
 
 
-  // custom cursor: неоновая точка со шлейфом (только мышь)
+  // custom cursor: точка + кольцо (только мышь)
   (function () {
     if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
     const root = document.documentElement;
     const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const cv = document.createElement('canvas');
-    cv.setAttribute('aria-hidden', 'true');
-    cv.style.cssText = 'position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:2147483647;pointer-events:none;';
-    document.body.appendChild(cv);
-    const ctx = cv.getContext('2d');
-    let W = 0, H = 0, dpr = 1;
-    function resize() {
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
-      W = innerWidth; H = innerHeight;
-      cv.width = W * dpr; cv.height = H * dpr;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    }
-    resize(); addEventListener('resize', resize);
-    root.classList.add('has-cursor');
-
+    const dot = document.createElement('div'); dot.className = 'cur-dot';
+    const ring = document.createElement('div'); ring.className = 'cur-ring';
+    document.body.append(ring, dot);
     const INTERACTIVE = 'a, button, [onclick], [role="button"], label, summary, select, .btn, .spin-tab, .koleso-btn, .top-right-profile, .order-cat-arrow, .item-stepper-btn';
-    const LIFE = 380;               // мс жизни шлейфа
-    const pts = [];
-    let x = -100, y = -100, visible = false, hover = false, down = false, text = false, raf = 0, r = 3;
-
-    function frame(now) {
-      ctx.clearRect(0, 0, W, H);
-      while (pts.length && now - pts[0].t > LIFE) pts.shift();
-      if (!calm && pts.length > 1) {
-        ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-        for (let i = 1; i < pts.length; i++) {
-          const k = 1 - (now - pts[i].t) / LIFE;       // 1 = свежий, 0 = угас
-          if (k <= 0) continue;
-          ctx.beginPath();
-          ctx.moveTo(pts[i - 1].x, pts[i - 1].y);
-          ctx.lineTo(pts[i].x, pts[i].y);
-          ctx.strokeStyle = 'rgba(255,30,30,' + (0.28 * k).toFixed(3) + ')';
-          ctx.lineWidth = 10 * k;
-          ctx.stroke();
-          ctx.strokeStyle = 'rgba(255,110,110,' + (0.85 * k).toFixed(3) + ')';
-          ctx.lineWidth = 2.5 * k;
-          ctx.stroke();
-        }
-      }
-      if (visible && !text) {
-        const target = down ? 2.5 : (hover ? 6 : 3.5);
-        r += (target - r) * 0.25;
-        const g = ctx.createRadialGradient(x, y, 0, x, y, r * 4);
-        g.addColorStop(0, 'rgba(255,60,60,0.55)');
-        g.addColorStop(1, 'rgba(255,0,0,0)');
-        ctx.fillStyle = g;
-        ctx.beginPath(); ctx.arc(x, y, r * 4, 0, 6.2832); ctx.fill();
-        ctx.fillStyle = '#ff3b3b';
-        ctx.beginPath(); ctx.arc(x, y, r, 0, 6.2832); ctx.fill();
-        ctx.fillStyle = 'rgba(255,255,255,0.9)';
-        ctx.beginPath(); ctx.arc(x, y, r * 0.38, 0, 6.2832); ctx.fill();
-      }
-      raf = (pts.length || (visible && !text && Math.abs(r - (down ? 2.5 : (hover ? 6 : 3.5))) > 0.05))
-        ? requestAnimationFrame(frame) : 0;
+    let x = -100, y = -100, rx = -100, ry = -100, raf = 0, armed = false;
+    function loop() {
+      const k = calm ? 1 : 0.18;
+      rx += (x - rx) * k; ry += (y - ry) * k;
+      ring.style.transform = 'translate3d(' + rx.toFixed(1) + 'px,' + ry.toFixed(1) + 'px,0)';
+      raf = (Math.abs(x - rx) > 0.1 || Math.abs(y - ry) > 0.1) ? requestAnimationFrame(loop) : 0;
     }
-    function kick() { if (!raf) raf = requestAnimationFrame(frame); }
-
     addEventListener('pointermove', (e) => {
       if (e.pointerType && e.pointerType !== 'mouse') return;
-      x = e.clientX; y = e.clientY; visible = true;
+      if (!armed) { armed = true; rx = x = e.clientX; ry = y = e.clientY; root.classList.add('has-cursor'); }
+      x = e.clientX; y = e.clientY;
+      dot.style.transform = 'translate3d(' + x + 'px,' + y + 'px,0)';
+      root.classList.add('cur-on');
       const t = e.target;
-      hover = !!(t.closest && t.closest(INTERACTIVE));
-      text = !!(t.closest && t.closest('input, textarea'));
-      pts.push({ x, y, t: performance.now() });
-      if (pts.length > 60) pts.shift();
-      kick();
+      root.classList.toggle('cur-hover', !!(t.closest && t.closest(INTERACTIVE)));
+      root.classList.toggle('cur-text', !!(t.closest && t.closest('input, textarea')));
+      if (!raf) raf = requestAnimationFrame(loop);
     }, { passive: true });
-    addEventListener('pointerdown', () => { down = true; kick(); });
-    addEventListener('pointerup', () => { down = false; kick(); });
-    document.addEventListener('mouseleave', () => { visible = false; kick(); });
+    addEventListener('pointerdown', () => root.classList.add('cur-down'));
+    addEventListener('pointerup', () => root.classList.remove('cur-down'));
+    document.addEventListener('mouseleave', () => root.classList.remove('cur-on'));
   })();
 </script>
 </body>
