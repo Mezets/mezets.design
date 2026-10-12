@@ -18,14 +18,6 @@
     --fg-filename: rgba(255,200,200,0.75);
     --fg-onblack: #fff;
   }
-  body.light-theme {
-    --bg-page: #ffffff;
-    --bg-panel-95: rgba(255,255,255,0.95);
-    --bg-card: rgba(255,0,0,0.04);
-    --fg-filename: rgba(120,20,20,0.75);
-    --fg-onblack: #111;
-  }
-
   html, body {
     font-family: 'Press Start 2P', monospace;
     background: var(--bg-page);
@@ -154,36 +146,6 @@
 
   #fireworks { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
 
-  .theme-switch {
-    position: fixed;
-    top: 18px; right: 18px;
-    z-index: 400;
-    display: flex;
-    align-items: center;
-    gap: 2px;
-    padding: 4px;
-    border-radius: 999px;
-    background: var(--bg-panel-95);
-    border: 1px solid rgba(255,0,0,0.3);
-    box-shadow: 0 0 20px rgba(255,0,0,0.15);
-  }
-  .theme-switch-btn {
-    display: flex; align-items: center; justify-content: center;
-    width: 34px; height: 34px;
-    border-radius: 50%;
-    cursor: pointer;
-    color: rgba(255,120,120,0.55);
-    background: transparent;
-    transition: background .25s, color .25s, transform .2s;
-  }
-  .theme-switch-btn svg { width: 17px; height: 17px; }
-  .theme-switch-btn:hover { transform: scale(1.08); }
-  .theme-switch-btn.active {
-    color: #fff;
-    background: linear-gradient(135deg, #ff2a2a, #b00000);
-    box-shadow: 0 0 14px rgba(255,0,0,0.5);
-  }
-
   .card {
     position: relative;
     z-index: 3;
@@ -264,6 +226,23 @@
   .home-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
 
   .error { font-size: 10px; line-height: 1.9; color: var(--fg-filename); }
+
+
+    /* --- custom cursor: точка + кольцо (только мышь) --- */
+    html.has-cursor, html.has-cursor * { cursor: none !important; }
+    html.has-cursor input, html.has-cursor textarea, html.has-cursor select { cursor: text !important; }
+    .cur-dot, .cur-ring {
+      position: fixed; left: 0; top: 0; z-index: 2147483647; pointer-events: none;
+      border-radius: 50%; opacity: 0; will-change: transform;
+      transition: opacity .2s ease, width .25s cubic-bezier(.16,1,.3,1), height .25s cubic-bezier(.16,1,.3,1), margin .25s cubic-bezier(.16,1,.3,1), background-color .2s ease, border-color .2s ease;
+    }
+    .cur-dot { width: 6px; height: 6px; margin: -3px 0 0 -3px; background: #ff2a2a; box-shadow: 0 0 10px rgba(255,42,42,0.9); }
+    .cur-ring { width: 32px; height: 32px; margin: -16px 0 0 -16px; border: 1.5px solid rgba(255,60,60,0.75); }
+    .cur-on .cur-dot, .cur-on .cur-ring { opacity: 1; }
+    .cur-hover .cur-ring { width: 54px; height: 54px; margin: -27px 0 0 -27px; background: rgba(255,40,40,0.12); border-color: rgba(255,110,110,0.95); }
+    .cur-hover .cur-dot { opacity: 0.35; }
+    .cur-down .cur-ring { width: 22px; height: 22px; margin: -11px 0 0 -11px; }
+    .cur-text .cur-dot, .cur-text .cur-ring { opacity: 0; }
 </style>
 </head>
 <body>
@@ -292,25 +271,6 @@
 </div>
 
 <canvas id="bg"></canvas>
-
-<div class="theme-switch" id="themeSwitch">
-  <div class="theme-switch-btn" id="themeBtnDark" title="Тёмная тема" onclick="setTheme('dark')">
-    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-  </div>
-  <div class="theme-switch-btn" id="themeBtnLight" title="Светлая тема" onclick="setTheme('light')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-      <circle cx="12" cy="12" r="4"></circle>
-      <line x1="12" y1="2" x2="12" y2="4"></line>
-      <line x1="12" y1="20" x2="12" y2="22"></line>
-      <line x1="4.93" y1="4.93" x2="6.34" y2="6.34"></line>
-      <line x1="17.66" y1="17.66" x2="19.07" y2="19.07"></line>
-      <line x1="2" y1="12" x2="4" y2="12"></line>
-      <line x1="20" y1="12" x2="22" y2="12"></line>
-      <line x1="4.93" y1="19.07" x2="6.34" y2="17.66"></line>
-      <line x1="17.66" y1="6.34" x2="19.07" y2="4.93"></line>
-    </svg>
-  </div>
-</div>
 
 <div class="fluff-wrap">
   <div class="fluff"></div>
@@ -343,26 +303,6 @@
 <div class="card" id="card">
 </div>
 
-<a onclick="openDataPolicy()" style="position:fixed;left:14px;bottom:14px;z-index:500;font-size:7px;color:rgba(255,150,150,0.45);text-decoration:underline;cursor:pointer;font-family:'Press Start 2P',monospace;">Политика данных</a>
-
-<div id="dataPolicyOverlay" style="display:none; position:fixed; inset:0; z-index:99998; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:20px;">
-  <div style="background:#0d0202; border:1px solid rgba(255,40,40,0.25); border-radius:14px; max-width:680px; width:100%; max-height:80vh; overflow-y:auto; padding:28px; color:#eee; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; font-size:14px; line-height:1.65;">
-    <div style="font-family:'Press Start 2P',monospace; font-size:13px; font-weight:400; margin-bottom:18px; color:#fff; line-height:1.6;">📄 Обработка персональных данных</div>
-    <p style="margin-bottom:10px">При посещении настоящего сайта — независимо от того, авторизуетесь ли вы через Discord — администрация сайта автоматически собирает, обрабатывает и хранит следующие данные:</p>
-    <ul style="margin:0 0 10px 18px; padding:0;">
-      <li>IP-адрес устройства, с которого осуществляется доступ к сайту, и определяемое по нему примерное географическое положение (страна, регион, город);</li>
-      <li>уникальный цифровой отпечаток браузера (browser fingerprint), формируемый на основе технических параметров устройства и программного обеспечения;</li>
-      <li>сведения о браузере и операционной системе устройства (тип, версия);</li>
-      <li>файлы cookie и данные локального хранилища браузера (localStorage), используемые для поддержания сессии авторизации.</li>
-    </ul>
-    <p style="margin-bottom:10px">Дополнительно, при прохождении авторизации через сервис Discord, обрабатываются идентификатор учётной записи Discord (Discord ID), имя пользователя и изображение профиля (аватар).</p>
-    <p style="margin-bottom:10px">Указанные данные обрабатываются исключительно в целях обеспечения корректной работы функционала сайта, предотвращения злоупотреблений (включая создание множественных учётных записей и обход ограничений доступа), а также для целей модерации, аналитики посещаемости и обеспечения безопасности сайта.</p>
-    <p style="margin-bottom:10px">Персональные данные хранятся в течение периода, необходимого для достижения указанных целей, и не передаются третьим лицам, за исключением случаев, предусмотренных действующим законодательством.</p>
-    <p style="margin-bottom:0">Если пользователь не согласен с условиями настоящего уведомления, ему следует покинуть сайт и воздержаться от дальнейшего его использования, а также от прохождения авторизации через Discord на данном сайте.</p>
-    <button onclick="closeDataPolicy()" style="margin-top:18px;width:100%;cursor:pointer;padding:10px;border:none;border-radius:8px;background:linear-gradient(180deg,#ff3b3b,#c81e1e);color:#fff;font-weight:700;">Понятно</button>
-  </div>
-</div>
-
 <script>
   setTimeout(function () {
     var g = document.getElementById('loadingGate');
@@ -372,40 +312,6 @@
 <script src="/mezets.design/common.js" onerror="var g=document.getElementById('loadingGate'); if(g) g.style.display='none';"></script>
 <script>
 
-  function openDataPolicy() { document.getElementById('dataPolicyOverlay').style.display = 'flex'; }
-  function closeDataPolicy() { document.getElementById('dataPolicyOverlay').style.display = 'none'; }
-
-  function getCookie(name) {
-    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-    return match ? decodeURIComponent(match[2]) : null;
-  }
-  function setCookie(name, value, days) {
-    const d = new Date();
-    d.setTime(d.getTime() + days * 24 * 60 * 60 * 1000);
-    document.cookie = `${name}=${encodeURIComponent(value)}; expires=${d.toUTCString()}; path=/; SameSite=Lax`;
-  }
-
-  const themeBtnDark = document.getElementById('themeBtnDark');
-  const themeBtnLight = document.getElementById('themeBtnLight');
-
-  function setTheme(theme, save = true) {
-    document.body.classList.toggle('light-theme', theme === 'light');
-    if (themeBtnDark && themeBtnLight) {
-      themeBtnDark.classList.toggle('active', theme === 'dark');
-      themeBtnLight.classList.toggle('active', theme === 'light');
-    }
-    if (save) setCookie('theme', theme, 365);
-  }
-
-  (function initTheme() {
-    const saved = getCookie('theme');
-    if (saved === 'dark' || saved === 'light') {
-      setTheme(saved, false);
-    } else {
-      const systemPrefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
-      setTheme(systemPrefersLight ? 'light' : 'dark', false);
-    }
-  })();
 
   const canvas = document.getElementById('bg');
   const ctx = canvas.getContext('2d');
@@ -562,7 +468,9 @@
     `;
   } else {
     const fileUrl = '/mezets.design/raboti/' + encodeURIComponent(file).replace(/%2F/g, '/');
-    const displayName = title ? decodeURIComponent(title) : file;
+    let displayName = file;
+    if (title) { try { displayName = decodeURIComponent(title); } catch (e) { displayName = title; } }
+    const esc = (v) => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
     card.innerHTML = `
       <div class="icon">
@@ -571,7 +479,7 @@
         </svg>
       </div>
       <div class="title">Ваша работа готова</div>
-      <div class="filename">${displayName}</div>
+      <div class="filename">${esc(displayName)}</div>
       <a class="btn" href="${fileUrl}" download>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/>
@@ -586,6 +494,39 @@
       </a>
     `;
   }
+
+
+  // custom cursor: точка + кольцо (только мышь)
+  (function () {
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    const root = document.documentElement;
+    const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const dot = document.createElement('div'); dot.className = 'cur-dot';
+    const ring = document.createElement('div'); ring.className = 'cur-ring';
+    document.body.append(ring, dot);
+    const INTERACTIVE = 'a, button, [onclick], [role="button"], label, summary, select, .btn, .spin-tab, .koleso-btn, .top-right-profile, .order-cat-arrow, .item-stepper-btn';
+    let x = -100, y = -100, rx = -100, ry = -100, raf = 0, armed = false;
+    function loop() {
+      const k = calm ? 1 : 0.18;
+      rx += (x - rx) * k; ry += (y - ry) * k;
+      ring.style.transform = 'translate3d(' + rx.toFixed(1) + 'px,' + ry.toFixed(1) + 'px,0)';
+      raf = (Math.abs(x - rx) > 0.1 || Math.abs(y - ry) > 0.1) ? requestAnimationFrame(loop) : 0;
+    }
+    addEventListener('pointermove', (e) => {
+      if (e.pointerType && e.pointerType !== 'mouse') return;
+      if (!armed) { armed = true; rx = x = e.clientX; ry = y = e.clientY; root.classList.add('has-cursor'); }
+      x = e.clientX; y = e.clientY;
+      dot.style.transform = 'translate3d(' + x + 'px,' + y + 'px,0)';
+      root.classList.add('cur-on');
+      const t = e.target;
+      root.classList.toggle('cur-hover', !!(t.closest && t.closest(INTERACTIVE)));
+      root.classList.toggle('cur-text', !!(t.closest && t.closest('input, textarea')));
+      if (!raf) raf = requestAnimationFrame(loop);
+    }, { passive: true });
+    addEventListener('pointerdown', () => root.classList.add('cur-down'));
+    addEventListener('pointerup', () => root.classList.remove('cur-down'));
+    document.addEventListener('mouseleave', () => root.classList.remove('cur-on'));
+  })();
 </script>
 
 </body>
