@@ -382,6 +382,16 @@
     .work-new:hover { color: #ff9b9b; border-color: rgba(255,0,0,0.5); }
     .work-new.on { color: #fff; background: linear-gradient(135deg, #ff2a2a, #b00000); border-color: transparent; box-shadow: 0 0 12px rgba(255,0,0,0.45); }
     .work-new.busy { opacity: .5; pointer-events: none; }
+    .work-actions { display: flex; flex-direction: column; gap: 5px; flex-shrink: 0; margin-right: 8px; }
+    .work-actions .work-new, .work-actions .work-edit { margin: 0; text-align: center; }
+    .work-edit {
+      padding: 6px 8px; cursor: pointer; font-size: 6px; letter-spacing: .5px; line-height: 1;
+      color: rgba(255,200,200,0.45); border: 1px solid rgba(255,0,0,0.22); border-radius: 8px;
+      transition: color .2s, border-color .2s; user-select: none; white-space: nowrap;
+    }
+    .work-edit:hover { color: #ff9b9b; border-color: rgba(255,0,0,0.5); }
+    .work-meta { font-size: 6px; color: #ff6b6b; line-height: 1.6; }
+    .work-meta:empty { display: none; }
 
     .divider {
       height: 1px;
@@ -1709,7 +1719,7 @@ async function loadWorks() {
 
     container.innerHTML = '';
     const baseUrl = `https://raw.githubusercontent.com/${REPO}/${BRANCH}/`;
-    const newSet = await fetchNewSet();
+    const newMap = await fetchNewMap();
 
     items.slice().reverse().forEach((item) => {
       const el = document.createElement('div');
@@ -1720,17 +1730,58 @@ async function loadWorks() {
         ? `<video class="work-thumb" src="${baseUrl}${item.img}" muted playsinline preload="metadata"></video>`
         : `<img class="work-thumb" src="${baseUrl}${item.img}" alt="">`;
 
-      const groupBadge = item.inGroup ? ' <span style="opacity:0.5">(в группе)</span>' : '';
-
       el.innerHTML = `
         ${thumbHtml}
         <div class="work-info">
-          <div class="work-type">${item.type}${groupBadge}</div>
-          <div class="work-file">${item.img}</div>
+          <div class="work-type"></div>
+          <div class="work-file"></div>
+          <div class="work-meta"></div>
         </div>
-        ${(!item.inGroup || item.groupFirst) ? `<div class="work-new${newSet.has(item.img) ? ' on' : ''}" title="Бейдж НОВОЕ на сайте" onclick="toggleNew(this, ${JSON.stringify(item.img)})">${newSet.has(item.img) ? '🆕 НОВОЕ' : '🆕 +'}</div>` : ''}
-        <div class="work-del" title="Удалить из index.html" onclick="deleteWork(${JSON.stringify(item.img)})">✕</div>
+        <div class="work-actions">
+          <div class="work-new" title="Бейдж НОВОЕ на сайте"></div>
+          <div class="work-edit" title="Изменить название и срок">РЕД.</div>
+        </div>
+        <div class="work-del" title="Удалить из index.html">✕</div>
       `;
+
+      const typeEl = el.querySelector('.work-type');
+      typeEl.textContent = item.type;
+      if (item.inGroup) {
+        const sp = document.createElement('span');
+        sp.style.opacity = '0.5';
+        sp.textContent = ' (в группе)';
+        typeEl.appendChild(sp);
+      }
+      el.querySelector('.work-file').textContent = item.img + ' · ' + item.time;
+
+      // бейдж НОВОЕ: undefined = выкл, '' = бессрочно, 'YYYY-MM-DD' = до даты
+      const newBtn = el.querySelector('.work-new');
+      const meta = el.querySelector('.work-meta');
+      let cur = newMap.get(item.img);
+      function paint() {
+        const on = cur !== undefined;
+        newBtn.classList.toggle('on', on);
+        newBtn.textContent = on ? 'НОВОЕ' : '+ НОВОЕ';
+        meta.textContent = on ? (cur ? 'НОВОЕ до ' + fmtNewDate(cur) : 'НОВОЕ · бессрочно') : '';
+      }
+      paint();
+      newBtn.addEventListener('click', async () => {
+        const ask = askNewExpiry(cur !== undefined);
+        if (ask === undefined) return;
+        newBtn.classList.add('busy');
+        try {
+          await saveNew(item.img, ask);
+          cur = ask === null ? undefined : ask;
+          paint();
+        } catch (e) {
+          alert('Ошибка: ' + e.message);
+        } finally {
+          newBtn.classList.remove('busy');
+        }
+      });
+      el.querySelector('.work-edit').addEventListener('click', () => editWork(item.img, item.type, item.time));
+      el.querySelector('.work-del').addEventListener('click', () => deleteWork(item.img));
+
       container.appendChild(el);
     });
   } catch(e) {
@@ -1792,41 +1843,94 @@ async function fetchNewSet() {
   }
 }
 
-async function toggleNew(btn, img) {
-  const makeNew = !btn.classList.contains('on');
-  let expires = '';
-  if (makeNew) {
-    const days = prompt('Сколько дней показывать «НОВОЕ»?\nПусто или 0 = пока не сниму вручную', '14');
-    if (days === null) return;
-    const n = parseInt(days, 10);
-    if (n > 0) {
-      const d = new Date(Date.now() + n * 86400000);
-      expires = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-    }
-  }
-  btn.classList.add('busy');
+function fmtNewDate(exp) {
+  const m = String(exp).slice(0, 10).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  return m ? `${m[3]}.${m[2]}.${m[1]}` : exp;
+}
+
+function newIsExpired(exp) {
+  if (!exp) return false;
+  const d = new Date(String(exp).replace(' ', 'T'));
+  if (isNaN(d)) return false;
+  if (String(exp).length <= 10) d.setHours(23, 59, 59);
+  return d < new Date();
+}
+
+// img -> expires_at ('' = бессрочно). Админский эндпоинт отдаёт и срок; при ошибке — публичный список без сроков.
+async function fetchNewMap() {
   try {
-    // сначала убираем старую запись (в т.ч. просроченную), иначе insert упрётся в PRIMARY KEY
-    const delRes = await adminFetch(`${BOT_API}/admin/db/portfolio_new/delete?pk_value=${encodeURIComponent(img)}`, { master: true });
-    if (!delRes.ok && delRes.status !== 404) {
-      const err = await delRes.json().catch(() => ({}));
-      throw new Error(err.error || 'Сервер отклонил (' + delRes.status + ')');
-    }
-    if (makeNew) {
-      const fields = { img };
-      if (expires) fields.expires_at = expires;
-      const res = await adminFetch(`${BOT_API}/admin/db/portfolio_new/insert`, { master: true, method: 'POST', body: { pk_value: img, fields } });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || 'Сервер отклонил (' + res.status + ')');
-      }
-    }
-    btn.classList.toggle('on', makeNew);
-    btn.textContent = makeNew ? '🆕 НОВОЕ' : '🆕 +';
+    const res = await adminFetch(`${BOT_API}/admin/db/portfolio_new`);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const map = new Map();
+    (data.rows || []).forEach(r => { if (r.img && !newIsExpired(r.expires_at)) map.set(String(r.img).trim(), r.expires_at || ''); });
+    return map;
+  } catch (e) {
+    const set = await fetchNewSet();
+    const map = new Map();
+    set.forEach(img => map.set(img, ''));
+    return map;
+  }
+}
+
+// undefined = отмена, null = снять бейдж, '' = бессрочно, 'YYYY-MM-DD' = до даты
+function askNewExpiry(isOn) {
+  const msg = isOn
+    ? 'НОВОЕ уже включено.\nНовый срок в днях (0 = бессрочно)\nили «-» чтобы снять бейдж:'
+    : 'Сколько дней показывать «НОВОЕ»?\n0 = пока не сниму вручную';
+  const v = prompt(msg, '14');
+  if (v === null) return undefined;
+  const t = v.trim();
+  if (t === '-') return isOn ? null : undefined;
+  const n = parseInt(t, 10);
+  if (!(n >= 0)) { alert('Нужно число дней'); return undefined; }
+  if (n === 0) return '';
+  const d = new Date(Date.now() + n * 86400000);
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+
+async function saveNew(img, expires) {
+  // сначала убираем старую запись (в т.ч. просроченную), иначе insert упрётся в PRIMARY KEY
+  const delRes = await adminFetch(`${BOT_API}/admin/db/portfolio_new/delete?pk_value=${encodeURIComponent(img)}`, { master: true });
+  if (!delRes.ok && delRes.status !== 404) {
+    const err = await delRes.json().catch(() => ({}));
+    throw new Error(err.error || 'Сервер отклонил (' + delRes.status + ')');
+  }
+  if (expires === null) return;
+  const fields = { img };
+  if (expires) fields.expires_at = expires;
+  const res = await adminFetch(`${BOT_API}/admin/db/portfolio_new/insert`, { master: true, method: 'POST', body: { pk_value: img, fields } });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Сервер отклонил (' + res.status + ')');
+  }
+}
+
+async function editWork(img, curType, curTime) {
+  const type = prompt('Название работы:', curType);
+  if (type === null) return;
+  const time = prompt('Срок выполнения:', curTime);
+  if (time === null) return;
+  const t = type.trim(), tm = time.trim();
+  if (!t || !tm) { alert('Поля не могут быть пустыми'); return; }
+  if (/["\\\r\n]/.test(t + tm)) { alert('Нельзя использовать кавычки ", обратный слэш и переносы строк'); return; }
+  if (t === curType && tm === curTime) return;
+  try {
+    const indexFile = await getFile('index.html');
+    if (!indexFile) throw new Error('index.html не найден');
+    let html = decodeURIComponent(escape(atob(indexFile.content.replace(/\n/g, ''))));
+    const rx = new RegExp(`(\\{\\s*img:\\s*"${escapeRegex(img)}",\\s*type:\\s*)"[^"]*"(,\\s*time:\\s*)"[^"]*"`);
+    if (!rx.test(html)) throw new Error('Запись не найдена');
+    html = html.replace(rx, (_, a, b) => `${a}"${t}"${b}"${tm}"`);
+    const htmlB64 = btoa(unescape(encodeURIComponent(html)));
+    const res = await ghFetch(`/repos/${REPO}/contents/index.html`, TOKEN, {
+      method: 'PUT',
+      body: JSON.stringify({ message: '[admin] portfolio: edit item', content: htmlB64, sha: indexFile.sha, branch: BRANCH }),
+    });
+    if (!res.ok) throw new Error('Не удалось обновить index.html');
+    await loadWorks();
   } catch (e) {
     alert('Ошибка: ' + e.message);
-  } finally {
-    btn.classList.remove('busy');
   }
 }
 
@@ -4224,7 +4328,7 @@ function adminUploadFile() {
     const dot = document.createElement('div'); dot.className = 'cur-dot';
     const ring = document.createElement('div'); ring.className = 'cur-ring';
     document.body.append(ring, dot);
-    const INTERACTIVE = 'a, button, [onclick], [role="button"], label, summary, select, input[type=checkbox], input[type=radio], input[type=file], input[type=button], input[type=submit], .tab, .btn, .work-del, .work-new';
+    const INTERACTIVE = 'a, button, [onclick], [role="button"], label, summary, select, input[type=checkbox], input[type=radio], input[type=file], input[type=button], input[type=submit], .tab, .btn, .work-del, .work-new, .work-edit';
     let x = -100, y = -100, rx = -100, ry = -100, raf = 0, armed = false;
     function loop() {
       const k = calm ? 1 : 0.18;
