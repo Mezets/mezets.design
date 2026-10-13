@@ -4142,7 +4142,7 @@
 
         const card = document.createElement('div');
         card.className = 'portfolio-card';
-        card.dataset.img = cover.img;
+        card.dataset.imgs = items.map(i => i.img).join('|');
         card.appendChild(buildCardMedia(cover));
 
         if (items.length > 1) {
@@ -4263,10 +4263,10 @@
 
 
   // бейдж «НОВОЕ»: список приходит с бэкенда (Railway), выдаётся из админки
-  let portfolioNewSet = new Set(PORTFOLIO_ITEMS.flatMap(e => (e.new ? [(e.group ? e.group[0] : e).img] : [])));
+  let portfolioNewSet = new Set(PORTFOLIO_ITEMS.flatMap(e => (e.group ? e.group : [e]).filter(i => i && i.new).map(i => i.img)));
   function applyNewBadges() {
     document.querySelectorAll('.portfolio-card').forEach(card => {
-      const has = portfolioNewSet.has(card.dataset.img);
+      const has = (card.dataset.imgs || '').split('|').some(img => portfolioNewSet.has(img));
       const el = card.querySelector('.portfolio-card-new');
       if (has && !el) {
         const b = document.createElement('div');
