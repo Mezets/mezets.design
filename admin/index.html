@@ -685,6 +685,55 @@
     .order-edit-total b { color: #ff5555; font-size: 9px; transition: transform .15s ease; }
 
 
+    /* --- РАБОТЫ: сетка как на главной YouTube + чипы --- */
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 8px; }
+    .chips:empty { display: none; }
+    .chips-scroll { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 6px; margin-bottom: 14px; scrollbar-width: thin; }
+    .chip {
+      flex-shrink: 0; font-family: inherit; font-size: 7px; line-height: 1; letter-spacing: .3px;
+      padding: 8px 11px; border-radius: 999px; cursor: pointer; white-space: nowrap;
+      color: rgba(255,200,200,0.7); background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,0,0,0.22);
+      transition: background .2s, color .2s, border-color .2s;
+    }
+    .chip:hover { border-color: rgba(255,0,0,0.55); color: #ffb3b3; }
+    .chip.on { color: #fff; background: linear-gradient(135deg, #ff2a2a, #b00000); border-color: transparent; box-shadow: 0 0 12px rgba(255,0,0,0.4); }
+    label.check { display: flex; align-items: center; gap: 8px; margin-top: 10px; cursor: pointer; }
+    label.check input { width: auto; margin: 0; }
+    .works-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 22px 14px; }
+    .works-empty { font-size: 7px; color: rgba(255,200,200,0.3); line-height: 2; grid-column: 1 / -1; }
+    .wcard { cursor: pointer; min-width: 0; }
+    .wthumb { position: relative; aspect-ratio: 16 / 9; border-radius: 12px; overflow: hidden; background: #150000; border: 1px solid rgba(255,0,0,0.18); transition: border-color .2s, transform .25s cubic-bezier(.16,1,.3,1); }
+    .wcard:hover .wthumb { border-color: rgba(255,0,0,0.55); transform: translateY(-2px); }
+    .wthumb img, .wthumb video { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .wtag { position: absolute; top: 7px; font-size: 6px; line-height: 1; padding: 5px 7px; border-radius: 7px; pointer-events: none; }
+    .wtag-new { left: 7px; background: linear-gradient(135deg, #ff2a2a, #b00000); color: #fff; box-shadow: 0 0 10px rgba(255,0,0,0.6); }
+    .wtag-group { right: 7px; background: rgba(0,0,0,0.65); color: #ffd0d0; }
+    .wmove { position: absolute; right: 6px; bottom: 6px; display: flex; gap: 4px; opacity: 0; transition: opacity .2s; }
+    .wcard:hover .wmove { opacity: 1; }
+    .wmove b { font-weight: normal; font-size: 9px; line-height: 1; padding: 5px 7px; border-radius: 7px; background: rgba(0,0,0,0.7); color: #ffd0d0; border: 1px solid rgba(255,0,0,0.3); }
+    .wmove b:hover { background: rgba(255,0,0,0.5); color: #fff; }
+    .wbody { padding: 9px 2px 0; }
+    .wtitle { font-size: 8px; line-height: 1.6; color: #ff6b6b; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .wmeta { margin-top: 5px; font-size: 6.5px; line-height: 1.7; color: rgba(255,200,200,0.5); overflow-wrap: anywhere; }
+    .wfile { margin-top: 3px; font-size: 6px; color: rgba(255,200,200,0.28); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .wm-overlay { position: fixed; inset: 0; z-index: 6000; display: none; align-items: flex-start; justify-content: center; padding: 4vh 12px; overflow-y: auto; background: rgba(5,0,0,0.78); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+    .wm-overlay.open { display: flex; }
+    .wm { width: 100%; max-width: 520px; background: #0c0000; border: 1px solid rgba(255,0,0,0.3); border-radius: 16px; padding: 18px; box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 40px rgba(255,0,0,0.12); }
+    .wm-head { display: flex; justify-content: space-between; align-items: center; font-size: 9px; color: #ff6b6b; margin-bottom: 12px; }
+    .wm-x { cursor: pointer; padding: 4px 8px; color: rgba(255,200,200,0.5); }
+    .wm-x:hover { color: #ff2a2a; }
+    .wm-preview { aspect-ratio: 16 / 9; border-radius: 12px; overflow: hidden; background: #150000; border: 1px solid rgba(255,0,0,0.18); }
+    .wm-preview img, .wm-preview video { width: 100%; height: 100%; object-fit: contain; display: block; }
+    .wm-file { font-size: 6px; color: rgba(255,200,200,0.3); margin: 6px 0 4px; overflow-wrap: anywhere; }
+    .wm-user { font-size: 7px; color: #7ee787; min-height: 0; margin-bottom: 4px; }
+    .wm-user:empty { display: none; }
+    .wm-status { font-size: 7px; line-height: 1.8; color: #ff6b6b; margin-top: 10px; white-space: pre-wrap; }
+    .wm-status:empty { display: none; }
+    .wm-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    .wm-actions .btn { width: auto; flex: 1 1 auto; margin: 0; }
+    .wm-danger { border-color: rgba(255,0,0,0.5) !important; color: #ff6b6b; }
+
     /* --- custom cursor: точка + кольцо (только мышь) --- */
     html.has-cursor, html.has-cursor * { cursor: none !important; }
     html.has-cursor input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=button]):not([type=submit]):not([type=range]), html.has-cursor textarea { cursor: text !important; }
@@ -777,13 +826,23 @@
         </div>
 
         <label>Тип работы</label>
-        <input type="text" id="workType" placeholder="Анимированное оформление форумного аккаунта">
+        <div class="chips" id="upTypeChips"></div>
+        <input type="text" id="workType" placeholder="Выбери выше или впиши свой тип">
 
         <label>Срок выполнения</label>
+        <div class="chips" id="upTimeChips"></div>
         <input type="text" id="workTime" placeholder="1 день">
 
         <label>Группа (необязательно)</label>
-        <input type="text" id="workGroup" placeholder="Оставь пустым, если одиночная работа">
+        <div class="chips" id="upGroupChips"></div>
+        <input type="text" id="workGroup" placeholder="Пусто = одиночная работа">
+
+        <label>Заказчик (необязательно)</label>
+        <input type="text" id="workUser" placeholder="Discord ID или начни вводить ник" autocomplete="off">
+        <div class="chips" id="workUserChips"></div>
+        <div class="wm-user" id="workUserInfo"></div>
+        <label class="check"><input type="checkbox" id="workShowAuthor"> Показывать заказчика на сайте</label>
+        <label class="check"><input type="checkbox" id="workMarkNew"> Бейдж «НОВОЕ» на 14 дней</label>
 <button class="btn" id="uploadBtn" onclick="uploadWork()">Загрузить работу</button>
 
         <div class="progress-wrap" id="progressWrap">
@@ -799,8 +858,9 @@
       <div class="card">
         <div class="card-title">📋 ВСЕ РАБОТЫ <span class="badge" id="worksCount">0</span></div>
 <button class="btn btn-sm" onclick="cooldownClick(this,'works',loadWorks)" style="margin-bottom:16px">🔄 Обновить список</button>
-        <div id="worksList" class="works-list">
-          <div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div>
+        <div class="chips chips-scroll" id="worksChips"></div>
+        <div id="worksGrid" class="works-grid">
+          <div class="works-empty">Загрузка...</div>
         </div>
       </div>
     </div>
@@ -1308,6 +1368,43 @@
   </div><!-- /mainScreen -->
 </div><!-- /wrap -->
 
+<div class="wm-overlay" id="workModal">
+  <div class="wm">
+    <div class="wm-head"><span>✏️ РАБОТА</span><span class="wm-x" id="wmClose">✕</span></div>
+    <div class="wm-preview" id="wmPreview"></div>
+    <div class="wm-file" id="wmFile"></div>
+
+    <label>Тип работы (какой заказ)</label>
+    <div class="chips" id="wmTypeChips"></div>
+    <input type="text" id="wmType" placeholder="Выбери выше или впиши свой тип">
+
+    <label>Срок выполнения</label>
+    <div class="chips" id="wmTimeChips"></div>
+    <input type="text" id="wmTime" placeholder="1 день">
+
+    <label>Группа</label>
+    <div class="chips" id="wmGroupChips"></div>
+    <input type="text" id="wmGroup" placeholder="Пусто = одиночная работа">
+
+    <label>Заказчик</label>
+    <input type="text" id="wmUser" placeholder="Discord ID или начни вводить ник" autocomplete="off">
+    <div class="chips" id="wmUserChips"></div>
+    <div class="wm-user" id="wmUserInfo"></div>
+    <label class="check"><input type="checkbox" id="wmShowAuthor"> Показывать заказчика на сайте</label>
+
+    <label>Бейдж «НОВОЕ»</label>
+    <div class="chips" id="wmNewChips"></div>
+
+    <div class="wm-status" id="wmStatus"></div>
+    <div class="wm-actions">
+      <button class="btn btn-sm" id="wmUp" type="button">◀ Раньше</button>
+      <button class="btn btn-sm" id="wmDown" type="button">Позже ▶</button>
+      <button class="btn btn-sm wm-danger" id="wmDelete" type="button">Удалить</button>
+      <button class="btn btn-sm" id="wmSave" type="button">Сохранить</button>
+    </div>
+  </div>
+</div>
+
 <script>
 document.addEventListener('contextmenu', e => e.preventDefault(), true);
 document.addEventListener('keydown', e => {
@@ -1470,8 +1567,9 @@ function switchTab(tab) {
   tabButtons.forEach((t,i) => t.classList.toggle('active', order[i]===tab));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
-  document.querySelector('.wrap').classList.toggle('wrap-wide', tab === 'users' || tab === 'orders' || tab === 'db');
+  document.querySelector('.wrap').classList.toggle('wrap-wide', tab === 'users' || tab === 'orders' || tab === 'db' || tab === 'manage');
   if (tab === 'manage') loadWorks();
+  if (tab === 'upload') { fetchWorks().then(refreshPickers).catch(() => {}); }
   if (tab === 'prices') loadPrices();
   if (tab === 'rules') loadRules();
   if (tab === 'users' && getAdminKey()) { loadUsers(); loadUnauthUsers(); loadWatchlist(); loadBannedIps(); }
@@ -1589,6 +1687,9 @@ async function uploadWork() {
   const workType  = document.getElementById('workType').value.trim();
   const workTime  = document.getElementById('workTime').value.trim();
   const workGroup = document.getElementById('workGroup').value.trim();
+  const workUser  = document.getElementById('workUser').value.trim();
+  const showAuthor = document.getElementById('workShowAuthor').checked;
+  const markNew   = document.getElementById('workMarkNew').checked;
   const status    = document.getElementById('uploadStatus');
   const btn       = document.getElementById('uploadBtn');
 
@@ -1632,50 +1733,23 @@ async function uploadWork() {
       throw new Error(err.message || 'Ошибка загрузки файла');
     }
 
-    setProgress(65, 'Обновляю index.html...');
-    const indexFile = await getFile('index.html');
-    if (!indexFile) throw new Error('index.html не найден в репозитории');
-
-    let html = decodeURIComponent(escape(atob(indexFile.content.replace(/\n/g, ''))));
-
-    const imgRef = `${folder}/${fname}`;
-    let newEntry;
-    if (workGroup) {
-      const groupTag = `/* group:${workGroup} */`;
-      const itemObj  = `      { img: "${imgRef}", type: "${workType}", time: "${workTime}" }`;
-
-      if (html.includes(groupTag)) {
-        html = html.replace(
-          new RegExp(`(/\\* group:${escapeRegex(workGroup)} \\*/[\\s\\S]*?)(\\s*\\]\\s*\\})`),
-          (match, before, close) => `${before},\n${itemObj}${close}`
-        );
-      } else {
-        newEntry = `{\n  ${groupTag}\n  group: [\n${itemObj},\n  ]\n},`;
-        html = insertAfterLastItem(html, newEntry);
-      }
-    } else {
-      newEntry = `    { img: "${imgRef}", type: "${workType}", time: "${workTime}" },`;
-      html = insertAfterLastItem(html, newEntry);
-    }
-
-    setProgress(85, 'Сохраняю index.html...');
-    const htmlB64 = btoa(unescape(encodeURIComponent(html)));
-    const htmlRes = await ghFetch(`/repos/${REPO}/contents/index.html`, TOKEN, {
-      method: 'PUT',
-      body: JSON.stringify({
-        message: `[admin] portfolio: add ${fname}`,
-        content: htmlB64,
-        sha: indexFile.sha,
-        branch: BRANCH,
-      }),
+    setProgress(75, 'Сохраняю в базе...');
+    const saveRes = await adminFetch(`${BOT_API}/admin/portfolio/save`, {
+      master: true, method: 'POST',
+      body: {
+        img: `${folder}/${fname}`, type: workType, time: workTime,
+        group_key: workGroup || null, user_id: workUser || null,
+        show_author: showAuthor, is_new: markNew,
+        new_until: markNew ? dateInDays(14) : null,
+      },
     });
-    if (!htmlRes.ok) {
-      const err = await htmlRes.json();
-      throw new Error('Файл загружен, но index.html не обновился: ' + (err.message || ''));
+    if (!saveRes.ok) {
+      const err = await saveRes.json().catch(() => ({}));
+      throw new Error('Файл загружен, но в базу не записался: ' + (err.error || ('HTTP ' + saveRes.status)));
     }
 
     setProgress(100, 'Готово!');
-    showStatus(status, `✅ Работа загружена!\nФайл: ${ghPath}\nСайт обновится через ~30 секунд.`, 'ok');
+    showStatus(status, `✅ Работа добавлена!\nФайл: ${ghPath}\nКартинка появится на сайте через ~30 секунд (деплой файла), данные — сразу.`, 'ok');
 
     fileInput.value = '';
     document.getElementById('fileDropName').textContent = '';
@@ -1683,6 +1757,12 @@ async function uploadWork() {
     document.getElementById('workType').value  = '';
     document.getElementById('workTime').value  = '';
     document.getElementById('workGroup').value = '';
+    document.getElementById('workUser').value = '';
+    document.getElementById('workUserInfo').textContent = '';
+    document.getElementById('workUserChips').innerHTML = '';
+    document.getElementById('workShowAuthor').checked = false;
+    document.getElementById('workMarkNew').checked = false;
+    fetchWorks().then(refreshPickers).catch(() => {});
 
     setTimeout(() => { document.getElementById('progressWrap').style.display = 'none'; }, 3000);
 
@@ -1694,286 +1774,10 @@ async function uploadWork() {
   }
 }
 
-function insertAfterLastItem(html, newEntry) {
-  const marker = '  ];'; // конец PORTFOLIO_ITEMS
-  const idx = html.lastIndexOf(marker);
-  if (idx === -1) throw new Error('Не удалось найти PORTFOLIO_ITEMS в index.html');
-  return html.slice(0, idx) + newEntry + '\n' + html.slice(idx);
-}
-
 function escapeRegex(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 
-async function loadWorks() {
-  const container = document.getElementById('worksList');
-  container.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div>';
-
-  try {
-    const indexFile = await getFile('index.html');
-    if (!indexFile) throw new Error('index.html не найден');
-    const html = decodeURIComponent(escape(atob(indexFile.content.replace(/\n/g, ''))));
-
-    const items = parsePortfolioItems(html);
-    document.getElementById('worksCount').textContent = items.length;
-
-    if (!items.length) { container.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Работ пока нет</div>'; return; }
-
-    container.innerHTML = '';
-    const baseUrl = `https://raw.githubusercontent.com/${REPO}/${BRANCH}/`;
-    const newMap = await fetchNewMap();
-
-    items.slice().reverse().forEach((item) => {
-      const el = document.createElement('div');
-      el.className = 'work-item';
-
-      const isVideo = /\.(mp4|webm)$/i.test(item.img);
-      const thumbHtml = isVideo
-        ? `<video class="work-thumb" src="${baseUrl}${item.img}" muted playsinline preload="metadata"></video>`
-        : `<img class="work-thumb" src="${baseUrl}${item.img}" alt="">`;
-
-      el.innerHTML = `
-        ${thumbHtml}
-        <div class="work-info">
-          <div class="work-type"></div>
-          <div class="work-file"></div>
-          <div class="work-meta"></div>
-        </div>
-        <div class="work-actions">
-          <div class="work-new" title="Бейдж НОВОЕ на сайте"></div>
-          <div class="work-edit" title="Изменить название и срок">РЕД.</div>
-        </div>
-        <div class="work-del" title="Удалить из index.html">✕</div>
-      `;
-
-      const typeEl = el.querySelector('.work-type');
-      typeEl.textContent = item.type;
-      if (item.inGroup) {
-        const sp = document.createElement('span');
-        sp.style.opacity = '0.5';
-        sp.textContent = ' (в группе)';
-        typeEl.appendChild(sp);
-      }
-      el.querySelector('.work-file').textContent = item.img + ' · ' + item.time;
-
-      // бейдж НОВОЕ: undefined = выкл, '' = бессрочно, 'YYYY-MM-DD' = до даты
-      const newBtn = el.querySelector('.work-new');
-      const meta = el.querySelector('.work-meta');
-      let cur = newMap.get(item.img);
-      function paint() {
-        const on = cur !== undefined;
-        newBtn.classList.toggle('on', on);
-        newBtn.textContent = on ? 'НОВОЕ' : '+ НОВОЕ';
-        meta.textContent = on ? (cur ? 'НОВОЕ до ' + fmtNewDate(cur) : 'НОВОЕ · бессрочно') : '';
-      }
-      paint();
-      newBtn.addEventListener('click', async () => {
-        const ask = askNewExpiry(cur !== undefined);
-        if (ask === undefined) return;
-        newBtn.classList.add('busy');
-        try {
-          await saveNew(item.img, ask);
-          cur = ask === null ? undefined : ask;
-          paint();
-        } catch (e) {
-          alert('Ошибка: ' + e.message);
-        } finally {
-          newBtn.classList.remove('busy');
-        }
-      });
-      el.querySelector('.work-edit').addEventListener('click', () => editWork(item.img, item.type, item.time));
-      el.querySelector('.work-del').addEventListener('click', () => deleteWork(item.img));
-
-      container.appendChild(el);
-    });
-  } catch(e) {
-    container.innerHTML = `<div style="font-size:7px;color:rgba(255,100,100,0.7);line-height:2">Ошибка: ${e.message}</div>`;
-  }
-}
-
-/*
- * Парсит PORTFOLIO_ITEMS с учётом структуры group: [...] — записи внутри
- * группы возвращаются наравне с обычными, но с пометкой inGroup:true, чтобы
- * счётчик и удаление работали корректно вне зависимости от вложенности.
- * Совпадение объекта { img: "...", type: "...", time: "..." } одинаковое
- * что на верхнем уровне, что внутри group — регэксп находит все объекты,
- * а вложенность определяется по позиции относительно ближайшего "group: [".
- */
-function parsePortfolioItems(html) {
-  const start = html.indexOf('const PORTFOLIO_ITEMS = [');
-  const end   = html.indexOf('\n  ];', start);
-  if (start === -1 || end === -1) return [];
-  const block = html.slice(start, end);
-  const items = [];
-  const single = /\{\s*img:\s*"([^"]+)",\s*type:\s*"([^"]+)",\s*time:\s*"([^"]+)"\s*\}/g;
-  const groupStarts = [];
-  const groupRx = /group:\s*\[/g;
-  let gm;
-  while ((gm = groupRx.exec(block)) !== null) groupStarts.push(gm.index);
-
-  let m;
-  let lastOpenGroup = null;
-  while ((m = single.exec(block)) !== null) {
-    // определяем, находится ли этот объект внутри ближайшего предшествующего group: [
-    // (грубая, но достаточная эвристика: считаем непарные ] после group-старта)
-    let inGroup = false;
-    let openGroup = null;
-    for (const gs of groupStarts) {
-      if (gs < m.index) {
-        const between = block.slice(gs, m.index);
-        const closes = (between.match(/\]/g) || []).length;
-        const opens  = (between.match(/\[/g) || []).length;
-        if (opens > closes) { inGroup = true; openGroup = gs; }
-      }
-    }
-    const groupFirst = inGroup && openGroup !== lastOpenGroup;
-    lastOpenGroup = inGroup ? openGroup : null;
-    items.push({ img: m[1], type: m[2], time: m[3], inGroup, groupFirst });
-  }
-  return items;
-}
-
-/* ── Бейдж «НОВОЕ» на работах: хранится на бэкенде (таблица portfolio_new) ── */
-async function fetchNewSet() {
-  try {
-    const res = await fetch(`${BOT_API}/api/portfolio/new`, { cache: 'no-store' });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    return new Set(Array.isArray(data.items) ? data.items : []);
-  } catch (e) {
-    return new Set();
-  }
-}
-
-function fmtNewDate(exp) {
-  const m = String(exp).slice(0, 10).match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  return m ? `${m[3]}.${m[2]}.${m[1]}` : exp;
-}
-
-function newIsExpired(exp) {
-  if (!exp) return false;
-  const d = new Date(String(exp).replace(' ', 'T'));
-  if (isNaN(d)) return false;
-  if (String(exp).length <= 10) d.setHours(23, 59, 59);
-  return d < new Date();
-}
-
 // img -> expires_at ('' = бессрочно). Админский эндпоинт отдаёт и срок; при ошибке — публичный список без сроков.
-async function fetchNewMap() {
-  try {
-    const res = await adminFetch(`${BOT_API}/admin/db/portfolio_new`);
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    const map = new Map();
-    (data.rows || []).forEach(r => { if (r.img && !newIsExpired(r.expires_at)) map.set(String(r.img).trim(), r.expires_at || ''); });
-    return map;
-  } catch (e) {
-    const set = await fetchNewSet();
-    const map = new Map();
-    set.forEach(img => map.set(img, ''));
-    return map;
-  }
-}
-
 // undefined = отмена, null = снять бейдж, '' = бессрочно, 'YYYY-MM-DD' = до даты
-function askNewExpiry(isOn) {
-  const msg = isOn
-    ? 'НОВОЕ уже включено.\nНовый срок в днях (0 = бессрочно)\nили «-» чтобы снять бейдж:'
-    : 'Сколько дней показывать «НОВОЕ»?\n0 = пока не сниму вручную';
-  const v = prompt(msg, '14');
-  if (v === null) return undefined;
-  const t = v.trim();
-  if (t === '-') return isOn ? null : undefined;
-  const n = parseInt(t, 10);
-  if (!(n >= 0)) { alert('Нужно число дней'); return undefined; }
-  if (n === 0) return '';
-  const d = new Date(Date.now() + n * 86400000);
-  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-}
-
-async function saveNew(img, expires) {
-  // сначала убираем старую запись (в т.ч. просроченную), иначе insert упрётся в PRIMARY KEY
-  const delRes = await adminFetch(`${BOT_API}/admin/db/portfolio_new/delete?pk_value=${encodeURIComponent(img)}`, { master: true });
-  if (!delRes.ok && delRes.status !== 404) {
-    const err = await delRes.json().catch(() => ({}));
-    throw new Error(err.error || 'Сервер отклонил (' + delRes.status + ')');
-  }
-  if (expires === null) return;
-  const fields = { img };
-  if (expires) fields.expires_at = expires;
-  const res = await adminFetch(`${BOT_API}/admin/db/portfolio_new/insert`, { master: true, method: 'POST', body: { pk_value: img, fields } });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.error || 'Сервер отклонил (' + res.status + ')');
-  }
-}
-
-async function editWork(img, curType, curTime) {
-  const type = prompt('Название работы:', curType);
-  if (type === null) return;
-  const time = prompt('Срок выполнения:', curTime);
-  if (time === null) return;
-  const t = type.trim(), tm = time.trim();
-  if (!t || !tm) { alert('Поля не могут быть пустыми'); return; }
-  if (/["\\\r\n]/.test(t + tm)) { alert('Нельзя использовать кавычки ", обратный слэш и переносы строк'); return; }
-  if (t === curType && tm === curTime) return;
-  try {
-    const indexFile = await getFile('index.html');
-    if (!indexFile) throw new Error('index.html не найден');
-    let html = decodeURIComponent(escape(atob(indexFile.content.replace(/\n/g, ''))));
-    const rx = new RegExp(`(\\{\\s*img:\\s*"${escapeRegex(img)}",\\s*type:\\s*)"[^"]*"(,\\s*time:\\s*)"[^"]*"`);
-    if (!rx.test(html)) throw new Error('Запись не найдена');
-    html = html.replace(rx, (_, a, b) => `${a}"${t}"${b}"${tm}"`);
-    const htmlB64 = btoa(unescape(encodeURIComponent(html)));
-    const res = await ghFetch(`/repos/${REPO}/contents/index.html`, TOKEN, {
-      method: 'PUT',
-      body: JSON.stringify({ message: '[admin] portfolio: edit item', content: htmlB64, sha: indexFile.sha, branch: BRANCH }),
-    });
-    if (!res.ok) throw new Error('Не удалось обновить index.html');
-    await loadWorks();
-  } catch (e) {
-    alert('Ошибка: ' + e.message);
-  }
-}
-
-async function deleteWork(img) {
-  if (!confirm('Удалить запись из PORTFOLIO_ITEMS?\n(Файл в репозитории останется)')) return;
-
-  try {
-    const indexFile = await getFile('index.html');
-    if (!indexFile) throw new Error('index.html не найден');
-    let html = decodeURIComponent(escape(atob(indexFile.content.replace(/\n/g, ''))));
-
-    const start = html.indexOf('const PORTFOLIO_ITEMS = [');
-    const end   = html.indexOf('\n  ];', start);
-    if (start === -1 || end === -1) throw new Error('Не найден PORTFOLIO_ITEMS');
-
-    // Удаляем ровно объект с данным img (уникальный ключ, не завязано на порядок/вложенность)
-    const itemRx = new RegExp(`\\s*\\{\\s*img:\\s*"${escapeRegex(img)}"[^}]*\\}\\s*,?`);
-    if (!itemRx.test(html)) throw new Error('Запись не найдена');
-    html = html.replace(itemRx, '');
-
-    // Чистим пустые или однослойные группы, которые могли остаться после удаления
-    // group: [ ] или group: [ ,] -> убираем всю обёртку целиком
-    html = html.replace(/,?\s*\{\s*group:\s*\[\s*,?\s*\]\s*\},?/g, '');
-    // group: [ { единственный элемент } ] -> разворачиваем обратно в обычную запись без group
-    html = html.replace(/\{\s*group:\s*\[\s*(\{\s*img:[\s\S]*?\})\s*,?\s*\]\s*\}/g, '$1');
-
-    const htmlB64 = btoa(unescape(encodeURIComponent(html)));
-    const res = await ghFetch(`/repos/${REPO}/contents/index.html`, TOKEN, {
-      method: 'PUT',
-      body: JSON.stringify({
-        message: '[admin] portfolio: remove item',
-        content: htmlB64,
-        sha: indexFile.sha,
-        branch: BRANCH,
-      }),
-    });
-    if (!res.ok) throw new Error('Не удалось обновить index.html');
-    await loadWorks();
-  } catch(e) {
-    alert('Ошибка: ' + e.message);
-  }
-}
-
 function toBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -4320,6 +4124,320 @@ function adminUploadFile() {
   input.click();
 }
 
+/* ═══════ РАБОТЫ: данные в БД, файлы на сайте (GitHub) ═══════ */
+let WORKS = [];
+let WORKS_META = { types: [], times: [], groups: [] };
+let worksFilter = '';
+let wmCurrent = null;
+let wmNew = { on: false, until: '' };
+const _pickerRenders = [];
+
+const $id = (x) => document.getElementById(x);
+
+function dateInDays(n) {
+  const d = new Date(Date.now() + n * 86400000);
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+function fmtDay(v) {
+  const m = String(v || '').slice(0, 10).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  return m ? `${m[3]}.${m[2]}.${m[1]}` : String(v || '');
+}
+function nextGroupKey() {
+  let max = 0;
+  WORKS_META.groups.forEach(g => { const m = /^g(\d+)$/.exec(g); if (m) max = Math.max(max, parseInt(m[1], 10)); });
+  return 'g' + (max + 1);
+}
+
+async function fetchWorks() {
+  const res = await adminFetch(`${BOT_API}/admin/portfolio`);
+  if (!res.ok) {
+    throw new Error(res.status === 403 ? 'Неверный ключ администратора'
+      : res.status === 404 ? 'Бэкенд без обновления (нет /admin/portfolio) — выкати новые файлы на Railway'
+      : 'Сервер ответил ' + res.status);
+  }
+  const data = await res.json();
+  WORKS = data.works || [];
+  WORKS_META = { types: data.types || [], times: data.times || [], groups: data.groups || [] };
+}
+
+/* чипы-подсказки над текстовым полем: клик подставляет значение, поле остаётся источником правды */
+function chipPicker(chipsEl, inputEl, optionsFn) {
+  function render() {
+    chipsEl.innerHTML = '';
+    const cur = inputEl.value.trim();
+    optionsFn().forEach(o => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'chip' + (o.value === cur ? ' on' : '');
+      b.textContent = o.label;
+      b.addEventListener('click', () => { inputEl.value = o.value; inputEl.dispatchEvent(new Event('input')); });
+      chipsEl.appendChild(b);
+    });
+  }
+  inputEl.addEventListener('input', render);
+  _pickerRenders.push(render);
+  render();
+  return render;
+}
+function refreshPickers() { _pickerRenders.forEach(r => r()); }
+
+/* выбор заказчика: вписать Discord ID или найти по нику */
+function userPicker(chipsEl, inputEl, infoEl) {
+  let timer = 0;
+  const known = {};
+  async function search() {
+    const q = inputEl.value.trim();
+    chipsEl.innerHTML = '';
+    infoEl.textContent = known[q] ? '✓ ' + known[q] : '';
+    if (q.length < 2) return;
+    try {
+      const res = await adminFetch(`${BOT_API}/admin/portfolio/users?q=${encodeURIComponent(q)}`);
+      if (!res.ok || inputEl.value.trim() !== q) return;
+      const data = await res.json();
+      (data.users || []).forEach(u => {
+        known[u.discord_id] = u.username || u.discord_id;
+        if (u.discord_id === q) infoEl.textContent = '✓ ' + known[q];
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'chip';
+        b.textContent = (u.username || '?') + ' · ' + u.discord_id;
+        b.addEventListener('click', () => {
+          inputEl.value = u.discord_id;
+          chipsEl.innerHTML = '';
+          infoEl.textContent = '✓ ' + (u.username || u.discord_id);
+        });
+        chipsEl.appendChild(b);
+      });
+    } catch (e) { /* без подсказок — ID можно вписать вручную */ }
+  }
+  inputEl.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(search, 300); });
+  return { setKnown(id, name) { if (id && name) known[id] = name; infoEl.textContent = id && name ? '✓ ' + name : ''; chipsEl.innerHTML = ''; } };
+}
+
+function isVideoPath(p) { return /\.(mp4|webm|mov)$/i.test(p); }
+function workMediaUrl(img) { return `https://raw.githubusercontent.com/${REPO}/${BRANCH}/${img}`; }
+
+function workCard(w, gsize) {
+  const card = document.createElement('div');
+  card.className = 'wcard';
+
+  const thumb = document.createElement('div');
+  thumb.className = 'wthumb';
+  const url = workMediaUrl(w.img);
+  if (isVideoPath(w.img)) {
+    const v = document.createElement('video');
+    v.src = url; v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'metadata';
+    card.addEventListener('mouseenter', () => { v.play().catch(() => {}); });
+    card.addEventListener('mouseleave', () => { v.pause(); });
+    thumb.appendChild(v);
+  } else {
+    const im = document.createElement('img');
+    im.src = url; im.alt = ''; im.loading = 'lazy';
+    thumb.appendChild(im);
+  }
+  if (w.new_active) { const t = document.createElement('div'); t.className = 'wtag wtag-new'; t.textContent = 'НОВОЕ'; thumb.appendChild(t); }
+  if (w.group_key) { const t = document.createElement('div'); t.className = 'wtag wtag-group'; t.textContent = `${w.group_key} · ${gsize[w.group_key] || 1}`; thumb.appendChild(t); }
+
+  const mv = document.createElement('div');
+  mv.className = 'wmove';
+  [['◀', 'up'], ['▶', 'down']].forEach(([sym, dir]) => {
+    const b = document.createElement('b');
+    b.textContent = sym; b.title = dir === 'up' ? 'Показывать раньше' : 'Показывать позже';
+    b.addEventListener('click', (e) => { e.stopPropagation(); moveWork(w.id, dir); });
+    mv.appendChild(b);
+  });
+  thumb.appendChild(mv);
+  card.appendChild(thumb);
+
+  const body = document.createElement('div');
+  body.className = 'wbody';
+  const title = document.createElement('div'); title.className = 'wtitle'; title.textContent = w.type;
+  const meta = document.createElement('div'); meta.className = 'wmeta';
+  const who = w.author_name || (w.user_id ? 'ID ' + w.user_id : '');
+  meta.textContent = [w.time, who ? '👤 ' + who + (w.show_author ? '' : ' (скрыт)') : ''].filter(Boolean).join(' · ');
+  const file = document.createElement('div'); file.className = 'wfile'; file.textContent = w.img;
+  body.append(title, meta, file);
+  card.appendChild(body);
+
+  card.addEventListener('click', () => openWorkModal(w));
+  return card;
+}
+
+function renderWorksGrid() {
+  const grid = $id('worksGrid'), chips = $id('worksChips');
+  $id('worksCount').textContent = WORKS.length;
+
+  chips.innerHTML = '';
+  const types = [...new Set(WORKS.map(w => w.type))];
+  if (worksFilter && !types.includes(worksFilter)) worksFilter = '';
+  [['', 'Все']].concat(types.map(t => [t, t])).forEach(([v, label]) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'chip' + (worksFilter === v ? ' on' : '');
+    b.textContent = label;
+    b.addEventListener('click', () => { worksFilter = v; renderWorksGrid(); });
+    chips.appendChild(b);
+  });
+
+  grid.innerHTML = '';
+  const gsize = {};
+  WORKS.forEach(w => { if (w.group_key) gsize[w.group_key] = (gsize[w.group_key] || 0) + 1; });
+  const list = WORKS.filter(w => !worksFilter || w.type === worksFilter);
+  if (!list.length) {
+    const e = document.createElement('div'); e.className = 'works-empty'; e.textContent = 'Работ пока нет';
+    grid.appendChild(e);
+    return;
+  }
+  list.forEach(w => grid.appendChild(workCard(w, gsize)));
+}
+
+async function loadWorks() {
+  const grid = $id('worksGrid');
+  grid.innerHTML = '';
+  const loading = document.createElement('div'); loading.className = 'works-empty'; loading.textContent = 'Загрузка...';
+  grid.appendChild(loading);
+  try {
+    await fetchWorks();
+    renderWorksGrid();
+    refreshPickers();
+  } catch (e) {
+    grid.innerHTML = '';
+    const err = document.createElement('div'); err.className = 'works-empty'; err.style.color = '#ff6b6b';
+    err.textContent = '❌ ' + e.message;
+    grid.appendChild(err);
+  }
+}
+
+async function moveWork(id, dir) {
+  try {
+    const res = await adminFetch(`${BOT_API}/admin/portfolio/move?id=${id}&dir=${dir}`, { master: true });
+    if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err.error || ('HTTP ' + res.status)); }
+    await fetchWorks();
+    renderWorksGrid();
+  } catch (e) { alert('Ошибка: ' + e.message); }
+}
+
+/* ── окно редактирования ── */
+function renderNewChips() {
+  const el = $id('wmNewChips');
+  el.innerHTML = '';
+  const opts = [{ l: 'Выкл', on: false, until: '' }]
+    .concat([3, 7, 14, 30].map(n => ({ l: n + ' дней', on: true, until: dateInDays(n) })))
+    .concat([{ l: 'Бессрочно', on: true, until: '' }]);
+  if (wmNew.on && wmNew.until && !opts.some(o => o.on && o.until === wmNew.until)) {
+    opts.splice(1, 0, { l: 'До ' + fmtDay(wmNew.until), on: true, until: wmNew.until });
+  }
+  opts.forEach(o => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'chip' + (o.on === wmNew.on && o.until === wmNew.until ? ' on' : '');
+    b.textContent = o.l;
+    b.addEventListener('click', () => { wmNew = { on: o.on, until: o.until }; renderNewChips(); });
+    el.appendChild(b);
+  });
+}
+
+function openWorkModal(w) {
+  wmCurrent = w;
+  const pv = $id('wmPreview');
+  pv.innerHTML = '';
+  const url = workMediaUrl(w.img);
+  if (isVideoPath(w.img)) {
+    const v = document.createElement('video'); v.src = url; v.controls = true; v.muted = true; v.loop = true; v.playsInline = true;
+    pv.appendChild(v);
+  } else {
+    const im = document.createElement('img'); im.src = url; im.alt = '';
+    pv.appendChild(im);
+  }
+  $id('wmFile').textContent = w.img;
+  $id('wmType').value = w.type || '';
+  $id('wmTime').value = w.time || '';
+  $id('wmGroup').value = w.group_key || '';
+  $id('wmUser').value = w.user_id || '';
+  $id('wmShowAuthor').checked = !!w.show_author;
+  $id('wmStatus').textContent = '';
+  wmUserPicker.setKnown(w.user_id, w.author_name);
+  wmNew = { on: !!w.is_new, until: w.new_until || '' };
+  renderNewChips();
+  refreshPickers();
+  $id('workModal').classList.add('open');
+}
+
+function closeWorkModal() {
+  $id('workModal').classList.remove('open');
+  const v = $id('wmPreview').querySelector('video');
+  if (v) v.pause();
+  wmCurrent = null;
+}
+
+async function saveWorkModal() {
+  if (!wmCurrent) return;
+  const st = $id('wmStatus');
+  const type = $id('wmType').value.trim();
+  const time = $id('wmTime').value.trim();
+  if (!type || !time) { st.textContent = 'Укажи тип и срок'; return; }
+  const user = $id('wmUser').value.trim();
+  if (user && !/^\d{15,25}$/.test(user)) { st.textContent = 'Заказчик: нужен Discord ID (только цифры) — выбери из подсказок по нику'; return; }
+  const btn = $id('wmSave');
+  btn.disabled = true; st.textContent = '';
+  try {
+    const res = await adminFetch(`${BOT_API}/admin/portfolio/save`, {
+      master: true, method: 'POST',
+      body: {
+        id: wmCurrent.id, type, time,
+        group_key: $id('wmGroup').value.trim() || null,
+        user_id: user || null,
+        show_author: $id('wmShowAuthor').checked,
+        is_new: wmNew.on, new_until: wmNew.on && wmNew.until ? wmNew.until : null,
+      },
+    });
+    if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err.error || ('HTTP ' + res.status)); }
+    await fetchWorks();
+    renderWorksGrid();
+    refreshPickers();
+    closeWorkModal();
+  } catch (e) {
+    st.textContent = 'Ошибка: ' + e.message;
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function deleteWorkModal() {
+  if (!wmCurrent) return;
+  if (!confirm('Удалить работу из базы?\n(Файл на сайте останется)')) return;
+  try {
+    const res = await adminFetch(`${BOT_API}/admin/portfolio/delete?id=${wmCurrent.id}`, { master: true });
+    if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err.error || ('HTTP ' + res.status)); }
+    await fetchWorks();
+    renderWorksGrid();
+    refreshPickers();
+    closeWorkModal();
+  } catch (e) { $id('wmStatus').textContent = 'Ошибка: ' + e.message; }
+}
+
+const groupOptions = () => [{ label: 'Без группы', value: '' }]
+  .concat(WORKS_META.groups.map(g => ({ label: 'Группа ' + g, value: g })))
+  .concat([{ label: '＋ Новая', value: nextGroupKey() }]);
+
+chipPicker($id('upTypeChips'),  $id('workType'),  () => WORKS_META.types.map(t => ({ label: t, value: t })));
+chipPicker($id('upTimeChips'),  $id('workTime'),  () => WORKS_META.times.map(t => ({ label: t, value: t })));
+chipPicker($id('upGroupChips'), $id('workGroup'), groupOptions);
+userPicker($id('workUserChips'), $id('workUser'), $id('workUserInfo'));
+chipPicker($id('wmTypeChips'),  $id('wmType'),  () => WORKS_META.types.map(t => ({ label: t, value: t })));
+chipPicker($id('wmTimeChips'),  $id('wmTime'),  () => WORKS_META.times.map(t => ({ label: t, value: t })));
+chipPicker($id('wmGroupChips'), $id('wmGroup'), groupOptions);
+const wmUserPicker = userPicker($id('wmUserChips'), $id('wmUser'), $id('wmUserInfo'));
+
+$id('wmClose').addEventListener('click', closeWorkModal);
+$id('workModal').addEventListener('click', (e) => { if (e.target === $id('workModal')) closeWorkModal(); });
+$id('wmSave').addEventListener('click', saveWorkModal);
+$id('wmDelete').addEventListener('click', deleteWorkModal);
+$id('wmUp').addEventListener('click', async () => { if (wmCurrent) { await moveWork(wmCurrent.id, 'up'); } });
+$id('wmDown').addEventListener('click', async () => { if (wmCurrent) { await moveWork(wmCurrent.id, 'down'); } });
+addEventListener('keydown', (e) => { if (e.key === 'Escape' && $id('workModal').classList.contains('open')) closeWorkModal(); });
+if (localStorage.getItem('mz_admin_key')) { fetchWorks().then(refreshPickers).catch(() => {}); }
+
   // custom cursor: точка + кольцо (только мышь)
   (function () {
     if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
@@ -4328,7 +4446,7 @@ function adminUploadFile() {
     const dot = document.createElement('div'); dot.className = 'cur-dot';
     const ring = document.createElement('div'); ring.className = 'cur-ring';
     document.body.append(ring, dot);
-    const INTERACTIVE = 'a, button, [onclick], [role="button"], label, summary, select, input[type=checkbox], input[type=radio], input[type=file], input[type=button], input[type=submit], .tab, .btn, .work-del, .work-new, .work-edit';
+    const INTERACTIVE = 'a, button, [onclick], [role="button"], label, summary, select, input[type=checkbox], input[type=radio], input[type=file], input[type=button], input[type=submit], .tab, .btn, .chip, .wcard, .wm-x, .wmove b';
     let x = -100, y = -100, rx = -100, ry = -100, raf = 0, armed = false;
     function loop() {
       const k = calm ? 1 : 0.18;
