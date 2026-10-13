@@ -717,6 +717,24 @@
     .wtitle { font-size: 8px; line-height: 1.6; color: #ff6b6b; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .wmeta { margin-top: 5px; font-size: 6.5px; line-height: 1.7; color: rgba(255,200,200,0.5); overflow-wrap: anywhere; }
     .wfile { margin-top: 3px; font-size: 6px; color: rgba(255,200,200,0.28); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .groups-view { display: flex; flex-direction: column; gap: 18px; }
+    .gbox { border: 1px solid rgba(255,0,0,0.22); border-radius: 14px; padding: 14px; background: rgba(255,255,255,0.02); }
+    .ghead { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+    .gname { font-size: 9px; color: #ff6b6b; line-height: 1.6; overflow-wrap: anywhere; }
+    .gcount { color: rgba(255,200,200,0.4); }
+    .gbtns { display: flex; flex-wrap: wrap; gap: 6px; }
+    .grow { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: thin; }
+    .gmem { flex: 0 0 170px; min-width: 0; cursor: pointer; }
+    .gmem .wthumb { border-radius: 10px; }
+    .gctl { position: absolute; left: 6px; bottom: 6px; display: flex; gap: 4px; }
+    .gctl b { font-weight: normal; font-size: 9px; line-height: 1; padding: 5px 7px; border-radius: 7px; background: rgba(0,0,0,0.7); color: #ffd0d0; border: 1px solid rgba(255,0,0,0.3); cursor: pointer; }
+    .gctl b:hover { background: rgba(255,0,0,0.5); color: #fff; }
+    .gctl b.off { opacity: .25; pointer-events: none; }
+    .picker-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); max-height: 52vh; overflow-y: auto; padding: 4px; }
+    .pcard { cursor: pointer; border-radius: 12px; padding: 4px; border: 2px solid transparent; transition: border-color .15s, background .15s; }
+    .pcard.sel { border-color: #ff2a2a; background: rgba(255,0,0,0.1); }
+    .pcard.sel .wthumb::after { content: '✓'; position: absolute; top: 6px; right: 6px; width: 18px; height: 18px; border-radius: 50%; background: #ff2a2a; color: #fff; font-size: 10px; line-height: 18px; text-align: center; }
+    .wtag-group { max-width: 70%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .wm-overlay { position: fixed; inset: 0; z-index: 6000; display: none; align-items: flex-start; justify-content: center; padding: 4vh 12px; overflow-y: auto; background: rgba(5,0,0,0.78); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
     .wm-overlay.open { display: flex; }
     .wm { width: 100%; max-width: 520px; background: #0c0000; border: 1px solid rgba(255,0,0,0.3); border-radius: 16px; padding: 18px; box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 40px rgba(255,0,0,0.12); }
@@ -858,10 +876,12 @@
       <div class="card">
         <div class="card-title">📋 ВСЕ РАБОТЫ <span class="badge" id="worksCount">0</span></div>
 <button class="btn btn-sm" onclick="cooldownClick(this,'works',loadWorks)" style="margin-bottom:16px">🔄 Обновить список</button>
+        <div class="chips" id="worksView"></div>
         <div class="chips chips-scroll" id="worksChips"></div>
         <div id="worksGrid" class="works-grid">
           <div class="works-empty">Загрузка...</div>
         </div>
+        <div id="groupsView" class="groups-view" style="display:none"></div>
       </div>
     </div>
 
@@ -1401,6 +1421,19 @@
       <button class="btn btn-sm" id="wmDown" type="button">Позже ▶</button>
       <button class="btn btn-sm wm-danger" id="wmDelete" type="button">Удалить</button>
       <button class="btn btn-sm" id="wmSave" type="button">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<div class="wm-overlay" id="groupPicker" style="z-index:6100">
+  <div class="wm" style="max-width:820px">
+    <div class="wm-head"><span id="gpTitle">Добавить в группу</span><span class="wm-x" id="gpClose">✕</span></div>
+    <div class="chips chips-scroll" id="gpChips"></div>
+    <div class="works-grid picker-grid" id="gpGrid"></div>
+    <div class="wm-status" id="gpStatus"></div>
+    <div class="wm-actions">
+      <button class="btn btn-sm" id="gpCancel" type="button">Отмена</button>
+      <button class="btn btn-sm" id="gpOk" type="button">Добавить</button>
     </div>
   </div>
 </div>
@@ -4128,6 +4161,10 @@ function adminUploadFile() {
 let WORKS = [];
 let WORKS_META = { types: [], times: [], groups: [] };
 let worksFilter = '';
+let worksView = 'works';
+let gpKey = '';
+const gpSel = new Set();
+let gpFilter = '';
 let wmCurrent = null;
 let wmNew = { on: false, until: '' };
 const _pickerRenders = [];
@@ -4144,8 +4181,8 @@ function fmtDay(v) {
 }
 function nextGroupKey() {
   let max = 0;
-  WORKS_META.groups.forEach(g => { const m = /^g(\d+)$/.exec(g); if (m) max = Math.max(max, parseInt(m[1], 10)); });
-  return 'g' + (max + 1);
+  WORKS_META.groups.forEach(g => { const m = /^Группа (\d+)$/.exec(g); if (m) max = Math.max(max, parseInt(m[1], 10)); });
+  return 'Группа ' + (max + 1);
 }
 
 async function fetchWorks() {
@@ -4264,8 +4301,22 @@ function workCard(w, gsize) {
 }
 
 function renderWorksGrid() {
-  const grid = $id('worksGrid'), chips = $id('worksChips');
+  const grid = $id('worksGrid'), chips = $id('worksChips'), gv = $id('groupsView'), vw = $id('worksView');
   $id('worksCount').textContent = WORKS.length;
+
+  vw.innerHTML = '';
+  [['works', '🎬 Работы'], ['groups', '📁 Группы (' + WORKS_META.groups.length + ')']].forEach(([v, label]) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'chip' + (worksView === v ? ' on' : '');
+    b.textContent = label;
+    b.addEventListener('click', () => { worksView = v; renderWorksGrid(); });
+    vw.appendChild(b);
+  });
+  grid.style.display = worksView === 'works' ? '' : 'none';
+  chips.style.display = worksView === 'works' ? '' : 'none';
+  gv.style.display = worksView === 'groups' ? '' : 'none';
+  if (worksView === 'groups') { renderGroupsView(); return; }
 
   chips.innerHTML = '';
   const types = [...new Set(WORKS.map(w => w.type))];
@@ -4308,12 +4359,13 @@ async function loadWorks() {
   }
 }
 
-async function moveWork(id, dir) {
+async function moveWork(id, dir, group) {
   try {
-    const res = await adminFetch(`${BOT_API}/admin/portfolio/move?id=${id}&dir=${dir}`, { master: true });
+    const res = await adminFetch(`${BOT_API}/admin/portfolio/move?id=${id}&dir=${dir}` + (group ? '&group=' + encodeURIComponent(group) : ''), { master: true });
     if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err.error || ('HTTP ' + res.status)); }
     await fetchWorks();
     renderWorksGrid();
+    refreshPickers();
   } catch (e) { alert('Ошибка: ' + e.message); }
 }
 
@@ -4416,8 +4468,165 @@ async function deleteWorkModal() {
   } catch (e) { $id('wmStatus').textContent = 'Ошибка: ' + e.message; }
 }
 
+/* ── группы ── */
+async function groupCall(url, opts) {
+  const res = await adminFetch(`${BOT_API}${url}`, Object.assign({ master: true }, opts || {}));
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    const map = { group_exists: 'Группа с таким именем уже есть', group_name_required: 'Введи имя группы', not_found: 'Не найдено', no_works: 'Ничего не выбрано' };
+    throw new Error(map[err.error] || err.error || ('HTTP ' + res.status));
+  }
+  return res.json();
+}
+async function groupReload() { await fetchWorks(); renderWorksGrid(); refreshPickers(); }
+
+function groupMember(w, key, idx, total) {
+  const m = document.createElement('div');
+  m.className = 'gmem';
+  const thumb = document.createElement('div');
+  thumb.className = 'wthumb';
+  const url = workMediaUrl(w.img);
+  if (isVideoPath(w.img)) {
+    const v = document.createElement('video'); v.src = url; v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'metadata';
+    m.addEventListener('mouseenter', () => { v.play().catch(() => {}); });
+    m.addEventListener('mouseleave', () => { v.pause(); });
+    thumb.appendChild(v);
+  } else {
+    const im = document.createElement('img'); im.src = url; im.alt = ''; im.loading = 'lazy'; thumb.appendChild(im);
+  }
+  if (idx === 0) { const t = document.createElement('div'); t.className = 'wtag wtag-new'; t.style.background = 'rgba(0,0,0,0.65)'; t.style.boxShadow = 'none'; t.textContent = 'обложка'; thumb.appendChild(t); }
+  const ctl = document.createElement('div');
+  ctl.className = 'gctl';
+  [['◀', 'up', idx === 0], ['▶', 'down', idx === total - 1]].forEach(([sym, dir, off]) => {
+    const b = document.createElement('b'); b.textContent = sym; if (off) b.className = 'off';
+    b.title = dir === 'up' ? 'Раньше в группе' : 'Позже в группе';
+    b.addEventListener('click', (e) => { e.stopPropagation(); moveWork(w.id, dir, key); });
+    ctl.appendChild(b);
+  });
+  const rm = document.createElement('b'); rm.textContent = '✕'; rm.title = 'Убрать из группы';
+  rm.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    try { await groupCall(`/admin/portfolio/group/remove?id=${w.id}`); await groupReload(); } catch (err) { alert('Ошибка: ' + err.message); }
+  });
+  ctl.appendChild(rm);
+  thumb.appendChild(ctl);
+  m.appendChild(thumb);
+  const body = document.createElement('div'); body.className = 'wbody';
+  const title = document.createElement('div'); title.className = 'wtitle'; title.textContent = w.type;
+  const meta = document.createElement('div'); meta.className = 'wmeta'; meta.textContent = w.time;
+  body.append(title, meta);
+  m.appendChild(body);
+  m.addEventListener('click', () => openWorkModal(w));
+  return m;
+}
+
+function renderGroupsView() {
+  const gv = $id('groupsView');
+  gv.innerHTML = '';
+  const top = document.createElement('div');
+  top.className = 'chips';
+  const add = document.createElement('button');
+  add.type = 'button'; add.className = 'chip on'; add.textContent = '＋ Новая группа';
+  add.addEventListener('click', () => {
+    const name = prompt('Название группы:', nextGroupKey());
+    if (name === null) return;
+    if (!name.trim()) { alert('Введи имя группы'); return; }
+    openGroupPicker(name.trim());
+  });
+  top.appendChild(add);
+  gv.appendChild(top);
+
+  if (!WORKS_META.groups.length) {
+    const e = document.createElement('div'); e.className = 'works-empty'; e.textContent = 'Групп пока нет. Группа — это несколько работ в одной карточке с листалкой.';
+    gv.appendChild(e);
+    return;
+  }
+  WORKS_META.groups.forEach(key => {
+    const members = WORKS.filter(w => w.group_key === key);
+    const box = document.createElement('div'); box.className = 'gbox';
+    const head = document.createElement('div'); head.className = 'ghead';
+    const name = document.createElement('div'); name.className = 'gname';
+    name.textContent = key + ' ';
+    const cnt = document.createElement('span'); cnt.className = 'gcount'; cnt.textContent = '· ' + members.length;
+    name.appendChild(cnt);
+    const btns = document.createElement('div'); btns.className = 'gbtns';
+    const mk = (label, fn, danger) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'chip' + (danger ? ' wm-danger' : ''); b.textContent = label; b.addEventListener('click', fn); btns.appendChild(b); };
+    mk('✏️ Имя', async () => {
+      const nn = prompt('Новое название группы:', key);
+      if (nn === null || !nn.trim() || nn.trim() === key) return;
+      try { await groupCall('/admin/portfolio/group/rename', { method: 'POST', body: { old: key, new: nn.trim() } }); await groupReload(); } catch (err) { alert('Ошибка: ' + err.message); }
+    });
+    mk('＋ Работы', () => openGroupPicker(key));
+    mk('Расформировать', async () => {
+      if (!confirm(`Расформировать «${key}»?\nРаботы останутся, но станут одиночными.`)) return;
+      try { await groupCall(`/admin/portfolio/group/dissolve?key=${encodeURIComponent(key)}`); await groupReload(); } catch (err) { alert('Ошибка: ' + err.message); }
+    }, true);
+    head.append(name, btns);
+    box.appendChild(head);
+    const row = document.createElement('div'); row.className = 'grow';
+    members.forEach((w, i) => row.appendChild(groupMember(w, key, i, members.length)));
+    box.appendChild(row);
+    gv.appendChild(box);
+  });
+}
+
+function renderGroupPicker() {
+  const ungrouped = WORKS.filter(w => !w.group_key);
+  const chips = $id('gpChips'), grid = $id('gpGrid');
+  chips.innerHTML = '';
+  const types = [...new Set(ungrouped.map(w => w.type))];
+  if (gpFilter && !types.includes(gpFilter)) gpFilter = '';
+  [['', 'Все']].concat(types.map(t => [t, t])).forEach(([v, label]) => {
+    const b = document.createElement('button'); b.type = 'button';
+    b.className = 'chip' + (gpFilter === v ? ' on' : ''); b.textContent = label;
+    b.addEventListener('click', () => { gpFilter = v; renderGroupPicker(); });
+    chips.appendChild(b);
+  });
+  grid.innerHTML = '';
+  const list = ungrouped.filter(w => !gpFilter || w.type === gpFilter);
+  if (!list.length) { const e = document.createElement('div'); e.className = 'works-empty'; e.textContent = 'Свободных работ нет'; grid.appendChild(e); }
+  list.forEach(w => {
+    const c = document.createElement('div');
+    c.className = 'pcard wcard' + (gpSel.has(w.id) ? ' sel' : '');
+    const thumb = document.createElement('div'); thumb.className = 'wthumb';
+    const url = workMediaUrl(w.img);
+    if (isVideoPath(w.img)) { const v = document.createElement('video'); v.src = url; v.muted = true; v.playsInline = true; v.preload = 'metadata'; thumb.appendChild(v); }
+    else { const im = document.createElement('img'); im.src = url; im.alt = ''; im.loading = 'lazy'; thumb.appendChild(im); }
+    const t = document.createElement('div'); t.className = 'wmeta'; t.textContent = w.type + ' · ' + w.time;
+    c.append(thumb, t);
+    c.addEventListener('click', () => { if (gpSel.has(w.id)) gpSel.delete(w.id); else gpSel.add(w.id); renderGroupPicker(); });
+    grid.appendChild(c);
+  });
+  $id('gpOk').textContent = gpSel.size ? `Добавить (${gpSel.size})` : 'Добавить';
+}
+
+function openGroupPicker(key) {
+  gpKey = key; gpSel.clear(); gpFilter = '';
+  $id('gpTitle').textContent = 'Добавить в «' + key + '»';
+  $id('gpStatus').textContent = '';
+  renderGroupPicker();
+  $id('groupPicker').classList.add('open');
+}
+function closeGroupPicker() { $id('groupPicker').classList.remove('open'); }
+async function confirmGroupPicker() {
+  const st = $id('gpStatus');
+  if (!gpSel.size) { st.textContent = 'Выбери хотя бы одну работу'; return; }
+  const btn = $id('gpOk'); btn.disabled = true; st.textContent = '';
+  try {
+    await groupCall('/admin/portfolio/group/add', { method: 'POST', body: { key: gpKey, ids: [...gpSel] } });
+    closeGroupPicker();
+    await groupReload();
+  } catch (e) { st.textContent = 'Ошибка: ' + e.message; }
+  finally { btn.disabled = false; }
+}
+$id('gpClose').addEventListener('click', closeGroupPicker);
+$id('gpCancel').addEventListener('click', closeGroupPicker);
+$id('gpOk').addEventListener('click', confirmGroupPicker);
+$id('groupPicker').addEventListener('click', (e) => { if (e.target === $id('groupPicker')) closeGroupPicker(); });
+addEventListener('keydown', (e) => { if (e.key === 'Escape' && $id('groupPicker').classList.contains('open')) closeGroupPicker(); });
+
 const groupOptions = () => [{ label: 'Без группы', value: '' }]
-  .concat(WORKS_META.groups.map(g => ({ label: 'Группа ' + g, value: g })))
+  .concat(WORKS_META.groups.map(g => ({ label: g, value: g })))
   .concat([{ label: '＋ Новая', value: nextGroupKey() }]);
 
 chipPicker($id('upTypeChips'),  $id('workType'),  () => WORKS_META.types.map(t => ({ label: t, value: t })));
@@ -4446,7 +4655,7 @@ if (localStorage.getItem('mz_admin_key')) { fetchWorks().then(refreshPickers).ca
     const dot = document.createElement('div'); dot.className = 'cur-dot';
     const ring = document.createElement('div'); ring.className = 'cur-ring';
     document.body.append(ring, dot);
-    const INTERACTIVE = 'a, button, [onclick], [role="button"], label, summary, select, input[type=checkbox], input[type=radio], input[type=file], input[type=button], input[type=submit], .tab, .btn, .chip, .wcard, .wm-x, .wmove b';
+    const INTERACTIVE = 'a, button, [onclick], [role="button"], label, summary, select, input[type=checkbox], input[type=radio], input[type=file], input[type=button], input[type=submit], .tab, .btn, .chip, .wcard, .gmem, .pcard, .wm-x, .wmove b, .gctl b';
     let x = -100, y = -100, rx = -100, ry = -100, raf = 0, armed = false;
     function loop() {
       const k = calm ? 1 : 0.18;
