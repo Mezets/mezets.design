@@ -1,0 +1,10 @@
+User-agent: *
+Disallow: /assets/css/
+Disallow: /assets/js/
+Disallow: /*?*
+Disallow: /*%*
+
+Allow: /assets/img/
+Allow: /assets/images/
+
+Sitemap: https://github.io
