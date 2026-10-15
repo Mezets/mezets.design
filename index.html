@@ -497,6 +497,7 @@
       margin-top: 4px;
       letter-spacing: .3px;
     }
+    .portfolio-card-author { font-size: 7px; color: rgba(255,200,200,0.6); margin-top: 5px; overflow-wrap: anywhere; }
     .portfolio-modal-author { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 8px; color: rgba(255,200,200,0.55); overflow-wrap: anywhere; }
     .portfolio-modal-author:empty { display: none; }
     .portfolio-modal-author img { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
@@ -2047,9 +2048,22 @@
     }
 
     .review-order {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
       font-size: 7px;
       color: rgba(255,180,180,0.4);
-      margin-top: 6px;
+      margin-top: 8px;
+    }
+    .review-type {
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(255,0,0,0.12);
+      border: 1px solid rgba(255,0,0,0.3);
+      color: #ff8a8a;
+      line-height: 1.4;
+      overflow-wrap: anywhere;
     }
 
     .reviews-loading {
@@ -2805,7 +2819,7 @@
       const dateStr = u.login_at ? u.login_at.split(' ')[0].split('-').reverse().join('.') : '';
       if (topEl) {
         topEl.innerHTML = `
-          ${u.avatar ? `<img src="${u.avatar}" alt="">` : ''}
+          ${u.avatar ? `<img src="${esc(u.avatar)}" alt="">` : ''}
           <div class="top-right-profile-text">
             <div class="top-right-profile-name">${(u.username || 'Discord').replace(/</g,'&lt;')}</div>
             ${dateStr ? `<div class="top-right-profile-date">Вход: ${dateStr}</div>` : ''}
@@ -2851,9 +2865,9 @@
         const st = statusLabel(o.status);
         const price = o.final_price || o.estimated_price || 0;
         return `
-          <div class="my-orders-item" onclick="window.location.href='order/?id=${o.id}'">
+          <div class="my-orders-item" onclick="window.location.href='order/?id=${encodeURIComponent(o.id)}'">
             <div class="my-orders-item-top">
-              <span class="my-orders-item-id">Заказ #${o.id}</span>
+              <span class="my-orders-item-id">Заказ #${esc(o.id)}</span>
               <span class="my-orders-item-price">${Math.round(price).toLocaleString('ru-RU')} ₽</span>
             </div>
             <span class="my-orders-item-status ${st.cls}">${st.text}</span>
@@ -3182,17 +3196,22 @@
     });
   }
 
+  function esc(v) {
+    return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
   function renderReview(r, idx, list) {
     const stars = [1,2,3,4,5].map(i =>
       `<span class="review-star ${i <= r.rating ? 'on' : ''}">★</span>`
     ).join('');
     const avatar = r.avatar
-      ? `<img class="review-avatar" src="${r.avatar}" alt="" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'review-avatar-placeholder',textContent:'?'}))">`
+      ? `<img class="review-avatar" src="${esc(r.avatar)}" alt="" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'review-avatar-placeholder',textContent:'?'}))">`
       : `<div class="review-avatar-placeholder">?</div>`;
-    const comment = r.comment ? `<div class="review-comment">${r.comment}</div>` : '';
-    const orderInfo = r.order
-      ? `<div class="review-order">Заказ ${r.order}${r.order_type ? ' · ' + r.order_type : ''}</div>`
-      : '';
+    const comment = r.comment ? `<div class="review-comment">${esc(r.comment)}</div>` : '';
+    const orderType = (r.order_type && !/^не указан/i.test(String(r.order_type).trim())) ? String(r.order_type).trim() : '';
+    const typeTag = orderType ? `<span class="review-type">${esc(orderType)}</span>` : '';
+    const orderNo = r.order ? `<span class="review-order-no">Заказ ${esc(r.order)}</span>` : '';
+    const orderInfo = (typeTag || orderNo) ? `<div class="review-order">${typeTag}${orderNo}</div>` : '';
     const el = document.createElement('div');
     el.className = 'review-item';
     el.style.animationDelay = `${idx * 60}ms`;
@@ -3200,8 +3219,8 @@
       <div class="review-header">
         ${avatar}
         <div class="review-meta">
-          <div class="review-author">${r.author}</div>
-          <div class="review-date">${r.date}</div>
+          <div class="review-author">${esc(r.author)}</div>
+          <div class="review-date">${esc(r.date)}</div>
         </div>
       </div>
       <div class="review-stars">${stars}</div>
@@ -3685,14 +3704,14 @@
       item.className = 'roulette-winner-item';
       item.style.animationDelay = `${i * 60}ms`;
       const avatarHtml = w.avatar
-        ? `<img class="roulette-winner-avatar" src="${w.avatar}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="roulette-winner-avatar-placeholder" style="display:none">🎰</div>`
+        ? `<img class="roulette-winner-avatar" src="${esc(w.avatar)}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="roulette-winner-avatar-placeholder" style="display:none">🎰</div>`
         : `<div class="roulette-winner-avatar-placeholder">🎰</div>`;
       const emoji = DISCOUNT_EMOJI[w.discount] || '🎰';
       item.innerHTML = `
         ${avatarHtml}
         <div class="roulette-winner-info">
-          <div class="roulette-winner-name">${w.username}</div>
-          <div class="roulette-winner-meta">${w.date} · шанс ${getChance(w.discount)}</div>
+          <div class="roulette-winner-name">${esc(w.username)}</div>
+          <div class="roulette-winner-meta">${esc(w.date)} · шанс ${getChance(w.discount)}</div>
         </div>
         <div class="roulette-winner-badge">${emoji} ${w.discount}%</div>
       `;
@@ -4195,6 +4214,13 @@
         infoTime.className = 'portfolio-card-time';
         infoTime.textContent = cover.time;
         info.append(infoType, infoTime);
+        const authorItem = items.find(i => i.author && i.author.name);
+        if (authorItem) {
+          const au = document.createElement('div');
+          au.className = 'portfolio-card-author';
+          au.textContent = 'Заказал: ' + authorItem.author.name;
+          info.appendChild(au);
+        }
         card.appendChild(info);
 
         card.addEventListener('click', () => {
