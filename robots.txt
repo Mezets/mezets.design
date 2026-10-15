@@ -7,4 +7,4 @@ Disallow: /*%*
 Allow: /assets/img/
 Allow: /assets/images/
 
-Sitemap: https://github.io
+Sitemap: https://mezets.github.io/mezets.design/
