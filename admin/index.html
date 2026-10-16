@@ -694,6 +694,14 @@
     .db-table tbody tr:hover td { background: rgba(255,0,0,0.04); }
     .db-table tr.dirty td { background: rgba(255,170,0,0.1); }
     .db-table tr.dirty .save-btn { box-shadow: 0 0 10px rgba(0,255,0,0.45); }
+    /* --- заказ в админке: позиции и поповеры --- */
+    .item-stepper input.item-qty[type="text"] { width: 26px; height: 22px; padding: 0; background: transparent; border: none; border-radius: 0; box-shadow: none; font-size: 8.5px; line-height: 22px; text-align: center; flex: 0 0 26px; }
+    .order-item-cb > span { min-width: 0; overflow-wrap: anywhere; }
+    .order-chat-col-main { border-right: none; }
+    #itemsPopover { width: 360px; }
+    .field-popover, .price-popover { max-height: min(70vh, 560px); overflow-y: auto; }
+    #admItemsListBox { display: flex; flex-direction: column; gap: 6px; max-height: 280px; overflow-y: auto; padding-right: 4px; }
+    #statusChips .chip, #admItemsCats .chip { font-size: 7px; }
     /* --- РАБОТЫ: сетка как на главной YouTube + чипы --- */
     .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 8px; }
     .chips:empty { display: none; }
@@ -1222,6 +1230,11 @@
                 </div>
                 <div class="status qe-status"></div>
               </div>
+
+              <div id="statusPopover" class="field-popover" style="width:300px">
+                <label>Статус заказа</label>
+                <div class="chips" id="statusChips"></div>
+              </div>
             </div>
             <div style="display:flex;gap:10px;align-items:center">
               <span onclick="toggleCustomFieldsPanel()" title="Дополнительные поля" style="cursor:pointer;font-size:14px;opacity:0.45;transition:opacity .2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.45">»</span>
@@ -1240,17 +1253,6 @@
               </div>
             </div>
 
-            <div class="order-chat-col-side">
-              <div style="display:flex;gap:8px;align-items:center;padding:14px 16px;border-bottom:1px solid rgba(255,0,0,0.12);flex-wrap:wrap;flex-shrink:0">
-                <span style="font-size:6px;color:rgba(255,200,200,0.4)">Статус:</span>
-                <select id="chatOrderStatus" style="flex:1;min-width:110px;font-size:7px" onchange="adminChangeOrderStatus()">
-                  <option value="new">Новый</option>
-                  <option value="in_progress">В работе</option>
-                  <option value="completed">Выполнен</option>
-                  <option value="cancelled">Закрыт</option>
-                </select>
-              </div>
-            </div>
           </div>
 
           <div id="customFieldsPanel" class="custom-fields-panel">
@@ -3624,18 +3626,18 @@ async function openOrderChat(orderId) {
     var categoryLabels = { 'design': 'Дизайн', 'discord_bot': 'Discord бот', 'telegram_bot': 'Telegram бот', 'website': 'Сайт', 'other': 'Другое' };
     var priceText = (o.estimated_price !== undefined && o.estimated_price !== null) ? o.estimated_price : '?';
     var meta =
-      '<span class="meta-trigger" onclick="event.stopPropagation();toggleFieldPopover(\'category\')" title="Изменить категорию">📁 <span id="qeCategoryLabel">' + escHtml(categoryLabels[o.category] || o.category || '—') + '</span></span>' +
-      ' · <span class="meta-trigger" onclick="event.stopPropagation();toggleFieldPopover(\'type\')" title="Изменить тип заказа">🏷 <span id="qeTypeLabel">Тип не указан</span></span>' +
-      ' · ' + escHtml(statusLabels[o.status] || o.status) +
-      ' · <span class="meta-trigger" onclick="event.stopPropagation();togglePricePopover()" title="Изменить цену / выдать скидку">' + escHtml(String(priceText)) + '₽ ✎</span>' +
-      ' · <span class="meta-trigger" onclick="event.stopPropagation();toggleFieldPopover(\'payment\')" title="Изменить способ оплаты и банк">💳 <span id="qePaymentLabel">—</span></span>' +
-      ' · <span class="meta-trigger" onclick="event.stopPropagation();toggleFieldPopover(\'task\')" title="Изменить описание задачи">📝 <span id="qeTaskLabel">Что нужно</span></span>' +
-      ' · <span class="meta-trigger" onclick="event.stopPropagation();toggleFieldPopover(\'items\')" title="Изменить позиции">🛒 <span id="qeItemsLabel">Позиции</span></span>' +
+      '<span class="meta-trigger" data-pop="category" onclick="event.stopPropagation();toggleFieldPopover(\'category\')" title="Изменить категорию">📁 <span id="qeCategoryLabel">' + escHtml(categoryLabels[o.category] || o.category || '—') + '</span></span>' +
+      ' · <span class="meta-trigger" data-pop="type" onclick="event.stopPropagation();toggleFieldPopover(\'type\')" title="Изменить тип заказа">🏷 <span id="qeTypeLabel">Тип не указан</span></span>' +
+      ' · <span class="meta-trigger" data-pop="status" onclick="event.stopPropagation();toggleFieldPopover(\'status\')" title="Изменить статус">● <span id="qeStatusLabel">' + escHtml(statusLabels[o.status] || o.status) + '</span></span>' +
+      ' · <span class="meta-trigger" data-pop="price" onclick="event.stopPropagation();togglePricePopover()" title="Изменить цену / выдать скидку">' + escHtml(String(priceText)) + '₽ ✎</span>' +
+      ' · <span class="meta-trigger" data-pop="payment" onclick="event.stopPropagation();toggleFieldPopover(\'payment\')" title="Изменить способ оплаты и банк">💳 <span id="qePaymentLabel">—</span></span>' +
+      ' · <span class="meta-trigger" data-pop="task" onclick="event.stopPropagation();toggleFieldPopover(\'task\')" title="Изменить описание задачи">📝 <span id="qeTaskLabel">Что нужно</span></span>' +
+      ' · <span class="meta-trigger" data-pop="items" onclick="event.stopPropagation();toggleFieldPopover(\'items\')" title="Изменить позиции">🛒 <span id="qeItemsLabel">Позиции</span></span>' +
       ' · ' + escHtml(o.created_at || '—');
     document.getElementById('chatOrderMeta').innerHTML = meta;
     populateOrderEditor(o);
-    var statusSel = document.getElementById('chatOrderStatus');
-    if (statusSel) statusSel.value = o.status || 'new';
+    CHAT_STATUS = o.status || 'new';
+    renderStatusChips();
     renderChatMessages(data.messages || [], data.attachments || []);
   } catch(e) {
     document.getElementById('chatMessages').innerHTML = '<div style="font-size:8px;color:rgba(255,100,100,0.5);text-align:center;padding:40px">Не удалось загрузить чат</div>';
@@ -3646,15 +3648,35 @@ async function openOrderChat(orderId) {
   CHAT_POLL_TIMER = setInterval(pollChatMessages, 3000);
 }
 
-async function adminChangeOrderStatus() {
-  if (!ACTIVE_CHAT_ORDER_ID) return;
-  var sel = document.getElementById('chatOrderStatus');
-  var status = sel.value;
+const CHAT_STATUS_LABELS = { 'new': 'Новый', 'in_progress': 'В работе', 'completed': 'Выполнен', 'cancelled': 'Закрыт' };
+let CHAT_STATUS = 'new';
+
+function renderStatusChips() {
+  const box = document.getElementById('statusChips');
+  if (!box) return;
+  box.innerHTML = '';
+  Object.keys(CHAT_STATUS_LABELS).forEach(key => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'chip' + (key === CHAT_STATUS ? ' on' : '');
+    b.textContent = CHAT_STATUS_LABELS[key];
+    b.addEventListener('click', () => adminChangeOrderStatus(key));
+    box.appendChild(b);
+  });
+}
+
+async function adminChangeOrderStatus(status) {
+  if (!ACTIVE_CHAT_ORDER_ID || !status || status === CHAT_STATUS) { toggleFieldPopover('status', false); return; }
   try {
     var res = await adminFetch(BOT_API + '/admin/order/' + ACTIVE_CHAT_ORDER_ID + '/status', {
       method: 'POST', body: { status: status },
     });
     if (!res.ok) throw new Error('Сервер отклонил (' + res.status + ')');
+    CHAT_STATUS = status;
+    var lbl = document.getElementById('qeStatusLabel');
+    if (lbl) lbl.textContent = CHAT_STATUS_LABELS[status] || status;
+    renderStatusChips();
+    toggleFieldPopover('status', false);
     await loadOrders();
   } catch(e) {
     alert('Не удалось изменить статус: ' + e.message);
@@ -3678,7 +3700,7 @@ function admOnPaymentChange() {
   if (wrap) wrap.style.display = (pay === 'card' || pay === 'sbp') ? '' : 'none';
 }
 
-const ALL_POPOVER_IDS = ['pricePopover', 'categoryPopover', 'typePopover', 'paymentPopover', 'taskPopover', 'itemsPopover'];
+const ALL_POPOVER_IDS = ['pricePopover', 'categoryPopover', 'typePopover', 'paymentPopover', 'taskPopover', 'itemsPopover', 'statusPopover'];
 
 function closeAllPopovers(except) {
   ALL_POPOVER_IDS.forEach(id => {
@@ -3697,6 +3719,22 @@ function togglePricePopover(force) {
     if (ACTIVE_ORDER_DATA) populateOrderEditor(ACTIVE_ORDER_DATA);
   }
   pop.classList.toggle('open', show);
+  if (show) positionPopover(pop, 'price');
+}
+
+// поповер открывается под той плашкой, по которой кликнули, и не вылезает за окно заказа
+function positionPopover(pop, key) {
+  const wrap = pop.parentElement;
+  const trig = wrap.querySelector('.meta-trigger[data-pop="' + key + '"]');
+  if (!trig) return;
+  const wr = wrap.getBoundingClientRect(), tr = trig.getBoundingClientRect();
+  const modalEl = document.querySelector('#orderChatOverlay > div');
+  const mr = modalEl ? modalEl.getBoundingClientRect() : { left: 0, right: window.innerWidth };
+  pop.style.top = (tr.bottom - wr.top + 6) + 'px';
+  const w = pop.offsetWidth;
+  const minLeft = mr.left + 14 - wr.left;
+  const maxLeft = mr.right - 14 - wr.left - w;
+  pop.style.left = Math.max(minLeft, Math.min(tr.left - wr.left, maxLeft)) + 'px';
 }
 
 function toggleFieldPopover(key, force) {
@@ -3707,8 +3745,10 @@ function toggleFieldPopover(key, force) {
   if (show) {
     closeAllPopovers(id);
     if (ACTIVE_ORDER_DATA) populateOrderEditor(ACTIVE_ORDER_DATA);
+    if (key === 'status') renderStatusChips();
   }
   pop.classList.toggle('open', show);
+  if (show) positionPopover(pop, key);
 }
 
 document.addEventListener('click', function(e) {
@@ -3784,12 +3824,20 @@ function admRenderItemsPickerHTML(sections, selectedMap) {
   if (!sections || sections.length === 0) {
     return '<div style="font-size:7px;color:rgba(255,200,200,0.4)">Не удалось загрузить услуги</div>';
   }
-  let html = '<select id="admItemsCategorySelect" class="order-select" style="margin-bottom:8px" onchange="admRenderItemsList()">';
+  let html = '<div class="chips" id="admItemsCats">';
   sections.forEach((sec, i) => {
-    html += `<option value="${i}">${escHtml(sec.label)}</option>`;
+    html += `<button type="button" class="chip${i === 0 ? ' on' : ''}" data-i="${i}" onclick="admPickItemsCategory(${i})">${escHtml(sec.label)}</button>`;
   });
-  html += '</select><div id="admItemsListBox"></div>';
+  html += '</div><input type="hidden" id="admItemsCategorySelect" value="0"><div id="admItemsListBox"></div>';
   return html;
+}
+
+function admPickItemsCategory(i) {
+  const inp = document.getElementById('admItemsCategorySelect');
+  if (!inp) return;
+  inp.value = String(i);
+  document.querySelectorAll('#admItemsCats .chip').forEach(c => c.classList.toggle('on', Number(c.dataset.i) === i));
+  admRenderItemsList();
 }
 
 function admRenderItemsList() {
