@@ -2553,6 +2553,21 @@
 
 <script>
 
+  // Публичные данные (работы, отзывы, победители, цены) хранятся на компьютере 30 дней: страница
+  // рисуется сразу из кэша, а свежие данные подтягиваются с сервера в фоне. Личные данные не кэшируются.
+  const MZ_CACHE_TTL = 30 * 24 * 60 * 60 * 1000;
+  function cacheRead(key) {
+    try {
+      const v = JSON.parse(localStorage.getItem('mz_cache_' + key));
+      if (v && typeof v.t === 'number' && Date.now() - v.t < MZ_CACHE_TTL) return v.d;
+      if (v) localStorage.removeItem('mz_cache_' + key);
+    } catch (e) {}
+    return null;
+  }
+  function cacheWrite(key, data) {
+    try { localStorage.setItem('mz_cache_' + key, JSON.stringify({ t: Date.now(), d: data })); } catch (e) {}
+  }
+
   const PORTFOLIO_ITEMS = [
     { img: "portfolio/mp4/f2c72d40df4751e3.mp4", type: "Анимированное оформление форумного аккаунта", time: "1 день" },
     { img: "portfolio/mp4/1.mp4", type: "Анимированное оформление форумного аккаунта", time: "3 дня" },
@@ -3230,27 +3245,42 @@
     list.appendChild(el);
   }
 
+  let reviewsSig = '';
+  function paintReviews(list, reviews) {
+    const sig = JSON.stringify(reviews);
+    if (sig === reviewsSig) return;
+    reviewsSig = sig;
+    list.innerHTML = '';
+    reviews.forEach((r, idx) => renderReview(r, idx, list));
+  }
+
   async function loadReviews() {
     const list = document.getElementById('reviewsList');
+    if (!reviewsSig) {
+      const cached = cacheRead('reviews');
+      if (cached && cached.length) paintReviews(list, cached);
+    }
     try {
       const res = await fetch(`${API}/api/reviews?limit=20`, { mode: 'cors' });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       if (!data.reviews || data.reviews.length === 0) {
+        reviewsSig = '';
         list.innerHTML = '<div class="reviews-loading">Отзывов пока нет</div>';
         return;
       }
-      list.innerHTML = '';
-      data.reviews.forEach((r, idx) => renderReview(r, idx, list));
+      cacheWrite('reviews', data.reviews);
+      paintReviews(list, data.reviews);
     } catch(e) {
       console.error('Reviews fetch error:', e);
+      if (reviewsSig) return;
       try {
         const res2 = await fetch(`${API}/api/reviews?limit=20`);
         if (!res2.ok) throw new Error(`HTTP ${res2.status}`);
         const data2 = await res2.json();
         if (data2.reviews && data2.reviews.length > 0) {
-          list.innerHTML = '';
-          data2.reviews.forEach((r, idx) => renderReview(r, idx, list));
+          cacheWrite('reviews', data2.reviews);
+          paintReviews(list, data2.reviews);
           return;
         }
       } catch(e2) { console.error('Fallback error:', e2); }
@@ -3400,14 +3430,24 @@
       updateOrderTotal();
       return;
     }
+    var stored = cacheRead('prices');
+    if (stored) {
+      cachedPriceItems = stored;
+      renderPriceItemsHTML(container, cachedPriceItems);
+      updateOrderTotal();
+    }
     try {
       var r = await fetch(API + '/api/prices');
       var d = await r.json();
-      cachedPriceItems = d.sections || [];
-      renderPriceItemsHTML(container, cachedPriceItems);
-      updateOrderTotal();
+      var fresh = d.sections || [];
+      cacheWrite('prices', fresh);
+      if (!stored || JSON.stringify(fresh) !== JSON.stringify(stored)) {
+        cachedPriceItems = fresh;
+        renderPriceItemsHTML(container, cachedPriceItems);
+        updateOrderTotal();
+      }
     } catch(e) {
-      container.innerHTML = '<div style="font-size:6px;color:rgba(255,150,150,0.5)">Не удалось загрузить услуги</div>';
+      if (!stored) container.innerHTML = '<div style="font-size:6px;color:rgba(255,150,150,0.5)">Не удалось загрузить услуги</div>';
     }
   }
   let orderCatIndex = 0;
@@ -3719,11 +3759,25 @@
     });
   }
 
+  let winnersSig = '';
+  function paintWinners(winners) {
+    const sig = JSON.stringify(winners);
+    if (sig === winnersSig) return;
+    winnersSig = sig;
+    renderRouletteWinners(winners);
+  }
+
   async function loadWinners() {
+    if (!winnersSig) {
+      const cached = cacheRead('winners');
+      if (cached) paintWinners(cached);
+    }
     try {
       const res  = await fetch(`${API}/last-winners`, { mode: 'cors' });
       const data = await res.json();
-      renderRouletteWinners(data.winners);
+      if (!Array.isArray(data.winners)) return;
+      cacheWrite('winners', data.winners);
+      paintWinners(data.winners);
     } catch(e) {}
   }
 
@@ -4321,6 +4375,12 @@
     portfolioTrackWrap.addEventListener('mouseleave', () => { portfolioPaused = false; });
   }
 
+  (function () {   // сначала из кэша на компьютере (хранится месяц), потом с сервера
+    const cached = cacheRead('portfolio');
+    if (cached && cached.length) {
+      PORTFOLIO_ITEMS.splice(0, PORTFOLIO_ITEMS.length, ...buildPortfolioEntries(cached));
+    }
+  })();
   renderPortfolio();
   if (!portfolioReducedMotion) requestAnimationFrame(portfolioTick);
 
@@ -4351,6 +4411,7 @@
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
       if (!Array.isArray(data.items) || !data.items.length) return;
+      cacheWrite('portfolio', data.items);
       const entries = buildPortfolioEntries(data.items);
       if (portfolioSig(entries) === portfolioSig(PORTFOLIO_ITEMS)) return;
       PORTFOLIO_ITEMS.splice(0, PORTFOLIO_ITEMS.length, ...entries);
