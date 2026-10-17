@@ -702,6 +702,13 @@
     .field-popover, .price-popover { max-height: min(70vh, 560px); overflow-y: auto; }
     #admItemsListBox { display: flex; flex-direction: column; gap: 6px; max-height: 280px; overflow-y: auto; padding-right: 4px; }
     #statusChips .chip, #admItemsCats .chip { font-size: 7px; }
+    .pmiss { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 12px; margin-top: 8px; border: 1px solid rgba(255,0,0,0.2); border-radius: 12px; }
+    .pmiss-name { flex: 1 1 200px; font-size: 8px; line-height: 1.7; color: #ff6b6b; overflow-wrap: anywhere; }
+    .pmiss-name small { display: block; font-size: 6.5px; color: rgba(255,200,200,0.45); }
+    .pmiss input { flex: 1 1 200px; margin: 0; }
+    .pmiss .chips { flex: 1 1 100%; margin: 0; }
+    .ptitle { font-size: 8px; color: #ffb3b3; margin: 14px 0 4px; line-height: 1.7; }
+    .pfail { font-size: 7px; color: rgba(255,200,200,0.6); line-height: 1.9; overflow-wrap: anywhere; }
     /* --- РАБОТЫ: сетка как на главной YouTube + чипы --- */
     .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 8px; }
     .chips:empty { display: none; }
@@ -997,6 +1004,14 @@
       </div>
 
       <div class="users-grid" id="usersGridWrap" style="display:none">
+      <div class="card" id="profilesCard" style="grid-column: 1 / -1">
+        <div class="card-title">🔄 ПРОФИЛИ DISCORD (ники и аватарки)</div>
+        <div class="db-info">Бот заново достанет ник и аватарку по сохранённым ID: у заказчиков, победителей рулетки и заказчиков работ в портфолио — даже если человек ни разу не заходил на сайт. Где ID не сохранён, поможет его найти.</div>
+        <button class="btn" id="profilesRefreshBtn" type="button" style="width:auto">🔄 Обновить ники и аватарки</button>
+        <div class="status" id="profilesStatus"></div>
+        <div id="profilesFailed"></div>
+        <div id="profilesMissing"></div>
+      </div>
       <div class="card">
         <div class="card-title">👤 АВТОРИЗОВАННЫЕ <span class="badge" id="usersCount">0</span></div>
 <input type="text" id="usersSearch" placeholder="Поиск: ник / Discord ID / IP / fingerprint" oninput="renderUsers()">
@@ -1622,6 +1637,7 @@ function switchTab(tab) {
   document.querySelector('.wrap').classList.toggle('wrap-wide', tab === 'users' || tab === 'orders' || tab === 'db' || tab === 'manage');
   if (tab === 'manage') loadWorks();
   if (tab === 'upload') { fetchWorks().then(refreshPickers).catch(() => {}); }
+  if (tab === 'users' && localStorage.getItem('mz_admin_key')) { pollProfiles(); }
   if (tab === 'prices') loadPrices();
   if (tab === 'rules') loadRules();
   if (tab === 'users' && getAdminKey()) { loadUsers(); loadUnauthUsers(); loadWatchlist(); loadBannedIps(); }
@@ -4430,39 +4446,72 @@ function refreshPickers() { _pickerRenders.forEach(r => r()); }
 
 /* выбор заказчика: вписать Discord ID или найти по нику */
 function userPicker(chipsEl, inputEl, infoEl, onPick) {
-  let timer = 0;
+  let timer = 0, seq = 0;
   const known = {};
-  async function search() {
+  function showInfo(id, warn) {
+    infoEl.textContent = '';
+    infoEl.style.color = warn ? '#ff6b6b' : '';
+    if (warn) { infoEl.textContent = warn; return; }
+    const u = known[id];
+    if (!u) return;
+    if (u.avatar) {
+      const im = document.createElement('img');
+      im.src = u.avatar; im.alt = '';
+      im.style.cssText = 'width:18px;height:18px;border-radius:50%;vertical-align:middle;margin-right:6px;object-fit:cover';
+      infoEl.appendChild(im);
+    }
+    infoEl.appendChild(document.createTextNode('✓ ' + u.name));
+  }
+  async function lookup() {
     const q = inputEl.value.trim();
+    const my = ++seq;
     chipsEl.innerHTML = '';
-    infoEl.textContent = known[q] ? '✓ ' + known[q] : '';
+    if (/^\d{15,25}$/.test(q)) {
+      if (known[q]) { showInfo(q); return; }
+      infoEl.style.color = ''; infoEl.textContent = 'Ищу в Discord…';
+      try {
+        const res = await adminFetch(`${BOT_API}/admin/discord/user?id=${encodeURIComponent(q)}`);
+        if (my !== seq) return;
+        if (res.ok) {
+          const data = await res.json();
+          known[q] = { name: data.username, avatar: data.avatar };
+          showInfo(q);
+        } else showInfo(q, '⚠ Discord не нашёл такой ID');
+      } catch (e) { infoEl.textContent = ''; }
+      return;
+    }
+    infoEl.textContent = '';
     if (q.length < 2) return;
     try {
-      const res = await adminFetch(`${BOT_API}/admin/portfolio/users?q=${encodeURIComponent(q)}`);
-      if (!res.ok || inputEl.value.trim() !== q) return;
+      const res = await adminFetch(`${BOT_API}/admin/discord/search?q=${encodeURIComponent(q)}`);
+      if (!res.ok || my !== seq) return;
       const data = await res.json();
       (data.users || []).forEach(u => {
-        known[u.discord_id] = u.username || u.discord_id;
-        if (u.discord_id === q) infoEl.textContent = '✓ ' + known[q];
+        known[u.id] = { name: u.username || u.id, avatar: u.avatar || '' };
         const b = document.createElement('button');
         b.type = 'button';
         b.className = 'chip';
-        b.textContent = (u.username || '?') + ' · ' + u.discord_id;
+        b.textContent = (u.username || '?') + ' · ' + u.id;
         b.addEventListener('click', () => {
-          inputEl.value = u.discord_id;
+          inputEl.value = u.id;
           chipsEl.innerHTML = '';
-          infoEl.textContent = '✓ ' + (u.username || u.discord_id);
-          if (onPick) onPick(u.discord_id);
+          showInfo(u.id);
+          if (onPick) onPick(u.id);
         });
         chipsEl.appendChild(b);
       });
     } catch (e) { /* без подсказок — ID можно вписать вручную */ }
   }
   inputEl.addEventListener('input', () => {
-    clearTimeout(timer); timer = setTimeout(search, 300);
+    clearTimeout(timer); timer = setTimeout(lookup, 300);
     if (onPick && /^\d{15,25}$/.test(inputEl.value.trim())) onPick(inputEl.value.trim());
   });
-  return { setKnown(id, name) { if (id && name) known[id] = name; infoEl.textContent = id && name ? '✓ ' + name : ''; chipsEl.innerHTML = ''; } };
+  return {
+    setKnown(id, name, avatar) {
+      chipsEl.innerHTML = ''; infoEl.textContent = ''; infoEl.style.color = '';
+      if (id && name) { known[id] = { name, avatar: avatar || '' }; showInfo(id); }
+    },
+  };
 }
 
 function isVideoPath(p) { return /\.(mp4|webm|mov)$/i.test(p); }
@@ -4624,7 +4673,7 @@ function openWorkModal(w) {
   wmShowTouched = false;
   $id('wmShowAuthor').checked = !!w.show_author;
   $id('wmStatus').textContent = '';
-  wmUserPicker.setKnown(w.user_id, w.author_name);
+  wmUserPicker.setKnown(w.user_id, w.author_name, w.author_avatar);
   wmNew = { on: !!w.is_new, until: w.new_until || '' };
   renderNewChips();
   refreshPickers();
@@ -4841,6 +4890,108 @@ $id('gpCancel').addEventListener('click', closeGroupPicker);
 $id('gpOk').addEventListener('click', confirmGroupPicker);
 $id('groupPicker').addEventListener('click', (e) => { if (e.target === $id('groupPicker')) closeGroupPicker(); });
 addEventListener('keydown', (e) => { if (e.key === 'Escape' && $id('groupPicker').classList.contains('open')) closeGroupPicker(); });
+
+/* ── профили Discord: одна кнопка обновляет ники и аватарки ── */
+let profilesTimer = 0;
+function pEl(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; }
+
+async function pollProfiles() {
+  clearTimeout(profilesTimer);
+  const btn = $id('profilesRefreshBtn');
+  try {
+    const res = await adminFetch(`${BOT_API}/admin/profiles/status`);
+    if (!res.ok) throw new Error(res.status === 403 ? 'Неверный ключ администратора' : 'Сервер ответил ' + res.status);
+    const st = await res.json();
+    renderProfiles(st);
+    btn.disabled = !!st.running;
+    if (st.running) profilesTimer = setTimeout(pollProfiles, 1500);
+  } catch (e) {
+    showStatus($id('profilesStatus'), 'Ошибка: ' + e.message, 'err');
+    btn.disabled = false;
+  }
+}
+
+async function startProfilesRefresh() {
+  const btn = $id('profilesRefreshBtn');
+  btn.disabled = true;
+  showStatus($id('profilesStatus'), 'Запускаю…', '');
+  try {
+    const res = await adminFetch(`${BOT_API}/admin/profiles/refresh`, { master: true, method: 'POST' });
+    if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err.error === 'master_key_invalid' ? 'Неверный мастер-ключ' : (err.error || ('HTTP ' + res.status))); }
+    pollProfiles();
+  } catch (e) {
+    showStatus($id('profilesStatus'), 'Ошибка: ' + e.message, 'err');
+    btn.disabled = false;
+  }
+}
+
+function renderProfiles(st) {
+  const line = st.running
+    ? `Обновляю… ${st.done} из ${st.total}`
+    : (st.finished_at ? `Готово: обновлено ${st.updated} из ${st.total}` : '');
+  const extra = [];
+  if (st.auto_matched) extra.push(`ID победителей подобраны автоматически: ${st.auto_matched}`);
+  if (st.error) extra.push('ошибка: ' + st.error);
+  showStatus($id('profilesStatus'), [line].concat(extra).filter(Boolean).join(' · '), st.error ? 'err' : (st.running ? '' : 'ok'));
+
+  const failed = $id('profilesFailed');
+  failed.innerHTML = '';
+  if (st.failed && st.failed.length) {
+    failed.appendChild(pEl('div', 'ptitle', 'Не нашлись в Discord (аккаунт удалён или ID неверный):'));
+    st.failed.forEach(f => failed.appendChild(pEl('div', 'pfail', (f.username || 'ник неизвестен') + ' · ' + f.id)));
+  }
+
+  const missing = $id('profilesMissing');
+  missing.innerHTML = '';
+  const list = st.missing_ids || [];
+  if (!list.length) return;
+  missing.appendChild(pEl('div', 'ptitle', `Рулетка: у ${list.length} победителей не сохранён Discord ID. Найди его по нику и привяжи:`));
+  list.forEach(w => missing.appendChild(missingRow(w)));
+}
+
+function missingRow(w) {
+  const row = pEl('div', 'pmiss');
+  const name = pEl('div', 'pmiss-name', w.username || '(без ника)');
+  name.appendChild(pEl('small', '', [w.win_date, w.discount ? '−' + w.discount + '%' : ''].filter(Boolean).join(' · ')));
+  const inp = document.createElement('input');
+  inp.type = 'text'; inp.placeholder = 'Discord ID (или нажми «Найти по нику»)'; inp.autocomplete = 'off';
+  const chips = pEl('div', 'chips');
+  const info = pEl('div', 'wm-user');
+  const find = pEl('button', 'btn btn-sm', 'Найти по нику');
+  find.type = 'button'; find.style.cssText = 'width:auto;margin:0';
+  const bind = pEl('button', 'btn btn-sm', 'Привязать');
+  bind.type = 'button'; bind.style.cssText = 'width:auto;margin:0';
+
+  find.addEventListener('click', async () => {
+    chips.innerHTML = ''; info.textContent = 'Ищу…'; info.style.color = '';
+    try {
+      const res = await adminFetch(`${BOT_API}/admin/discord/search?q=${encodeURIComponent(w.username || '')}`);
+      const data = res.ok ? await res.json() : { users: [] };
+      info.textContent = data.users.length ? '' : 'Не нашёл. Скопируй ID в Discord (ПКМ по пользователю → Копировать ID) и вставь выше.';
+      data.users.forEach(u => {
+        const c = pEl('button', 'chip', (u.username || '?') + ' · ' + u.id);
+        c.type = 'button';
+        c.addEventListener('click', () => { inp.value = u.id; chips.innerHTML = ''; info.textContent = '✓ ' + (u.username || u.id) + ' — нажми «Привязать»'; });
+        chips.appendChild(c);
+      });
+    } catch (e) { info.textContent = 'Ошибка поиска'; }
+  });
+  bind.addEventListener('click', async () => {
+    const id = inp.value.trim();
+    if (!/^\d{15,25}$/.test(id)) { info.style.color = '#ff6b6b'; info.textContent = 'Нужен Discord ID — только цифры'; return; }
+    bind.disabled = true;
+    try {
+      const res = await adminFetch(`${BOT_API}/admin/profiles/assign`, { master: true, method: 'POST', body: { winner_id: w.id, discord_id: id } });
+      if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err.error || ('HTTP ' + res.status)); }
+      const data = await res.json();
+      await pollProfiles();
+      showStatus($id('profilesStatus'), 'Привязано' + (data.username ? ': ' + data.username : '') + (data.profile_found ? '' : ' (профиль в Discord не найден)'), 'ok');
+    } catch (e) { info.style.color = '#ff6b6b'; info.textContent = 'Ошибка: ' + e.message; bind.disabled = false; }
+  });
+  row.append(name, inp, find, bind, chips, info);
+  return row;
+}
+$id('profilesRefreshBtn').addEventListener('click', startProfilesRefresh);
 
 const groupOptions = () => [{ label: 'Без группы', value: '' }]
   .concat(WORKS_META.groups.map(g => ({ label: g, value: g })))
