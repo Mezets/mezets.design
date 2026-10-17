@@ -1003,15 +1003,18 @@
         <div class="status" id="usersGateStatus"></div>
       </div>
 
-      <div class="users-grid" id="usersGridWrap" style="display:none">
-      <div class="card" id="profilesCard" style="grid-column: 1 / -1">
+      <div id="profilesWrap" style="display:none">
+      <div class="card" id="profilesCard">
         <div class="card-title">🔄 ПРОФИЛИ DISCORD (ники и аватарки)</div>
         <div class="db-info">Бот заново достанет ник и аватарку по сохранённым ID: у заказчиков, победителей рулетки и заказчиков работ в портфолио — даже если человек ни разу не заходил на сайт. Где ID не сохранён, поможет его найти.</div>
         <button class="btn" id="profilesRefreshBtn" type="button" style="width:auto">🔄 Обновить ники и аватарки</button>
         <div class="status" id="profilesStatus"></div>
         <div id="profilesFailed"></div>
         <div id="profilesMissing"></div>
+        </div>
       </div>
+
+      <div class="users-grid" id="usersGridWrap" style="display:none">
       <div class="card">
         <div class="card-title">👤 АВТОРИЗОВАННЫЕ <span class="badge" id="usersCount">0</span></div>
 <input type="text" id="usersSearch" placeholder="Поиск: ник / Discord ID / IP / fingerprint" oninput="renderUsers()">
@@ -1621,6 +1624,7 @@ function enterUsersGate() {
 
   document.getElementById('usersGate').style.display = 'none';
   document.getElementById('usersGridWrap').style.display = 'flex';
+  document.getElementById('profilesWrap').style.display = 'block';
 
   loadUsers();
   loadUnauthUsers();
