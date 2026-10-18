@@ -301,6 +301,68 @@ html, body {
 }
 @keyframes lgSpin { to { transform: rotate(360deg); } }
 
+/* --- окно заказа как в админке --- */
+.order-panel {
+  position: relative; display: flex; flex-direction: column;
+  background: rgba(12,0,0,0.95); border: 1px solid rgba(255,0,0,0.25); border-radius: 18px;
+  box-shadow: 0 0 60px rgba(255,0,0,0.15);
+  height: min(82vh, 780px); min-height: 520px;
+  backdrop-filter: blur(10px);
+  animation: orderPanelIn .28s cubic-bezier(.22,.61,.36,1);
+}
+@keyframes orderPanelIn { from { opacity: 0; transform: translateY(10px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.order-panel-head {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+  padding: 18px 20px 12px; border-bottom: 1px solid rgba(255,0,0,0.12); flex-shrink: 0;
+  border-radius: 18px 18px 0 0;
+}
+.order-panel-title { font-size: 11px; color: #ff2a2a; letter-spacing: 1px; }
+.order-panel-meta { font-size: 7px; color: rgba(255,200,200,0.4); margin-top: 6px; line-height: 2.2; }
+.order-panel-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.meta-trigger { cursor: pointer; color: #ff8888; text-decoration: underline dotted; text-underline-offset: 2px; transition: color .15s; display: inline-block; }
+.meta-trigger:hover { color: #ffb0b0; }
+.order-panel .chat-box { flex: 1; height: auto; min-height: 120px; margin-bottom: 0; padding: 16px 20px; gap: 8px; }
+.order-panel-input { display: flex; gap: 8px; padding: 12px 20px 18px; border-top: 1px solid rgba(255,0,0,0.12); flex-shrink: 0; }
+.order-panel .chat-input { padding: 12px 14px; font-size: 7px; }
+.order-panel .field-popover { max-height: min(62vh, 480px); overflow-y: auto; }
+.field-popover.ro .pop-actions { display: none; }
+.field-popover.ro .item-stepper-btn { display: none; }
+.field-popover.ro textarea, .field-popover.ro select { pointer-events: none; opacity: .8; }
+.order-extra { margin-top: 8px; font-size: 6px; line-height: 1.8; color: rgba(255,200,200,0.5); white-space: pre-wrap; word-break: break-word; }
+.order-extra:empty { display: none; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 8px; }
+.chip {
+  flex-shrink: 0; font-family: inherit; font-size: 7px; line-height: 1; letter-spacing: .3px;
+  padding: 8px 11px; border-radius: 999px; cursor: pointer; white-space: nowrap;
+  color: rgba(255,200,200,0.7); background: rgba(255,255,255,0.04); border: 1px solid rgba(255,0,0,0.22);
+  transition: background .2s, color .2s, border-color .2s;
+}
+.chip:hover { border-color: rgba(255,0,0,0.55); color: #ffb3b3; }
+.chip.on { color: #fff; background: linear-gradient(135deg, #ff2a2a, #b00000); border-color: transparent; box-shadow: 0 0 12px rgba(255,0,0,0.4); }
+.order-item-cb > span { min-width: 0; overflow-wrap: anywhere; }
+.order-cat-list.hidden { display: none; }
+#orderEditItemsBox .order-cat-list { max-height: 260px; overflow-y: auto; padding-right: 4px; }
+@media (max-width: 600px) {
+  .order-panel { height: calc(100vh - 150px); min-height: 460px; }
+  .order-panel-head { flex-direction: column; }
+}
+
+/* --- курсор: точка + кольцо (только мышь) --- */
+html.has-cursor, html.has-cursor * { cursor: none !important; }
+html.has-cursor input, html.has-cursor textarea, html.has-cursor select { cursor: text !important; }
+.cur-dot, .cur-ring {
+  position: fixed; left: 0; top: 0; z-index: 2147483647; pointer-events: none;
+  border-radius: 50%; opacity: 0; will-change: transform;
+  transition: opacity .2s ease, width .25s cubic-bezier(.16,1,.3,1), height .25s cubic-bezier(.16,1,.3,1), margin .25s cubic-bezier(.16,1,.3,1), background-color .2s ease, border-color .2s ease;
+}
+.cur-dot { width: 6px; height: 6px; margin: -3px 0 0 -3px; background: #ff2a2a; box-shadow: 0 0 10px rgba(255,42,42,0.9); }
+.cur-ring { width: 32px; height: 32px; margin: -16px 0 0 -16px; border: 1.5px solid rgba(255,60,60,0.75); }
+.cur-on .cur-dot, .cur-on .cur-ring { opacity: 1; }
+.cur-hover .cur-ring { width: 54px; height: 54px; margin: -27px 0 0 -27px; background: rgba(255,40,40,0.12); border-color: rgba(255,110,110,0.95); }
+.cur-hover .cur-dot { opacity: 0.35; }
+.cur-down .cur-ring { width: 22px; height: 22px; margin: -11px 0 0 -11px; }
+.cur-text .cur-dot, .cur-text .cur-ring { opacity: 0; }
+
 .fluff-wrap { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
 .fluff { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.2; }
 .fluff-1 {
@@ -359,70 +421,56 @@ html, body {
     </div>
   </div>
 
-  <div id="chatContent" style="display:none" class="chat-layout">
-    <div class="chat-layout-sidebar">
-      <div class="card">
-        <div class="order-info">
-          <div class="order-info-left">
-            <div class="order-id" id="orderIdDisplay">Заказ #—</div>
-            <div class="order-meta" id="orderMeta"></div>
-          </div>
-          <div>
-            <div class="order-price" id="orderPrice"></div>
-            <div class="order-status-badge" id="orderStatusBadge"></div>
-            <div style="margin-top:8px;display:flex;flex-direction:column;gap:6px">
-              <button class="btn btn-sm btn-danger" id="closeOrderBtn" onclick="closeOrder()" style="display:none;width:100%">Закрыть заказ</button>
-            </div>
+  <div id="chatContent" style="display:none" class="order-panel">
+    <div class="order-panel-head">
+      <div style="position:relative;min-width:0" id="orderHeadAnchor">
+        <div class="order-panel-title" id="orderIdDisplay">Заказ #—</div>
+        <div class="order-panel-meta" id="orderMeta"></div>
+
+        <div id="taskPopover" class="field-popover">
+          <label>Что нужно</label>
+          <textarea id="orderEditTaskInput" class="order-textarea" style="height:70px" placeholder="Опиши задачу..."></textarea>
+          <div class="order-extra" id="orderExtraInfo"></div>
+          <div class="pop-actions" style="display:flex;gap:8px;margin-top:8px">
+            <button class="btn btn-sm" onclick="saveOrderEditClient()" style="flex:1;border-color:rgba(0,200,0,0.35);color:#55ff55">💾 Сохранить</button>
+            <button class="btn btn-sm" onclick="toggleFieldPopover(null,'task',false)" style="width:auto">Отмена</button>
           </div>
         </div>
-        <div id="orderDescWrap" style="position:relative">
-          <div class="order-desc-box" id="orderDescBox"></div>
 
-          <div id="taskPopover" class="field-popover">
-            <label>Что нужно</label>
-            <textarea id="orderEditTaskInput" class="order-textarea" style="height:70px" placeholder="Опиши задачу..."></textarea>
-            <div style="display:flex;gap:8px;margin-top:8px">
-              <button class="btn btn-sm" onclick="saveOrderEditClient()" style="flex:1;border-color:rgba(0,200,0,0.35);color:#55ff55">💾 Сохранить</button>
-              <button class="btn btn-sm" onclick="toggleFieldPopover(null,'task',false)" style="width:auto">Отмена</button>
-            </div>
+        <div id="paymentPopover" class="field-popover">
+          <label>Способ оплаты</label>
+          <select id="orderEditPaymentInput" class="order-select"></select>
+          <label style="margin-top:8px">Банк</label>
+          <select id="orderEditBankInput" class="order-select"></select>
+          <div class="pop-actions" style="display:flex;gap:8px;margin-top:8px">
+            <button class="btn btn-sm" onclick="saveOrderEditClient()" style="flex:1;border-color:rgba(0,200,0,0.35);color:#55ff55">💾 Сохранить</button>
+            <button class="btn btn-sm" onclick="toggleFieldPopover(null,'payment',false)" style="width:auto">Отмена</button>
           </div>
+        </div>
 
-          <div id="paymentPopover" class="field-popover">
-            <label>Способ оплаты</label>
-            <select id="orderEditPaymentInput" class="order-select"></select>
-            <label style="margin-top:8px">Банк</label>
-            <select id="orderEditBankInput" class="order-select"></select>
-            <div style="display:flex;gap:8px;margin-top:8px">
-              <button class="btn btn-sm" onclick="saveOrderEditClient()" style="flex:1;border-color:rgba(0,200,0,0.35);color:#55ff55">💾 Сохранить</button>
-              <button class="btn btn-sm" onclick="toggleFieldPopover(null,'payment',false)" style="width:auto">Отмена</button>
-            </div>
+        <div id="itemsPopover" class="field-popover field-popover-wide">
+          <label>Выбрано</label>
+          <div id="orderEditItemsBox">
+            <div style="font-size:6px;color:rgba(255,200,200,0.4)">Загружаю услуги...</div>
           </div>
-
-          <div id="itemsPopover" class="field-popover field-popover-wide">
-            <label>Выбрано</label>
-            <div id="orderEditItemsBox">
-              <div style="font-size:6px;color:rgba(255,200,200,0.4)">Загружаю услуги...</div>
-            </div>
-            <div class="order-edit-total"><span>Итого</span><b id="orderEditTotalPrice">0 ₽</b></div>
-            <div style="display:flex;gap:8px;margin-top:8px">
-              <button class="btn btn-sm" onclick="saveOrderEditClient()" style="flex:1;border-color:rgba(0,200,0,0.35);color:#55ff55">💾 Сохранить</button>
-              <button class="btn btn-sm" onclick="toggleFieldPopover(null,'items',false)" style="width:auto">Отмена</button>
-            </div>
+          <div class="order-edit-total"><span>Итого</span><b id="orderEditTotalPrice">0 ₽</b></div>
+          <div class="pop-actions" style="display:flex;gap:8px;margin-top:8px">
+            <button class="btn btn-sm" onclick="saveOrderEditClient()" style="flex:1;border-color:rgba(0,200,0,0.35);color:#55ff55">💾 Сохранить</button>
+            <button class="btn btn-sm" onclick="toggleFieldPopover(null,'items',false)" style="width:auto">Отмена</button>
           </div>
         </div>
         <div class="status" id="orderEditStatus" style="margin-top:8px"></div>
       </div>
+      <div class="order-panel-actions">
+        <button class="btn btn-sm btn-danger" id="closeOrderBtn" onclick="closeOrder()" style="display:none">Закрыть заказ</button>
+      </div>
     </div>
 
-    <div class="chat-layout-main">
-      <div class="card">
-        <div class="chat-box" id="chatBox"></div>
-        <div class="chat-input-row">
-          <button class="btn btn-sm chat-file-btn" onclick="uploadFile()" title="Прикрепить файл">📎</button>
-          <input class="chat-input" id="msgInput" placeholder="Сообщение..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}">
-          <button class="btn chat-send" onclick="sendMsg()">→</button>
-        </div>
-      </div>
+    <div class="chat-box" id="chatBox"></div>
+    <div class="order-panel-input">
+      <button class="btn btn-sm chat-file-btn" onclick="uploadFile()" title="Прикрепить файл" style="flex-shrink:0">📎</button>
+      <input class="chat-input" id="msgInput" placeholder="Сообщение..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}">
+      <button class="btn btn-sm chat-send" onclick="sendMsg()" title="Отправить" style="flex-shrink:0;border-color:rgba(255,0,0,0.35)">Отправить →</button>
     </div>
   </div>
 </div>
@@ -548,57 +596,44 @@ function parseDescription(description) {
   };
 }
 
-function playDescSwap() {
-  const box = g('orderDescBox');
-  if (!box) return;
-  box.classList.remove('swap');
-  void box.offsetWidth; // форсируем reflow, чтобы анимация перезапустилась
-  box.classList.add('swap');
-}
 
-function renderDescView(order) {
+function renderMeta(order) {
   const parsed = parseDescription(order.description);
   const canEdit = order.status !== 'completed' && order.status !== 'cancelled';
-  const rowAttrs = key => canEdit ? ` class="order-desc-row order-desc-row-clickable" onclick="toggleFieldPopover(this,'${key}')"` : ' class="order-desc-row"';
-  const editHint = canEdit ? ' <span class="edit-hint">✎</span>' : '';
-  let html = '';
-  if (parsed.freeLines.length) {
-    html += `<div${rowAttrs('task')}><span class="order-desc-row-label">Что нужно:${editHint}</span><span class="order-desc-row-value">${escapeHtml(parsed.task)}</span></div>`;
-  }
-  if (order.payment_method) {
-    const payLabel = PAYMENT_LABELS[order.payment_method] || order.payment_method;
-    html += `<div${rowAttrs('payment')}><span class="order-desc-row-label">Способ оплаты:${editHint}</span><span class="order-desc-row-value">${escapeHtml(payLabel)}</span></div>`;
-  }
-  parsed.fieldLines.forEach(([, label, value]) => {
-    const cleanLabel = label.trim().toLowerCase();
-    if (cleanLabel === 'выбрано') {
-      const items = value.split(',').map(v => v.trim()).filter(Boolean);
-      const itemsHtml = items.map(item => `<div class="order-desc-item">${escapeHtml(item)}</div>`).join('');
-      html += `<div${rowAttrs('items')}><span class="order-desc-row-label">${escapeHtml(label)}:${editHint}</span><div class="order-desc-row-value order-desc-items">${itemsHtml}</div></div>`;
-    } else if (cleanLabel === 'банк') {
-      html += `<div${rowAttrs('payment')}><span class="order-desc-row-label">${escapeHtml(label)}:${editHint}</span><span class="order-desc-row-value">${escapeHtml(value)}</span></div>`;
-    } else {
-      html += `<div class="order-desc-row"><span class="order-desc-row-label">${escapeHtml(label)}:</span><span class="order-desc-row-value">${escapeHtml(value)}</span></div>`;
-    }
-  });
-  g('orderDescBox').innerHTML = html || escapeHtml(order.description || '');
-  playDescSwap();
+  const statusLabels = { 'new': 'Новый', 'in_progress': 'В работе', 'completed': 'Выполнен', 'cancelled': 'Отменён' };
+  const payLabel = PAYMENT_LABELS[order.payment_method] || order.payment_method || '—';
+  const payText = payLabel + (parsed.bank ? ' · ' + parsed.bank : '');
+  const itemsCount = Object.keys(parseSelectedItems(parsed.selected)).length;
+  const taskPreview = parsed.task ? (parsed.task.length > 24 ? parsed.task.slice(0, 24).trim() + '…' : parsed.task) : 'Что нужно';
+  const price = order.estimated_price ? order.estimated_price + '₽' : '?₽';
+  const trig = (key, inner, title) =>
+    `<span class="meta-trigger" data-pop="${key}" onclick="event.stopPropagation();toggleFieldPopover(this,'${key}')" title="${escapeHtml(title)}">${inner}</span>`;
+  g('orderMeta').innerHTML = [
+    '📁 ' + escapeHtml(CATEGORY_LABELS[order.category] || order.category || '—'),
+    `<span class="status-${escapeHtml(order.status)}">● ${escapeHtml(statusLabels[order.status] || order.status)}</span>`,
+    `<span id="orderPriceChip">${escapeHtml(price)}</span>`,
+    trig('payment', '💳 ' + escapeHtml(payText), canEdit ? 'Изменить способ оплаты и банк' : 'Способ оплаты и банк'),
+    trig('task', '📝 ' + escapeHtml(taskPreview), canEdit ? 'Изменить описание задачи' : 'Описание задачи'),
+    trig('items', '🛒 Позиции' + (itemsCount ? ' (' + itemsCount + ')' : ''), canEdit ? 'Изменить позиции' : 'Выбранные позиции'),
+    escapeHtml(order.created_at ? order.created_at.slice(0, 16) : '—'),
+  ].join(' · ');
+  setPopoversReadOnly(!canEdit);
+}
+
+function setPopoversReadOnly(ro) {
+  ALL_POPOVER_IDS.forEach(id => { const el = g(id); if (el) el.classList.toggle('ro', !!ro); });
+  const ta = g('orderEditTaskInput');
+  if (ta) ta.readOnly = !!ro;
 }
 
 function renderOrder(order, messages, attachments) {
   g('loadingState').style.display = 'none';
   g('chatContent').style.display = 'flex';
 
-  const statusLabels = { 'new': 'Новый', 'in_progress': 'В работе', 'completed': 'Выполнен', 'cancelled': 'Отменён' };
   g('orderIdDisplay').textContent = `Заказ #${order.id}`;
   document.title = `Mezets - Чат заказа #${order.id}`;
-  g('orderMeta').textContent = `${CATEGORY_LABELS[order.category] || order.category || ''} · ${order.created_at ? order.created_at.slice(0, 10) : ''}`;
-  g('orderPrice').textContent = order.estimated_price ? `${order.estimated_price} ₽` : '';
-  const badge = g('orderStatusBadge');
-  badge.textContent = statusLabels[order.status] || order.status;
-  badge.className = 'order-status-badge status-' + order.status;
   CURRENT_ORDER = order;
-  renderDescView(order);
+  renderMeta(order);
   populateEditPopovers(order);
 
   const closeBtn = g('closeOrderBtn');
@@ -652,13 +687,13 @@ function renderEditItemsCarouselHTML(sections, selectedMap) {
   }
   editCatIndex = 0;
   editCatCount = sections.length;
-  let html = '<div class="order-cat-carousel">';
-  html += '<button type="button" class="order-cat-arrow" onclick="scrollEditCategory(-1)">‹</button>';
-  html += `<div class="order-cat-viewport"><div class="order-cat-track" id="editCatTrack" style="width:${sections.length * 100}%">`;
-  sections.forEach(sec => {
-    html += `<div class="order-cat-panel" style="width:${100 / sections.length}%">`;
-    html += `<div class="order-cat-panel-title">${escapeHtml(sec.label)}</div>`;
-    html += '<div class="order-cat-list">';
+  let html = '<div class="chips" id="editCatDots">';
+  sections.forEach((sec, i) => {
+    html += `<button type="button" class="chip${i === 0 ? ' on' : ''}" onclick="goToEditCategory(${i})">${escapeHtml(sec.label)}</button>`;
+  });
+  html += '</div>';
+  sections.forEach((sec, i) => {
+    html += `<div class="order-cat-list${i === 0 ? '' : ' hidden'}" data-cat="${i}">`;
     sec.items.forEach(item => {
       const isNegotiable = /договор/i.test(item.price);
       const qty = selectedMap[item.name] || 0;
@@ -674,16 +709,8 @@ function renderEditItemsCarouselHTML(sections, selectedMap) {
         '</div>' +
       '</div>';
     });
-    html += '</div></div>';
+    html += '</div>';
   });
-  html += '</div></div>';
-  html += '<button type="button" class="order-cat-arrow" onclick="scrollEditCategory(1)">›</button>';
-  html += '</div>';
-  html += '<div class="order-cat-dots" id="editCatDots">';
-  sections.forEach((_, i) => {
-    html += `<span class="order-cat-dot${i === 0 ? ' active' : ''}" onclick="goToEditCategory(${i})"></span>`;
-  });
-  html += '</div>';
   return html;
 }
 
@@ -696,11 +723,8 @@ function goToEditCategory(i) {
   applyEditCategoryPosition();
 }
 function applyEditCategoryPosition() {
-  const track = g('editCatTrack');
-  if (!track) return;
-  const step = editCatCount > 0 ? (100 / editCatCount) : 100;
-  track.style.transform = `translateX(-${editCatIndex * step}%)`;
-  document.querySelectorAll('#editCatDots .order-cat-dot').forEach((d, i) => d.classList.toggle('active', i === editCatIndex));
+  document.querySelectorAll('#orderEditItemsBox .order-cat-list').forEach(el => el.classList.toggle('hidden', Number(el.dataset.cat) !== editCatIndex));
+  document.querySelectorAll('#editCatDots .chip').forEach((d, i) => d.classList.toggle('on', i === editCatIndex));
 }
 
 function stepEditItemQty(btn, delta) {
@@ -713,7 +737,7 @@ function stepEditItemQty(btn, delta) {
   input.classList.remove('qty-pulse');
   void input.offsetWidth;
   input.classList.add('qty-pulse');
-  updateEditTotal();
+  updateEditTotal(true);
 }
 
 function collectEditItems() {
@@ -730,7 +754,7 @@ function collectEditItems() {
   return { items, total };
 }
 
-function updateEditTotal() {
+function updateEditTotal(live) {
   const { total } = collectEditItems();
   const out = g('orderEditTotalPrice');
   if (out) {
@@ -739,9 +763,9 @@ function updateEditTotal() {
     void out.offsetWidth;
     out.classList.add('total-pulse');
   }
-  const topPrice = g('orderPrice');
+  const topPrice = live ? g('orderPriceChip') : null;   // цена в шапке меняется только пока двигаешь позиции
   if (topPrice) {
-    topPrice.textContent = `${total} ₽`;
+    topPrice.textContent = `${total}₽`;
     topPrice.classList.remove('total-pulse');
     void topPrice.offsetWidth;
     topPrice.classList.add('total-pulse');
@@ -759,18 +783,14 @@ function closeAllPopovers(except) {
 }
 
 function positionPopover(popId, triggerEl) {
-  const pop = g(popId);
-  const anchor = g('orderDescWrap');
-  if (!pop || !anchor || !triggerEl) return;
-  const aRect = anchor.getBoundingClientRect();
-  const tRect = triggerEl.getBoundingClientRect();
-  let left = tRect.left - aRect.left;
-  const top = tRect.bottom - aRect.top + 6;
-  const maxLeft = Math.max(0, anchor.offsetWidth - pop.offsetWidth);
-  if (left > maxLeft) left = Math.max(0, maxLeft);
-  if (left < 0) left = 0;
-  pop.style.top = top + 'px';
-  pop.style.left = left + 'px';
+  const pop = g(popId), anchor = g('orderHeadAnchor'), panel = g('chatContent');
+  if (!pop || !anchor || !panel || !triggerEl) return;
+  const a = anchor.getBoundingClientRect(), t = triggerEl.getBoundingClientRect(), p = panel.getBoundingClientRect();
+  pop.style.top = (t.bottom - a.top + 6) + 'px';
+  const w = pop.offsetWidth;
+  const minLeft = p.left + 14 - a.left;
+  const maxLeft = p.right - 14 - a.left - w;
+  pop.style.left = Math.max(minLeft, Math.min(t.left - a.left, maxLeft)) + 'px';
 }
 
 function toggleFieldPopover(triggerEl, key, force) {
@@ -782,11 +802,14 @@ function toggleFieldPopover(triggerEl, key, force) {
     closeAllPopovers(id);
     if (CURRENT_ORDER) populateEditPopovers(CURRENT_ORDER);
   } else if (key === 'items' && CURRENT_ORDER) {
-    const topPrice = g('orderPrice');
-    if (topPrice) topPrice.textContent = CURRENT_ORDER.estimated_price ? `${CURRENT_ORDER.estimated_price} ₽` : '';
+    const chip = g('orderPriceChip');
+    if (chip) chip.textContent = CURRENT_ORDER.estimated_price ? `${CURRENT_ORDER.estimated_price}₽` : '?₽';
   }
   pop.classList.toggle('open', show);
-  if (show && triggerEl) positionPopover(id, triggerEl);
+  if (show) {
+    const trig = triggerEl || document.querySelector('.meta-trigger[data-pop="' + key + '"]');
+    positionPopover(id, trig);
+  }
 }
 
 document.addEventListener('click', function(e) {
@@ -794,7 +817,7 @@ document.addEventListener('click', function(e) {
     const pop = g(id);
     if (!pop || !pop.classList.contains('open')) return;
     if (pop.contains(e.target)) return;
-    if (e.target.closest && e.target.closest('.order-desc-row-clickable')) return;
+    if (e.target.closest && e.target.closest('.meta-trigger')) return;
     pop.classList.remove('open');
   });
 });
@@ -819,6 +842,8 @@ function populateEditPopovers(order) {
     `<option value="${escapeHtml(b)}"${b === parsed.bank ? ' selected' : ''}>${escapeHtml(b)}</option>`
   ).join('');
   g('orderEditTaskInput').value = parsed.task;
+  const extra = parsed.fieldLines.filter(([, label]) => !['банк', 'выбрано'].includes(label.trim().toLowerCase()));
+  g('orderExtraInfo').textContent = extra.map(([, label, value]) => `${label}: ${value}`).join('\n');
 
   const box = g('orderEditItemsBox');
   loadEditPriceSections().then(sections => {
@@ -843,6 +868,12 @@ async function saveOrderEditClient() {
   const parts = [task];
   if (bank) parts.push(`Банк: ${bank}`);
   if (items.length) parts.push(`Выбрано: ${items.join(', ')}`);
+  if (CURRENT_ORDER) {
+    // прочие строки описания (не задача/банк/выбрано) не теряем при сохранении
+    parseDescription(CURRENT_ORDER.description).fieldLines
+      .filter(([, label]) => !['банк', 'выбрано'].includes(label.trim().toLowerCase()))
+      .forEach(([, label, value]) => parts.push(`${label}: ${value}`));
+  }
   const description = parts.join('\n');
   const estimated_price = total;
   const session = getSession();
@@ -1028,6 +1059,38 @@ function uploadFile() {
   };
   input.click();
 }
+
+// курсор: точка + кольцо (только мышь)
+(function () {
+  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  const root = document.documentElement;
+  const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const dot = document.createElement('div'); dot.className = 'cur-dot';
+  const ring = document.createElement('div'); ring.className = 'cur-ring';
+  document.body.append(ring, dot);
+  const INTERACTIVE = 'a, button, [onclick], [role="button"], label, summary, select, .btn, .chip, .meta-trigger, .order-cat-arrow, .item-stepper-btn';
+  let x = -100, y = -100, rx = -100, ry = -100, raf = 0, armed = false;
+  function loop() {
+    const k = calm ? 1 : 0.18;
+    rx += (x - rx) * k; ry += (y - ry) * k;
+    ring.style.transform = 'translate3d(' + rx.toFixed(1) + 'px,' + ry.toFixed(1) + 'px,0)';
+    raf = (Math.abs(x - rx) > 0.1 || Math.abs(y - ry) > 0.1) ? requestAnimationFrame(loop) : 0;
+  }
+  addEventListener('pointermove', (e) => {
+    if (e.pointerType && e.pointerType !== 'mouse') return;
+    if (!armed) { armed = true; rx = x = e.clientX; ry = y = e.clientY; root.classList.add('has-cursor'); }
+    x = e.clientX; y = e.clientY;
+    dot.style.transform = 'translate3d(' + x + 'px,' + y + 'px,0)';
+    root.classList.add('cur-on');
+    const t = e.target;
+    root.classList.toggle('cur-hover', !!(t.closest && t.closest(INTERACTIVE)));
+    root.classList.toggle('cur-text', !!(t.closest && t.closest('input, textarea')));
+    if (!raf) raf = requestAnimationFrame(loop);
+  }, { passive: true });
+  addEventListener('pointerdown', () => root.classList.add('cur-down'));
+  addEventListener('pointerup', () => root.classList.remove('cur-down'));
+  document.addEventListener('mouseleave', () => root.classList.remove('cur-on'));
+})();
 
 function tilt(card) {
   let rafId = null;
