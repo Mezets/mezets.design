@@ -498,6 +498,14 @@
       letter-spacing: .3px;
     }
     .portfolio-card-author { font-size: 7px; color: rgba(255,200,200,0.6); margin-top: 5px; overflow-wrap: anywhere; }
+    .portfolio-modal-review { margin-top: 12px; padding: 12px; border: 1px solid rgba(255,0,0,0.22); border-radius: 12px; background: rgba(255,0,0,0.05); }
+    .portfolio-modal-review:empty { display: none; }
+    .pmr-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-size: 8px; }
+    .pmr-head img { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; }
+    .pmr-author { color: #ff6b6b; overflow-wrap: anywhere; }
+    .pmr-stars { color: #ffcc00; letter-spacing: 1px; }
+    .pmr-meta { margin-top: 6px; font-size: 6.5px; line-height: 1.8; color: rgba(255,200,200,0.5); overflow-wrap: anywhere; }
+    .pmr-text { margin-top: 8px; font-size: 7.5px; line-height: 1.9; color: rgba(255,225,225,0.88); overflow-wrap: anywhere; white-space: pre-wrap; }
     .portfolio-modal-author { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 8px; color: rgba(255,200,200,0.55); overflow-wrap: anywhere; }
     .portfolio-modal-author:empty { display: none; }
     .portfolio-modal-author img { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
@@ -4026,6 +4034,47 @@
       authorEl.appendChild(nm);
     }
 
+    let reviewEl = document.getElementById('portfolioModalReview');
+    if (!reviewEl) {
+      reviewEl = document.createElement('div');
+      reviewEl.id = 'portfolioModalReview';
+      reviewEl.className = 'portfolio-modal-review';
+      authorEl.insertAdjacentElement('afterend', reviewEl);
+    }
+    reviewEl.textContent = '';
+    const rv = item.review;
+    if (rv && (rv.comment || rv.rating)) {
+      const head = document.createElement('div');
+      head.className = 'pmr-head';
+      if (rv.avatar) {
+        const av = document.createElement('img');
+        av.src = rv.avatar; av.alt = '';
+        head.appendChild(av);
+      }
+      const who = document.createElement('span');
+      who.className = 'pmr-author';
+      who.textContent = rv.author || 'Аноним';
+      head.appendChild(who);
+      const stars = document.createElement('span');
+      stars.className = 'pmr-stars';
+      stars.textContent = '★'.repeat(rv.rating || 0) + '☆'.repeat(Math.max(0, 5 - (rv.rating || 0)));
+      head.appendChild(stars);
+      reviewEl.appendChild(head);
+      const metaTxt = [rv.date, rv.order ? 'Заказ ' + rv.order : '', rv.order_type].filter(Boolean).join(' · ');
+      if (metaTxt) {
+        const meta = document.createElement('div');
+        meta.className = 'pmr-meta';
+        meta.textContent = metaTxt;
+        reviewEl.appendChild(meta);
+      }
+      if (rv.comment) {
+        const txt = document.createElement('div');
+        txt.className = 'pmr-text';
+        txt.textContent = rv.comment;
+        reviewEl.appendChild(txt);
+      }
+    }
+
     const multi = items.length > 1;
     portfolioModalPrev.style.display = multi ? 'flex' : 'none';
     portfolioModalNext.style.display = multi ? 'flex' : 'none';
@@ -4388,14 +4437,14 @@
   // Работы приходят из БД (Railway), правятся в админке. Массив PORTFOLIO_ITEMS выше — запасной
   // вариант на случай, если бэкенд недоступен; файлы (картинки/видео) лежат на сайте.
   function portfolioSig(entries) {
-    return JSON.stringify(entries.map(e => (e.group ? e.group : [e]).map(i => [i.img, i.type, i.time, !!i.new, i.author ? i.author.name : null])));
+    return JSON.stringify(entries.map(e => (e.group ? e.group : [e]).map(i => [i.img, i.type, i.time, !!i.new, i.author ? i.author.name : null, i.review ? [i.review.author, i.review.rating, i.review.comment, i.review.order_type] : null])));
   }
   function buildPortfolioEntries(list) {
     const entries = [];
     const groups = {};
     list.forEach(it => {
       if (!it || !it.img) return;
-      const item = { img: it.img, type: it.type, time: it.time, new: !!it.new, author: it.author || null };
+      const item = { img: it.img, type: it.type, time: it.time, new: !!it.new, author: it.author || null, review: it.review || null };
       if (it.group) {
         if (!groups[it.group]) { groups[it.group] = { group: [] }; entries.push(groups[it.group]); }
         groups[it.group].group.push(item);
