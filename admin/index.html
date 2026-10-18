@@ -759,6 +759,19 @@
     .pcard.sel { border-color: #ff2a2a; background: rgba(255,0,0,0.1); }
     .pcard.sel .wthumb::after { content: '✓'; position: absolute; top: 6px; right: 6px; width: 18px; height: 18px; border-radius: 50%; background: #ff2a2a; color: #fff; font-size: 10px; line-height: 18px; text-align: center; }
     .wtag-group { max-width: 70%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .rv-card { display: flex; gap: 10px; padding: 10px 12px; border: 1px solid rgba(255,0,0,0.22); border-radius: 12px; background: rgba(255,255,255,0.03); }
+    .rv-card img, .rv-ph { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; flex-shrink: 0; background: rgba(255,0,0,0.15); }
+    .rv-body { min-width: 0; flex: 1; }
+    .rv-head { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; font-size: 8px; color: #ff6b6b; }
+    .rv-stars { color: #ffcc00; font-size: 9px; letter-spacing: 1px; }
+    .rv-meta { font-size: 6.5px; line-height: 1.8; color: rgba(255,200,200,0.5); overflow-wrap: anywhere; }
+    .rv-comment { margin-top: 5px; font-size: 7.5px; line-height: 1.8; color: rgba(255,225,225,0.85); overflow-wrap: anywhere; white-space: pre-wrap; }
+    .rv-empty { font-size: 7px; line-height: 1.9; color: rgba(255,200,200,0.45); }
+    .rp-list { display: flex; flex-direction: column; gap: 8px; max-height: 58vh; overflow-y: auto; padding-right: 4px; }
+    .rp-list .rv-card { cursor: pointer; transition: border-color .15s, background .15s; }
+    .rp-list .rv-card:hover { border-color: rgba(255,0,0,0.6); background: rgba(255,0,0,0.07); }
+    .rv-tag { display: inline-block; font-size: 6px; padding: 3px 6px; border-radius: 6px; background: rgba(0,200,0,0.15); color: #7ee787; }
+    .rv-tag.used { background: rgba(255,170,0,0.15); color: #ffcc66; }
     .wm-overlay { position: fixed; inset: 0; z-index: 6000; display: none; align-items: flex-start; justify-content: center; padding: 4vh 12px; overflow-y: auto; background: rgba(5,0,0,0.78); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
     .wm-overlay.open { display: flex; }
     .wm { width: 100%; max-width: 520px; background: #0c0000; border: 1px solid rgba(255,0,0,0.3); border-radius: 16px; padding: 18px; box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 40px rgba(255,0,0,0.12); }
@@ -1452,6 +1465,10 @@
     <label>Бейдж «НОВОЕ»</label>
     <div class="chips" id="wmNewChips"></div>
 
+    <label>Отзыв об этой работе</label>
+    <div id="wmReview"></div>
+    <div class="chips" id="wmReviewActions"></div>
+
     <div class="wm-status" id="wmStatus"></div>
     <div class="wm-actions">
       <button class="btn btn-sm" id="wmUp" type="button">◀ Раньше</button>
@@ -1472,6 +1489,15 @@
       <button class="btn btn-sm" id="gpCancel" type="button">Отмена</button>
       <button class="btn btn-sm" id="gpOk" type="button">Добавить</button>
     </div>
+  </div>
+</div>
+
+<div class="wm-overlay" id="reviewPicker" style="z-index:6200">
+  <div class="wm" style="max-width:640px">
+    <div class="wm-head"><span>⭐ ВЫБРАТЬ ОТЗЫВ</span><span class="wm-x" id="rpClose">✕</span></div>
+    <input type="text" id="rpSearch" placeholder="🔍 Поиск: автор, текст, тип заказа" autocomplete="off">
+    <div class="db-info" id="rpInfo"></div>
+    <div id="rpList" class="rp-list"></div>
   </div>
 </div>
 
@@ -2259,33 +2285,117 @@ async function deletePromoCode(id) {
 
 let rulesData = []; // [{title, text, important}, ...]
 
+let rulesLoaded = false;
+
+async function ghReadRules() {
+  const res = await ghFetch(`/repos/${REPO}/contents/rules/index.html?ref=${BRANCH}`);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    const hint = res.status === 404 ? ' (файл rules/index.html не найден или токен не видит репозиторий)'
+               : res.status === 401 ? ' (токен GitHub неверный или истёк)' : '';
+    throw new Error(`GitHub ответил ${res.status}: ${err.message || 'ошибка'}${hint}`);
+  }
+  const f = await res.json();
+  return { sha: f.sha, html: decodeURIComponent(escape(atob((f.content || '').replace(/\n/g, '')))) };
+}
+
+// границы блока .rules-grid ищем по вложенности div — маркер-комментарий в конце не нужен
+function findRulesGrid(raw) {
+  const open = /<div\b[^>]*class="[^"]*\brules-grid\b[^"]*"[^>]*>/.exec(raw);
+  if (!open) return null;
+  const openEnd = open.index + open[0].length;
+  const rx = /<(\/?)div\b[^>]*>/g;
+  rx.lastIndex = openEnd;
+  let depth = 1, m;
+  while ((m = rx.exec(raw))) {
+    depth += m[1] ? -1 : 1;
+    if (depth === 0) return { openEnd, closeStart: m.index };
+  }
+  return null;
+}
+
+function parseRules(rawHtml) {
+  const grid = findRulesGrid(rawHtml);
+  if (!grid) throw new Error('В rules/index.html не найден блок <div class="rules-grid">');
+  const doc = new DOMParser().parseFromString('<div id="r">' + rawHtml.slice(grid.openEnd, grid.closeStart) + '</div>', 'text/html');
+  return Array.from(doc.querySelectorAll('#r .rule')).map(el => {
+    const t = el.querySelector('.rule-title'), x = el.querySelector('.rule-text');
+    return {
+      important: el.classList.contains('important'),
+      title: (t ? t.textContent : '').trim(),
+      text: (x ? x.innerHTML : '').trim(),
+    };
+  });
+}
+
 async function loadRules() {
   const container = document.getElementById('rulesList');
   container.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div>';
   showStatus(document.getElementById('rulesStatus'), '', '');
   try {
-    const f = await getFile('rules/index.html');
-    if (!f) throw new Error('rules/index.html не найден');
-    const rawHtml = decodeURIComponent(escape(atob(f.content.replace(/\n/g, ''))));
-    rulesData = parseRules(rawHtml);
+    const f = await ghReadRules();
+    rulesData = parseRules(f.html);
+    rulesLoaded = true;
     renderRules();
+    if (!rulesData.length) showStatus(document.getElementById('rulesStatus'), 'Блок правил найден, но правил в нём нет', 'info');
   } catch(e) {
-    container.innerHTML = '<div style="font-size:7px;color:rgba(255,100,100,0.7);line-height:2">Ошибка: ' + e.message + '</div>';
+    rulesLoaded = false;
+    container.innerHTML = '<div style="font-size:7px;color:rgba(255,100,100,0.7);line-height:2"></div>';
+    container.firstChild.textContent = 'Ошибка: ' + e.message;
   }
 }
 
-function parseRules(rawHtml) {
-  const items = [];
-  const ruleRx = /<div class="rule([^"]*)"[^>]*>\s*<div class="rule-num">[^<]*<\/div>\s*<div class="rule-body">\s*<div class="rule-title">([^<]*)<\/div>\s*<div class="rule-text">([\s\S]*?)<\/div>\s*<\/div>\s*<\/div>/g;
-  let m;
-  while ((m = ruleRx.exec(rawHtml)) !== null) {
-    items.push({
-      important: m[1].includes('important'),
-      title: m[2].trim(),
-      text: m[3].trim()
-    });
+async function saveRules() {
+  const status = document.getElementById('rulesStatus');
+  const btn    = document.getElementById('saveRulesBtn');
+  if (!rulesLoaded) {
+    showStatus(status, 'Сначала нажми «Загрузить актуальные правила», иначе можно затереть то, что уже на сайте', 'err');
+    return;
   }
-  return items;
+  if (!rulesData.length && !confirm('Список правил пуст. Сохранить пустую страницу правил?')) return;
+  btn.disabled = true;
+  showStatus(status, 'Читаю rules/index.html...', 'info');
+
+  try {
+    const f = await ghReadRules();
+    const grid = findRulesGrid(f.html);
+    if (!grid) throw new Error('В rules/index.html не найден блок <div class="rules-grid"> — сохранять некуда');
+
+    const newRulesHtml = rulesData.map((rule, idx) => {
+      const num     = String(idx+1).padStart(2,'0');
+      const delay   = (0.04 + idx * 0.05).toFixed(2);
+      const cls     = rule.important ? 'rule important' : 'rule';
+      return `  <div class="${cls}" style="animation-delay:${delay}s">\n    <div class="rule-num">${num}</div>\n    <div class="rule-body">\n      <div class="rule-title">${escHtml(rule.title)}</div>\n      <div class="rule-text">\n        ${rule.text}\n      </div>\n    </div>\n  </div>`;
+    }).join('\n\n');
+
+    // без String.replace со строкой-шаблоном: символы вроде $1 или $& в тексте правил не должны ничего ломать
+    const rawHtml = f.html.slice(0, grid.openEnd) + '\n\n' + newRulesHtml + '\n\n  ' + f.html.slice(grid.closeStart);
+    if (rawHtml === f.html) { showStatus(status, 'Изменений нет — на сайте уже такие же правила', 'info'); return; }
+
+    showStatus(status, 'Сохраняю...', 'info');
+    const b64 = btoa(unescape(encodeURIComponent(rawHtml)));
+    const res = await ghFetch('/repos/' + REPO + '/contents/rules/index.html', TOKEN, {
+      method: 'PUT',
+      body: JSON.stringify({ message: '[admin] update rules', content: b64, sha: f.sha, branch: BRANCH }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      const hint = (res.status === 403 || res.status === 404) ? ' — у токена нет права записи (нужен доступ Contents: Read and write к репозиторию)'
+                 : (res.status === 409 || res.status === 422) ? ' — файл на GitHub успели изменить, нажми «Загрузить актуальные правила» и повтори'
+                 : '';
+      throw new Error(`GitHub ответил ${res.status}: ${err.message || 'ошибка'}${hint}`);
+    }
+
+    // проверка: читаем файл обратно и убеждаемся, что правила действительно записались
+    const back = await ghReadRules();
+    const saved = parseRules(back.html);
+    if (saved.length !== rulesData.length) throw new Error(`после сохранения на GitHub ${saved.length} правил вместо ${rulesData.length}`);
+    showStatus(status, `Правила сохранены и проверены на GitHub (${saved.length}). Сайт обновится через ~30 сек.`, 'ok');
+  } catch(e) {
+    showStatus(status, 'Ошибка: ' + e.message, 'err');
+  } finally {
+    btn.disabled = false;
+  }
 }
 
 function renderRules() {
@@ -2378,52 +2488,6 @@ function addRule() {
   document.getElementById('newRuleImportant').checked = false;
   renderRules();
   showStatus(document.getElementById('rulesStatus'), 'Правило добавлено — не забудь сохранить!', 'info');
-}
-
-async function saveRules() {
-  const status = document.getElementById('rulesStatus');
-  const btn    = document.getElementById('saveRulesBtn');
-  btn.disabled = true;
-  showStatus(status, 'Читаю rules/index.html...', 'info');
-
-  try {
-    const f = await getFile('rules/index.html');
-    if (!f) throw new Error('rules/index.html не найден');
-    let rawHtml = decodeURIComponent(escape(atob(f.content.replace(/\n/g, ''))));
-
-    const newRulesHtml = rulesData.map((rule, idx) => {
-      const num     = String(idx+1).padStart(2,'0');
-      const delay   = (0.04 + idx * 0.05).toFixed(2);
-      const cls     = rule.important ? 'rule important' : 'rule';
-      return `  <div class="${cls}" style="animation-delay:${delay}s">\n    <div class="rule-num">${num}</div>\n    <div class="rule-body">\n      <div class="rule-title">${escHtml(rule.title)}</div>\n      <div class="rule-text">\n        ${rule.text}\n      </div>\n    </div>\n  </div>`;
-    }).join('\n\n');
-
-    rawHtml = rawHtml.replace(
-      /(<div class="rules-grid">)[\s\S]*?(<\/div><!-- \/rules-grid -->)/,
-      '$1\n\n' + newRulesHtml + '\n\n  $2'
-    );
-
-    showStatus(status, 'Сохраняю...', 'info');
-    const b64 = btoa(unescape(encodeURIComponent(rawHtml)));
-    const res = await ghFetch('/repos/' + REPO + '/contents/rules/index.html', TOKEN, {
-      method: 'PUT',
-      body: JSON.stringify({
-        message: '[admin] update rules',
-        content: b64,
-        sha: f.sha,
-        branch: BRANCH,
-      }),
-    });
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.message || 'GitHub API error');
-    }
-    showStatus(status, 'Правила сохранены! Сайт обновится через ~30 сек.', 'ok');
-  } catch(e) {
-    showStatus(status, 'Ошибка: ' + e.message, 'err');
-  } finally {
-    btn.disabled = false;
-  }
 }
 
 function rteCmd(edId, cmd) {
@@ -4558,7 +4622,7 @@ function workCard(w, gsize) {
   const title = document.createElement('div'); title.className = 'wtitle'; title.textContent = w.type;
   const meta = document.createElement('div'); meta.className = 'wmeta';
   const who = w.author_name || (w.user_id ? 'ID ' + w.user_id : '');
-  meta.textContent = [w.time, who ? '👤 ' + who + (w.show_author ? '' : ' (скрыт)') : ''].filter(Boolean).join(' · ');
+  meta.textContent = [w.time, who ? '👤 ' + who + (w.show_author ? '' : ' (скрыт)') : '', w.review ? '★ есть отзыв' : ''].filter(Boolean).join(' · ');
   const file = document.createElement('div'); file.className = 'wfile'; file.textContent = w.img;
   body.append(title, meta, file);
   card.appendChild(body);
@@ -4681,6 +4745,7 @@ function openWorkModal(w) {
   wmNew = { on: !!w.is_new, until: w.new_until || '' };
   renderNewChips();
   refreshPickers();
+  renderWmReview();
   $id('workModal').classList.add('open');
 }
 
@@ -4997,6 +5062,104 @@ function missingRow(w) {
 }
 $id('profilesRefreshBtn').addEventListener('click', startProfilesRefresh);
 
+/* ── отзыв, привязанный к работе ── */
+let REVIEWS_LIST = null;
+
+function reviewCard(r, extra) {
+  const card = document.createElement('div');
+  card.className = 'rv-card';
+  if (r.avatar) { const im = document.createElement('img'); im.src = r.avatar; im.alt = ''; card.appendChild(im); }
+  else card.appendChild(Object.assign(document.createElement('div'), { className: 'rv-ph' }));
+  const body = document.createElement('div'); body.className = 'rv-body';
+  const head = document.createElement('div'); head.className = 'rv-head';
+  head.appendChild(Object.assign(document.createElement('span'), { textContent: r.author || 'Аноним' }));
+  head.appendChild(Object.assign(document.createElement('span'), { className: 'rv-stars', textContent: '★'.repeat(r.rating || 0) + '☆'.repeat(Math.max(0, 5 - (r.rating || 0))) }));
+  if (extra) head.appendChild(extra);
+  body.appendChild(head);
+  const metaText = [r.date, r.order ? 'Заказ ' + r.order : '', r.order_type].filter(Boolean).join(' · ');
+  if (metaText) body.appendChild(Object.assign(document.createElement('div'), { className: 'rv-meta', textContent: metaText }));
+  if (r.comment) body.appendChild(Object.assign(document.createElement('div'), { className: 'rv-comment', textContent: r.comment }));
+  card.appendChild(body);
+  return card;
+}
+
+function renderWmReview() {
+  const box = $id('wmReview'), acts = $id('wmReviewActions');
+  box.innerHTML = ''; acts.innerHTML = '';
+  if (!wmCurrent) return;
+  const mk = (label, fn, on) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'chip' + (on ? ' on' : ''); b.textContent = label; b.addEventListener('click', fn); acts.appendChild(b); };
+  if (wmCurrent.review) {
+    box.appendChild(reviewCard(wmCurrent.review));
+    mk('Заменить', openReviewPicker);
+    mk('Открепить', () => saveWorkReview(null));
+  } else {
+    box.appendChild(Object.assign(document.createElement('div'), { className: 'rv-empty', textContent: 'Отзыв не привязан. Если клиент оставил отзыв — выбери его из списка, и он покажется в окне этой работы на главной.' }));
+    mk('＋ Привязать отзыв', openReviewPicker, true);
+  }
+}
+
+async function saveWorkReview(review) {
+  if (!wmCurrent) return;
+  const st = $id('wmStatus');
+  st.textContent = '';
+  try {
+    const res = await adminFetch(`${BOT_API}/admin/portfolio/review`, { master: true, method: 'POST', body: { id: wmCurrent.id, review } });
+    if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err.error || ('HTTP ' + res.status)); }
+    wmCurrent.review = review;
+    await fetchWorks();
+    wmCurrent = WORKS.find(x => x.id === wmCurrent.id) || wmCurrent;
+    renderWorksGrid();
+    renderWmReview();
+    closeReviewPicker();
+  } catch (e) { st.textContent = 'Ошибка: ' + e.message; }
+}
+
+function closeReviewPicker() { $id('reviewPicker').classList.remove('open'); }
+
+async function openReviewPicker() {
+  const list = $id('rpList'), info = $id('rpInfo');
+  $id('rpSearch').value = '';
+  list.innerHTML = '';
+  info.textContent = 'Загружаю отзывы из Discord…';
+  $id('reviewPicker').classList.add('open');
+  try {
+    if (!REVIEWS_LIST) {
+      const res = await fetch(`${BOT_API}/api/reviews?limit=50`, { cache: 'no-store' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      REVIEWS_LIST = (await res.json()).reviews || [];
+    }
+    renderReviewPicker();
+  } catch (e) { info.textContent = 'Не удалось загрузить отзывы: ' + e.message; }
+}
+
+function renderReviewPicker() {
+  const list = $id('rpList'), info = $id('rpInfo');
+  list.innerHTML = '';
+  const q = $id('rpSearch').value.trim().toLowerCase();
+  const names = [wmCurrent && wmCurrent.author_label, wmCurrent && wmCurrent.author_name].filter(Boolean).map(n => n.toLowerCase());
+  const usedBy = {};
+  WORKS.forEach(w => { if (w.review && w.review.id) usedBy[w.review.id] = w; });
+  let items = (REVIEWS_LIST || []).map(r => {
+    const a = (r.author || '').toLowerCase();
+    return { r, match: names.some(n => n && (a === n || a.includes(n) || n.includes(a))) };
+  });
+  if (q) items = items.filter(({ r }) => [r.author, r.comment, r.order_type, r.order].join(' ').toLowerCase().includes(q));
+  items.sort((a, b) => Number(b.match) - Number(a.match));
+  info.textContent = items.length ? `Отзывов: ${items.length}. Нажми на отзыв, чтобы привязать его к этой работе.` : 'Отзывов не найдено (показываются последние 50 из канала отзывов).';
+  items.forEach(({ r, match }) => {
+    let tag = null;
+    if (match) { tag = Object.assign(document.createElement('span'), { className: 'rv-tag', textContent: 'похоже на заказчика' }); }
+    else if (usedBy[r.id] && wmCurrent && usedBy[r.id].id !== wmCurrent.id) { tag = Object.assign(document.createElement('span'), { className: 'rv-tag used', textContent: 'уже у другой работы' }); }
+    const card = reviewCard(r, tag);
+    card.addEventListener('click', () => saveWorkReview({ id: r.id, author: r.author, avatar: r.avatar, rating: r.rating, comment: r.comment, date: r.date, order: r.order, order_type: r.order_type }));
+    list.appendChild(card);
+  });
+}
+$id('rpClose').addEventListener('click', closeReviewPicker);
+$id('reviewPicker').addEventListener('click', (e) => { if (e.target === $id('reviewPicker')) closeReviewPicker(); });
+$id('rpSearch').addEventListener('input', renderReviewPicker);
+addEventListener('keydown', (e) => { if (e.key === 'Escape' && $id('reviewPicker').classList.contains('open')) closeReviewPicker(); });
+
 const groupOptions = () => [{ label: 'Без группы', value: '' }]
   .concat(WORKS_META.groups.map(g => ({ label: g, value: g })))
   .concat([{ label: '＋ Новая', value: nextGroupKey() }]);
@@ -5031,7 +5194,7 @@ if (localStorage.getItem('mz_admin_key')) { fetchWorks().then(refreshPickers).ca
     const dot = document.createElement('div'); dot.className = 'cur-dot';
     const ring = document.createElement('div'); ring.className = 'cur-ring';
     document.body.append(ring, dot);
-    const INTERACTIVE = 'a, button, [onclick], [role="button"], label, summary, select, input[type=checkbox], input[type=radio], input[type=file], input[type=button], input[type=submit], .tab, .btn, .chip, .wcard, .gmem, .pcard, .wm-x, .wmove b, .gctl b';
+    const INTERACTIVE = 'a, button, [onclick], [role="button"], label, summary, select, input[type=checkbox], input[type=radio], input[type=file], input[type=button], input[type=submit], .tab, .btn, .chip, .wcard, .gmem, .pcard, .rv-card, .wm-x, .wmove b, .gctl b';
     let x = -100, y = -100, rx = -100, ry = -100, raf = 0, armed = false;
     function loop() {
       const k = calm ? 1 : 0.18;
