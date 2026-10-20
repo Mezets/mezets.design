@@ -92,11 +92,8 @@
     }
 
     .page {
-      position: relative;
-      z-index: 2;
-      max-width: 1250px;
-      margin: 0 auto;
-      padding: 32px 36px 24px;
+      position: relative; z-index: 2;
+      max-width: 1250px; margin: 0 auto; padding: 32px 36px 60px;
     }
 
     .home-arrow {
@@ -113,143 +110,136 @@
     .home-arrow svg { width: 18px; height: 18px; display: block; }
     .home-arrow:hover { transform: scale(1.1) translateX(-2px); border-color: rgba(255,0,0,0.5); box-shadow: 0 0 26px rgba(255,0,0,0.3); }
 
+    .page-header { text-align: center; margin-bottom: 20px; }
+    h1.page-title {
+      font-size: 18px; font-weight: normal; color: #ff2a2a; letter-spacing: 2px; line-height: 1.4;
+      margin-bottom: 8px; text-shadow: 0 0 18px rgba(255,0,0,0.45);
+    }
+    .page-sub { font-size: 9px; color: rgba(255,200,200,0.4); letter-spacing: 1px; line-height: 1.8; }
 
-    .page-header {
-      text-align: center;
-      margin-bottom: 18px;
+    .toolbar {
+      position: sticky; top: 0; z-index: 20;
+      display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+      padding: 12px 0; margin-bottom: 10px;
+      background: linear-gradient(180deg, rgba(5,0,0,0.94), rgba(5,0,0,0.78) 70%, rgba(5,0,0,0));
     }
-    .page-title {
-      font-size: 18px;
-      color: #ff2a2a;
-      letter-spacing: 2px;
-      line-height: 1.4;
-      margin-bottom: 8px;
+    .chips { display: flex; gap: 6px; flex: 1 1 260px; min-width: 0; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+    .chips::-webkit-scrollbar { display: none; }
+    .chip {
+      flex-shrink: 0; font-family: inherit; font-size: 8px; line-height: 1; letter-spacing: .3px;
+      padding: 10px 14px; border-radius: 999px; cursor: pointer; white-space: nowrap;
+      color: rgba(255,200,200,0.75); background: rgba(255,255,255,0.04); border: 1px solid rgba(255,0,0,0.22);
+      transition: background .2s, color .2s, border-color .2s, box-shadow .2s;
     }
-    .page-sub {
-      font-size: 9px;
-      color: rgba(255,200,200,0.4);
-      letter-spacing: 1px;
-      line-height: 1.8;
+    .chip:hover { border-color: rgba(255,0,0,0.55); color: #ffb3b3; }
+    .chip.on { color: #fff; background: linear-gradient(135deg, #ff2a2a, #b00000); border-color: transparent; box-shadow: 0 0 14px rgba(255,0,0,0.4); }
+    .search {
+      flex: 0 1 280px; min-width: 170px; padding: 11px 15px; border-radius: 999px;
+      background: rgba(255,0,0,0.05); border: 1px solid rgba(255,0,0,0.2);
+      color: rgba(255,220,220,0.9); font-family: 'Press Start 2P', monospace; font-size: 8px; line-height: 1.4; outline: none;
+      transition: border-color .2s, box-shadow .2s;
     }
+    .search::placeholder { color: rgba(255,200,200,0.35); }
+    .search:focus { border-color: rgba(255,0,0,0.5); box-shadow: 0 0 14px rgba(255,0,0,0.12); }
+    .shown-info { font-size: 7px; color: rgba(255,200,200,0.4); letter-spacing: .5px; white-space: nowrap; }
 
     .rules-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 12px;
     }
-
-    .rules-grid { perspective: 1200px; }
     .rule {
-      display: flex;
-      gap: 14px;
+      position: relative;
+      display: flex; gap: 14px; align-items: flex-start;
       padding: 18px 20px;
-      border-radius: 14px;
-      background: rgba(255,0,0,0.04);
-      border: 1px solid rgba(255,0,0,0.13);
-      transition: border-color .25s, box-shadow .25s, transform .1s ease-out;
-      transform-style: preserve-3d;
-      will-change: transform;
+      border-radius: 18px;
+      background: rgba(12,0,0,0.85);
+      border: 1px solid rgba(255,0,0,0.18);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 40px rgba(255,0,0,0.05);
+      transition: border-color .25s, box-shadow .25s, transform .25s cubic-bezier(.16,1,.3,1);
       opacity: 0;
-      animation: fadeUp .4s ease forwards;
+      animation: fadeUp .45s ease forwards;
     }
-    .rule:hover {
-      border-color: rgba(255,0,0,0.28);
-      box-shadow: 0 0 20px rgba(255,0,0,0.07);
-    }
+    .rule:hover { border-color: rgba(255,0,0,0.38); box-shadow: 0 0 28px rgba(255,0,0,0.12); transform: translateY(-2px); }
+    .rule.hide { display: none; }
 
     .rule-num {
-      font-size: 10px;
-      color: rgba(255,80,80,0.5);
-      flex-shrink: 0;
-      width: 24px;
-      padding-top: 2px;
-      text-align: right;
+      flex-shrink: 0; width: 36px; height: 36px; padding: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; text-align: center; color: #ff6b6b;
+      border-radius: 10px; border: 1px solid rgba(255,0,0,0.25); background: rgba(255,0,0,0.08);
     }
-
-    .rule-body { flex: 1; }
-
+    .rule-body { flex: 1; min-width: 0; }
     .rule-title {
-      font-size: 11px;
-      color: #ff5555;
-      letter-spacing: 1px;
-      margin-bottom: 8px;
-      line-height: 1.4;
+      font-size: 11px; color: #ff5555; letter-spacing: 1px; margin-bottom: 8px; line-height: 1.5;
+      display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
     }
-
-    .rule-text {
-      font-size: 9px;
-      color: rgba(255,230,230,0.9);
-      line-height: 2;
-      letter-spacing: .3px;
-    }
-
-    .rule-text .hi {
-      color: #ffaaaa;
-    }
+    .rule-text { font-size: 9px; color: rgba(255,230,230,0.9); line-height: 2; letter-spacing: .3px; overflow-wrap: anywhere; }
+    .rule-text b { color: #ffd2d2; font-weight: normal; }
+    .rule-text i { color: rgba(255,200,200,0.7); font-style: normal; }
+    .rule-text .hi { color: #ff9b9b; }
 
     .rule.important {
-      border-color: rgba(255,0,0,0.22);
-      background: rgba(255,0,0,0.07);
+      border-color: rgba(255,0,0,0.32);
+      background: linear-gradient(135deg, rgba(255,0,0,0.12), rgba(12,0,0,0.88) 55%);
+      box-shadow: 0 0 34px rgba(255,0,0,0.1);
+    }
+    .rule.important .rule-num { color: #fff; border-color: transparent; background: linear-gradient(135deg, #ff2a2a, #b00000); box-shadow: 0 0 12px rgba(255,0,0,0.45); }
+    .rule.important .rule-title::after {
+      content: 'ВАЖНО'; font-size: 6px; letter-spacing: .5px; line-height: 1;
+      padding: 4px 7px; border-radius: 999px; color: #ffb3b3; background: rgba(255,0,0,0.15); border: 1px solid rgba(255,0,0,0.3);
     }
 
-    .divider {
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(255,0,0,0.15), transparent);
-      margin: 12px 0;
-    }
+    .empty-state { display: none; text-align: center; font-size: 9px; line-height: 1.8; color: rgba(255,200,200,0.4); padding: 40px 0; }
+    .empty-state.show { display: block; }
 
-    .footer-note {
-      margin-top: 16px;
-      padding: 12px 18px;
-      border-radius: 10px;
-      border: 1px dashed rgba(255,0,0,0.2);
-      font-size: 9px;
-      color: rgba(255,200,200,0.7);
-      line-height: 1.8;
-      text-align: center;
-      letter-spacing: .5px;
+    .panel {
+      background: rgba(12,0,0,0.85); border: 1px solid rgba(255,0,0,0.2); border-radius: 18px;
+      padding: 16px 22px; margin-top: 14px; backdrop-filter: blur(10px); box-shadow: 0 0 40px rgba(255,0,0,0.06);
     }
-
-    .order-cta {
-      margin-top: 16px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-    }
-    .cta-label {
-      font-size: 9px;
-      color: rgba(255,200,200,0.3);
-      letter-spacing: 1px;
-    }
+    .footer-note { font-size: 9px; color: rgba(255,200,200,0.75); line-height: 1.8; text-align: center; letter-spacing: .5px; }
+    .order-cta { display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; padding: 24px 20px; }
+    .cta-label { font-size: 9px; color: rgba(255,200,200,0.45); letter-spacing: 1px; }
     .cta-btn {
-      display: inline-flex; align-items: center; justify-content: center;
-      padding: 13px 26px;
-      font-family: 'Press Start 2P', monospace; font-size: 11px; line-height: 1.6;
-      color: #ff3b3b; border-radius: 12px;
-      background: rgba(255,0,0,0.05); border: 1px solid rgba(255,0,0,0.25);
-      text-decoration: none;
-      transition: .2s; position: relative; overflow: hidden;
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 14px 30px; font-family: 'Press Start 2P', monospace; font-size: 11px; line-height: 1.6;
+      color: #fff; border-radius: 12px; text-decoration: none; position: relative; overflow: hidden;
+      background: linear-gradient(135deg, rgba(255,42,42,0.9), rgba(160,0,0,0.9)); border: 1px solid rgba(255,100,100,0.5);
+      box-shadow: 0 0 24px rgba(255,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.25);
+      transition: transform .2s, box-shadow .2s;
     }
-    .cta-btn::before {
-      content: ""; position: absolute; top: 0; left: -120%; width: 120%; height: 100%;
-      background: linear-gradient(120deg, transparent, rgba(255,0,0,0.3), transparent);
-      transition: .5s;
-    }
+    .cta-btn::before { content: ""; position: absolute; top: 0; left: -120%; width: 120%; height: 100%; background: linear-gradient(120deg, transparent, rgba(255,255,255,0.28), transparent); transition: .5s; }
     .cta-btn:hover::before { left: 120%; }
-    .cta-btn:hover { border-color: rgba(255,0,0,0.5); box-shadow: 0 0 28px rgba(255,0,0,0.13); transform: scale(1.03); }
+    .cta-btn:hover { transform: scale(1.03); box-shadow: 0 0 36px rgba(255,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.3); }
+    .cta-btn:active { transform: scale(0.98); }
 
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(10px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 
-    @media (max-width: 600px) {
+    @media (max-width: 700px) {
       .page { padding: 70px 16px 60px; }
-      .page-title { font-size: 12px; }
-      .rule { gap: 12px; padding: 18px 16px; }
-      .rule-num { width: 18px; }
+      h1.page-title { font-size: 13px; }
+      .toolbar { position: static; }
+      .rules-grid { grid-template-columns: 1fr; }
+      .rule { gap: 12px; padding: 16px 14px; }
+      .rule-num { width: 30px; height: 30px; font-size: 8px; }
     }
+
+    /* курсор: точка + кольцо (только мышь) */
+    html.has-cursor, html.has-cursor * { cursor: none !important; }
+    html.has-cursor input { cursor: text !important; }
+    .cur-dot, .cur-ring {
+      position: fixed; left: 0; top: 0; z-index: 2147483647; pointer-events: none;
+      border-radius: 50%; opacity: 0; will-change: transform;
+      transition: opacity .2s ease, width .25s cubic-bezier(.16,1,.3,1), height .25s cubic-bezier(.16,1,.3,1), margin .25s cubic-bezier(.16,1,.3,1), background-color .2s ease, border-color .2s ease;
+    }
+    .cur-dot { width: 6px; height: 6px; margin: -3px 0 0 -3px; background: #ff2a2a; box-shadow: 0 0 10px rgba(255,42,42,0.9); }
+    .cur-ring { width: 32px; height: 32px; margin: -16px 0 0 -16px; border: 1.5px solid rgba(255,60,60,0.75); }
+    .cur-on .cur-dot, .cur-on .cur-ring { opacity: 1; }
+    .cur-hover .cur-ring { width: 54px; height: 54px; margin: -27px 0 0 -27px; background: rgba(255,40,40,0.12); border-color: rgba(255,110,110,0.95); }
+    .cur-hover .cur-dot { opacity: 0.35; }
+    .cur-down .cur-ring { width: 22px; height: 22px; margin: -11px 0 0 -11px; }
+    .cur-text .cur-dot, .cur-text .cur-ring { opacity: 0; }
   </style>
 </head>
 <body>
@@ -292,9 +282,15 @@
 
 <div class="page">
 
-  <div class="page-header">
-    <div class="page-title">Правила заказа</div>
+  <header class="page-header">
+    <h1 class="page-title">Правила заказа</h1>
     <div class="page-sub">Прочитай перед оформлением · Это важно для нас обоих</div>
+  </header>
+
+  <div class="toolbar">
+    <div class="chips" id="ruleChips"></div>
+    <span class="shown-info" id="ruleInfo"></span>
+    <input type="text" class="search" id="ruleSearch" placeholder="Найти в правилах..." autocomplete="off">
   </div>
 
   <div class="rules-grid">
@@ -408,11 +404,13 @@
 
   </div><!-- /rules-grid -->
 
-  <div class="footer-note">
+  <div class="empty-state" id="ruleEmpty">Ничего не нашлось.<br>Попробуй другое слово или выбери «Все».</div>
+
+  <div class="panel footer-note">
     Оформляя заказ, ты соглашаешься с этими правилами
   </div>
 
-  <div class="order-cta">
+  <div class="panel order-cta">
     <div class="cta-label">Всё понятно?</div>
     <a class="cta-btn" href="https://mezets.github.io/mezets.design/">Оформить заказ</a>
   </div>
@@ -427,7 +425,6 @@
 </script>
 <script src="/mezets.design/common.js" onerror="var g=document.getElementById('loadingGate'); if(g) g.style.display='none';"></script>
 <script>
-
   const canvas = document.getElementById('bg');
   const ctx    = canvas.getContext('2d');
   function resize() { canvas.width = innerWidth; canvas.height = innerHeight; }
@@ -456,17 +453,79 @@
   }
   if (!noMotion) animate();
 
-  if (!noMotion) {
-    document.querySelectorAll('.rule').forEach(card => {
-      card.addEventListener('mousemove', e => {
-        const r = card.getBoundingClientRect();
-        const x = (e.clientX - r.left) / r.width  - .5;
-        const y = (e.clientY - r.top)  / r.height - .5;
-        card.style.transform = `rotateY(${x*14}deg) rotateX(${-y*14}deg) scale(1.03)`;
+  // фильтр правил: «Все / Важные» и поиск по тексту (работает с любыми правилами, которые добавлены в админке)
+  (function () {
+    const grid = document.querySelector('.rules-grid');
+    const chipsEl = document.getElementById('ruleChips');
+    const searchEl = document.getElementById('ruleSearch');
+    const infoEl = document.getElementById('ruleInfo');
+    const emptyEl = document.getElementById('ruleEmpty');
+    if (!grid || !chipsEl) return;
+    const rules = Array.from(grid.querySelectorAll('.rule'));
+    const state = { only: 'all', q: '' };
+    const importantCount = rules.filter(r => r.classList.contains('important')).length;
+    const chips = [['all', 'Все (' + rules.length + ')']];
+    if (importantCount) chips.push(['important', 'Важные (' + importantCount + ')']);
+
+    function apply() {
+      const q = state.q.trim().toLowerCase();
+      let shown = 0;
+      rules.forEach(r => {
+        const okType = state.only === 'all' || r.classList.contains('important');
+        const okText = !q || r.textContent.toLowerCase().includes(q);
+        const ok = okType && okText;
+        r.classList.toggle('hide', !ok);
+        if (ok) shown++;
       });
-      card.addEventListener('mouseleave', () => { card.style.transform = ''; });
-    });
-  }
+      infoEl.textContent = (state.only !== 'all' || q) ? ('Показано ' + shown + ' из ' + rules.length) : '';
+      emptyEl.classList.toggle('show', shown === 0);
+    }
+    function buildChips() {
+      chipsEl.textContent = '';
+      chips.forEach(([val, label]) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'chip' + (state.only === val ? ' on' : '');
+        b.textContent = label;
+        b.addEventListener('click', () => { state.only = val; buildChips(); apply(); });
+        chipsEl.appendChild(b);
+      });
+    }
+    searchEl.addEventListener('input', () => { state.q = searchEl.value; apply(); });
+    buildChips(); apply();
+  })();
+
+  // курсор: точка + кольцо (только мышь)
+  (function () {
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    const root = document.documentElement;
+    const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const dot = document.createElement('div'); dot.className = 'cur-dot';
+    const ring = document.createElement('div'); ring.className = 'cur-ring';
+    document.body.append(ring, dot);
+    const INTERACTIVE = 'a, button, label, .chip, .cta-btn, .home-arrow';
+    let x = -100, y = -100, rx = -100, ry = -100, raf = 0, armed = false;
+    function loop() {
+      const k = calm ? 1 : 0.18;
+      rx += (x - rx) * k; ry += (y - ry) * k;
+      ring.style.transform = 'translate3d(' + rx.toFixed(1) + 'px,' + ry.toFixed(1) + 'px,0)';
+      raf = (Math.abs(x - rx) > 0.1 || Math.abs(y - ry) > 0.1) ? requestAnimationFrame(loop) : 0;
+    }
+    addEventListener('pointermove', (e) => {
+      if (e.pointerType && e.pointerType !== 'mouse') return;
+      if (!armed) { armed = true; rx = x = e.clientX; ry = y = e.clientY; root.classList.add('has-cursor'); }
+      x = e.clientX; y = e.clientY;
+      dot.style.transform = 'translate3d(' + x + 'px,' + y + 'px,0)';
+      root.classList.add('cur-on');
+      const t = e.target;
+      root.classList.toggle('cur-hover', !!(t.closest && t.closest(INTERACTIVE)));
+      root.classList.toggle('cur-text', !!(t.closest && t.closest('input')));
+      if (!raf) raf = requestAnimationFrame(loop);
+    }, { passive: true });
+    addEventListener('pointerdown', () => root.classList.add('cur-down'));
+    addEventListener('pointerup', () => root.classList.remove('cur-down'));
+    document.addEventListener('mouseleave', () => root.classList.remove('cur-on'));
+  })();
 </script>
 </body>
 </html>
