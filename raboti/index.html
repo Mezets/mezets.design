@@ -146,106 +146,116 @@
 
   #fireworks { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
 
+
   .card {
     position: relative;
     z-index: 3;
     width: 100%;
-    max-width: 420px;
-    padding: 36px 28px;
-    border-radius: 22px;
-    background: var(--bg-card);
-    border: 1px solid rgba(255,0,0,0.2);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    box-shadow: 0 0 40px rgba(255,0,0,0.12);
-    text-align: center;
-    transform-style: preserve-3d;
-    will-change: transform;
-    transition: transform .1s ease-out, border-color .25s, box-shadow .25s;
+    max-width: 560px;
+    border-radius: 18px;
+    background: rgba(12,0,0,0.92);
+    border: 1px solid rgba(255,0,0,0.25);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 0 60px rgba(255,0,0,0.15);
+    text-align: left;
+    overflow: hidden;
+    animation: cardIn .3s cubic-bezier(.22,.61,.36,1);
+    transition: border-color .25s, box-shadow .25s;
   }
-  .card:hover { border-color: rgba(255,0,0,0.4); box-shadow: 0 0 56px rgba(255,0,0,0.2); }
+  .card:hover { border-color: rgba(255,0,0,0.4); box-shadow: 0 0 70px rgba(255,0,0,0.2); }
+  @keyframes cardIn { from { opacity: 0; transform: translateY(10px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
-  .icon {
-    width: 64px; height: 64px; margin: 0 auto 22px;
-    color: #ff3b3b;
+  .card-head { padding: 18px 22px 14px; border-bottom: 1px solid rgba(255,0,0,0.12); }
+  h1.title {
+    font-size: 12px; font-weight: normal; line-height: 1.8; color: #ff2a2a; letter-spacing: 1px;
+    text-shadow: 0 0 12px rgba(255,40,40,0.6), 0 0 28px rgba(255,0,0,0.3);
   }
+  .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 10px; }
+  .chip {
+    font-family: inherit; font-size: 7px; line-height: 1; letter-spacing: .3px;
+    padding: 8px 11px; border-radius: 999px; white-space: nowrap;
+    color: rgba(255,200,200,0.75); background: rgba(255,255,255,0.04); border: 1px solid rgba(255,0,0,0.22);
+  }
+  .chip.accent { color: #fff; background: linear-gradient(135deg, #ff2a2a, #b00000); border-color: transparent; box-shadow: 0 0 12px rgba(255,0,0,0.4); }
+  button.chip { cursor: pointer; transition: background .2s, color .2s, border-color .2s; }
+  button.chip:hover { border-color: rgba(255,0,0,0.55); color: #ffb3b3; }
+  button.chip.done { color: #7ee787; border-color: rgba(0,200,0,0.4); }
+
+  .preview {
+    margin: 18px 22px 0; aspect-ratio: 16 / 10; border-radius: 12px; overflow: hidden;
+    background: #150000; border: 1px solid rgba(255,0,0,0.18);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .preview img, .preview video { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .preview .big-icon { width: 54px; height: 54px; color: #ff3b3b; opacity: .9; }
+  .preview .big-icon svg { width: 100%; height: 100%; filter: drop-shadow(0 0 10px rgba(255,0,0,0.5)); }
+
+  .card-body { padding: 18px 22px 22px; display: flex; flex-direction: column; gap: 10px; }
+  .filename { font-size: 8px; line-height: 1.8; color: var(--fg-filename); word-break: break-all; }
+
+  .icon { width: 54px; height: 54px; margin: 22px 22px 0; color: #ff3b3b; }
   .icon svg { width: 100%; height: 100%; filter: drop-shadow(0 0 10px rgba(255,0,0,0.5)); }
-
-  .title {
-    font-size: 13px;
-    line-height: 1.8;
-    color: #ff2a2a;
-    letter-spacing: 1px;
-    margin-bottom: 10px;
-    text-shadow: 0 0 12px rgba(255,40,40,0.7), 0 0 28px rgba(255,0,0,0.35);
-  }
-
-  .filename {
-    font-size: 9px;
-    line-height: 1.7;
-    color: var(--fg-filename);
-    word-break: break-all;
-    margin-bottom: 28px;
-  }
 
   .btn {
     display: flex; align-items: center; justify-content: center; gap: 10px;
     padding: 16px 12px; text-align: center; text-decoration: none;
     font-family: 'Press Start 2P', monospace; font-size: 11px; line-height: 1.6;
     color: #fff; border-radius: 12px;
-    background: rgba(255,0,0,0.75); border: 1px solid rgba(255,0,0,0.5);
-    box-shadow: 0 0 18px rgba(255,0,0,0.25);
-    transition: .2s; position: relative; overflow: hidden;
-    cursor: pointer;
+    background: linear-gradient(135deg, rgba(255,42,42,0.9), rgba(160,0,0,0.9)); border: 1px solid rgba(255,100,100,0.5);
+    box-shadow: 0 0 24px rgba(255,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.25);
+    transition: transform .2s, box-shadow .2s; position: relative; overflow: hidden;
   }
   .btn::before {
     content: ""; position: absolute; top: 0; left: -120%; width: 120%; height: 100%;
-    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.25), transparent);
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.28), transparent);
     transition: .5s;
   }
   .btn:hover::before { left: 120%; }
-  .btn:hover { transform: scale(1.03); box-shadow: 0 0 36px rgba(255,0,0,0.4); }
+  .btn:hover { transform: scale(1.02); box-shadow: 0 0 36px rgba(255,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.3); }
+  .btn:active { transform: scale(0.98); }
   .btn svg { width: 16px; height: 16px; flex-shrink: 0; }
 
   .home-btn {
     display: flex; align-items: center; justify-content: center; gap: 8px;
-    padding: 14px 12px; margin-top: 14px; text-align: center; text-decoration: none;
-    font-family: 'Press Start 2P', monospace; font-size: 10px; line-height: 1.6;
-    color: #ff3b3b; border-radius: 12px;
+    padding: 13px 12px; text-align: center; text-decoration: none;
+    font-family: 'Press Start 2P', monospace; font-size: 9px; line-height: 1.6;
+    color: #ff6b6b; border-radius: 12px;
     background: rgba(255,0,0,0.05); border: 1px solid rgba(255,0,0,0.25);
-    box-shadow: 0 0 18px rgba(255,0,0,0.1);
-    transition: .2s; position: relative; overflow: hidden;
+    transition: transform .2s, border-color .2s, box-shadow .2s; position: relative; overflow: hidden;
   }
-  .home-btn::before {
-    content: ""; position: absolute; top: 0; left: -120%; width: 120%; height: 100%;
-    background: linear-gradient(120deg, transparent, rgba(255,0,0,0.35), transparent);
-    transition: .5s;
-  }
-  .home-btn:hover::before { left: 120%; }
-  .home-btn:hover { transform: scale(1.03); border-color: rgba(255,0,0,0.5); box-shadow: 0 0 30px rgba(255,0,0,0.25); }
+  .home-btn:hover { transform: scale(1.02); border-color: rgba(255,0,0,0.5); box-shadow: 0 0 26px rgba(255,0,0,0.2); }
+  .home-btn:active { transform: scale(0.98); }
   .home-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
 
-  .error { font-size: 10px; line-height: 1.9; color: var(--fg-filename); }
+  .error { font-size: 9px; line-height: 1.9; color: var(--fg-filename); }
 
+  @media (max-width: 600px) {
+    body { padding: 16px; }
+    .card-head, .card-body { padding-left: 16px; padding-right: 16px; }
+    .preview { margin-left: 16px; margin-right: 16px; }
+    .icon { margin-left: 16px; }
+  }
 
-    /* --- custom cursor: точка + кольцо (только мышь) --- */
-    html.has-cursor, html.has-cursor * { cursor: none !important; }
-    html.has-cursor input, html.has-cursor textarea, html.has-cursor select { cursor: text !important; }
-    .cur-dot, .cur-ring {
-      position: fixed; left: 0; top: 0; z-index: 2147483647; pointer-events: none;
-      border-radius: 50%; opacity: 0; will-change: transform;
-      transition: opacity .2s ease, width .25s cubic-bezier(.16,1,.3,1), height .25s cubic-bezier(.16,1,.3,1), margin .25s cubic-bezier(.16,1,.3,1), background-color .2s ease, border-color .2s ease;
-    }
-    .cur-dot { width: 6px; height: 6px; margin: -3px 0 0 -3px; background: #ff2a2a; box-shadow: 0 0 10px rgba(255,42,42,0.9); }
-    .cur-ring { width: 32px; height: 32px; margin: -16px 0 0 -16px; border: 1.5px solid rgba(255,60,60,0.75); }
-    .cur-on .cur-dot, .cur-on .cur-ring { opacity: 1; }
-    .cur-hover .cur-ring { width: 54px; height: 54px; margin: -27px 0 0 -27px; background: rgba(255,40,40,0.12); border-color: rgba(255,110,110,0.95); }
-    .cur-hover .cur-dot { opacity: 0.35; }
-    .cur-down .cur-ring { width: 22px; height: 22px; margin: -11px 0 0 -11px; }
-    .cur-text .cur-dot, .cur-text .cur-ring { opacity: 0; }
+  /* курсор: точка + кольцо (только мышь) */
+  html.has-cursor, html.has-cursor * { cursor: none !important; }
+  html.has-cursor input, html.has-cursor textarea, html.has-cursor select { cursor: text !important; }
+  .cur-dot, .cur-ring {
+    position: fixed; left: 0; top: 0; z-index: 2147483647; pointer-events: none;
+    border-radius: 50%; opacity: 0; will-change: transform;
+    transition: opacity .2s ease, width .25s cubic-bezier(.16,1,.3,1), height .25s cubic-bezier(.16,1,.3,1), margin .25s cubic-bezier(.16,1,.3,1), background-color .2s ease, border-color .2s ease;
+  }
+  .cur-dot { width: 6px; height: 6px; margin: -3px 0 0 -3px; background: #ff2a2a; box-shadow: 0 0 10px rgba(255,42,42,0.9); }
+  .cur-ring { width: 32px; height: 32px; margin: -16px 0 0 -16px; border: 1.5px solid rgba(255,60,60,0.75); }
+  .cur-on .cur-dot, .cur-on .cur-ring { opacity: 1; }
+  .cur-hover .cur-ring { width: 54px; height: 54px; margin: -27px 0 0 -27px; background: rgba(255,40,40,0.12); border-color: rgba(255,110,110,0.95); }
+  .cur-hover .cur-dot { opacity: 0.35; }
+  .cur-down .cur-ring { width: 22px; height: 22px; margin: -11px 0 0 -11px; }
+  .cur-text .cur-dot, .cur-text .cur-ring { opacity: 0; }
 </style>
 </head>
 <body>
+
 
 <div id="banOverlay" style="display:none; position:fixed; inset:0; z-index:999999; background:radial-gradient(ellipse at center, #2a0000 0%, #050000 75%); color:#fff; align-items:center; justify-content:center; text-align:center; flex-direction:column; padding:24px;">
   <div style="font-size:64px; line-height:1; margin-bottom:18px;">🚫</div>
@@ -299,6 +309,7 @@
   <div class="balloon balloon-stripe balloon-r9"></div>
 </div>
 <canvas id="fireworks"></canvas>
+
 
 <div class="card" id="card">
 </div>
@@ -432,71 +443,92 @@
     fwTick();
   })();
 
-  function tilt(card) {
-    if (!card || noMotion) return;
-    card.addEventListener('mousemove', e => {
-      const r = card.getBoundingClientRect();
-      const x = (e.clientX - r.left) / r.width  - 0.5;
-      const y = (e.clientY - r.top)  / r.height - 0.5;
-      card.style.transform = `rotateY(${x*16}deg) rotateX(${-y*16}deg) scale(1.02)`;
-    });
-    card.addEventListener('mouseleave', () => { card.style.transform = 'rotateY(0) rotateX(0) scale(1)'; });
-  }
-  tilt(document.getElementById('card'));
-
   const params = new URLSearchParams(window.location.search);
-  const file = params.get('f');
+  const file = (params.get('f') || '').trim();
   const title = params.get('title');
   const card = document.getElementById('card');
+  const esc = (v) => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-  if (!file) {
+  const ICON_DL   = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>';
+  const ICON_HOME = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8M5 10v10a1 1 0 001 1h4v-6h4v6h4a1 1 0 001-1V10"/></svg>';
+  const ICON_ERR  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>';
+  const ICON_FILE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8l-5-5zM14 3v5h5"/></svg>';
+
+  const IMAGES = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'avif', 'bmp'];
+  const VIDEOS = ['mp4', 'webm', 'mov', 'm4v'];
+  function fileKind(ext) {
+    if (IMAGES.includes(ext)) return 'Изображение';
+    if (VIDEOS.includes(ext)) return 'Видео';
+    if (['zip', 'rar', '7z'].includes(ext)) return 'Архив';
+    if (['psd', 'ai', 'fig', 'svg'].includes(ext)) return 'Исходник';
+    return 'Файл';
+  }
+
+  // ссылка не должна выходить за папку с работами
+  const invalid = !file || file.split('/').some(p => p === '..' || p === '.');
+
+  if (invalid) {
     card.innerHTML = `
-      <div class="icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <circle cx="12" cy="12" r="10"/>
-          <path d="M12 8v4M12 16h.01"/>
-        </svg>
+      <div class="card-head">
+        <h1 class="title">${file ? 'Неверная ссылка' : 'Файл не указан'}</h1>
       </div>
-      <div class="title">Файл не указан</div>
-      <div class="error">Ссылка неполная.<br>Попросите отправителя прислать её ещё раз.</div>
-      <a class="home-btn" href="/mezets.design/">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M3 11l9-8 9 8M5 10v10a1 1 0 001 1h4v-6h4v6h4a1 1 0 001-1V10"/>
-        </svg>
-        На главную
-      </a>
+      <div class="icon">${ICON_ERR}</div>
+      <div class="card-body">
+        <div class="error">Ссылка неполная.<br>Попросите отправителя прислать её ещё раз.</div>
+        <a class="home-btn" href="/mezets.design/">${ICON_HOME}На главную</a>
+      </div>
     `;
   } else {
     const fileUrl = '/mezets.design/raboti/' + encodeURIComponent(file).replace(/%2F/g, '/');
     let displayName = file;
     if (title) { try { displayName = decodeURIComponent(title); } catch (e) { displayName = title; } }
-    const esc = (v) => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const dot = file.lastIndexOf('.');
+    const ext = dot > -1 ? file.slice(dot + 1).toLowerCase() : '';
+    const kind = fileKind(ext);
+
+    let previewHtml;
+    if (IMAGES.includes(ext)) previewHtml = `<img src="${fileUrl}" alt="">`;
+    else if (VIDEOS.includes(ext)) previewHtml = `<video src="${fileUrl}" controls muted playsinline preload="metadata"></video>`;
+    else previewHtml = `<div class="big-icon">${ICON_FILE}</div>`;
 
     card.innerHTML = `
-      <div class="icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/>
-        </svg>
+      <div class="card-head">
+        <h1 class="title">Ваша работа готова</h1>
+        <div class="meta">
+          ${ext ? `<span class="chip accent">${esc(ext.toUpperCase())}</span>` : ''}
+          <span class="chip">${esc(kind)}</span>
+          <button class="chip" type="button" id="copyLinkBtn">Скопировать ссылку</button>
+        </div>
       </div>
-      <div class="title">Ваша работа готова</div>
-      <div class="filename">${esc(displayName)}</div>
-      <a class="btn" href="${fileUrl}" download>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/>
-        </svg>
-        Скачать
-      </a>
-      <a class="home-btn" href="/mezets.design/">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M3 11l9-8 9 8M5 10v10a1 1 0 001 1h4v-6h4v6h4a1 1 0 001-1V10"/>
-        </svg>
-        На главную
-      </a>
+      <div class="preview" id="previewBox">${previewHtml}</div>
+      <div class="card-body">
+        <div class="filename">${esc(displayName)}</div>
+        <a class="btn" href="${fileUrl}" download>${ICON_DL}Скачать</a>
+        <a class="home-btn" href="/mezets.design/">${ICON_HOME}На главную</a>
+      </div>
     `;
+
+    // если превью не загрузилось — показываем иконку файла вместо пустого поля
+    const media = card.querySelector('#previewBox img, #previewBox video');
+    if (media) media.addEventListener('error', () => {
+      const box = document.getElementById('previewBox');
+      if (box) box.innerHTML = `<div class="big-icon">${ICON_FILE}</div>`;
+    });
+
+    const copyBtn = document.getElementById('copyLinkBtn');
+    copyBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        copyBtn.textContent = 'Скопировано ✓';
+        copyBtn.classList.add('done');
+      } catch (e) {
+        copyBtn.textContent = 'Не удалось скопировать';
+      }
+      setTimeout(() => { copyBtn.textContent = 'Скопировать ссылку'; copyBtn.classList.remove('done'); }, 2200);
+    });
   }
 
-
-  // custom cursor: точка + кольцо (только мышь)
+  // курсор: точка + кольцо (только мышь)
   (function () {
     if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
     const root = document.documentElement;
@@ -504,7 +536,7 @@
     const dot = document.createElement('div'); dot.className = 'cur-dot';
     const ring = document.createElement('div'); ring.className = 'cur-ring';
     document.body.append(ring, dot);
-    const INTERACTIVE = 'a, button, [onclick], [role="button"], label, summary, select, .btn, .spin-tab, .koleso-btn, .top-right-profile, .order-cat-arrow, .item-stepper-btn';
+    const INTERACTIVE = 'a, button, label, .btn, .home-btn, .chip, video';
     let x = -100, y = -100, rx = -100, ry = -100, raf = 0, armed = false;
     function loop() {
       const k = calm ? 1 : 0.18;
