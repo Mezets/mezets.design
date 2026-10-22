@@ -453,46 +453,120 @@
   }
   if (!noMotion) animate();
 
-  // фильтр правил: «Все / Важные» и поиск по тексту (работает с любыми правилами, которые добавлены в админке)
+  // ── правила: с сервера (меняются в админке сразу), из хранилища браузера (до месяца) или статика из HTML
   (function () {
+    const CACHE_TTL = 30 * 24 * 60 * 60 * 1000;
+    function cacheRead(key) {
+      try {
+        const v = JSON.parse(localStorage.getItem('mz_cache_' + key));
+        if (v && typeof v.t === 'number' && Date.now() - v.t < CACHE_TTL) return v.d;
+        if (v) localStorage.removeItem('mz_cache_' + key);
+      } catch (e) {}
+      return null;
+    }
+    function cacheWrite(key, data) {
+      try { localStorage.setItem('mz_cache_' + key, JSON.stringify({ t: Date.now(), d: data })); } catch (e) {}
+    }
+
+    // в тексте правил оставляем только безопасную разметку: жирный, курсив, перенос строки и подсветка span.hi
+    function cleanHtml(html) {
+      const doc = new DOMParser().parseFromString('<div>' + html + '</div>', 'text/html');
+      const root = doc.body.firstChild;
+      (function walk(node) {
+        Array.from(node.childNodes).forEach(ch => {
+          if (ch.nodeType === 3) return;
+          if (ch.nodeType !== 1) { ch.remove(); return; }
+          const tag = ch.tagName.toLowerCase();
+          if (tag === 'script' || tag === 'style') { ch.remove(); return; }
+          walk(ch);
+          const ok = ['b', 'strong', 'i', 'em', 'u', 'br'].includes(tag) || (tag === 'span' && ch.getAttribute('class') === 'hi');
+          if (ok) {
+            Array.from(ch.attributes).forEach(at => { if (!(tag === 'span' && at.name === 'class')) ch.removeAttribute(at.name); });
+          } else {
+            while (ch.firstChild) node.insertBefore(ch.firstChild, ch);
+            ch.remove();
+          }
+        });
+      })(root);
+      return root.innerHTML;
+    }
+
     const grid = document.querySelector('.rules-grid');
     const chipsEl = document.getElementById('ruleChips');
     const searchEl = document.getElementById('ruleSearch');
     const infoEl = document.getElementById('ruleInfo');
     const emptyEl = document.getElementById('ruleEmpty');
     if (!grid || !chipsEl) return;
-    const rules = Array.from(grid.querySelectorAll('.rule'));
     const state = { only: 'all', q: '' };
-    const importantCount = rules.filter(r => r.classList.contains('important')).length;
-    const chips = [['all', 'Все (' + rules.length + ')']];
-    if (importantCount) chips.push(['important', 'Важные (' + importantCount + ')']);
+    let sig = '';
 
-    function apply() {
-      const q = state.q.trim().toLowerCase();
-      let shown = 0;
-      rules.forEach(r => {
-        const okType = state.only === 'all' || r.classList.contains('important');
-        const okText = !q || r.textContent.toLowerCase().includes(q);
-        const ok = okType && okText;
-        r.classList.toggle('hide', !ok);
-        if (ok) shown++;
+    function readStatic() {
+      return Array.from(grid.querySelectorAll('.rule')).map(r => {
+        const t = r.querySelector('.rule-title'), x = r.querySelector('.rule-text');
+        return { title: t ? t.textContent.trim() : '', text: x ? x.innerHTML.trim() : '', important: r.classList.contains('important') };
       });
-      infoEl.textContent = (state.only !== 'all' || q) ? ('Показано ' + shown + ' из ' + rules.length) : '';
-      emptyEl.classList.toggle('show', shown === 0);
     }
-    function buildChips() {
+
+    function render(list) {
+      sig = JSON.stringify(list);
+      grid.textContent = '';
+      list.forEach((r, i) => {
+        const rule = document.createElement('div');
+        rule.className = r.important ? 'rule important' : 'rule';
+        rule.style.animationDelay = (0.04 + i * 0.05).toFixed(2) + 's';
+        const num = document.createElement('div'); num.className = 'rule-num'; num.textContent = String(i + 1).padStart(2, '0');
+        const body = document.createElement('div'); body.className = 'rule-body';
+        const title = document.createElement('div'); title.className = 'rule-title'; title.textContent = r.title;
+        const text = document.createElement('div'); text.className = 'rule-text'; text.innerHTML = cleanHtml(r.text);
+        body.append(title, text);
+        rule.append(num, body);
+        grid.appendChild(rule);
+      });
+      refresh();
+    }
+
+    function refresh() {
+      const rules = Array.from(grid.querySelectorAll('.rule'));
+      const importantCount = rules.filter(r => r.classList.contains('important')).length;
+      if (state.only === 'important' && !importantCount) state.only = 'all';
+      const chips = [['all', 'Все (' + rules.length + ')']];
+      if (importantCount) chips.push(['important', 'Важные (' + importantCount + ')']);
       chipsEl.textContent = '';
       chips.forEach(([val, label]) => {
         const b = document.createElement('button');
         b.type = 'button';
         b.className = 'chip' + (state.only === val ? ' on' : '');
         b.textContent = label;
-        b.addEventListener('click', () => { state.only = val; buildChips(); apply(); });
+        b.addEventListener('click', () => { state.only = val; refresh(); });
         chipsEl.appendChild(b);
       });
+      const q = state.q.trim().toLowerCase();
+      let shown = 0;
+      rules.forEach(r => {
+        const ok = (state.only === 'all' || r.classList.contains('important')) && (!q || r.textContent.toLowerCase().includes(q));
+        r.classList.toggle('hide', !ok);
+        if (ok) shown++;
+      });
+      infoEl.textContent = (state.only !== 'all' || q) ? ('Показано ' + shown + ' из ' + rules.length) : '';
+      emptyEl.classList.toggle('show', shown === 0);
     }
-    searchEl.addEventListener('input', () => { state.q = searchEl.value; apply(); });
-    buildChips(); apply();
+
+    searchEl.addEventListener('input', () => { state.q = searchEl.value; refresh(); });
+
+    const staticList = readStatic();
+    sig = JSON.stringify(staticList);
+    const stored = cacheRead('rules');
+    if (stored && stored.length) render(stored); else refresh();
+
+    const api = (typeof BAN_API !== 'undefined') ? BAN_API : '';
+    if (api) {
+      fetch(api + '/api/rules').then(r => r.json()).then(d => {
+        const fresh = (d.rules || []).filter(r => r && r.title && r.text);
+        if (!fresh.length) return;
+        cacheWrite('rules', fresh);
+        if (JSON.stringify(fresh) !== sig) render(fresh);
+      }).catch(() => {});
+    }
   })();
 
   // курсор: точка + кольцо (только мышь)
