@@ -2328,16 +2328,37 @@ function parseRules(rawHtml) {
   });
 }
 
+let rulesSource = 'backend';   // 'backend' — правила в БД (на сайте меняются сразу); 'github' — запасной путь, если бэкенд ещё без обновления
+
+function rulesStatusEl() { return document.getElementById('rulesStatus'); }
+
 async function loadRules() {
   const container = document.getElementById('rulesList');
   container.innerHTML = '<div style="font-size:7px;color:rgba(255,200,200,0.3);line-height:2">Загрузка...</div>';
-  showStatus(document.getElementById('rulesStatus'), '', '');
+  showStatus(rulesStatusEl(), '', '');
   try {
+    let backendErr = null;
+    try {
+      const res = await adminFetch(`${BOT_API}/admin/rules`);
+      if (res.ok) {
+        const data = await res.json();
+        rulesData = (data.rules || []).map(r => ({ title: r.title, text: r.text, important: !!r.important }));
+        rulesSource = 'backend';
+        rulesLoaded = true;
+        renderRules();
+        return;
+      }
+      if (res.status !== 404) backendErr = new Error(res.status === 403 ? 'Неверный ключ администратора' : 'Сервер ответил ' + res.status);
+    } catch (e) { backendErr = e; }
+    if (backendErr && backendErr.message && /ключ|Сервер ответил/.test(backendErr.message)) throw backendErr;
+
+    // бэкенд без обновления (или недоступен) — читаем страницу правил с GitHub, как раньше
     const f = await ghReadRules();
     rulesData = parseRules(f.html);
+    rulesSource = 'github';
     rulesLoaded = true;
     renderRules();
-    if (!rulesData.length) showStatus(document.getElementById('rulesStatus'), 'Блок правил найден, но правил в нём нет', 'info');
+    showStatus(rulesStatusEl(), 'Бэкенд без обновления: правила читаются и сохраняются через GitHub (на сайте появятся через минуту-две)', 'info');
   } catch(e) {
     rulesLoaded = false;
     container.innerHTML = '<div style="font-size:7px;color:rgba(255,100,100,0.7);line-height:2"></div>';
@@ -2345,52 +2366,87 @@ async function loadRules() {
   }
 }
 
+function buildRulesHtml() {
+  return rulesData.map((rule, idx) => {
+    const num     = String(idx+1).padStart(2,'0');
+    const delay   = (0.04 + idx * 0.05).toFixed(2);
+    const cls     = rule.important ? 'rule important' : 'rule';
+    return `  <div class="${cls}" style="animation-delay:${delay}s">\n    <div class="rule-num">${num}</div>\n    <div class="rule-body">\n      <div class="rule-title">${escHtml(rule.title)}</div>\n      <div class="rule-text">\n        ${rule.text}\n      </div>\n    </div>\n  </div>`;
+  }).join('\n\n');
+}
+
+// записывает правила в rules/index.html на GitHub; возвращает 'saved' | 'same'
+async function writeRulesToGithub() {
+  const f = await ghReadRules();
+  const grid = findRulesGrid(f.html);
+  if (!grid) throw new Error('в rules/index.html не найден блок <div class="rules-grid">');
+  // без String.replace со строкой-шаблоном: символы вроде $1 или $& в тексте правил не должны ничего ломать
+  const rawHtml = f.html.slice(0, grid.openEnd) + '\n\n' + buildRulesHtml() + '\n\n  ' + f.html.slice(grid.closeStart);
+  if (rawHtml === f.html) return 'same';
+  const b64 = btoa(unescape(encodeURIComponent(rawHtml)));
+  const res = await ghFetch('/repos/' + REPO + '/contents/rules/index.html', TOKEN, {
+    method: 'PUT',
+    body: JSON.stringify({ message: '[admin] update rules', content: b64, sha: f.sha, branch: BRANCH }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    const hint = (res.status === 403 || res.status === 404) ? ' — у токена нет права записи (нужен доступ Contents: Read and write к репозиторию)'
+               : (res.status === 409 || res.status === 422) ? ' — файл на GitHub успели изменить, повтори сохранение'
+               : '';
+    throw new Error(`GitHub ответил ${res.status}: ${err.message || 'ошибка'}${hint}`);
+  }
+  const back = await ghReadRules();
+  const saved = parseRules(back.html);
+  if (saved.length !== rulesData.length) throw new Error(`после сохранения на GitHub ${saved.length} правил вместо ${rulesData.length}`);
+  return 'saved';
+}
+
 async function saveRules() {
-  const status = document.getElementById('rulesStatus');
+  const status = rulesStatusEl();
   const btn    = document.getElementById('saveRulesBtn');
   if (!rulesLoaded) {
     showStatus(status, 'Сначала нажми «Загрузить актуальные правила», иначе можно затереть то, что уже на сайте', 'err');
     return;
   }
-  if (!rulesData.length && !confirm('Список правил пуст. Сохранить пустую страницу правил?')) return;
+  if (!rulesData.length) {
+    showStatus(status, 'Нельзя сохранить пустой список правил — добавь хотя бы одно', 'err');
+    return;
+  }
   btn.disabled = true;
-  showStatus(status, 'Читаю rules/index.html...', 'info');
-
   try {
-    const f = await ghReadRules();
-    const grid = findRulesGrid(f.html);
-    if (!grid) throw new Error('В rules/index.html не найден блок <div class="rules-grid"> — сохранять некуда');
-
-    const newRulesHtml = rulesData.map((rule, idx) => {
-      const num     = String(idx+1).padStart(2,'0');
-      const delay   = (0.04 + idx * 0.05).toFixed(2);
-      const cls     = rule.important ? 'rule important' : 'rule';
-      return `  <div class="${cls}" style="animation-delay:${delay}s">\n    <div class="rule-num">${num}</div>\n    <div class="rule-body">\n      <div class="rule-title">${escHtml(rule.title)}</div>\n      <div class="rule-text">\n        ${rule.text}\n      </div>\n    </div>\n  </div>`;
-    }).join('\n\n');
-
-    // без String.replace со строкой-шаблоном: символы вроде $1 или $& в тексте правил не должны ничего ломать
-    const rawHtml = f.html.slice(0, grid.openEnd) + '\n\n' + newRulesHtml + '\n\n  ' + f.html.slice(grid.closeStart);
-    if (rawHtml === f.html) { showStatus(status, 'Изменений нет — на сайте уже такие же правила', 'info'); return; }
+    if (rulesSource === 'github') {
+      showStatus(status, 'Сохраняю на GitHub...', 'info');
+      const r = await writeRulesToGithub();
+      showStatus(status, r === 'same' ? 'Изменений нет — на сайте уже такие же правила' : 'Правила сохранены на GitHub и проверены. Сайт обновится через минуту-две.', r === 'same' ? 'info' : 'ok');
+      return;
+    }
 
     showStatus(status, 'Сохраняю...', 'info');
-    const b64 = btoa(unescape(encodeURIComponent(rawHtml)));
-    const res = await ghFetch('/repos/' + REPO + '/contents/rules/index.html', TOKEN, {
-      method: 'PUT',
-      body: JSON.stringify({ message: '[admin] update rules', content: b64, sha: f.sha, branch: BRANCH }),
+    const res = await adminFetch(`${BOT_API}/admin/rules/save`, {
+      master: true, method: 'POST',
+      body: { rules: rulesData.map(r => ({ title: r.title, text: r.text, important: !!r.important })) },
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      const hint = (res.status === 403 || res.status === 404) ? ' — у токена нет права записи (нужен доступ Contents: Read and write к репозиторию)'
-                 : (res.status === 409 || res.status === 422) ? ' — файл на GitHub успели изменить, нажми «Загрузить актуальные правила» и повтори'
-                 : '';
-      throw new Error(`GitHub ответил ${res.status}: ${err.message || 'ошибка'}${hint}`);
+      const map = {
+        master_key_invalid: 'Неверный мастер-ключ',
+        forbidden: 'Неверный ключ администратора',
+        title_and_text_required: 'У каждого правила должны быть заголовок и текст',
+        empty_rules: 'Нельзя сохранить пустой список правил',
+        too_many_rules: 'Слишком много правил (максимум 100)',
+      };
+      throw new Error(map[err.error] || err.error || ('Сервер ответил ' + res.status));
     }
 
-    // проверка: читаем файл обратно и убеждаемся, что правила действительно записались
-    const back = await ghReadRules();
-    const saved = parseRules(back.html);
-    if (saved.length !== rulesData.length) throw new Error(`после сохранения на GitHub ${saved.length} правил вместо ${rulesData.length}`);
-    showStatus(status, `Правила сохранены и проверены на GitHub (${saved.length}). Сайт обновится через ~30 сек.`, 'ok');
+    // копия в rules/index.html нужна поисковикам и тем, у кого выключен JS: обновляем её по возможности
+    let note = '';
+    try {
+      await writeRulesToGithub();
+      note = ' Копия на GitHub (для поисковиков) тоже обновлена.';
+    } catch (e) {
+      note = ' Копия на GitHub (для поисковиков) не обновилась: ' + e.message;
+    }
+    showStatus(status, 'Правила сохранены — на сайте уже обновились.' + note, 'ok');
   } catch(e) {
     showStatus(status, 'Ошибка: ' + e.message, 'err');
   } finally {
