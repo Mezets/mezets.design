@@ -805,6 +805,151 @@
     .cur-down .cur-ring { width: 22px; height: 22px; margin: -11px 0 0 -11px; }
     .cur-text .cur-dot, .cur-text .cur-ring { opacity: 0; }
   </style>
+<!-- mz-net-notice -->
+<script>
+(function () {
+  // Уведомление «технические неполадки / включи VPN»: появляется, если запросы к серверу или картинки не загружаются
+  if (window.__mzNetNotice) return;
+  window.__mzNetNotice = true;
+
+  var SNOOZE_MS = 10 * 60 * 1000;       // после закрытия не беспокоим 10 минут
+  var DEBOUNCE_MS = 900;                // даём шанс повторному запросу, прежде чем показывать
+  var MEDIA_LIMIT = 3, MEDIA_WINDOW = 12000;
+  var timer = 0, shownKind = '', failHost = '', mediaErrors = [];
+
+  var TEXTS = {
+    net: {
+      title: 'Технические неполадки',
+      text: 'Не удалось связаться с сервером. Если данные не появляются — включи средство обхода блокировок (VPN) и обнови страницу.'
+    },
+    media: {
+      title: 'Часть страницы не загрузилась',
+      text: 'Картинки или файлы не открываются. Возможно, у тебя блокировка — включи средство обхода блокировок (VPN) и обнови страницу.'
+    },
+    offline: {
+      title: 'Нет подключения к интернету',
+      text: 'Проверь соединение. Если интернет есть, а сайт не грузится — включи средство обхода блокировок (VPN).'
+    }
+  };
+
+  function snoozed() {
+    try { return Date.now() - Number(sessionStorage.getItem('mz_net_notice_closed') || 0) < SNOOZE_MS; } catch (e) { return false; }
+  }
+  function hostOf(url) { try { return new URL(url, location.href).host; } catch (e) { return ''; } }
+
+  function injectStyle() {
+    if (document.getElementById('mzNetStyle')) return;
+    var st = document.createElement('style');
+    st.id = 'mzNetStyle';
+    st.textContent =
+      '#mzNetNotice{position:fixed;left:50%;bottom:18px;z-index:2147482000;width:calc(100% - 28px);max-width:540px;' +
+      'transform:translate(-50%,0);display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:14px;' +
+      'background:rgba(12,0,0,.96);border:1px solid rgba(255,60,60,.4);box-shadow:0 0 40px rgba(255,0,0,.22),0 10px 40px rgba(0,0,0,.5);' +
+      'font-family:"Press Start 2P",monospace;color:rgba(255,225,225,.92);animation:mznIn .3s cubic-bezier(.22,.61,.36,1)}' +
+      '#mzNetNotice[hidden]{display:none}' +
+      '#mzNetNotice .mzn-icon{font-size:16px;line-height:1;flex-shrink:0;margin-top:2px}' +
+      '#mzNetNotice .mzn-body{flex:1;min-width:0}' +
+      '#mzNetNotice .mzn-title{font-size:9px;line-height:1.7;color:#ff5555;letter-spacing:.5px;margin-bottom:6px}' +
+      '#mzNetNotice .mzn-text{font-size:7px;line-height:2;color:rgba(255,215,215,.8);overflow-wrap:anywhere}' +
+      '#mzNetNotice .mzn-actions{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}' +
+      '#mzNetNotice button{font-family:inherit;cursor:pointer}' +
+      '#mzNetNotice .mzn-btn{font-size:7px;line-height:1;padding:9px 12px;border-radius:999px;color:#fff;border:0;' +
+      'background:linear-gradient(135deg,#ff2a2a,#b00000);box-shadow:0 0 12px rgba(255,0,0,.35)}' +
+      '#mzNetNotice .mzn-x{flex-shrink:0;background:none;border:0;color:rgba(255,200,200,.5);font-size:11px;line-height:1;padding:4px 6px}' +
+      '#mzNetNotice .mzn-x:hover{color:#ff2a2a}' +
+      '@keyframes mznIn{from{opacity:0;transform:translate(-50%,14px)}to{opacity:1;transform:translate(-50%,0)}}' +
+      '@media (prefers-reduced-motion:reduce){#mzNetNotice{animation:none}}';
+    (document.head || document.documentElement).appendChild(st);
+  }
+
+  function build() {
+    var el = document.getElementById('mzNetNotice');
+    if (el) return el;
+    injectStyle();
+    el = document.createElement('div');
+    el.id = 'mzNetNotice';
+    el.setAttribute('role', 'alert');
+    el.hidden = true;
+    var icon = document.createElement('div'); icon.className = 'mzn-icon'; icon.textContent = '⚠️';
+    var body = document.createElement('div'); body.className = 'mzn-body';
+    var title = document.createElement('div'); title.className = 'mzn-title';
+    var text = document.createElement('div'); text.className = 'mzn-text';
+    var actions = document.createElement('div'); actions.className = 'mzn-actions';
+    var reload = document.createElement('button'); reload.type = 'button'; reload.className = 'mzn-btn'; reload.textContent = 'Обновить страницу';
+    reload.addEventListener('click', function () { location.reload(); });
+    actions.appendChild(reload);
+    body.appendChild(title); body.appendChild(text); body.appendChild(actions);
+    var close = document.createElement('button'); close.type = 'button'; close.className = 'mzn-x'; close.setAttribute('aria-label', 'Закрыть'); close.textContent = '✕';
+    close.addEventListener('click', function () {
+      try { sessionStorage.setItem('mz_net_notice_closed', String(Date.now())); } catch (e) {}
+      hide();
+    });
+    el.appendChild(icon); el.appendChild(body); el.appendChild(close);
+    (document.body || document.documentElement).appendChild(el);
+    return el;
+  }
+
+  function show(kind) {
+    if (snoozed() && kind !== 'offline') return;
+    function go() {
+      var el = build();
+      el.querySelector('.mzn-title').textContent = TEXTS[kind].title;
+      el.querySelector('.mzn-text').textContent = TEXTS[kind].text;
+      el.hidden = false;
+      shownKind = kind;
+    }
+    if (document.body) go(); else document.addEventListener('DOMContentLoaded', go, { once: true });
+  }
+  function hide() {
+    var el = document.getElementById('mzNetNotice');
+    if (el) el.hidden = true;
+    shownKind = '';
+  }
+
+  function noteFailure(host) {
+    failHost = host;
+    clearTimeout(timer);
+    timer = setTimeout(function () { show(navigator.onLine === false ? 'offline' : 'net'); }, DEBOUNCE_MS);
+  }
+  function noteSuccess(host) {
+    // успешный запрос к тому же серверу — связь восстановилась
+    if (host && host === failHost) {
+      clearTimeout(timer);
+      if (shownKind === 'net') hide();
+      failHost = '';
+    }
+  }
+
+  var origFetch = window.fetch;
+  if (typeof origFetch === 'function') {
+    window.fetch = function (input) {
+      var url = typeof input === 'string' ? input : (input && input.url) || '';
+      var host = hostOf(url);
+      return origFetch.apply(this, arguments).then(function (res) {
+        if (res && (res.status === 0 || (res.status >= 502 && res.status <= 504))) noteFailure(host);
+        else noteSuccess(host);
+        return res;
+      }, function (err) {
+        if (!(err && err.name === 'AbortError')) noteFailure(host);
+        throw err;
+      });
+    };
+  }
+
+  // несколько подряд не загрузившихся картинок/видео — тоже признак блокировки
+  window.addEventListener('error', function (e) {
+    var t = e && e.target;
+    if (!t || !t.tagName || ['IMG', 'VIDEO', 'SOURCE'].indexOf(t.tagName) === -1) return;
+    var now = Date.now();
+    mediaErrors = mediaErrors.filter(function (ts) { return now - ts < MEDIA_WINDOW; });
+    mediaErrors.push(now);
+    if (mediaErrors.length >= MEDIA_LIMIT && !shownKind) show('media');
+  }, true);
+
+  window.addEventListener('offline', function () { show('offline'); });
+  window.addEventListener('online', function () { if (shownKind === 'offline') hide(); });
+})();
+</script>
 </head>
 <body>
 
