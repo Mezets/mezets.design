@@ -3531,13 +3531,14 @@
   async function renderPriceItems() {
     var container = document.getElementById('priceItemsContainer');
     if (!container) return;
-    if (cachedPriceItems) {
+    if (cachedPriceItems && cachedPriceItems.length) {
       renderPriceItemsHTML(container, cachedPriceItems);
       updateOrderTotal();
       return;
     }
     var stored = cacheRead('prices');
-    if (stored) {
+    var hasStored = !!(stored && stored.length);
+    if (hasStored) {
       cachedPriceItems = stored;
       renderPriceItemsHTML(container, cachedPriceItems);
       updateOrderTotal();
@@ -3546,14 +3547,19 @@
       var r = await fetch(API + '/api/prices');
       var d = await r.json();
       var fresh = d.sections || [];
-      cacheWrite('prices', fresh);
-      if (!stored || JSON.stringify(fresh) !== JSON.stringify(stored)) {
-        cachedPriceItems = fresh;
-        renderPriceItemsHTML(container, cachedPriceItems);
-        updateOrderTotal();
+      if (fresh.length) {
+        // пустой ответ не запоминаем: иначе форма заказа «залипнет» на «Нет доступных услуг»
+        cacheWrite('prices', fresh);
+        if (!hasStored || JSON.stringify(fresh) !== JSON.stringify(stored)) {
+          cachedPriceItems = fresh;
+          renderPriceItemsHTML(container, cachedPriceItems);
+          updateOrderTotal();
+        }
+      } else if (!hasStored) {
+        renderPriceItemsHTML(container, []);
       }
     } catch(e) {
-      if (!stored) container.innerHTML = '<div style="font-size:6px;color:rgba(255,150,150,0.5)">Не удалось загрузить услуги</div>';
+      if (!hasStored) container.innerHTML = '<div style="font-size:6px;color:rgba(255,150,150,0.5)">Не удалось загрузить услуги</div>';
     }
   }
   let orderCatIndex = 0;
