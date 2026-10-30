@@ -1230,6 +1230,32 @@
       line-height: 2; letter-spacing: .5px;
     }
 
+    .vpn-banner {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      z-index: 1000;
+      width: min(440px, calc(100vw - 24px));
+      background: rgba(8,0,0,0.97);
+      border: 1px solid rgba(255,0,0,0.4);
+      border-radius: 18px;
+      padding: 14px 40px 12px 14px;
+      font-family: 'Press Start 2P', monospace;
+      box-shadow: 0 0 40px rgba(255,0,0,0.18);
+      transform: translate(-50%, -20px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .4s cubic-bezier(.22,1,.36,1), transform .4s cubic-bezier(.22,1,.36,1);
+    }
+    .vpn-banner.show { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+    .vpn-banner-title { font-size: 9px; color: #ff2a2a; letter-spacing: 1px; line-height: 1.6; margin-bottom: 8px; }
+    .vpn-banner-msg { font-size: 7px; color: rgba(255,200,200,.65); line-height: 2; letter-spacing: .5px; }
+    .vpn-banner-close {
+      position: absolute; top: 8px; right: 10px;
+      background: none; border: none; color: rgba(255,120,120,.8);
+      font-size: 16px; line-height: 1; cursor: pointer; padding: 4px;
+    }
+
     .burst-particle {
       position: fixed;
       pointer-events: none;
@@ -2652,6 +2678,15 @@
 </div>
 
 
+<div class="vpn-banner" id="vpnBanner" role="alert">
+  <button type="button" class="vpn-banner-close" onclick="dismissVpnBanner()" aria-label="Закрыть">×</button>
+  <div class="vpn-banner-title">Нет связи с сервером</div>
+  <div class="vpn-banner-msg">
+    Данные не загружаются — возможно, сервер заблокирован у твоего провайдера.<br>
+    Включи VPN или другой способ обхода блокировок и обнови страницу.
+  </div>
+</div>
+
 <img src="cow.png" alt="cow" class="flying-cow" id="flyingCow" title="Жми на корову!">
 <audio id="cowSound" src="cow.mp3" preload="auto"></audio>
 
@@ -2812,13 +2847,32 @@
   function hideMaint() {
     document.getElementById('maintToast').classList.remove('show');
   }
+  var vpnDismissed = false;
+  function showVpnBanner() {
+    if (vpnDismissed) return;
+    document.getElementById('vpnBanner').classList.add('show');
+  }
+  function hideVpnBanner() {
+    document.getElementById('vpnBanner').classList.remove('show');
+  }
+  function dismissVpnBanner() {
+    vpnDismissed = true;
+    hideVpnBanner();
+  }
   async function checkMaintenance() {
+    var ctrl = new AbortController();
+    var timer = setTimeout(function() { ctrl.abort(); }, 8000);
     try {
-      const res  = await fetch(`${API}/maintenance-status`, { mode: 'cors' });
+      const res  = await fetch(`${API}/maintenance-status`, { mode: 'cors', signal: ctrl.signal });
       const data = await res.json();
+      clearTimeout(timer);
+      hideVpnBanner();
       if (data.on) showMaint(data.msg, data.title);
       else hideMaint();
-    } catch(e) {}
+    } catch(e) {
+      clearTimeout(timer);
+      showVpnBanner();
+    }
   }
   checkMaintenance();
   setInterval(checkMaintenance, 60000);
@@ -3508,7 +3562,7 @@
   async function openOrderModal() {
     var s; try { s = localStorage.getItem('mezets_session') || ''; } catch(e) { s = ''; }
     if (!s) {
-      try { var r = await fetch(API + '/discord-login-url'); var d = await r.json(); window.location.href = d.url; } catch(e) { window.location.href = API + '/discord-login-url'; }
+      try { var r = await fetch(API + '/discord-login-url'); var d = await r.json(); window.location.href = d.url; } catch(e) { showVpnBanner(); }
       return;
     }
     rearmEntranceAnimation(document.getElementById('orderModalBox'));
@@ -3559,6 +3613,7 @@
         renderPriceItemsHTML(container, []);
       }
     } catch(e) {
+      showVpnBanner();
       if (!hasStored) container.innerHTML = '<div style="font-size:6px;color:rgba(255,150,150,0.5)">Не удалось загрузить услуги</div>';
     }
   }
