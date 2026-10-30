@@ -3433,6 +3433,7 @@
       paintReviews(list, data.reviews);
     } catch(e) {
       console.error('Reviews fetch error:', e);
+      showVpnBanner();
       if (reviewsSig) return;
       try {
         const res2 = await fetch(`${API}/api/reviews?limit=20`);
@@ -3477,10 +3478,14 @@
   let prevOrders = null, prevOnline = null, prevRating = null, firstLoad = true;
 
   async function loadStats() {
+    var ctrl = new AbortController();
+    var timer = setTimeout(function() { ctrl.abort(); }, 8000);
     try {
-      const res = await fetch(`${API}/stats?_=${Date.now()}`, { mode: 'cors', cache: 'no-store' });
+      const res = await fetch(`${API}/stats?_=${Date.now()}`, { mode: 'cors', cache: 'no-store', signal: ctrl.signal });
       if (!res.ok) throw new Error();
       const d      = await res.json();
+      clearTimeout(timer);
+      hideVpnBanner();
       const orders = extractNumber(d.total_orders);
       const online = typeof d.online === 'number' ? d.online : extractNumber(d.online);
       const rating = Math.round(extractRating(d.average_rating));
@@ -3490,6 +3495,8 @@
       document.getElementById('period').textContent = safe(d.period);
       firstLoad = false;
     } catch(e) {
+      clearTimeout(timer);
+      showVpnBanner();
       document.getElementById('orders').textContent = '—';
       document.getElementById('period').textContent = '—';
       document.getElementById('online').textContent = '—';
