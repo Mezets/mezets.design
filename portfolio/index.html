@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Портфолио — Mezets | оформление Discord, VK, YouTube, форумов</title>
+  <meta name="description" content="Портфолио Mezets: оформление форумных аккаунтов и разделов, групп ВК, Discord, YouTube для RP-серверов. Работы, сроки и отзывы клиентов.">
+  <link rel="canonical" href="https://mezets.github.io/mezets.design/portfolio/">
+  <link rel="icon" type="image/png" href="/mezets.design/favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scrollbar-width: thin; scrollbar-color: rgba(255,0,0,0.45) rgba(10,0,0,0.6); }
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-track { background: rgba(10,0,0,0.6); }
+    ::-webkit-scrollbar-thumb { background: rgba(255,0,0,0.45); border-radius: 6px; border: 2px solid rgba(10,0,0,0.6); }
+    html, body { font-family: 'Press Start 2P', monospace; background: #050000; min-height: 100vh; overflow-x: hidden; color: #fff; }
+
+    .fluff-wrap { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+    .fluff { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.2; }
+    .fluff-1 { width: 700px; height: 700px; background: radial-gradient(circle, rgba(255,0,0,0.9), rgba(180,0,0,0.3), transparent 70%); animation: mf1 18s ease-in-out infinite; }
+    @keyframes mf1 { 0%,100% { transform: translate(5vw,10vh); } 33% { transform: translate(55vw,20vh); } 66% { transform: translate(30vw,60vh); } }
+    @media (prefers-reduced-motion: reduce) { .fluff-1 { animation: none; } * { transition: none !important; } }
+
+    .home-arrow {
+      position: fixed; top: 18px; left: 18px; z-index: 900; width: 42px; height: 42px;
+      display: flex; align-items: center; justify-content: center; border-radius: 12px;
+      background: rgba(255,0,0,0.08); border: 1px solid rgba(255,0,0,0.25); color: #ff2a2a; text-decoration: none;
+      backdrop-filter: blur(10px); box-shadow: 0 0 18px rgba(255,0,0,0.15); transition: .2s ease;
+    }
+    .home-arrow svg { width: 18px; height: 18px; display: block; }
+    .home-arrow:hover { transform: scale(1.1) translateX(-2px); border-color: rgba(255,0,0,0.5); }
+
+    .page { position: relative; z-index: 2; max-width: 1400px; margin: 0 auto; padding: 32px 28px 70px; }
+    .page-header { text-align: center; margin-bottom: 18px; }
+    .page-title { font-size: 18px; font-weight: normal; color: #ff2a2a; letter-spacing: 2px; margin-bottom: 8px; text-shadow: 0 0 18px rgba(255,0,0,0.45); }
+    .page-sub { font-size: 9px; color: rgba(255,200,200,0.4); letter-spacing: 1px; line-height: 1.8; }
+
+    .toolbar {
+      position: sticky; top: 0; z-index: 20; display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+      padding: 12px 0; margin-bottom: 14px;
+      background: linear-gradient(180deg, rgba(5,0,0,0.94), rgba(5,0,0,0.78) 70%, rgba(5,0,0,0));
+    }
+    .chips { display: flex; gap: 6px; flex: 1 1 360px; min-width: 0; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+    .chips::-webkit-scrollbar { display: none; }
+    .chip {
+      flex-shrink: 0; font-family: inherit; font-size: 8px; line-height: 1; letter-spacing: .3px; padding: 10px 14px; border-radius: 999px;
+      cursor: pointer; white-space: nowrap; color: rgba(255,200,200,0.75); background: rgba(255,255,255,0.04); border: 1px solid rgba(255,0,0,0.22);
+      transition: background .2s, color .2s, border-color .2s;
+    }
+    .chip:hover { border-color: rgba(255,0,0,0.55); color: #ffb3b3; }
+    .chip.on { color: #fff; background: linear-gradient(135deg, #ff2a2a, #b00000); border-color: transparent; box-shadow: 0 0 14px rgba(255,0,0,0.4); }
+    .search {
+      flex: 0 1 260px; min-width: 170px; padding: 11px 15px; border-radius: 999px; background: rgba(255,0,0,0.05);
+      border: 1px solid rgba(255,0,0,0.2); color: rgba(255,220,220,0.9); font-family: inherit; font-size: 8px; outline: none;
+    }
+    .search::placeholder { color: rgba(255,200,200,0.35); }
+    .search:focus { border-color: rgba(255,0,0,0.5); }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 28px 16px; }
+    .vcard { cursor: pointer; min-width: 0; animation: vin .4s ease both; }
+    @keyframes vin { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+    .thumb {
+      position: relative; aspect-ratio: 16 / 9; border-radius: 14px; overflow: hidden; background: #140000;
+      border: 1px solid rgba(255,0,0,0.18); transition: border-radius .2s, border-color .2s, box-shadow .2s;
+    }
+    .vcard:hover .thumb { border-radius: 6px; border-color: rgba(255,0,0,0.55); box-shadow: 0 0 22px rgba(255,0,0,0.25); }
+    .thumb img, .thumb video { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .tbadge {
+      position: absolute; right: 8px; bottom: 8px; font-size: 7px; line-height: 1; padding: 6px 7px; border-radius: 6px;
+      background: rgba(0,0,0,0.82); color: #fff; letter-spacing: .5px;
+    }
+    .tnew {
+      position: absolute; left: 8px; top: 8px; font-size: 7px; line-height: 1; padding: 6px 8px; border-radius: 6px;
+      background: #ff2a2a; color: #fff; letter-spacing: .5px; box-shadow: 0 0 12px rgba(255,0,0,0.6);
+    }
+    .tplay { position: absolute; left: 8px; bottom: 8px; font-size: 7px; line-height: 1; padding: 6px 7px; border-radius: 6px; background: rgba(0,0,0,0.82); color: #ff6b6b; }
+    .vmeta { display: flex; gap: 10px; margin-top: 12px; }
+    .vava {
+      width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; overflow: hidden; display: flex; align-items: center; justify-content: center;
+      background: rgba(255,0,0,0.12); border: 1px solid rgba(255,0,0,0.35); color: #ff6b6b; font-size: 10px;
+    }
+    .vava img { width: 100%; height: 100%; object-fit: cover; }
+    .vtext { min-width: 0; }
+    .vtitle {
+      font-size: 9px; line-height: 1.7; color: rgba(255,235,235,0.95); overflow-wrap: anywhere;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .vsub { font-size: 7px; line-height: 1.9; color: rgba(255,200,200,0.5); margin-top: 4px; overflow-wrap: anywhere; }
+    .vsub .stars { color: #ff4d4d; }
+
+    .empty { grid-column: 1 / -1; text-align: center; font-size: 9px; line-height: 2; color: rgba(255,200,200,0.4); padding: 60px 0; }
+
+    /* окно просмотра */
+    .modal { position: fixed; inset: 0; z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); }
+    .modal.open { display: flex; }
+    .mbox {
+      position: relative; width: min(980px, 100%); max-height: 100%; overflow-y: auto; border-radius: 18px;
+      background: rgba(10,0,0,0.98); border: 1px solid rgba(255,0,0,0.4); box-shadow: 0 0 60px rgba(255,0,0,0.2);
+    }
+    .mclose {
+      position: absolute; top: 10px; right: 10px; z-index: 5; width: 34px; height: 34px; border-radius: 50%; border: none; cursor: pointer;
+      background: rgba(0,0,0,0.7); color: #fff; font-size: 18px; line-height: 1;
+    }
+    .mclose:hover { background: rgba(255,0,0,0.6); }
+    .mmedia { position: relative; background: #000; display: flex; justify-content: center; }
+    .mmedia img, .mmedia video { max-width: 100%; max-height: 62vh; display: block; }
+    .marrow {
+      position: absolute; top: 50%; transform: translateY(-50%); width: 38px; height: 38px; border-radius: 50%; border: none; cursor: pointer;
+      background: rgba(0,0,0,0.65); color: #fff; font-size: 18px; display: none; align-items: center; justify-content: center;
+    }
+    .marrow:hover { background: rgba(255,0,0,0.6); }
+    .marrow.l { left: 10px; } .marrow.r { right: 10px; }
+    .mdots { display: flex; gap: 6px; justify-content: center; padding: 10px 0 0; }
+    .mdots span { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.25); cursor: pointer; }
+    .mdots span.on { background: #ff2a2a; box-shadow: 0 0 8px rgba(255,0,0,0.7); }
+    .minfo { padding: 16px 20px 20px; }
+    .mtype { font-size: 11px; line-height: 1.7; color: #ff4d4d; overflow-wrap: anywhere; }
+    .mtime { font-size: 8px; color: rgba(255,200,200,0.55); margin-top: 8px; line-height: 1.8; }
+    .mauthor { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 8px; color: rgba(255,200,200,0.55); overflow-wrap: anywhere; }
+    .mauthor img { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; }
+    .mauthor b { font-weight: normal; color: #ff6b6b; }
+    .mreview { margin-top: 14px; padding: 12px; border: 1px solid rgba(255,0,0,0.22); border-radius: 12px; background: rgba(255,0,0,0.05); }
+    .mreview:empty { display: none; }
+    .rhead { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .rhead img { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; }
+    .rauth { font-size: 9px; color: #ff6b6b; }
+    .rstars { font-size: 10px; color: #ff4d4d; letter-spacing: 1px; }
+    .rmeta { font-size: 7px; color: rgba(255,200,200,0.4); margin-top: 6px; line-height: 1.8; }
+    .rtext { font-size: 8px; color: rgba(255,235,235,0.9); margin-top: 8px; line-height: 2; overflow-wrap: anywhere; white-space: pre-wrap; }
+
+    .vpn-banner {
+      position: fixed; top: 16px; left: 50%; z-index: 1100; width: min(440px, calc(100vw - 24px));
+      background: rgba(8,0,0,0.97); border: 1px solid rgba(255,0,0,0.4); border-radius: 18px; padding: 14px 40px 12px 14px;
+      box-shadow: 0 0 40px rgba(255,0,0,0.18); transform: translate(-50%, -20px); opacity: 0; pointer-events: none;
+      transition: opacity .4s, transform .4s;
+    }
+    .vpn-banner.show { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+    .vpn-title { font-size: 9px; color: #ff2a2a; letter-spacing: 1px; line-height: 1.6; margin-bottom: 8px; }
+    .vpn-msg { font-size: 7px; color: rgba(255,200,200,.65); line-height: 2; }
+    .vpn-close { position: absolute; top: 8px; right: 10px; background: none; border: none; color: rgba(255,120,120,.8); font-size: 16px; cursor: pointer; padding: 4px; }
+
+    @media (max-width: 760px) {
+      .page { padding: 70px 14px 50px; }
+      .grid { grid-template-columns: 1fr; gap: 24px; }
+      .modal { padding: 8px; }
+    }
+  </style>
+</head>
+<body>
+
+<a class="home-arrow" href="https://mezets.github.io/mezets.design/" title="Назад">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+</a>
+
+<div class="fluff-wrap"><div class="fluff fluff-1"></div></div>
+
+<div class="vpn-banner" id="vpnBanner" role="alert">
+  <button type="button" class="vpn-close" id="vpnClose" aria-label="Закрыть">×</button>
+  <div class="vpn-title">Нет связи с сервером</div>
+  <div class="vpn-msg">Свежие работы и отзывы не загрузились — возможно, сервер заблокирован у твоего провайдера.<br>Включи VPN или другой способ обхода блокировок и обнови страницу.</div>
+</div>
+
+<div class="page">
+  <div class="page-header">
+    <h1 class="page-title">Портфолио</h1>
+    <div class="page-sub" id="pageSub">Все работы · Оформление вручную</div>
+  </div>
+
+  <div class="toolbar">
+    <div class="chips" id="chips"></div>
+    <input type="text" class="search" id="search" placeholder="Найти работу..." autocomplete="off">
+  </div>
+
+  <div class="grid" id="grid"></div>
+</div>
+
+<div class="modal" id="modal">
+  <div class="mbox">
+    <button type="button" class="mclose" id="mclose" aria-label="Закрыть">×</button>
+    <div class="mmedia" id="mmedia">
+      <button type="button" class="marrow l" id="mprev" aria-label="Назад">‹</button>
+      <button type="button" class="marrow r" id="mnext" aria-label="Вперёд">›</button>
+    </div>
+    <div class="mdots" id="mdots"></div>
+    <div class="minfo">
+      <div class="mtype" id="mtype"></div>
+      <div class="mtime" id="mtime"></div>
+      <div class="mauthor" id="mauthor"></div>
+      <div class="mreview" id="mreview"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var API  = 'https://mez.up.railway.app';
+  var SITE = 'https://mezets.github.io/mezets.design/';
+  var CACHE_KEY = 'mezets_portfolio_page_v1';
+  var CACHE_TTL = 30 * 24 * 3600 * 1000;
+
+  // Запасной список — на случай, если бэкенд недоступен. Основные данные приходят с сервера (/api/portfolio).
+  var FALLBACK = [{"img":"portfolio/mp4/f2c72d40df4751e3.mp4","type":"Анимированное оформление форумного аккаунта","time":"1 день"},{"img":"portfolio/mp4/1.mp4","type":"Анимированное оформление форумного аккаунта","time":"3 дня"},{"img":"portfolio/mp4/v1zerox122.mp4","type":"Анимированное оформление форумного аккаунта","time":"1 день"},{"img":"portfolio/png/02072026.png","type":"Оформление форумного раздела","time":"2 дня"},{"group":[{"img":"portfolio/png/280620261.png","type":"Оформление форумного аккаунта и раздела","time":"1 день"},{"img":"portfolio/png/280620262.png","type":"Оформление форумного аккаунта и раздела","time":"1 день"}]},{"img":"portfolio/mp4/d61caa09fc0a7268.mp4","type":"Анимированное оформление форумного аккаунта","time":"2 дня"},{"img":"portfolio/mp4/c5e015abe5ef5d24.mp4","type":"Анимированное оформление форумного аккаунта","time":"14 дней / С учётом ожиданий"},{"img":"portfolio/mp4/6e1c16cb73a4f0c7.mp4","type":"Анимированное оформление форумного аккаунта","time":"3 дня"},{"img":"portfolio/mp4/e826c60c70506a4e.mp4","type":"Анимированное оформление форумного аккаунта","time":"2 дня"},{"img":"portfolio/mp4/9cce42308c66a6fa.mp4","type":"Анимированное оформление форумного аккаунта","time":"2 дня"},{"img":"portfolio/mp4/637c6ea26a1fc236.mp4","type":"Анимированное оформление форумного аккаунта","time":"1 день"},{"img":"portfolio/mp4/c110732042b25a2b.mp4","type":"Анимированное оформление форумного аккаунта","time":"1 день"},{"img":"portfolio/mp4/2b5b754da85608e5.mp4","type":"Анимированное оформление форумного аккаунта","time":"1 день"},{"img":"portfolio/mp4/ca37069f0cb26cf0.mp4","type":"Анимированное оформление форумного аккаунта","time":"1 день"},{"group":[{"img":"portfolio/png/vk (3).png","type":"Оформление группы ВК","time":"2 дня"},{"img":"portfolio/png/vk (1).png","type":"Оформление группы ВК","time":"2 дня"},{"img":"portfolio/png/vk (2).png","type":"Оформление группы ВК","time":"2 дня"}]},{"img":"portfolio/png/321.png","type":"Оформление форумного аккаунта","time":"1 день"},{"img":"portfolio/mp4/9eae1af972e0c792.mp4","type":"Анимированное оформление форумного аккаунта","time":"1 день"},{"img":"portfolio/png/d48ccf921236f3c2126.png","type":"Оформление группы ВК","time":"1 день"},{"img":"portfolio/mp4/bc06898fd6fc67ab.mp4","type":"Анимированное оформление форумного аккаунта","time":"1 день"},{"img":"portfolio/png/a3290f724f898e3f.png","type":"Оформление форумного аккаунта","time":"1 день"},{"group":[{"img":"portfolio/mp4/21808c23072837b1.mp4","type":"Анимированное оформление форумного аккаунта","time":"1 день"},{"img":"portfolio/mp4/66fad8f99e42d879.mp4","type":"Анимированное оформление форумного аккаунта","time":"1 день"}]},{"img":"portfolio/mp4/c.mp4","type":"Анимированное оформление форумного аккаунта","time":"1 день"},{"img":"portfolio/png/148604a323a84573.png","type":"Оформление форумного аккаунта","time":"2 дня"},{"img":"portfolio/mp4/feedf0a20e18c140.mp4","type":"Анимированное оформление форумного аккаунта","time":"1 день"},{"group":[{"img":"portfolio/png/tv (2).png","type":"Оформление Twitch","time":"1 день"},{"img":"portfolio/png/tv (1).png","type":"Оформление Twitch","time":"1 день"}]},{"img":"portfolio/png/9ac3993015b2b9cf.png","type":"Оформление форумного аккаунта","time":"1 день"},{"img":"portfolio/png/ff7f32b0d6ba1011.png","type":"Оформление форумных разделов","time":"1 день"},{"img":"portfolio/png/11beebc137b1f5e9.png","type":"Оформление группы ВК","time":"2 дня"},{"img":"portfolio/mp4/9c45641283169ca6.mp4","type":"Анимированное оформление форумного аккаунта","time":"2 дня"},{"img":"portfolio/png/4fb69b3f3e108103.png","type":"Оформление форумного аккаунта","time":"1 день"},{"img":"portfolio/mp4/ae016f282b171634.mp4","type":"Анимированное оформление форумного аккаунта","time":"2 дня"},{"group":[{"img":"portfolio/png/dvizhpervih (6).png","type":"Оформление для <<Движения первых>>","time":"2 месяца / С учётом ожиданий"},{"img":"portfolio/png/dvizhpervih (7).png","type":"Оформление для <<Движения первых>>","time":"2 месяца / С учётом ожиданий"},{"img":"portfolio/png/dvizhpervih (8).png","type":"Оформление для <<Движения первых>>","time":"2 месяца / С учётом ожиданий"},{"img":"portfolio/png/dvizhpervih (1).png","type":"Оформление для <<Движения первых>>","time":"2 месяца / С учётом ожиданий"},{"img":"portfolio/png/dvizhpervih (2).png","type":"Оформление для <<Движения первых>>","time":"2 месяца / С учётом ожиданий"},{"img":"portfolio/png/dvizhpervih (3).png","type":"Оформление для <<Движения первых>>","time":"2 месяца / С учётом ожиданий"},{"img":"portfolio/png/dvizhpervih (5).png","type":"Оформление для <<Движения первых>>","time":"2 месяца / С учётом ожиданий"},{"img":"portfolio/png/dvizhpervih (4).png","type":"Оформление для <<Движения первых>>","time":"2 месяца / С учётом ожиданий"}]},{"img":"portfolio/png/9ef13f1bfc538763.png","type":"Оформление форумного аккаунта","time":"1 день"},{"img":"portfolio/png/prev.png","type":"Превью для YouTube","time":"2 дня"},{"img":"portfolio/mp4/5abbc31fb75cc879.mp4","type":"Анимированное оформление форумного аккаунта","time":"1 день"},{"img":"portfolio/png/2.png","type":"Оформление форумного аккаунта","time":"1 день"},{"img":"portfolio/mp4/9aea3cf2d065ca86.mp4","type":"Анимированное оформление форумного аккаунта","time":"1 день"},{"img":"portfolio/png/a3e33aad31bfabfe.png","type":"Оформление форумного аккаунта","time":"1 день"},{"img":"portfolio/mp4/b48e6dd5bea5da15.mp4","type":"Анимированное оформление форумного аккаунта","time":"2 дня"},{"img":"portfolio/mp4/3a39b97d42947ac6.mp4","type":"Анимированное оформление форумного аккаунта","time":"1 день"},{"img":"portfolio/png/ec777b88d33127a8.png","type":"Оформление форумного аккаунта","time":"2 дня"}]
+;
+
+  var entries = [];
+  var filterType = '';
+  var query = '';
+
+  function mediaUrl(src) {
+    if (!src) return '';
+    if (/^(https?:)?\/\//i.test(src) || src.charAt(0) === '/') return src;
+    return SITE + encodeURI(src).replace(/#/g, '%23');
+  }
+  function isVideo(src) { return /\.(mp4|webm|mov)(\?|$)/i.test(src || ''); }
+
+  function buildEntries(list) {
+    var out = [], groups = {};
+    list.forEach(function (it) {
+      if (!it || !it.img) return;
+      var item = { img: it.img, type: it.type || '', time: it.time || '', isNew: !!it.new, author: it.author || null, review: it.review || null };
+      if (it.group) {
+        if (!groups[it.group]) { groups[it.group] = []; out.push(groups[it.group]); }
+        groups[it.group].push(item);
+      } else out.push([item]);
+    });
+    // группы из запасного списка (вложенные массивы) разворачиваются отдельно
+    return out;
+  }
+  function buildFromFallback(list) {
+    var out = [];
+    list.forEach(function (e) {
+      var arr = (e.group ? e.group : [e]).filter(function (i) { return i && i.img; }).map(function (i) {
+        return { img: i.img, type: i.type || '', time: i.time || '', isNew: !!i.new, author: i.author || null, review: i.review || null };
+      });
+      if (arr.length) out.push(arr);
+    });
+    return out;
+  }
+
+  function cacheRead() {
+    try {
+      var o = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+      if (o && Date.now() - o.t < CACHE_TTL && Array.isArray(o.d) && o.d.length) return o.d;
+    } catch (e) {}
+    return null;
+  }
+  function cacheWrite(d) { try { localStorage.setItem(CACHE_KEY, JSON.stringify({ t: Date.now(), d: d })); } catch (e) {} }
+
+  /* ── фильтры ── */
+  function shortType(t) {
+    t = (t || '').toLowerCase();
+    if (t.indexOf('вк') !== -1 || t.indexOf('vk') !== -1) return 'ВК';
+    if (t.indexOf('аватар') !== -1) return 'Аватарки';
+    if (t.indexOf('discord') !== -1 || t.indexOf('дискорд') !== -1) return 'Discord';
+    if (t.indexOf('youtube') !== -1 || t.indexOf('превью') !== -1) return 'YouTube';
+    if (t.indexOf('twitch') !== -1) return 'Twitch';
+    if (t.indexOf('бот') !== -1) return 'Боты';
+    if (t.indexOf('раздел') !== -1 && t.indexOf('аккаунт') === -1) return 'Форумные разделы';
+    if (t.indexOf('аним') !== -1 && t.indexOf('форум') !== -1) return 'Форум · анимация';
+    if (t.indexOf('форум') !== -1) return 'Форум';
+    return 'Другое';
+  }
+  function renderChips() {
+    var counts = {}, order = [];
+    entries.forEach(function (g) { var k = shortType(g[0].type); if (!counts[k]) { counts[k] = 0; order.push(k); } counts[k]++; });
+    var box = document.getElementById('chips');
+    box.innerHTML = '';
+    function mk(label, val, n) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'chip' + (filterType === val ? ' on' : '');
+      b.textContent = label + (n != null ? ' ' + n : '');
+      b.onclick = function () { filterType = val; renderChips(); renderGrid(); };
+      box.appendChild(b);
+    }
+    mk('Все', '', entries.length);
+    order.forEach(function (k) { mk(k, k, counts[k]); });
+  }
+
+  /* ── сетка ── */
+  var vidObserver = ('IntersectionObserver' in window) ? new IntersectionObserver(function (list) {
+    list.forEach(function (e) {
+      var v = e.target;
+      if (e.isIntersecting && !v.src) { v.src = v.dataset.src; v.load(); vidObserver.unobserve(v); }
+    });
+  }, { rootMargin: '300px' }) : null;
+
+  function makeMedia(item) {
+    var url = mediaUrl(item.img);
+    if (isVideo(item.img)) {
+      var v = document.createElement('video');
+      v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'metadata';
+      v.dataset.src = url + '#t=0.1';
+      if (vidObserver) vidObserver.observe(v); else v.src = v.dataset.src;
+      return v;
+    }
+    var im = document.createElement('img');
+    im.src = url; im.alt = item.type; im.loading = 'lazy';
+    return im;
+  }
+
+  function stars(n) { n = n || 0; return '★'.repeat(n) + '☆'.repeat(Math.max(0, 5 - n)); }
+
+  function renderGrid() {
+    var grid = document.getElementById('grid');
+    grid.innerHTML = '';
+    var q = query.trim().toLowerCase();
+    var shown = 0;
+    entries.forEach(function (items, idx) {
+      var cover = items[0];
+      if (filterType && shortType(cover.type) !== filterType) return;
+      if (q) {
+        var hay = (cover.type + ' ' + cover.time + ' ' + items.map(function (i) { return i.author ? i.author.name : ''; }).join(' ')).toLowerCase();
+        if (hay.indexOf(q) === -1) return;
+      }
+      shown++;
+      var card = document.createElement('div');
+      card.className = 'vcard';
+      card.style.animationDelay = Math.min(shown, 12) * 0.03 + 's';
+
+      var thumb = document.createElement('div');
+      thumb.className = 'thumb';
+      thumb.appendChild(makeMedia(cover));
+      if (isVideo(cover.img)) { var pl = document.createElement('div'); pl.className = 'tplay'; pl.textContent = '▶'; thumb.appendChild(pl); }
+      if (items.length > 1) { var b = document.createElement('div'); b.className = 'tbadge'; b.textContent = '1/' + items.length; thumb.appendChild(b); }
+      if (items.some(function (i) { return i.isNew; })) { var nw = document.createElement('div'); nw.className = 'tnew'; nw.textContent = 'НОВОЕ'; thumb.appendChild(nw); }
+      card.appendChild(thumb);
+
+      var meta = document.createElement('div'); meta.className = 'vmeta';
+      var ava = document.createElement('div'); ava.className = 'vava';
+      var au = items.find(function (i) { return i.author && i.author.name; });
+      var rv = items.find(function (i) { return i.review && (i.review.rating || i.review.comment); });
+      if (au && au.author.avatar) { var ai = document.createElement('img'); ai.src = au.author.avatar; ai.alt = ''; ava.appendChild(ai); }
+      else ava.textContent = au ? au.author.name.charAt(0).toUpperCase() : 'M';
+      var tx = document.createElement('div'); tx.className = 'vtext';
+      var tt = document.createElement('div'); tt.className = 'vtitle'; tt.textContent = cover.type;
+      var sb = document.createElement('div'); sb.className = 'vsub';
+      var parts = [];
+      if (au) parts.push('Заказал: ' + au.author.name);
+      if (cover.time) parts.push(cover.time);
+      sb.textContent = parts.join(' · ');
+      if (rv) { var st = document.createElement('span'); st.className = 'stars'; st.textContent = ' ' + stars(rv.review.rating); sb.appendChild(st); }
+      tx.append(tt, sb);
+      meta.append(ava, tx);
+      card.appendChild(meta);
+
+      card.addEventListener('mouseenter', function () { var v = thumb.querySelector('video'); if (v && v.src) v.play().catch(function () {}); });
+      card.addEventListener('mouseleave', function () { var v = thumb.querySelector('video'); if (v) { v.pause(); v.currentTime = 0.1; } });
+      card.addEventListener('click', function () { openModal(items); });
+      grid.appendChild(card);
+    });
+    if (!shown) {
+      var em = document.createElement('div'); em.className = 'empty';
+      em.innerHTML = 'Ничего не нашлось.<br>Попробуй другое слово или выбери «Все».';
+      grid.appendChild(em);
+    }
+    document.getElementById('pageSub').textContent = 'Работ: ' + entries.length + ' · Оформление вручную';
+  }
+
+  /* ── окно просмотра ── */
+  var cur = [], ci = 0;
+  var modal = document.getElementById('modal');
+  function openModal(items) { cur = items; ci = 0; showSlide(); modal.classList.add('open'); document.body.style.overflow = 'hidden'; }
+  function closeModal() {
+    modal.classList.remove('open'); document.body.style.overflow = '';
+    var v = document.querySelector('#mmedia video'); if (v) v.pause();
+  }
+  function showSlide() {
+    var it = cur[ci];
+    var wrap = document.getElementById('mmedia');
+    Array.prototype.slice.call(wrap.querySelectorAll('img,video')).forEach(function (n) { n.remove(); });
+    var url = mediaUrl(it.img), el;
+    if (isVideo(it.img)) { el = document.createElement('video'); el.src = url; el.controls = true; el.autoplay = true; el.loop = true; el.playsInline = true; }
+    else { el = document.createElement('img'); el.src = url; el.alt = it.type; }
+    wrap.insertBefore(el, wrap.firstChild);
+
+    document.getElementById('mtype').textContent = it.type;
+    document.getElementById('mtime').textContent = it.time ? 'Срок выполнения: ' + it.time : '';
+
+    var ae = document.getElementById('mauthor'); ae.textContent = '';
+    if (it.author && it.author.name) {
+      var l = document.createElement('span'); l.textContent = 'Заказал:'; ae.appendChild(l);
+      if (it.author.avatar) { var av = document.createElement('img'); av.src = it.author.avatar; av.alt = ''; ae.appendChild(av); }
+      var nm = document.createElement('b'); nm.textContent = it.author.name; ae.appendChild(nm);
+    }
+
+    var re = document.getElementById('mreview'); re.textContent = '';
+    var rv = it.review;
+    if (rv && (rv.comment || rv.rating)) {
+      var h = document.createElement('div'); h.className = 'rhead';
+      if (rv.avatar) { var ra = document.createElement('img'); ra.src = rv.avatar; ra.alt = ''; h.appendChild(ra); }
+      var who = document.createElement('span'); who.className = 'rauth'; who.textContent = rv.author || 'Аноним'; h.appendChild(who);
+      var sr = document.createElement('span'); sr.className = 'rstars'; sr.textContent = stars(rv.rating); h.appendChild(sr);
+      re.appendChild(h);
+      var mt = [rv.date, rv.order ? 'Заказ ' + rv.order : '', rv.order_type].filter(Boolean).join(' · ');
+      if (mt) { var m = document.createElement('div'); m.className = 'rmeta'; m.textContent = mt; re.appendChild(m); }
+      if (rv.comment) { var t = document.createElement('div'); t.className = 'rtext'; t.textContent = rv.comment; re.appendChild(t); }
+    }
+
+    var multi = cur.length > 1;
+    document.getElementById('mprev').style.display = multi ? 'flex' : 'none';
+    document.getElementById('mnext').style.display = multi ? 'flex' : 'none';
+    var dots = document.getElementById('mdots'); dots.innerHTML = '';
+    if (multi) cur.forEach(function (_, i) {
+      var d = document.createElement('span'); if (i === ci) d.className = 'on';
+      d.onclick = function () { ci = i; showSlide(); }; dots.appendChild(d);
+    });
+  }
+  function step(d) { if (cur.length > 1) { ci = (ci + d + cur.length) % cur.length; showSlide(); } }
+  document.getElementById('mclose').onclick = closeModal;
+  document.getElementById('mprev').onclick = function () { step(-1); };
+  document.getElementById('mnext').onclick = function () { step(1); };
+  modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
+  document.addEventListener('keydown', function (e) {
+    if (!modal.classList.contains('open')) return;
+    if (e.key === 'Escape') closeModal();
+    else if (e.key === 'ArrowLeft') step(-1);
+    else if (e.key === 'ArrowRight') step(1);
+  });
+
+  document.getElementById('search').addEventListener('input', function (e) { query = e.target.value; renderGrid(); });
+
+  /* ── плашка про VPN ── */
+  var vpnOff = false;
+  document.getElementById('vpnClose').onclick = function () { vpnOff = true; document.getElementById('vpnBanner').classList.remove('show'); };
+  function vpn(on) { if (on && vpnOff) return; document.getElementById('vpnBanner').classList.toggle('show', on); }
+
+  /* ── загрузка ── */
+  function sig(list) { return JSON.stringify(list.map(function (g) { return g.map(function (i) { return [i.img, i.type, i.time, i.isNew, i.author && i.author.name, i.review && [i.review.author, i.review.rating, i.review.comment]]; }); })); }
+
+  function setEntries(list) {
+    if (sig(list) === sig(entries)) return;
+    entries = list;
+    if (filterType && !entries.some(function (g) { return shortType(g[0].type) === filterType; })) filterType = '';
+    renderChips(); renderGrid();
+  }
+
+  var cached = cacheRead();
+  setEntries(cached ? buildEntries(cached) : buildFromFallback(FALLBACK));
+
+  (function load() {
+    var ctrl = new AbortController();
+    var timer = setTimeout(function () { ctrl.abort(); }, 8000);
+    fetch(API + '/api/portfolio', { mode: 'cors', signal: ctrl.signal })
+      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(function (data) {
+        clearTimeout(timer);
+        vpn(false);
+        if (!Array.isArray(data.items) || !data.items.length) return;
+        cacheWrite(data.items);
+        setEntries(buildEntries(data.items));
+      })
+      .catch(function () { clearTimeout(timer); vpn(true); });
+  })();
+</script>
+</body>
+</html>
