@@ -1234,13 +1234,12 @@
       position: fixed;
       bottom: 28px;
       left: 28px;
-      z-index: 1000;
+      z-index: 999;
       width: 240px;
-      max-width: calc(100vw - 32px);
       background: rgba(8,0,0,0.97);
       border: 1px solid rgba(255,0,0,0.4);
       border-radius: 18px;
-      padding: 14px 40px 12px 14px;
+      padding: 14px 34px 12px 14px;
       font-family: 'Press Start 2P', monospace;
       box-shadow: 0 0 40px rgba(255,0,0,0.18);
       transform: translateY(20px);
@@ -1251,6 +1250,7 @@
     .vpn-banner.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
     .vpn-banner-title { font-size: 9px; color: #ff2a2a; letter-spacing: 1px; line-height: 1.6; margin-bottom: 8px; }
     .vpn-banner-msg { font-size: 7px; color: rgba(255,200,200,.65); line-height: 2; letter-spacing: .5px; }
+    @media (max-width: 600px) { .vpn-banner { bottom: 16px; left: 8px; width: 200px; } }
     .vpn-banner-close {
       position: absolute; top: 8px; right: 10px;
       background: none; border: none; color: rgba(255,120,120,.8);
@@ -1275,7 +1275,6 @@
       .card { width: 100%; max-width: 340px; }
       .koleso-btn { width: 56px; height: 56px; bottom: 16px; right: 16px; }
       .maint-toast { bottom: 16px; left: 8px; right: auto; width: 200px; }
-      .vpn-banner { bottom: 16px; left: 8px; right: auto; width: 200px; }
       .float-winners { display: none; }
       .bottom-nav-btn { width: 100%; max-width: 340px; }
       .bottom-nav { padding: 8px 16px 40px; gap: 12px; }
@@ -2161,7 +2160,6 @@
     html.has-cursor .portfolio-fs-img-wrap, html.has-cursor .portfolio-fs-img-wrap * { cursor: zoom-in !important; }
     html.has-cursor .portfolio-fs-img-wrap.zoomed, html.has-cursor .portfolio-fs-img-wrap.zoomed * { cursor: zoom-out !important; }
 </style>
-
 </head>
 <body>
 <div id="banOverlay" style="display:none; position:fixed; inset:0; z-index:999999; background:radial-gradient(ellipse at center, #2a0000 0%, #050000 75%); color:#fff; align-items:center; justify-content:center; text-align:center; flex-direction:column; padding:24px;">
@@ -2398,6 +2396,7 @@
 </div>
 
 <div class="bottom-nav">
+  <a class="btn bottom-nav-btn" href="/mezets.design/portfolio/">Портфолио</a>
   <a class="btn bottom-nav-btn" href="/mezets.design/prices">Цены на оформление</a>
   <a class="btn bottom-nav-btn" href="/mezets.design/rules">Правила оформления</a>
 </div>
