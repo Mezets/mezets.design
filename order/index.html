@@ -378,6 +378,126 @@ html.has-cursor input, html.has-cursor textarea, html.has-cursor select { cursor
 
 .empty-chat { font-size: 8px; color: rgba(255,200,200,0.3); text-align: center; padding: 60px 20px; }
 </style>
+<style>
+/* ═════ РЕДИЗАЙН ЧАТА ЗАКАЗА ═════ */
+.logo { text-shadow: 0 0 20px rgba(255,40,40,0.7), 0 0 44px rgba(255,0,0,0.3); }
+.logo img { filter: drop-shadow(0 0 12px rgba(255,0,0,0.5)); }
+
+.btn {
+  background: linear-gradient(180deg, rgba(255,50,50,0.16), rgba(255,0,0,0.05));
+  border: 1px solid rgba(255,70,70,0.35); border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(255,0,0,0.12), inset 0 1px 0 rgba(255,160,160,0.18);
+  transition: transform .2s cubic-bezier(.22,1,.36,1), border-color .2s, box-shadow .25s, background .25s, color .2s;
+}
+.btn:hover { transform: translateY(-2px); color: #fff; background: linear-gradient(180deg, rgba(255,60,60,0.32), rgba(255,0,0,0.12)); border-color: rgba(255,90,90,0.8); box-shadow: 0 10px 28px rgba(255,0,0,0.35), inset 0 1px 0 rgba(255,190,190,0.3); }
+.btn:active { transform: scale(.96); }
+.btn-danger { background: linear-gradient(180deg, rgba(255,40,40,0.35), rgba(140,0,0,0.25)); border-color: rgba(255,90,90,0.6); color: #fff; }
+
+.card, .order-panel {
+  background: linear-gradient(165deg, rgba(44,0,0,0.96), rgba(10,0,0,0.98) 55%);
+  border: 1px solid rgba(255,70,70,0.4); border-radius: 26px;
+  box-shadow: 0 28px 90px rgba(0,0,0,0.7), 0 0 60px rgba(255,0,0,0.18), inset 0 1px 0 rgba(255,150,150,0.15);
+}
+.card:hover { border-color: rgba(255,90,90,0.6); box-shadow: 0 28px 90px rgba(0,0,0,0.7), 0 0 80px rgba(255,0,0,0.26), inset 0 1px 0 rgba(255,150,150,0.2); }
+.order-panel::before {
+  content: ''; position: absolute; left: 0; right: 0; top: 0; height: 130px; pointer-events: none; border-radius: 26px 26px 0 0;
+  background: radial-gradient(ellipse at 50% -20%, rgba(255,40,40,0.25), transparent 70%);
+}
+.order-panel > * { position: relative; }
+.order-panel-head { padding: 22px 26px 16px; border-bottom: 1px solid rgba(255,70,70,0.22); border-radius: 26px 26px 0 0; }
+.order-panel-title { font-size: 15px; text-shadow: 0 0 16px rgba(255,40,40,0.8), 0 0 36px rgba(255,0,0,0.4); }
+.order-panel-meta { margin-top: 10px; line-height: 2.4; }
+.meta-trigger {
+  text-decoration: none; padding: 5px 10px; margin: 0 2px; border-radius: 999px; color: #ff9b9b;
+  background: rgba(255,0,0,0.08); border: 1px solid rgba(255,70,70,0.28);
+  transition: background .2s, border-color .2s, color .2s, transform .2s cubic-bezier(.22,1,.36,1);
+}
+.meta-trigger:hover { color: #fff; background: rgba(255,0,0,0.22); border-color: rgba(255,100,100,0.7); transform: translateY(-1px); }
+
+/* сообщения */
+.order-panel .chat-box { padding: 20px 26px; gap: 12px; scrollbar-width: thin; scrollbar-color: rgba(255,0,0,0.4) transparent; }
+.chat-box::-webkit-scrollbar { width: 6px; }
+.chat-box::-webkit-scrollbar-track { background: transparent; }
+.chat-box::-webkit-scrollbar-thumb { background: rgba(255,0,0,0.4); border-radius: 6px; }
+.msg-row { gap: 9px; }
+.msg-avatar { width: 30px; height: 30px; font-size: 10px; border-width: 2px; box-shadow: 0 0 14px rgba(255,0,0,0.25); }
+img.msg-avatar { border: 2px solid rgba(255,70,70,0.5); }
+.msg { padding: 13px 16px; border-radius: 18px; box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+.msg-user {
+  background: linear-gradient(135deg, rgba(255,50,50,0.28), rgba(150,0,0,0.2));
+  border: 1px solid rgba(255,90,90,0.4); border-bottom-right-radius: 5px;
+  box-shadow: 0 6px 22px rgba(255,0,0,0.16), inset 0 1px 0 rgba(255,170,170,0.18);
+}
+.msg-discord {
+  background: linear-gradient(135deg, rgba(255,255,255,0.07), rgba(255,255,255,0.025));
+  border: 1px solid rgba(255,255,255,0.12); border-bottom-left-radius: 5px;
+  backdrop-filter: blur(6px);
+}
+.msg-system { background: none; box-shadow: none; padding: 0; }
+.msg-system .msg-text {
+  display: inline-block; font-style: normal; padding: 7px 14px; border-radius: 999px;
+  background: rgba(255,0,0,0.07); border: 1px solid rgba(255,70,70,0.2); color: rgba(255,190,190,0.7);
+}
+.msg-author { font-size: 7px; color: #ff9b9b; letter-spacing: .5px; }
+.msg-text { font-size: 10px; line-height: 1.75; color: #fff; }
+.msg-time { color: rgba(255,170,170,0.45); }
+.msg-attachment { border-radius: 10px; padding: 6px 10px; background: rgba(255,0,0,0.08); border: 1px solid rgba(255,70,70,0.3); color: #ffb3b3; }
+.msg-attachment:hover { background: rgba(255,0,0,0.2); border-color: rgba(255,100,100,0.7); }
+.msg-attachment-img { border-radius: 14px; border: 1px solid rgba(255,70,70,0.35); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+.msg-attachment-img:hover { border-color: rgba(255,100,100,0.8); box-shadow: 0 8px 28px rgba(255,0,0,0.3); }
+
+/* поле ввода */
+.order-panel-input { padding: 14px 26px 22px; border-top: 1px solid rgba(255,70,70,0.22); gap: 10px; align-items: center; }
+.chat-input {
+  padding: 15px 18px; border-radius: 16px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,70,70,0.28);
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.4); transition: border-color .2s, box-shadow .25s, background .2s;
+}
+.order-panel .chat-input { font-size: 8px; padding: 15px 18px; }
+.chat-input:focus { border-color: rgba(255,90,90,0.75); background: rgba(40,0,0,0.5); box-shadow: inset 0 2px 8px rgba(0,0,0,0.4), 0 0 0 3px rgba(255,0,0,0.14), 0 0 22px rgba(255,0,0,0.2); }
+.chat-input::placeholder { color: rgba(255,150,150,0.3); }
+.chat-send {
+  padding: 14px 18px; border-radius: 14px; color: #fff;
+  background: linear-gradient(180deg, rgba(255,60,60,0.6), rgba(190,0,0,0.4)); border: 1px solid rgba(255,110,110,0.6);
+  box-shadow: 0 6px 22px rgba(255,0,0,0.35), inset 0 1px 0 rgba(255,190,190,0.35);
+}
+.chat-file-btn { padding: 14px 15px; border-radius: 14px; }
+
+/* всплывающие окна полей */
+.field-popover {
+  padding: 18px; border-radius: 20px; background: linear-gradient(170deg, rgba(40,0,0,0.99), rgba(10,0,0,0.99));
+  border: 1px solid rgba(255,70,70,0.4); box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 40px rgba(255,0,0,0.16);
+}
+.field-popover label, .order-label { color: rgba(255,170,170,0.75); font-size: 7px; }
+.order-select, .order-textarea {
+  border-radius: 14px; background-color: rgba(0,0,0,0.38); border: 1px solid rgba(255,70,70,0.28);
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.4);
+}
+.order-select {
+  -webkit-appearance: none; appearance: none; padding-right: 36px;
+  background-image: linear-gradient(45deg, transparent 50%, #ff6b6b 50%), linear-gradient(135deg, #ff6b6b 50%, transparent 50%);
+  background-position: calc(100% - 20px) 52%, calc(100% - 14px) 52%; background-size: 6px 6px, 6px 6px; background-repeat: no-repeat;
+}
+.order-select:hover { border-color: rgba(255,90,90,0.65); }
+.order-select:focus, .order-textarea:focus { border-color: rgba(255,90,90,0.75); box-shadow: inset 0 2px 8px rgba(0,0,0,0.4), 0 0 0 3px rgba(255,0,0,0.14), 0 0 22px rgba(255,0,0,0.2); }
+.order-item-cb { border-radius: 12px; padding: 8px 10px; background: rgba(255,0,0,0.05); border: 1px solid rgba(255,70,70,0.18); transition: border-color .2s, background .2s, transform .2s cubic-bezier(.22,1,.36,1); }
+.order-item-cb:hover { transform: translateX(3px); border-color: rgba(255,90,90,0.55); background: rgba(255,0,0,0.1); }
+.item-stepper-btn { border-radius: 8px; }
+.order-edit-total { border-radius: 14px; padding: 10px 14px; background: linear-gradient(135deg, rgba(255,0,0,0.12), rgba(255,0,0,0.03)); border: 1px solid rgba(255,80,80,0.35); }
+.order-cat-viewport, .order-cat-arrow { border-radius: 14px; }
+.chip { padding: 9px 13px; }
+.status { border-radius: 12px; }
+
+.order-info-left .order-id { text-shadow: 0 0 14px rgba(255,40,40,0.7); }
+.order-status-badge { border-radius: 999px; padding: 7px 14px; background: rgba(255,255,255,0.04); }
+.order-desc-box { border-radius: 14px; background: rgba(255,0,0,0.04); border: 1px solid rgba(255,70,70,0.2); }
+
+@media (prefers-reduced-motion: reduce) { .btn:hover, .order-item-cb:hover, .meta-trigger:hover { transform: none; } }
+@media (max-width: 600px) {
+  .order-panel-head { padding: 18px 16px 12px; }
+  .order-panel .chat-box { padding: 14px 14px; }
+  .order-panel-input { padding: 12px 14px 16px; }
+}
+</style>
 <!-- mz-vpn-banner -->
 <style>
   .vpn-banner { position: fixed; bottom: 28px; left: 28px; z-index: 99995; width: 240px; background: rgba(8,0,0,0.97); border: 1px solid rgba(255,0,0,0.4); border-radius: 18px; padding: 14px 34px 12px 14px; font-family: 'Press Start 2P', monospace; box-shadow: 0 0 40px rgba(255,0,0,0.18); transform: translateY(20px); opacity: 0; pointer-events: none; transition: opacity .4s cubic-bezier(.22,1,.36,1), transform .4s cubic-bezier(.22,1,.36,1); }
