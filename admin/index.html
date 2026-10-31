@@ -2489,8 +2489,17 @@ async function loadRules() {
         const data = await res.json();
         rulesData = (data.rules || []).map(r => ({ title: r.title, text: r.text, important: !!r.important }));
         rulesSource = 'backend';
+        if (rulesData.length) {
+          rulesLoaded = true;
+          renderRules();
+          return;
+        }
+        // в БД правил ещё нет (пустой список) — берём текущие со страницы на GitHub, после «Сохранить» они попадут в БД
+        const f0 = await ghReadRules();
+        rulesData = parseRules(f0.html);
         rulesLoaded = true;
         renderRules();
+        showStatus(rulesStatusEl(), 'В базе правил пока нет — загружены текущие правила со страницы сайта. Нажми «Сохранить все изменения», чтобы перенести их в базу.', 'info');
         return;
       }
       if (res.status !== 404) backendErr = new Error(res.status === 403 ? 'Неверный ключ администратора' : 'Сервер ответил ' + res.status);
@@ -2571,6 +2580,14 @@ async function saveRules() {
       master: true, method: 'POST',
       body: { rules: rulesData.map(r => ({ title: r.title, text: r.text, important: !!r.important })) },
     });
+    if (res.status === 404) {
+      // на бэкенде нет эндпоинта сохранения правил — пишем прямо в rules/index.html на GitHub
+      rulesSource = 'github';
+      showStatus(status, 'Бэкенд без обновления — сохраняю на GitHub...', 'info');
+      const r0 = await writeRulesToGithub();
+      showStatus(status, r0 === 'same' ? 'Изменений нет — на сайте уже такие же правила' : 'Правила сохранены на GitHub и проверены. Сайт обновится через минуту-две.', r0 === 'same' ? 'info' : 'ok');
+      return;
+    }
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       const map = {
