@@ -422,10 +422,10 @@
     .portfolio-section {
       position: relative;
       z-index: 2;
-      max-width: 1000px;
+      max-width: 1240px;
       margin: 0 auto;
-      padding: 10px 24px 30px;
-      perspective: 1000px;
+      padding: 10px 24px 40px;
+      perspective: 1200px;
     }
     .portfolio-title {
       font-size: 13px;
@@ -441,13 +441,15 @@
       width: 100%;
       cursor: grab;
       touch-action: pan-y;
-      padding: 10px 0;
+      padding: 26px 0 30px;
       border-radius: 16px;
       box-shadow: 0 0 32px rgba(255,0,0,0.1);
+      transition: box-shadow .5s ease;
       mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
       -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
     }
     .portfolio-track-wrap.dragging { cursor: grabbing; }
+    .portfolio-track-wrap.paused { box-shadow: 0 0 60px rgba(255,0,0,0.22), inset 0 0 40px rgba(255,0,0,0.06); }
     .portfolio-track {
       display: flex;
       gap: 14px;
@@ -455,14 +457,14 @@
     }
     .portfolio-card {
       flex-shrink: 0;
-      width: 240px;
-      border-radius: 14px;
+      width: 330px;
+      border-radius: 18px;
       overflow: hidden;
       border: 1px solid rgba(255,0,0,0.22);
       background: rgba(255,0,0,0.04);
       box-shadow: 0 0 22px rgba(255,0,0,0.1);
       cursor: pointer;
-      transition: border-color .2s, box-shadow .2s, transform .1s ease-out;
+      transition: border-color .25s, box-shadow .3s, transform .18s ease-out, opacity .35s ease, filter .35s ease;
       user-select: none;
       -webkit-user-select: none;
       position: relative;
@@ -470,29 +472,69 @@
       will-change: transform;
     }
     .portfolio-card:hover {
-      border-color: rgba(255,0,0,0.45);
-      box-shadow: 0 0 40px rgba(255,0,0,0.22);
+      border-color: rgba(255,60,60,0.8);
+      box-shadow: 0 18px 50px rgba(255,0,0,0.35), 0 0 36px rgba(255,0,0,0.3);
+      z-index: 3;
+    }
+    /* соседние карточки притухают, пока смотришь на одну */
+    .portfolio-track:has(.portfolio-card:hover) .portfolio-card:not(:hover) {
+      opacity: .5;
+      filter: saturate(.6) blur(1.2px);
+    }
+    .portfolio-card-media { position: relative; overflow: hidden; }
+    .portfolio-card-media img,
+    .portfolio-card-media video { transition: transform .6s cubic-bezier(.22,1,.36,1); }
+    .portfolio-card:hover .portfolio-card-media img,
+    .portfolio-card:hover .portfolio-card-media video { transform: scale(1.09); }
+    /* блик, следующий за курсором */
+    .portfolio-card-glare {
+      position: absolute; inset: 0; pointer-events: none; opacity: 0;
+      background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,0.28), rgba(255,60,60,0.12) 35%, transparent 60%);
+      mix-blend-mode: screen; transition: opacity .3s ease;
+    }
+    .portfolio-card:hover .portfolio-card-glare { opacity: 1; }
+    /* бегущая красная полоска сверху при наведении */
+    .portfolio-card::before {
+      content: ''; position: absolute; left: 0; top: 0; height: 3px; width: 100%; z-index: 4; pointer-events: none;
+      background: linear-gradient(90deg, transparent, #ff2a2a, #ff9b9b, #ff2a2a, transparent);
+      background-size: 200% 100%; opacity: 0; transform: scaleX(.3); transition: opacity .3s, transform .4s ease;
+    }
+    .portfolio-card:hover::before { opacity: 1; transform: scaleX(1); animation: pcShine 1.4s linear infinite; }
+    @keyframes pcShine { to { background-position: -200% 0; } }
+    /* плашка «Смотреть» выезжает снизу */
+    .portfolio-card-open {
+      position: absolute; left: 50%; bottom: 14px; z-index: 4; pointer-events: none;
+      transform: translate(-50%, 16px); opacity: 0; white-space: nowrap;
+      font-size: 8px; letter-spacing: 1px; color: #fff; padding: 9px 14px; border-radius: 999px;
+      background: linear-gradient(135deg, #ff2a2a, #b00000); box-shadow: 0 0 20px rgba(255,0,0,0.6);
+      transition: opacity .3s ease, transform .4s cubic-bezier(.22,1,.36,1);
+    }
+    .portfolio-card:hover .portfolio-card-open { opacity: 1; transform: translate(-50%, 0); }
+    @media (hover: none) { .portfolio-card-open, .portfolio-card-glare { display: none; } }
+    @media (prefers-reduced-motion: reduce) {
+      .portfolio-card:hover::before { animation: none; }
+      .portfolio-card:hover .portfolio-card-media img, .portfolio-card:hover .portfolio-card-media video { transform: none; }
     }
     .portfolio-card img,
     .portfolio-card video {
       width: 100%;
-      height: 170px;
+      height: 235px;
       object-fit: cover;
       display: block;
       pointer-events: none;
       background: #000;
     }
     .portfolio-card-info {
-      padding: 9px 10px;
+      padding: 12px 14px 13px;
     }
     .portfolio-card-type {
-      font-size: 8px;
+      font-size: 10px;
       color: rgba(255,225,225,0.9);
       line-height: 1.6;
       letter-spacing: .3px;
     }
     .portfolio-card-time {
-      font-size: 7px;
+      font-size: 8px;
       color: rgba(255,150,150,0.55);
       margin-top: 4px;
       letter-spacing: .3px;
@@ -540,9 +582,9 @@
     }
     @media (max-width: 600px) {
       .portfolio-section { padding: 6px 12px 24px; }
-      .portfolio-card { width: 175px; }
+      .portfolio-card { width: 250px; }
       .portfolio-card img,
-      .portfolio-card video { height: 125px; }
+      .portfolio-card video { height: 175px; }
     }
 
     .portfolio-modal-overlay {
@@ -4314,7 +4356,17 @@
 
         const card = document.createElement('div');
         card.className = 'portfolio-card';
-        card.appendChild(buildCardMedia(cover));
+        const mediaBox = document.createElement('div');
+        mediaBox.className = 'portfolio-card-media';
+        mediaBox.appendChild(buildCardMedia(cover));
+        const glare = document.createElement('div');
+        glare.className = 'portfolio-card-glare';
+        mediaBox.appendChild(glare);
+        card.appendChild(mediaBox);
+        const openPill = document.createElement('div');
+        openPill.className = 'portfolio-card-open';
+        openPill.textContent = 'СМОТРЕТЬ →';
+        card.appendChild(openPill);
 
         if (items.length > 1) {
           const badge = document.createElement('div');
@@ -4352,18 +4404,18 @@
           if (!portfolioDragged) openPortfolioModal(items);
         });
 
-        if (rep === 0) {
-          card.addEventListener('mousemove', e => {
-            if (portfolioDown) return;
-            const r = card.getBoundingClientRect();
-            const x = (e.clientX - r.left) / r.width  - 0.5;
-            const y = (e.clientY - r.top)  / r.height - 0.5;
-            card.style.transform = `rotateY(${x*10}deg) rotateX(${-y*10}deg)`;
-          });
-          card.addEventListener('mouseleave', () => {
-            card.style.transform = '';
-          });
-        }
+        card.addEventListener('mousemove', e => {
+          if (portfolioDown) return;
+          const r = card.getBoundingClientRect();
+          const x = (e.clientX - r.left) / r.width  - 0.5;
+          const y = (e.clientY - r.top)  / r.height - 0.5;
+          card.style.setProperty('--mx', ((x + 0.5) * 100).toFixed(1) + '%');
+          card.style.setProperty('--my', ((y + 0.5) * 100).toFixed(1) + '%');
+          card.style.transform = `translateY(-10px) scale(1.05) rotateY(${x*12}deg) rotateX(${-y*12}deg)`;
+        });
+        card.addEventListener('mouseleave', () => {
+          card.style.transform = '';
+        });
 
         portfolioTrack.appendChild(card);
       });
@@ -4377,6 +4429,7 @@
   let portfolioBaseX    = 0;
   let portfolioPaused   = false;
   let portfolioLastTs   = null;
+  let portfolioSpeedK   = 1;      // 0..1 — плавный разгон/торможение ленты
   const PORTFOLIO_SPEED = 36; // px/сек
 
   const portfolioReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -4406,8 +4459,11 @@
     if (portfolioLastTs === null) portfolioLastTs = ts;
     const dt = (ts - portfolioLastTs) / 1000;
     portfolioLastTs = ts;
-    if (!portfolioPaused && !portfolioDown && PORTFOLIO_ITEMS.length > 1) {
-      portfolioApply(portfolioWrap(portfolioX - PORTFOLIO_SPEED * dt));
+    const target = (portfolioPaused || portfolioDown) ? 0 : 1;
+    portfolioSpeedK += (target - portfolioSpeedK) * Math.min(1, dt * 5);
+    if (portfolioSpeedK < 0.003) portfolioSpeedK = 0;
+    if (!portfolioDown && portfolioSpeedK > 0 && PORTFOLIO_ITEMS.length > 1) {
+      portfolioApply(portfolioWrap(portfolioX - PORTFOLIO_SPEED * portfolioSpeedK * dt));
     }
     requestAnimationFrame(portfolioTick);
   }
@@ -4442,8 +4498,8 @@
     window.addEventListener('touchmove',  portfolioPointerMove, { passive: false });
     window.addEventListener('mouseup',    portfolioPointerUp);
     window.addEventListener('touchend',   portfolioPointerUp);
-    portfolioTrackWrap.addEventListener('mouseenter', () => { portfolioPaused = true;  });
-    portfolioTrackWrap.addEventListener('mouseleave', () => { portfolioPaused = false; });
+    portfolioTrackWrap.addEventListener('mouseenter', () => { portfolioPaused = true;  portfolioTrackWrap.classList.add('paused'); });
+    portfolioTrackWrap.addEventListener('mouseleave', () => { portfolioPaused = false; portfolioTrackWrap.classList.remove('paused'); });
   }
 
   (function () {   // сначала из кэша на компьютере (хранится месяц), потом с сервера
