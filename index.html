@@ -501,16 +501,7 @@
     }
     .portfolio-card:hover::before { opacity: 1; transform: scaleX(1); animation: pcShine 1.4s linear infinite; }
     @keyframes pcShine { to { background-position: -200% 0; } }
-    /* плашка «Смотреть» выезжает снизу */
-    .portfolio-card-open {
-      position: absolute; left: 50%; bottom: 14px; z-index: 4; pointer-events: none;
-      transform: translate(-50%, 16px); opacity: 0; white-space: nowrap;
-      font-size: 8px; letter-spacing: 1px; color: #fff; padding: 9px 14px; border-radius: 999px;
-      background: linear-gradient(135deg, #ff2a2a, #b00000); box-shadow: 0 0 20px rgba(255,0,0,0.6);
-      transition: opacity .3s ease, transform .4s cubic-bezier(.22,1,.36,1);
-    }
-    .portfolio-card:hover .portfolio-card-open { opacity: 1; transform: translate(-50%, 0); }
-    @media (hover: none) { .portfolio-card-open, .portfolio-card-glare { display: none; } }
+    @media (hover: none) { .portfolio-card-glare { display: none; } }
     @media (prefers-reduced-motion: reduce) {
       .portfolio-card:hover::before { animation: none; }
       .portfolio-card:hover .portfolio-card-media img, .portfolio-card:hover .portfolio-card-media video { transform: none; }
@@ -4363,10 +4354,6 @@
         glare.className = 'portfolio-card-glare';
         mediaBox.appendChild(glare);
         card.appendChild(mediaBox);
-        const openPill = document.createElement('div');
-        openPill.className = 'portfolio-card-open';
-        openPill.textContent = 'СМОТРЕТЬ →';
-        card.appendChild(openPill);
 
         if (items.length > 1) {
           const badge = document.createElement('div');
