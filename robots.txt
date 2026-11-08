@@ -1,10 +1,4 @@
 User-agent: *
-Disallow: /assets/css/
-Disallow: /assets/js/
-Disallow: /*?*
-Disallow: /*%*
+Allow: /
 
-Allow: /assets/img/
-Allow: /assets/images/
-
-Sitemap: https://mezets.github.io/mezets.design/
+Sitemap: https://mezets.github.io/mezets.design/sitemap.xml
